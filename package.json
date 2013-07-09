@@ -1,0 +1,34 @@
+{
+	"name": "nessa.js",
+	"version": "0.0.1",
+	"author": "Martin Purcell <martin.purcell@gmail.com>",
+	"description": "Nessa - TV Media Manager",
+	"private": true,
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/greebowarrior/nessa.git"
+	},
+	"dependencies": {
+		"express": "3.x.x",
+		"feedparser": "0.16.1",
+		"log4js": "0.6.x",
+		"mime": "1.2.9",
+		"nconf": "0.6.7",
+		"mkdirp": "0.3.5",
+		"node-schedule": "0.1.8",
+		"node-uuid": "1.4.x",
+		"request": "2.21.x",
+		"qs": "0.6.x",
+		"socket.io": "0.9.x",
+		"sqlite3": "2.1.x",
+		"transmission": "0.2.x",
+		"tvdb": "0.0.12",
+		"twilio": "1.1.x",
+		"url": "0.7.x",
+		"xml2js": "0.2.x",
+		"xtend": "2.0.x"
+	},
+	"engines": {
+		"node": ">=0.8.11"
+	}
+}

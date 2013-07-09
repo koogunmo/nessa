@@ -1,0 +1,115 @@
+@import url('reset.css');
+
+html {
+	height: 100%;
+	width: 100%;
+}
+
+body {
+	background-color: #4E5969;
+	color: #FFFFFF;
+	font-family: Helvetica, Verdana, Arial, sans-serif;
+	font-size: 10px;
+	height: 100%;
+	position: relative;
+	width: 100%;
+}
+
+a {
+	color: #CCCCCC;
+	font-weight: normal;
+	text-decoration: none;
+	transition: all 0.5s;
+	-webkit-transition: all 0.5s;
+}
+a:hover {
+	color: #FFFFFF;
+}
+
+nav {
+	background-color: #5C697B;
+	border-bottom: 1px solid #CCCCCC;
+	box-shadow: 0px 0px 20px #000000;
+	height: 30px;
+	left: 0px;
+	position: fixed;
+	top: 0px;
+	width: 100%;
+	z-index: 10;
+}
+nav ul {
+	border-collapse: collapse;
+	display: table;
+	height: 100%;
+	position: relative;
+	width: 100%;
+}
+nav ul li {
+	display: table-cell;
+	height: 30px;
+	position: relative;
+	text-align: center;
+	transition: all 0.5s;
+	-webkit-transition: all 0.5s;
+}
+nav ul li:hover {
+	background-color: #545f70;
+}
+
+nav ul li a {
+	color: #CCCCCC;
+	display: block;
+	font-size: 18px;
+	height: 100%;
+	line-height: 30px;
+	width: 100%;
+}
+
+#main {
+	margin: 0px auto;
+	max-width: 960px;
+	padding-top: 50px;
+	
+}
+
+#main ul {
+	font-size: 14px;
+}
+#main ul li:hover {
+	background-color: #545f70;
+}
+#main ul li a {
+	display: block;
+	height: 100%;
+	width: 100%;
+}
+#main li > ul {
+	display: none;
+}
+#main li:hover > ul {
+	display: block;
+	margin: 10px 20px;
+}
+#main li:hover > a {
+	color: #FFFFFF;
+	font-weight: bold;
+}
+
+#main ul.shows {
+	border-top: 1px solid #CCCCCC;
+	border-left: 1px solid #CCCCCC;
+	border-right: 1px solid #CCCCCC;
+}
+#main ul.shows > li {
+	border-bottom: 1px solid #CCCCCC;
+	padding: 5px;
+}
+
+footer {
+	bottom: 0px;
+	font-size: 10px;
+	height: 20px;
+	left: 0px;
+	position: fixed;
+	width: 100%;
+}
