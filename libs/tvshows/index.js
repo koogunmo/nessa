@@ -25,16 +25,29 @@ exports = module.exports = {
 						});
 					});
 				});
+				if (typeof(callback) == 'function') callback();
 			} catch(e) {
 				console.error(e.message);
 			}
 		});
 	},
 	
-	tvdb: function(){
-		db.each("SELECT * FROM show WHERE tvdb IS NOT NULL", function(error, show){
-			tvdb.getInfo('', show.tvdb, function(){
-				// Update title to match TVDB
+	update: function(){
+		// Enhance each show record with additional TVDB data
+		db.each("SELECT * FROM show WHERE status = 1 AND tvdb IS NOT NULL AND imdb IS NULL", function(error, show){
+			if (error) console.error(error);
+			request.get('http://thetvdb.com/api/'+nconf.get('tvdb:apikey')+'/series/'+show.tvdb+'/all/en.xml', function(error, req, xml){
+				parser.parseString(xml, function(error, json){
+					if (error) return;					
+					var data = json.Data.Series[0];
+					var record = {
+						id: show.tvdb,
+						name: data.SeriesName[0],
+						synopsis: data.Overview[0],
+						imdb: data.IMDB_ID[0]
+					};
+					db.run("UPDATE show SET name = ?, synopsis = ?, imdb = ? WHERE tvdb = ?", record.name, record.synopsis, record.imdb, record.id);
+				});
 			});
 		});
 	},
@@ -56,7 +69,7 @@ exports = module.exports = {
 		});
 	},
 	
-	getLatest: function() {
+	getLatest: function(callback) {
 		// Check the feeds for new episodes
 		db.each("SELECT * FROM show WHERE status = 1 AND ended = 0 AND feed IS NOT NULL", function(error, show){
 			if (error) return;
@@ -78,20 +91,18 @@ exports = module.exports = {
 							results.push(record);
 						});
 						
+					//	console.log(results);
 						
 						results.forEach(function(result){
-							if (result.hd) return;	// Ignore HD (mkv) files for now
-							
+							if (show.hd != result.hd) return;
 							db.get("SELECT * FROM show_episode WHERE show_id = ? AND season = ? AND episode = ?", show.id, result.season, result.episode, function(error, row){
 								if (error || typeof(row) == 'undefined') return;
-								
-								
-								
 								if (!row.file || row.hash) return;
 								
-								// add to download queue
 								
-							//	bt.add('show', row.id, item.link);
+								
+								/* Add to transmission */
+							//	torrent.add(row.id, result.magnet);
 								
 							});
 						});
@@ -101,16 +112,5 @@ exports = module.exports = {
 				}
 			});
 		});
-	},
-	
-	show: function(id, full) {
-		db.serialize(function(){
-			db.get("SELECT * FROM show_new WHERE id = ?", function(error, row) {
-				
-			});
-		});
-		
-		//	http://tvshowsapp.com/feeds/Californication.full.xml
-		
 	}
 }

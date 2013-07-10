@@ -86,11 +86,11 @@ nav ul li a {
 #main li > ul {
 	display: none;
 }
-#main li:hover > ul {
+#main li.open > ul {
 	display: block;
 	margin: 10px 20px;
 }
-#main li:hover > a {
+#main li.open > a {
 	color: #FFFFFF;
 	font-weight: bold;
 }
@@ -112,4 +112,50 @@ footer {
 	left: 0px;
 	position: fixed;
 	width: 100%;
+}
+
+ul.episodes li {
+	display: table;
+	width: 100%;
+}
+ul.episodes li.unavailable {
+	color: #7E7E7E;
+}
+ul.episodes li span {
+	display: table-cell;
+	width: auto;
+}
+ul.episodes li span.episode {
+	width: 30px;
+}
+ul.episodes li span.title {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+ul.episodes li span.duration {
+	text-align: right;
+	width: 50px;
+}
+ul.episodes li span.date {
+	text-align: right;
+	width: 100px;
+}
+ul.episodes li span.actions {
+	text-align: right;
+	width: 32px;
+}
+
+.icon {
+	background-position: center bottom;
+	background-repeat: no-repeat;
+	display: block !important;
+	height: 16px !important;
+	width: 16px !important;
+}
+.icon.play {
+	background-image: url('../gfx/icons/icon_play.png');
+}
+.icon.play:hover {
+	background-image: url('../gfx/icons/icon_play_hover.png');
 }

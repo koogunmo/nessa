@@ -41,6 +41,9 @@ url		= require('url'),
 uuid	= require('node-uuid'),
 xml2js	= new (require('xml2js')).Parser();
 
+torrent	= require('./libs/transmission');
+
+
 var showhelper	= require('./core/show');
 
 /* Express */
@@ -63,6 +66,22 @@ db = new sqlite.Database(__dirname + '/db/nessa.sqlite', function(error){
 		// Create database and try again
 	}
 });
+
+
+
+
+var tvshows = require('./libs/tvshows');
+/*
+tvshows.update(function(show){
+	
+});
+*/
+
+/// INSTALL
+tvshows.list(function(){
+	tvshows.update();
+});
+
 
 /***********************************************************************/
 /* Handle events */
