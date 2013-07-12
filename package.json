@@ -13,9 +13,9 @@
 		"feedparser": "0.16.1",
 		"log4js": "0.6.x",
 		"mime": "1.2.9",
-		"nconf": "0.6.7",
-		"mkdirp": "0.3.5",
-		"node-schedule": "0.1.8",
+		"nconf": "0.6.x",
+		"mkdirp": "0.3.x",
+		"node-schedule": "0.1.x",
 		"node-ssdp": "0.0.2",
 		"node-uuid": "1.4.x",
 		"request": "2.21.x",
@@ -30,6 +30,6 @@
 		"xtend": "2.0.x"
 	},
 	"engines": {
-		"node": ">=0.8.11"
+		"node": "0.10.x"
 	}
 }

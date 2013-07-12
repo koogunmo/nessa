@@ -5,7 +5,9 @@ var feed	= require('feedparser'),
 	parser	= new(require('xml2js')).Parser(),
 	request	= require('request');
 
+
 exports = module.exports = {
+	
 	list: function(callback){
 		// Get the latest showlist feed 
 		request.get('http://tvshowsapp.com/showlist/showlist.xml', function(error, req, xml){
@@ -19,8 +21,8 @@ exports = module.exports = {
 							tvdb: show.tvdbid[0],
 							feed: show.mirrors[0].mirror[0]
 						};
-						db.get("SELECT * FROM show WHERE tvdb = ?", record.tvdb, function(error, row){
-							if (error || typeof(row) != 'undefined') return;
+						db.get("SELECT COUNT(id) AS count FROM show WHERE tvdb = ?", record.tvdb, function(error, row){
+							if (error || row.count >= 1) return;
 							db.run("INSERT INTO show (tvdb, name, feed) VALUES (?,?,?)", record.tvdb, record.name, record.feed);
 						});
 					});
@@ -32,7 +34,7 @@ exports = module.exports = {
 		});
 	},
 	
-	update: function(){
+	info: function(){
 		// Enhance each show record with additional TVDB data
 		db.each("SELECT * FROM show WHERE status = 1 AND tvdb IS NOT NULL AND imdb IS NULL", function(error, show){
 			if (error) console.error(error);
@@ -49,6 +51,41 @@ exports = module.exports = {
 					db.run("UPDATE show SET name = ?, synopsis = ?, imdb = ? WHERE tvdb = ?", record.name, record.synopsis, record.imdb, record.id);
 				});
 			});
+		});
+	},
+	
+	tvrage: function(){
+		// Search TVRage for a matching show
+		var tvrage = plugin('tvrage');
+		
+		db.each("SELECT * FROM show WHERE tvrage IS NULL", function(error, show){
+			try {
+				tvrage.search(show.name, function(results){
+					// TODO: Improve matching
+					if (results.length > 1) {
+						var list = []
+						for (var i=0;i<results.length;i++) {
+							var result = results[i];
+							if (result.name.indexOf(show.name) == 0) {
+								list.push(result);
+							}
+						}
+						results = list;
+					}
+					if (results.length == 1) {
+						var result = results[0];
+						db.run("UPDATE show SET tvrage = ? WHERE id = ?", result.name, result.id, show.id);
+					} else {
+						// We'll need user interaction for these ones
+						logger.info('[TV RAGE] - %d result(s) found for: %s', results.length, show.name);
+						results.forEach(function(result){
+							logger.info(' - %s (%s)', result.name, result.started);
+						});
+					}
+				});
+			} catch(e) {
+				logger.error(e.message);
+			}
 		});
 	},
 	

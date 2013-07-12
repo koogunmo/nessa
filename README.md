@@ -1,5 +1,5 @@
 # Nessa for Node
-Automatic Torrent grabber for Shows & Movies
+Automated TV Torrent grabber for Shows & Movies
 
 ## System Requirements
 
@@ -77,21 +77,21 @@ At this point, Nessa will be capable of running 24/7, but limited to downloading
 ### Phase 5
 - Implement uPNP/DLNA MediaServer?
 	- Removes dependency on Twonky
-	- Need to find/write a good uPnP/AV module
+		- Need to find/write a good uPnP/AV module?
 
-### Phase 6
-- ???
-- Profit!
-- Ability to search and add movie torrents
+## Acknowledgments
+
+Nessa utilises the following third-party data sources:
+
+- [TVShowsApp](http://tvshowsapp.com): If you like our software, please donate to them so they can keep up their fantastic work.
+- [The TVDB](http://thetvdb.com): Extended show information and artwork
+- [TV Rage](http://www.tvrage.com): Episode data
+
+## Disclaimer
+
+The authors of this software not condone, or approve of the illegal downloading and/or sharing of copyrighted material. You, the end user, are solely responsible for any legal actions against you that may occur as a result of using this software.
 
 ---
-
-## Data Sources
-###TV Shows
-
-- TVRage (show & episode information)
-- TVDB (artwork)
-- TVShowsApp.com
 
 ## Magnet link format
 
@@ -126,3 +126,4 @@ Specials
 	Templating?
 	Interface
 	API
+

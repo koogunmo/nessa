@@ -2,6 +2,7 @@ var parser	= new (require('xml2js')).Parser();
 var request	= require('request');
 
 exports = module.exports = {
+	
 	search: function(q, callback) {
 		// Search for a show, so we can grab its ID
 		var url = 'http://services.tvrage.com/feeds/search.php?show=' + q;
