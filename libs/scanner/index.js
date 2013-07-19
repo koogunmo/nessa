@@ -41,6 +41,37 @@ module.exports = exports = {
 	episodes: function(showid){
 		if (base = nconf.get('shows:base')) {
 			
+			db.get("SELECT * FROM show WHERE id = ?", showid, function(error, show){
+				if (error) {
+					logger.error(error);
+					return;
+				}
+				showdir = base + '/' + show.directory;
+				fs.readdir(showdir, function(error, list){
+					list.forEach(function(item){
+						fs.stat(showdir + '/' + item, function(error, stat){
+							if (error) {
+								logger.error(error);
+								return;
+							}
+							
+							if (stat.isDirectory()){
+								// recurse
+							} else {
+								
+								// RegExp file name, move, add to db
+								
+							}
+							
+							
+						});
+					});
+				});
+				
+				
+			});
+			
+			/*
 			db.each("SELECT DISTINCT(E.season) AS season, S.directory FROM show AS S INNER JOIN show_episode AS E ON S.id = E.show_id WHERE S.id = ? GROUP BY E.season", showid, function(error, episode){
 				
 				// TO DO: Season number formatting
@@ -60,6 +91,7 @@ module.exports = exports = {
 					});
 				});
 			});
+			*/
 		}
 	}
 };

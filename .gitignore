@@ -17,3 +17,8 @@ node_modules
 npm-debug.log
 
 cache/*.*
+docs
+settings.json
+test_data
+test.*
+upnp.js

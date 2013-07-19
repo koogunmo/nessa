@@ -1,12 +1,14 @@
 // grab data from http://tvshowsapp.com
 
-var feed	= require('feedparser'),
+var event	= require('events').EventEmitter,
+	feed	= require('feedparser'),
 	fs		= require('fs'),
 	parser	= new(require('xml2js')).Parser(),
-	request	= require('request');
+	request	= require('request'),
+	util = require('util');
 
 
-exports = module.exports = {
+var TVShows = {
 	
 	list: function(callback){
 		// Get the latest showlist feed 
@@ -27,6 +29,7 @@ exports = module.exports = {
 						});
 					});
 				});
+				event.emit('complete');
 				if (typeof(callback) == 'function') callback();
 			} catch(e) {
 				console.error(e.message);
@@ -36,11 +39,14 @@ exports = module.exports = {
 	
 	info: function(){
 		// Enhance each show record with additional TVDB data
-		db.each("SELECT * FROM show WHERE status = 1 AND tvdb IS NOT NULL AND imdb IS NULL", function(error, show){
+		db.each("SELECT * FROM show WHERE tvdb IS NOT NULL AND imdb IS NULL", function(error, show){
 			if (error) console.error(error);
 			request.get('http://thetvdb.com/api/'+nconf.get('tvdb:apikey')+'/series/'+show.tvdb+'/all/en.xml', function(error, req, xml){
 				parser.parseString(xml, function(error, json){
-					if (error) return;					
+					if (error) {
+						logger.error(error);
+						return;
+					}
 					var data = json.Data.Series[0];
 					var record = {
 						id: show.tvdb,
@@ -48,6 +54,8 @@ exports = module.exports = {
 						synopsis: data.Overview[0],
 						imdb: data.IMDB_ID[0]
 					};
+					console.log(record);
+					
 					db.run("UPDATE show SET name = ?, synopsis = ?, imdb = ? WHERE tvdb = ?", record.name, record.synopsis, record.imdb, record.id);
 				});
 			});
@@ -74,7 +82,7 @@ exports = module.exports = {
 					}
 					if (results.length == 1) {
 						var result = results[0];
-						db.run("UPDATE show SET tvrage = ? WHERE id = ?", result.name, result.id, show.id);
+						db.run("UPDATE show SET tvrage = ? WHERE id = ?", result.id, show.id);
 					} else {
 						// We'll need user interaction for these ones
 						logger.info('[TV RAGE] - %d result(s) found for: %s', results.length, show.name);
@@ -86,6 +94,34 @@ exports = module.exports = {
 			} catch(e) {
 				logger.error(e.message);
 			}
+		});
+	},
+	
+	episodes: function(){
+		var tvrage = plugin('tvrage');
+		// Update episode listings for all enabled shows
+		
+		db.each("SELECT id, tvrage FROM show WHERE status = 1 AND tvrage IS NOT NULL", function(error, show){
+			// Fetch listings, parse, and insert into show_episode
+			tvrage.episodes(show.tvrage, function(episodes){
+				episodes.forEach(function(ep){
+					db.get("SELECT COUNT(id) as count, id FROM show_episode WHERE show_id = ? AND season = ? AND episode = ?", show.id, ep.seasonnum, ep.epnum, function(error, result){
+						if (count == 0) {
+							var record = [
+								show.id,
+								ep.seasonnum,
+								ep.epnum,
+								ep.title,
+								ep.airdate
+							];
+						//	db.run("INSERT INTO show_episode (showid,season,episode,title,airdate) VALUES (?,?,?,?,?)", record);
+						} else {
+						//	db.run("UPDATE show_episode SET airdate = ? , title = ? WHERE ");
+						}
+					});
+					
+				});
+			});
 		});
 	},
 	
@@ -150,4 +186,8 @@ exports = module.exports = {
 			});
 		});
 	}
-}
+};
+
+util.inherits(TVShows, event);
+
+exports = module.exports = TVShows;

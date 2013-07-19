@@ -80,11 +80,9 @@ exports = module.exports = {
 						season.episode.forEach(function(episode) {
 							var row = {
 								id: episode.seasonnum[0],
-								epnum: episode.epnum[0],
-								seasonnum: episode.seasonnum[0],
-								prodnum: episode.prodnum[0],
+								season: list.id,
+								episode: episode.seasonnum[0],
 								airdate: episode.airdate[0],
-								link: episode.link[0],
 								title: episode.title[0]
 							};
 							list.episode.push(row);

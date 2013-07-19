@@ -85,6 +85,11 @@ process.on('SIGUSR2', function(){
 /***********************************************************************/
 /* Load tasks */
 fs.readdir(__dirname + '/core/tasks', function(error, files){
+	if (error) {
+		logger.error(error);
+		return;
+	}
+	if (files === undefined) return;
 	files.filter(function(file){
 		return (file.substr(-3) == '.js');
 	}).forEach(function(file){
@@ -95,9 +100,9 @@ fs.readdir(__dirname + '/core/tasks', function(error, files){
 /***********************************************************************/
 // Below is a chaotic mess of ideas and prototyping
 
-var scanner = plugin('scanner');
 
-scanner.shows();
+
+
 
 
 // Default route
@@ -105,10 +110,47 @@ app.get('/', function(req, res) {
 	res.end("We'll make the interface later");
 });
 
+app.get('/install', function(req, res){
+	
+	// Scan FS for show folders
+	
+	/* Setup order
+	--
+	1. shows.list()
+	2. scanner.shows()
+	3. shows.info()
+	4. shows.episodes()
+	5. scanner.episodes()
+	*/
+	
+	// TO DO
+	// Manual matching of TV shows in FS to TVDB data
+	
+//	var scanner = plugin('scanner');
+//	scanner.shows();
+	
+	var shows = plugin('showdata');
+	
+//	shows.episodes();
+	
+	// Retrieve TVDB data
+//	tvshows.info();
+	
+	// Retrieve TVRage ID - needs to run after TVDB is done
+//	tvshows.tvrage();
+	
+	// Retrieve episode listings for enabled shows
+//	tvshows.episodes();
+	
+	// Scan FS for episodes & match
+	
+	res.end('Installation complete.');
+});
+
+
 /*
 app.get('/restart', function(req, res){
 	res.end('Restarting server...');
-	logger.info('Restarting...');
 	process.kill(process.pid, 'SIGUSR2');
 });
 */

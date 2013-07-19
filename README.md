@@ -8,15 +8,30 @@ Automated TV Torrent grabber for Shows & Movies
 - Transmission with RPC Enabled
 - Plenty of HDD space
 
-## Recommendations
+## Optional Third-party software
 
-[Twonky 7](http://my.twonky.com/user/download) for media sharing (until Phase 5)
+- [Twonky 7](http://twonky.com/downloads/) for media sharing
 
 ## Running nessa
 
-> /usr/bin/node /path/to/nessa/server.js port=6355
+> /usr/bin/node /path/to/nessa/server.js
 
-You can then access the interface at [http://localhost:6355](http://localhost:6355)
+You can then access the interface at [http://localhost:6377](http://localhost:6377)  
+Alternatively, you could use a reverse proxy like nginx on port 80:
+
+	server {
+		listen 80;
+		root /opt/nessa;
+		index index.html index.htm;
+		server_name _;
+		location / {
+		        proxy_pass http://localhost:6377;
+		        proxy_http_version 1.1;
+		        proxy_set_header Upgrade $http_upgrade;
+		        proxy_set_header Connection "upgrade";
+		        proxy_set_header Host $host;
+		}
+	}
 
 ## Project Goal
 
@@ -27,10 +42,12 @@ UI should be responsive, and use AJAX for content changes, etc
 - Populate a database of known shows
 	- (We're piggybacking TVShowsApp's XML feeds for now)
 	- Retrieve TVRage and TVDB data per show
+		- TVDB: Full title, Synopsis, IMDB ID
+		- TVRage: ID
 	- Poll for updates occasionally (once per week?)
 - Scan local filesystem for directories
 	- Match show with database entry, flag as enabled
-		- Retrieve episode listings from TVRage and store.
+		- Retrieve episode listings from TVRage
 - Scan show directories for episodes
 	- Update database and rename episode file if necessary
 		- Default format: SHOW/Season ##/Episode ## - Title.ext
@@ -44,9 +61,8 @@ UI should be responsive, and use AJAX for content changes, etc
 At this point, Nessa will be capable of running 24/7, but limited to downloading new episodes of existing shows only.
 
 ### Phase 2
-- Automatic Update by schedule (03:00 daily?)
-	- Pull latest version of Nessa from Github
-		- Restart node (SIGUSR2 and forever)
+- ~~~Automatic update by schedule~~~
+	- Pulls latest version from Github & restarts node/forever
 - Build responsive HTML5 interface
 	- Need to find a good templating system
 	- MUST work on mobile devices (iPad/iPhone)
