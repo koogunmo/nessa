@@ -6,11 +6,14 @@ Automated TV Torrent grabber for Shows & Movies
 - Linux/OS X
 - Node.js 0.10.x
 - Transmission with RPC Enabled
-- Plenty of HDD space
+- Plenty of storage space
 
-## Optional Third-party software
+## "Optional" Third-party software
+Nessa doesn't handle uPNP/AV (yet), so you'll need a MediaServer to stream your content. I've used the following, with various degrees of success
 
-- [Twonky 7](http://twonky.com/downloads/) for media sharing
+- [minidlna](minidlna.sourceforge.net) (Open-source)
+- [Twonky 7](http://twonky.com/downloads) (Commercial)
+
 
 ## Running nessa
 
@@ -39,21 +42,22 @@ To build a system that functions in a similar manner to SickBeard, using torrent
 UI should be responsive, and use AJAX for content changes, etc
 
 ### Phase 1
-- Populate a database of known shows
+- ~~Populate a database of known shows~~
 	- (We're piggybacking TVShowsApp's XML feeds for now)
-	- Retrieve TVRage and TVDB data per show
+	- ~~Retrieve TVRage and TVDB data per show~~
 		- TVDB: Full title, Synopsis, IMDB ID
 		- TVRage: ID
-	- Poll for updates occasionally (once per week?)
-- Scan local filesystem for directories
-	- Match show with database entry, flag as enabled
-		- Retrieve episode listings from TVRage
-- Scan show directories for episodes
-	- Update database and rename episode file if necessary
-		- Default format: SHOW/Season ##/Episode ## - Title.ext
+	- Poll for updates weekly
+- ~~Scan local filesystem for directories~~
+	- ~~Match show with database entry, flag as enabled~~
+		- ~~Retrieve episode listings from TVRage~~
+- ~~Scan show directories for episodes~~
+	- ~~Update database and rename episode file if necessary~~
+		- (Default format: [BASEDIR]/[SHOWNAME]/Season ##/Episode ## - Title.ext)
 	- Flag episodes as available
 - Schedule for grabbing torrents/magnets
-	- Again, we're using TVShowsApp's feed for this
+	- (Again, we're using TVShowsApp's feed for this)
+	- Parse and reformat the magnet link to add a few extra trackers
 	- Automatically add to Transmission
 		- Copy and rename when download completes
 		- Delete from Transmission directory when seeding is complete
@@ -61,10 +65,10 @@ UI should be responsive, and use AJAX for content changes, etc
 At this point, Nessa will be capable of running 24/7, but limited to downloading new episodes of existing shows only.
 
 ### Phase 2
-- ~~~Automatic update by schedule~~~
-	- Pulls latest version from Github & restarts node/forever
+- ~~Automatic update by schedule~~
+	- Pulls latest version from Github then sends SIGUSR2
 - Build responsive HTML5 interface
-	- Need to find a good templating system
+	- Need to find a good templating system (Any suggestions?)
 	- MUST work on mobile devices (iPad/iPhone)
 		- Mobile-first approach
 	- Use Socket.IO
@@ -109,11 +113,6 @@ The authors of this software not condone, or approve of the illegal downloading 
 
 ---
 
-## Magnet link format
-
-	magnet:?xt=urn:sha1:<HASH>&dn=<DISPLAY NAME>&tr=udp://tracker.openbittorrent.com:80&tr=udp://tracker.istole.it:80...
-
-
 ## Helpful RegExp
 
 Standard Episodic Content
@@ -133,13 +132,3 @@ Specials
 "Everything Else":
 	
 	(Episode Name || Guest)?.(REPACK || PROPER).(720p || HDTV).(x264 || XviD)
-
-
-##To do
-
-	Add setup/config wizard
-	
-	Templating?
-	Interface
-	API
-

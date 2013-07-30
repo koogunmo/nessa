@@ -1,6 +1,31 @@
 /* Scan local filesystem for shows and episodes */
 
-var fs		= require('fs');
+var fs		= require('fs'),
+	path	= require('path');
+
+function listDirectory(path, callback) {
+	fs.readdir(path, function(error, list){
+		if (error) {
+			logger.error(error);
+			return;
+		}
+		list.forEach(function(item){
+			var fullpath = path + '/' + item;
+			fs.stat(fullpath, function(error, stat){
+				if (error) {
+					logger.error(error);
+					return;
+				}
+				if (stat.isDirectory()){
+					listDirectory(fullpath, callback);
+				} else if (stat.isFile()) {
+					if (item.match(/^\./)) return;
+					if (typeof(callback) == 'function') callback(fullpath);
+				}
+			});
+		});
+	});
+}
 
 module.exports = exports = {
 	shows: function(){
@@ -24,74 +49,74 @@ module.exports = exports = {
 								}
 								if (row !== undefined) {
 									db.run("UPDATE show SET status = 1, directory = ? WHERE id = ?", dir, row.id);
-									// Scan episodes?
+								//	events.emit('scanner.shows', null, row.id);
+									
 								} else {
-							//		db.run('INSERT INTO show (status,name,directory) VALUES (1,?,?)', dir, folder);
+									/*
+									db.run('INSERT INTO show (status,name,directory) VALUES (1,?,?)', dir, folder, function(error, result){
+										
+									});
+									*/
 								}
-								// Fetch episode listings for this show
-								
 							});
 						}
 					});
 				});
 			});
+			events.emit('scanner.shows', null);
 		}
 	},
 	
-	episodes: function(showid){
+	episodes: function(showid, season, episode){
 		if (base = nconf.get('shows:base')) {
+			if (showid === undefined) {
+				return;
+			}
 			
 			db.get("SELECT * FROM show WHERE id = ?", showid, function(error, show){
 				if (error) {
 					logger.error(error);
 					return;
 				}
-				showdir = base + '/' + show.directory;
-				fs.readdir(showdir, function(error, list){
-					list.forEach(function(item){
-						fs.stat(showdir + '/' + item, function(error, stat){
-							if (error) {
-								logger.error(error);
-								return;
+				
+				var showdir = base + '/' + show.directory;
+				
+				listDirectory(showdir, function(filepath){
+					var file = filepath.replace(showdir + '/', '');
+					var data = helper.getEpisodeNumbers(file);
+					
+					// Episode number range
+					if (data.episodes.length > 1) {
+						var ep = helper.zeroPadding(data.episodes[0])+'-'+helper.zeroPadding(data.episodes[data.episodes.length-1]);
+					} else {
+						var ep = helper.zeroPadding(data.episodes[0]);
+					}
+					// Title formatting
+					db.all("SELECT * FROM show_episode WHERE show_id = ? AND season = ?", show.id, data.season, function(error, rows){
+						if (error) {
+							logger.error(error);
+							return;
+						}
+						var title = [];
+						rows.forEach(function(row){
+							if (data.episodes.indexOf(row.episode) >= 0) {
+								title.push(row.title);
 							}
-							
-							if (stat.isDirectory()){
-								// recurse
-							} else {
-								
-								// RegExp file name, move, add to db
-								
-							}
-							
-							
+						});
+						var newName = 'Season '+helper.zeroPadding(data.season)+'/Episode '+ep+' - '+title.join('; ')+path.extname(file);
+						if (file != newName) {
+							helper.moveFile(showdir + '/' + file, showdir + '/' + newName);
+						}
+						
+						// Update Database records
+						data.episodes.forEach(function(episode){
+							db.run("UPDATE show_episode SET file = ? WHERE show_id = ? AND season = ? AND episode = ?", [newName, showid, data.season, episode], function(error, res){
+								console.log(error, res);
+							});
 						});
 					});
 				});
-				
-				
 			});
-			
-			/*
-			db.each("SELECT DISTINCT(E.season) AS season, S.directory FROM show AS S INNER JOIN show_episode AS E ON S.id = E.show_id WHERE S.id = ? GROUP BY E.season", showid, function(error, episode){
-				
-				// TO DO: Season number formatting
-				
-				fs.readdir(base + '/' + episode.directory + '/Season ' + episode.season, function(error, files){
-					
-					files.forEach(function(file){
-						// RegExp on filename
-						
-						console.log
-						
-						// Move/Rename file if not in Season ##/Episode ## - <title>.ext format
-						
-						if (match) {
-					//		db.run("UPDATE show_episode SET file = ? WHERE showid = ? AND season = ? AND episode = ?", file, episode.id, episode.season, episode.episode);
-						}
-					});
-				});
-			});
-			*/
 		}
 	}
 };

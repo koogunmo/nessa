@@ -45,10 +45,16 @@ var extend	= require('xtend'),
 	sys		= require('sys'),
 	tvdb	= new (require('tvdb'))({apiKey: nconf.get('tvdb:apikey')}),
 	url		= require('url'),
+	util	= require('util'),
 	uuid	= require('node-uuid'),
+	
 	xml2js	= new (require('xml2js')).Parser();
 
+/* Global methods */
+global.events = new (require('events')).EventEmitter;
 global.logger = logger;
+
+global.helper = require('./core/helper');
 
 /* Express */
 var app		= express();
@@ -100,11 +106,6 @@ fs.readdir(__dirname + '/core/tasks', function(error, files){
 /***********************************************************************/
 // Below is a chaotic mess of ideas and prototyping
 
-
-
-
-
-
 // Default route
 app.get('/', function(req, res) {	
 	res.end("We'll make the interface later");
@@ -113,40 +114,39 @@ app.get('/', function(req, res) {
 app.get('/install', function(req, res){
 	
 	// Scan FS for show folders
+	var shows = plugin('showdata'),
+		scanner = plugin('scanner');
 	
-	/* Setup order
-	--
-	1. shows.list()
-	2. scanner.shows()
-	3. shows.info()
-	4. shows.episodes()
-	5. scanner.episodes()
-	*/
 	
-	// TO DO
-	// Manual matching of TV shows in FS to TVDB data
+	events.on('shows.list', function(error, id){
+		logger.info('Scanning for shows');
+		scanner.shows();
+		
+	}).on('scanner.shows', function(error, id){
+		logger.info('Fetching show info');
+		shows.info();
+		
+	}).on('shows.info', function(error, id){
+		logger.info('Fetching show episode listings');
+		shows.episodes(id);
+		
+	}).on('shows.episodes', function(error, id){
+		logger.info('Scanning for episodes');
+		scanner.episodes(id);
+	});
+//	shows.list();
+	scanner.episodes(105);
 	
-//	var scanner = plugin('scanner');
-//	scanner.shows();
-	
-	var shows = plugin('showdata');
-	
-//	shows.episodes();
-	
-	// Retrieve TVDB data
-//	tvshows.info();
-	
-	// Retrieve TVRage ID - needs to run after TVDB is done
-//	tvshows.tvrage();
-	
-	// Retrieve episode listings for enabled shows
-//	tvshows.episodes();
-	
-	// Scan FS for episodes & match
+	// TO DO - manual matching of shows
 	
 	res.end('Installation complete.');
 });
 
+/*
+// Magnet parser test
+var magnet = 'magnet:?xt=urn:btih:60800347c8346ebb16b192290194d64dbe560b0a&dn=Continuum+S02E12+720p+HDTV+x264-KILLERS+%5Beztv%5D&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&tr=udp%3A%2F%2Ftracker.publicbt.com%3A80&tr=udp%3A%2F%2Ftracker.istole.it%3A6969&tr=udp%3A%2F%2Ftracker.ccc.de%3A80&tr=udp%3A%2F%2Fopen.demonii.com%3A1337';
+console.log(helper.formatMagnet(magnet));
+*/
 
 /*
 app.get('/restart', function(req, res){

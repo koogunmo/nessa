@@ -158,8 +158,8 @@ var TVShows = {
 								season: res.season,
 								episode: res.episodes[0],
 								hd: (item.title[0].match('720p')) ? true : false,
-								torrent: item.link[0],
-								magnet: item.guid[0]['_']
+							//	torrent: item.link[0],		// Due to cunty governments, this is no longer an option
+								magnet: item.guid[0]['_']	// need to tweak to add multiple trackers...
 							};
 							results.push(record);
 						});
@@ -171,8 +171,6 @@ var TVShows = {
 							db.get("SELECT * FROM show_episode WHERE show_id = ? AND season = ? AND episode = ?", show.id, result.season, result.episode, function(error, row){
 								if (error || typeof(row) == 'undefined') return;
 								if (!row.file || row.hash) return;
-								
-								
 								
 								/* Add to transmission */
 							//	torrent.add(row.id, result.magnet);
