@@ -50,11 +50,12 @@ exports = module.exports = {
 		} else if (match[7] && match[8]) {
 		*/
 		
-		
 		var regexp	= /(S|Season\s)?(\d{1,2})(E|\/Episode\s|x)?([\d\-]{2,})/i;
+		var abdexp	= /(\d{4})\D(\d{2})\D(\d{2})/i;
 		
 		if (match = file.match(regexp)) {
 			var response = {
+				type: 'seasons',
 				season: null,
 				episodes: []
 			};
@@ -63,27 +64,34 @@ exports = module.exports = {
 			if (match[1] && match[3]) {
 				response.season = parseInt(match[1], 10);
 				episode = match[3];
-			}
-			
-			if (episode.match('-')) {
-				// Multipart episode
-				var split	= episode.split('-'),
-					start	= parseInt(split[0], 10)
-					stop	= parseInt(split[split.length-1], 10);
-				
-				for (i = start; i <= stop; i++) {
-					response.episodes.push(i);
+				if (episode.match('-')) {
+					// Multipart episode
+					var split	= episode.split('-'),
+						start	= parseInt(split[0], 10)
+						stop	= parseInt(split[split.length-1], 10);
+					
+					for (i = start; i <= stop; i++) {
+						response.episodes.push(i);
+					}
+				} else {
+					// Single episode
+					response.episodes.push(parseInt(episode, 10));
 				}
+				// TO DO: Add Air-By-Date support
+				return response;
 			} else {
-				// Single episode
-				response.episodes.push(parseInt(episode, 10));
+				return false;
 			}
-			// TO DO: Add Air-By-Date support
-			return response;
-			
 		} else if (match = file.match(abdexp)) {
-			// Air By Date
-			
+			// Air By Date (e.g. Colbert, Daily Show, Craig Ferguson)
+			console.log(match);
+			var reponse = {
+				type: 'ABD',
+				year: match[0],
+				month: parseInt(match[1], 10),
+				day: parseInt(match[2], 10)
+			};
+			return response;
 		}
 		return false;
 	},
