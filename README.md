@@ -99,6 +99,65 @@ At this point, Nessa will be capable of running 24/7, but limited to downloading
 	- Removes dependency on Twonky
 		- Need to find/write a good uPnP/AV module?
 
+## File formatting
+
+We use a human-readable format for directories and filenames.
+	
+	[Show Name]/Season ##/Episode ## - [Show Title].ext
+Season and Episode numbers always have leading zeroes.
+
+In the case of multipart episodes, the format is expanded
+	
+	[Show Name]/Season ##/Episode ##-## - [Part 1 Title; Part 2 Title].ext
+For example:
+
+	Falling Skies/Season 01/Episode 01-02 - Live and Learn; The Armory.avi
+
+## RegExp
+
+We use the following Regular Expressions to detect the Season/Episode numbers in the filenames.
+We welcome any improvements you can suggest!
+
+### Episodic content
+	
+	(S|Season)?\s?(\d{1,2})[\/\s]?(E|Episode|x)?\s?([\d\-]{2,})
+
+Which supports the following formats:
+	
+	Season 01/Episode 02
+	Season 01/Episode 02-03
+	S01E02
+	S01E02-03
+	1x02
+	1x02-03
+It does *NOT* support:
+
+	S01E02E03
+but it does need to be added at some point.
+
+Any episodes which are similar to:	
+
+	102
+	10203
+are ignored because that format is incredibly stupid.
+
+### Daily Shows/Air-by-date
+
+Shows that are aired daily (e.g The Colbert Report, The Daily Show, Conan) don't have season or episode numbers in the conventional sense.
+	
+	(\d{4})\D?(\d{2})\D?(\d{2})
+Which will match:
+	
+	2013.08.01
+	20130801
+	
+with any separator in place of the dot.
+
+### Specials / Miniseries
+
+We need to create expressions for miniseries
+
+						
 ## Acknowledgments
 
 Nessa utilises the following third-party data sources:
@@ -107,28 +166,11 @@ Nessa utilises the following third-party data sources:
 - [The TVDB](http://thetvdb.com): Extended show information and artwork
 - [TV Rage](http://www.tvrage.com): Episode data
 
+## Licence
+
+This software is distributed under a Modified BSD License. Please see LICENCE.txt for full details
+
 ## Disclaimer
 
 The authors of this software not condone, or approve of the illegal downloading and/or sharing of copyrighted material. You, the end user, are solely responsible for any legal actions against you that may occur as a result of using this software.
 
----
-
-## Helpful RegExp
-
-Standard Episodic Content
-
-	^(.*?)\.S?(\d{1,2})[Ex]?(\d{2})\.(.*)$  
-	0. Name, 1. Season, 2. Episode, 3. Everything else
-	
-Daily Shows
-
-	^(.*?)\.(\d{4})\.(\d{2})\.(\d{2})\.(.*)$  
-	0. Name, 1. Year, 2. Month, 3. Day, 4. Everything Else
-
-Specials
-
-	^(.*?)\.(\d)of(\d).(\w+)
-
-"Everything Else":
-	
-	(Episode Name || Guest)?.(REPACK || PROPER).(720p || HDTV).(x264 || XviD)
