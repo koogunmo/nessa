@@ -35,35 +35,9 @@ exports = module.exports = {
 	// Parse the various formats for TV Shows
 	getEpisodeNumbers: function(file) {
 		
-		/* Original version of the Season/Episode RegEx*/
-		/*
-		var regexp	= /S([\d]+)E([\d\-]+)|([\d]+)x([\d\-]+)|Season (\d+)\/Episode ([\d\-]+)|(\d{1,2})([\d]{2})/i;
-		if (match[1] && match[2]) {
-			response.season = parseInt(match[1], 10);
-			episode = match[2];
-		} else if (match[3] && match[4]) {
-			response.season = parseInt(match[3], 10);
-			episode = match[4];
-		} else if (match[5] && match[6]) {{
-			response.season = parseInt(match[5], 10)
-			episode = match[6];
-		} else if (match[7] && match[8]) {
-		*/
-		
-		var regexp	= /(S|Season)?\s?(\d{1,2})[\/\s]?(E|Episode|x)?\s?([\d\-]{2,})/i;
-		/*	Will match:
-				Season 01/Episode 02
-				Season 01/Episode 02-03
-				S01E02
-				S01E02-03
-				1x02
-				1x02-03
-			Will *NOT* match:
-				S01E02E03 (Probably need to support this)
-				10203
-		*/
-		
+		var regexp	= /(S|Season)?\s?(\d{1,2})[\/\s]?(E|Episode|x)?\s?([\d\-]{2,})/i;		
 		var abdexp	= /(\d{4})\D?(\d{2})\D?(\d{2})/i;
+		
 		
 		if (match = file.match(regexp)) {
 			if (match[1] && match[3]) {

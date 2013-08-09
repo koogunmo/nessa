@@ -107,7 +107,6 @@ module.exports = exports = {
 						if (file != newName) {
 							helper.moveFile(showdir + '/' + file, showdir + '/' + newName);
 						}
-						
 						// Update Database records
 						data.episodes.forEach(function(episode){
 							db.run("UPDATE show_episode SET file = ? WHERE show_id = ? AND season = ? AND episode = ?", [newName, showid, data.season, episode], function(error, res){

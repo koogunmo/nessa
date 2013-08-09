@@ -22,7 +22,7 @@
 		"qs": "0.6.x",
 		"socket.io": "0.9.x",
 		"sqlite3": "2.1.x",
-		"transmission": "0.2.x",
+		"transmission": "0.3.x",
 		"tvdb": "0.0.12",
 		"twilio": "1.1.x",
 		"url": "0.7.x",
