@@ -38,17 +38,16 @@ exports = module.exports = {
 		var regexp	= /(S|Season)?\s?(\d{1,2})[\/\s]?(E|Episode|x)?\s?([\d\-]{2,})/i;		
 		var abdexp	= /(\d{4})\D?(\d{2})\D?(\d{2})/i;
 		
-		
 		if (match = file.match(regexp)) {
-			if (match[1] && match[3]) {
+			if (match[2] && match[4]) {
 				var response = {
 					type: 'seasons',
 					season: null,
 					episodes: []
 				};
 				var episode	= null;
-				response.season = parseInt(match[1], 10);
-				episode = match[3];
+				response.season = parseInt(match[2], 10);
+				episode = match[4];
 				if (episode.match('-')) {
 					// Multipart episode
 					var split	= episode.split('-'),

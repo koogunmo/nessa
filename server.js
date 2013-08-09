@@ -134,12 +134,7 @@ app.get('/install', function(req, res){
 		logger.info('Scanning for episodes');
 		scanner.episodes(id);
 	});
-//	shows.list();
-	
-	// Test on "The Vampire Diaries" - If that fucks up, then nothing of value will have been lost
-	scanner.episodes(516);
-	
-	// TO DO - manual matching of shows
+	shows.episodes(516);
 	
 	res.end('Installation complete.');
 });

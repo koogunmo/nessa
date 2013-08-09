@@ -78,7 +78,6 @@ module.exports = exports = {
 					logger.error(error);
 					return;
 				}
-				
 				var showdir = base + '/' + show.directory;
 				
 				listDirectory(showdir, function(filepath){
