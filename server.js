@@ -134,7 +134,7 @@ app.get('/install', function(req, res){
 		logger.info('Scanning for episodes');
 		scanner.episodes(id);
 	});
-	shows.episodes(516);
+	shows.list();
 	
 	res.end('Installation complete.');
 });

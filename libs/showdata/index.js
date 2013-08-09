@@ -85,7 +85,7 @@ var ShowData = {
 								record.tvrage = result.id;
 							}
 							db.run("UPDATE show SET name = ?, synopsis = ?, imdb = ?, tvrage = ? WHERE tvdb = ?", record.name, record.synopsis, record.imdb, record.tvrage, record.id);
-							events.emit('shows.info', null, record.id);
+							events.emit('shows.info', null, show.id);
 						});
 					});
 				} catch(e) {
