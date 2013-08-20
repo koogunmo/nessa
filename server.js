@@ -117,26 +117,31 @@ app.get('/install', function(req, res){
 	var shows = plugin('showdata'),
 		scanner = plugin('scanner');
 	
-	
 	events.on('shows.list', function(error, id){
-		logger.info('Scanning for shows');
 		scanner.shows();
 		
 	}).on('scanner.shows', function(error, id){
-		logger.info('Fetching show info');
 		shows.info();
 		
 	}).on('shows.info', function(error, id){
-		logger.info('Fetching show episode listings');
 		shows.episodes(id);
 		
 	}).on('shows.episodes', function(error, id){
-		logger.info('Scanning for episodes');
 		scanner.episodes(id);
+		
 	});
-	shows.list();
+	
+//	shows.list();
+	shows.info();
 	
 	res.end('Installation complete.');
+});
+
+app.get('/check', function(req, res){
+	var tvshows = plugin('tvshows');
+	
+	tvshows.getLatest();
+	
 });
 
 /*

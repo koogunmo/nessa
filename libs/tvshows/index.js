@@ -7,13 +7,19 @@ var event	= require('events').EventEmitter,
 	request	= require('request'),
 	util = require('util');
 
-
 var TVShows = {
 	
 	list: function(callback){
+		logger.log('Fetching show masterlist');
+		
+		console.log('derp');
+		
 		// Get the latest showlist feed 
 		request.get('http://tvshowsapp.com/showlist/showlist.xml', function(error, req, xml){
-			if (error) return;
+			if (error) {
+				logger.error(error);
+				return;
+			}
 			try {
 				parser.parseString(xml, function(error, json){
 					if (error) return;
@@ -29,7 +35,7 @@ var TVShows = {
 						});
 					});
 				});
-				event.emit('complete');
+				
 				if (typeof(callback) == 'function') callback();
 			} catch(e) {
 				console.error(e.message);
@@ -40,7 +46,11 @@ var TVShows = {
 	info: function(){
 		// Enhance each show record with additional TVDB data
 		db.each("SELECT * FROM show WHERE tvdb IS NOT NULL AND imdb IS NULL", function(error, show){
-			if (error) console.error(error);
+			if (error) {
+				logger.error(error);
+				return;
+			}
+			logger.info(show.name + ': Fetching show data');
 			request.get('http://thetvdb.com/api/'+nconf.get('tvdb:apikey')+'/series/'+show.tvdb+'/all/en.xml', function(error, req, xml){
 				parser.parseString(xml, function(error, json){
 					if (error) {
@@ -54,9 +64,8 @@ var TVShows = {
 						synopsis: data.Overview[0],
 						imdb: data.IMDB_ID[0]
 					};
-					console.log(record);
-					
 					db.run("UPDATE show SET name = ?, synopsis = ?, imdb = ? WHERE tvdb = ?", record.name, record.synopsis, record.imdb, record.id);
+					event.emit('shows.info', null, show.id);
 				});
 			});
 		});
@@ -65,8 +74,12 @@ var TVShows = {
 	tvrage: function(){
 		// Search TVRage for a matching show
 		var tvrage = plugin('tvrage');
-		
 		db.each("SELECT * FROM show WHERE tvrage IS NULL", function(error, show){
+			if (error) {
+				logger.error(error);
+				return;
+			}
+			logger.info(show.name + ': Fetching TVRage data');
 			try {
 				tvrage.search(show.name, function(results){
 					// TODO: Improve matching
@@ -97,11 +110,18 @@ var TVShows = {
 		});
 	},
 	
-	episodes: function(){
+	episodes: function(showid){
 		var tvrage = plugin('tvrage');
 		// Update episode listings for all enabled shows
 		
-		db.each("SELECT id, tvrage FROM show WHERE status = 1 AND tvrage IS NOT NULL", function(error, show){
+		if (typeof(showid) == 'number') {
+			var sql = "SELECT id, name, tvrage FROM show WHERE id = " + showid + " AND status = 1 AND tvrage IS NOT NULL LIMIT 1";
+		} else {
+			var sql = "SELECT id, name, tvrage FROM show WHERE status = 1 AND tvrage IS NOT NULL";
+		}
+		
+		db.each(sql, function(error, show){
+			logger.info(show.name + ': Fetching episode data');
 			// Fetch listings, parse, and insert into show_episode
 			tvrage.episodes(show.tvrage, function(episodes){
 				episodes.forEach(function(ep){
@@ -114,13 +134,13 @@ var TVShows = {
 								ep.title,
 								ep.airdate
 							];
-						//	db.run("INSERT INTO show_episode (showid,season,episode,title,airdate) VALUES (?,?,?,?,?)", record);
+							db.run("INSERT INTO show_episode (showid,season,episode,title,airdate) VALUES (?,?,?,?,?)", record);
 						} else {
-						//	db.run("UPDATE show_episode SET airdate = ? , title = ? WHERE ");
+						//	db.run("UPDATE show_episode SET airdate = ? , title = ? WHERE id = ?", ep.airdate, ep.title, result.id);
 						}
 					});
-					
 				});
+				event.emit('shows.episodes', null, show.id);
 			});
 		});
 	},
@@ -158,23 +178,17 @@ var TVShows = {
 								season: res.season,
 								episode: res.episodes[0],
 								hd: (item.title[0].match('720p')) ? true : false,
-							//	torrent: item.link[0],		// Due to cunty governments, this is no longer an option
 								magnet: item.guid[0]['_']	// need to tweak to add multiple trackers...
 							};
 							results.push(record);
 						});
 						
-					//	console.log(results);
-						
 						results.forEach(function(result){
 							if (show.hd != result.hd) return;
 							db.get("SELECT * FROM show_episode WHERE show_id = ? AND season = ? AND episode = ?", show.id, result.season, result.episode, function(error, row){
-								if (error || typeof(row) == 'undefined') return;
-								if (!row.file || row.hash) return;
-								
-								/* Add to transmission */
+								if (error || typeof(row) == 'undefined' || !row.file || row.hash) return;
+								/* Add to Transmission */
 							//	torrent.add(row.id, result.magnet);
-								
 							});
 						});
 					});
@@ -187,5 +201,4 @@ var TVShows = {
 };
 
 util.inherits(TVShows, event);
-
 exports = module.exports = TVShows;

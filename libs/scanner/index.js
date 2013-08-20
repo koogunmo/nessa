@@ -29,6 +29,7 @@ function listDirectory(path, callback) {
 
 module.exports = exports = {
 	shows: function(){
+		logger.info('Scanning shows...');
 		if (base = nconf.get('shows:base')) {
 			fs.readdir(base, function(error, dirs){
 				if (error) {
@@ -63,7 +64,7 @@ module.exports = exports = {
 					});
 				});
 			});
-			events.emit('scanner.shows', null);
+			events.emit('scanner.shows', null, null);
 		}
 	},
 	
@@ -73,47 +74,55 @@ module.exports = exports = {
 				return;
 			}
 			
-			db.get("SELECT * FROM show WHERE id = ?", showid, function(error, show){
-				if (error) {
-					logger.error(error);
-					return;
-				}
-				var showdir = base + '/' + show.directory;
-				
-				listDirectory(showdir, function(filepath){
-					var file = filepath.replace(showdir + '/', '');
-					var data = helper.getEpisodeNumbers(file);
-					
-					// Episode number range
-					if (data.episodes.length > 1) {
-						var ep = helper.zeroPadding(data.episodes[0])+'-'+helper.zeroPadding(data.episodes[data.episodes.length-1]);
-					} else {
-						var ep = helper.zeroPadding(data.episodes[0]);
+			db.get("SELECT id, name, directory FROM show WHERE id = ?", showid, function(error, show){
+				try {
+					if (error) {
+						logger.error(error);
+						return;
 					}
-					// Title formatting
-					db.all("SELECT * FROM show_episode WHERE show_id = ? AND season = ?", show.id, data.season, function(error, rows){
-						if (error) {
-							logger.error(error);
-							return;
+					if (!show.directory) return;
+					
+					logger.info(show.name + ': Scanning episodes...');
+					var showdir = base + '/' + show.directory;
+					
+					listDirectory(showdir, function(filepath){
+						var file = filepath.replace(showdir + '/', '');
+						var data = helper.getEpisodeNumbers(file);
+						
+						// Episode number range
+						if (data.episodes.length > 1) {
+							var ep = helper.zeroPadding(data.episodes[0])+'-'+helper.zeroPadding(data.episodes[data.episodes.length-1]);
+						} else {
+							var ep = helper.zeroPadding(data.episodes[0]);
 						}
-						var title = [];
-						rows.forEach(function(row){
-							if (data.episodes.indexOf(row.episode) >= 0) {
-								title.push(row.title);
+						// Title formatting
+						db.all("SELECT * FROM show_episode WHERE show_id = ? AND season = ?", show.id, data.season, function(error, rows){
+							if (error) {
+								logger.error(error);
+								return;
 							}
-						});
-						var newName = 'Season '+helper.zeroPadding(data.season)+'/Episode '+ep+' - '+title.join('; ')+path.extname(file);
-						if (file != newName) {
-							helper.moveFile(showdir + '/' + file, showdir + '/' + newName);
-						}
-						// Update Database records
-						data.episodes.forEach(function(episode){
-							db.run("UPDATE show_episode SET file = ? WHERE show_id = ? AND season = ? AND episode = ?", [newName, showid, data.season, episode], function(error, res){
-								console.log(error, res);
+							var title = [];
+							rows.forEach(function(row){
+								if (data.episodes.indexOf(row.episode) >= 0) {
+									title.push(row.title);
+								}
+							});
+							var newName = 'Season '+helper.zeroPadding(data.season)+'/Episode '+ep+' - '+title.join('; ')+path.extname(file);
+							if (file != newName) {
+								helper.moveFile(showdir + '/' + file, showdir + '/' + newName);
+							}
+							// Update Database records
+							data.episodes.forEach(function(episode){
+								db.run("UPDATE show_episode SET file = ? WHERE show_id = ? AND season = ? AND episode = ?", [newName, showid, data.season, episode], function(error, res){
+									console.log(error, res);
+								});
 							});
 						});
+						event.emit('scanner.episodes', null, show.id);
 					});
-				});
+				} catch(e) {
+					logger.error(e.message);
+				}
 			});
 		}
 	}

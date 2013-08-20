@@ -8,6 +8,7 @@ var feed	= require('feedparser'),
 var ShowData = {
 	
 	list: function(callback){
+		logger.info('Fetching show masterlist');
 		// Get the latest showlist feed 
 		request.get('http://tvshowsapp.com/showlist/showlist.xml', function(error, req, xml){
 			if (error) {
@@ -23,15 +24,19 @@ var ShowData = {
 							tvdb: show.tvdbid[0],
 							feed: show.mirrors[0].mirror[0]
 						};
-						db.get("SELECT COUNT(id) AS count FROM show WHERE tvdb = ?", record.tvdb, function(error, row){
-							if (error || row.count >= 1) return;
-							db.run("INSERT INTO show (tvdb, name, feed) VALUES (?,?,?)", record.tvdb, record.name, record.feed, function(error, resp){
-								
-							});
+						db.get("SELECT COUNT(id), id AS count FROM show WHERE tvdb = ?", record.tvdb, function(error, row){
+							if (error || row.count >= 1) {
+								events.emit('shows.list', null, row.id);
+								return;
+							} else {
+								db.run("INSERT INTO show (tvdb, name, feed) VALUES (?,?,?)", record.tvdb, record.name, record.feed, function(error, resp){
+									console.log(error, resp);
+								});
+							}
 						});
 					});
 				});
-			//	events.emit('shows.list');
+				events.emit('shows.list', null, null);
 			} catch(e) {
 				console.error(e.message);
 			}
@@ -40,12 +45,19 @@ var ShowData = {
 	
 	info: function(){
 		// Enhance each show record with additional TVDB data
-		db.each("SELECT * FROM show WHERE tvdb IS NOT NULL", function(error, show){
+		db.each("SELECT * FROM show WHERE tvdb IS NOT NULL ORDER BY name ASC", function(error, show){
 			if (error) {
 				console.error(error);
 				return;
 			}
+			
+			logger.info(show.name + ': Fetching show data');
+			
 			request.get('http://thetvdb.com/api/'+nconf.get('tvdb:apikey')+'/series/'+show.tvdb+'/en.xml', function(error, req, xml){
+				if (error) {
+					logger.error(error);
+					return;
+				}
 				try {
 					parser.parseString(xml, function(error, json){
 						if (error) {
@@ -85,8 +97,8 @@ var ShowData = {
 								record.tvrage = result.id;
 							}
 							db.run("UPDATE show SET name = ?, synopsis = ?, imdb = ?, tvrage = ? WHERE tvdb = ?", record.name, record.synopsis, record.imdb, record.tvrage, record.id);
-							events.emit('shows.info', null, show.id);
 						});
+						events.emit('shows.info', null, show.id);
 					});
 				} catch(e) {
 					logger.error(e.message);
@@ -96,32 +108,38 @@ var ShowData = {
 	},
 
 	episodes: function(showid){
-		db.get("SELECT * FROM show WHERE id = ? AND tvrage IS NOT NULL", showid, function(error, show){
+		db.each("SELECT * FROM show WHERE id = ? AND status = 1 AND tvrage IS NOT NULL", showid, function(error, show){
 			if (error) {
 				logger.error(error);
 				return;
 			}
-			tvrage.episodes(show.tvrage, function(data){
-				data.season.forEach(function(season){
-					season.episode.forEach(function(episode){
-						var record = [
-							episode.title,
-							episode.airdate,
-							show.id,
-							episode.season,
-							episode.episode
-						];
-						db.get("SELECT COUNT(id) AS count FROM show_episode WHERE show_id = ? AND season = ? AND episode = ?", record[2], record[3], record[4], function(error, result){
-							if (result.count == 1) {
-								db.run("UPDATE show_episode SET title = ?, airdate = ? WHERE show_id = ? AND season = ? AND episode = ?", record);
-							} else {
-								db.run("INSERT INTO show_episode (title,airdate,show_id,season,episode) VALUES (?,?,?,?,?)", record);
-							}
+			logger.info(show.name + ': Fetching episode data');
+			try {
+				tvrage.episodes(show.tvrage, function(data){
+					data.season.forEach(function(season){
+						season.episode.forEach(function(episode){
+							var record = [
+								episode.title,
+								episode.airdate,
+								show.id,
+								episode.season,
+								episode.episode
+							];
+							db.get("SELECT COUNT(id) AS count FROM show_episode WHERE show_id = ? AND season = ? AND episode = ?", record[2], record[3], record[4], function(error, result){
+								if (result.count == 1) {
+									db.run("UPDATE show_episode SET title = ?, airdate = ? WHERE show_id = ? AND season = ? AND episode = ?", record);
+								} else {
+									db.run("INSERT INTO show_episode (title,airdate,show_id,season,episode) VALUES (?,?,?,?,?)", record);
+								}
+							});
 						});
 					});
+					events.emit('shows.episodes', null, show.id);
 				});
-				events.emit('shows.episodes', null, show.id);
-			});
+			} catch(e) {
+				logger.error(e.message);
+				
+			}
 		});
 	}
 	
