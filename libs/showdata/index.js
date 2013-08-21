@@ -30,7 +30,7 @@ var ShowData = {
 								return;
 							} else {
 								db.run("INSERT INTO show (tvdb, name, feed) VALUES (?,?,?)", record.tvdb, record.name, record.feed, function(error, resp){
-									console.log(error, resp);
+									console.log('data:list', error, resp);
 								});
 							}
 						});
@@ -153,7 +153,6 @@ var ShowData = {
 	getLatest: function() {
 		// Check the feeds for new episodes
 		db.each("SELECT * FROM show WHERE status = 1 AND ended = 0 AND feed IS NOT NULL", function(error, show){
-			console.log('herp');
 			if (error) {
 				logger.error(error);
 				return;
@@ -182,7 +181,7 @@ var ShowData = {
 							db.get("SELECT * FROM show_episode WHERE show_id = ? AND season = ? AND episode = ?", show.id, result.season, result.episode, function(error, row){
 								if (error || typeof(row) == 'undefined' || row.file || row.hash) return;
 								
-								console.log(row, result);
+								console.log('data:latest', row, result);
 								
 								/* Add to Transmission */
 							//	torrent.add(row.id, result.magnet);
