@@ -12,8 +12,6 @@ var TVShows = {
 	list: function(callback){
 		logger.log('Fetching show masterlist');
 		
-		console.log('derp');
-		
 		// Get the latest showlist feed 
 		request.get('http://tvshowsapp.com/showlist/showlist.xml', function(error, req, xml){
 			if (error) {
@@ -187,6 +185,9 @@ var TVShows = {
 							if (show.hd != result.hd) return;
 							db.get("SELECT * FROM show_episode WHERE show_id = ? AND season = ? AND episode = ?", show.id, result.season, result.episode, function(error, row){
 								if (error || typeof(row) == 'undefined' || !row.file || row.hash) return;
+								
+								console.log(row, result);
+								
 								/* Add to Transmission */
 							//	torrent.add(row.id, result.magnet);
 							});

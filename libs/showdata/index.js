@@ -141,7 +141,55 @@ var ShowData = {
 				
 			}
 		});
+	},
+	
+	
+	getLatest: function() {
+		// Check the feeds for new episodes
+		db.each("SELECT * FROM show WHERE status = 1 AND ended = 0 AND feed IS NOT NULL", function(error, show){
+			console.log('herp');
+			if (error) {
+				logger.error(error);
+				return;
+			}
+			request.get(show.feed, function(error, req, xml){
+				if (error) {
+					logger.error(error);
+					return;
+				}
+				try {
+					parser.parseString(xml, function(error, json){
+						if (error) return;
+						var results = [];
+						json.rss.channel[0].item.forEach(function(item){
+							var res = helper.getEpisodeNumbers(item.title[0]);
+							var record = {
+								season: res.season,
+								episode: res.episodes[0],
+								hd: (item.title[0].match('720p')) ? true : false,
+								magnet: item.guid[0]['_']	// need to tweak to add multiple trackers...
+							};
+							results.push(record);
+						});
+						results.forEach(function(result){
+							if (show.hd != result.hd) return;
+							db.get("SELECT * FROM show_episode WHERE show_id = ? AND season = ? AND episode = ?", show.id, result.season, result.episode, function(error, row){
+								if (error || typeof(row) == 'undefined' || row.file || row.hash) return;
+								
+								console.log(row, result);
+								
+								/* Add to Transmission */
+							//	torrent.add(row.id, result.magnet);
+							});
+						});
+					});
+				} catch(e) {
+					logger.error(e.message);
+				}
+			});
+		});
 	}
+
 	
 };
 exports = module.exports = ShowData;
