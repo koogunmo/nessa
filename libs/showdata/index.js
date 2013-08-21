@@ -43,9 +43,16 @@ var ShowData = {
 		});
 	},
 	
-	info: function(){
+	info: function(showid){
+		
+		if (typeof(showid) == 'number') {
+			var sql = "SELECT * FROM show WHERE id = "+showid+" AND tvdb IS NOT NULL ORDER BY name ASC";
+		} else {
+			var sql = "SELECT * FROM show WHERE tvdb IS NOT NULL ORDER BY name ASC";
+		}
+		
 		// Enhance each show record with additional TVDB data
-		db.each("SELECT * FROM show WHERE tvdb IS NOT NULL ORDER BY name ASC", function(error, show){
+		db.each(sql, function(error, show){
 			if (error) {
 				console.error(error);
 				return;

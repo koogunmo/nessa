@@ -120,7 +120,7 @@ app.get('/install', function(req, res){
 	events.on('shows.list', function(error, id){
 		scanner.shows();
 	}).on('scanner.shows', function(error, id){
-		shows.info();
+		shows.info(id);
 	}).on('shows.info', function(error, id){
 		shows.episodes(id);
 	}).on('shows.episodes', function(error, id){
