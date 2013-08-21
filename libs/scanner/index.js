@@ -90,7 +90,7 @@ module.exports = exports = {
 						var file = filepath.replace(showdir + '/', '');
 						var data = helper.getEpisodeNumbers(file);
 						
-						if (!data.episodes) {
+						if (!data || !data.episodes) {
 							logger.error(data);
 							return;
 						}
@@ -118,9 +118,8 @@ module.exports = exports = {
 							}
 							// Update Database records
 							data.episodes.forEach(function(episode){
-								db.run("UPDATE show_episode SET file = ? WHERE show_id = ? AND season = ? AND episode = ?", [newName, showid, data.season, episode], function(error, res){
-									console.log('scanner:episodes', error, res);
-									
+								db.exec("UPDATE show_episode SET file = ? WHERE show_id = ? AND season = ? AND episode = ?", newName, show.id, data.season, episode, function(error){
+									if (error) logger.error(error);
 								});
 							});
 						});
