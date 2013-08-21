@@ -50,6 +50,7 @@ module.exports = exports = {
 								}
 								if (row !== undefined) {
 									db.run("UPDATE show SET status = 1, directory = ? WHERE id = ?", dir, row.id);
+									
 								//	events.emit('scanner.shows', null, row.id);
 									
 								} else {

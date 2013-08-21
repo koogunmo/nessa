@@ -26,7 +26,7 @@ var ShowData = {
 						};
 						db.get("SELECT COUNT(id), id AS count FROM show WHERE tvdb = ?", record.tvdb, function(error, row){
 							if (error || row.count >= 1) {
-								events.emit('shows.list', null, row.id);
+							//	events.emit('shows.list', null, row.id);
 								return;
 							} else {
 								db.run("INSERT INTO show (tvdb, name, feed) VALUES (?,?,?)", record.tvdb, record.name, record.feed, function(error, resp){
@@ -44,7 +44,6 @@ var ShowData = {
 	},
 	
 	info: function(showid){
-		
 		if (typeof(showid) == 'number') {
 			var sql = "SELECT * FROM show WHERE id = "+showid+" AND tvdb IS NOT NULL ORDER BY name ASC";
 		} else {
