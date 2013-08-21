@@ -118,7 +118,7 @@ module.exports = exports = {
 							}
 							// Update Database records
 							data.episodes.forEach(function(episode){
-								db.exec("UPDATE show_episode SET file = ? WHERE show_id = ? AND season = ? AND episode = ?", newName, show.id, data.season, episode, function(error){
+								db.run("UPDATE show_episode SET file = ? WHERE show_id = ? AND season = ? AND episode = ?", newName, show.id, data.season, episode, function(error){
 									if (error) logger.error(error);
 								});
 							});

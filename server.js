@@ -55,6 +55,7 @@ global.events = new (require('events')).EventEmitter;
 global.logger = logger;
 
 global.helper = require('./core/helper');
+global.torrent = plugin('transmission');
 
 /* Express */
 var app		= express();
@@ -75,6 +76,7 @@ global.db = new sqlite.Database(__dirname + '/db/nessa.sqlite', function(error){
 	}
 });
 
+torrent.connect();
 
 /***********************************************************************/
 /* Handle events */
@@ -138,6 +140,8 @@ app.get('/check', function(req, res){
 	
 	res.end('Searching for new downloads');
 });
+
+torrent.complete();
 
 /*
 // Magnet parser test

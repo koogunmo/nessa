@@ -5,10 +5,10 @@ var feed	= require('feedparser'),
 	tvrage	= plugin('tvrage'),
 	util = require('util');
 
+
 var ShowData = {
-	
 	list: function(callback){
-		logger.info('Fetching show masterlist');
+		logger.info('Fetching show masterlist.');
 		// Get the latest showlist feed 
 		request.get('http://tvshowsapp.com/showlist/showlist.xml', function(error, req, xml){
 			if (error) {
