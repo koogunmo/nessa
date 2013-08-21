@@ -74,7 +74,7 @@ module.exports = exports = {
 				return;
 			}
 			
-			db.get("SELECT id, name, directory FROM show WHERE id = ?", showid, function(error, show){
+			db.get("SELECT id, name, directory FROM show WHERE status = 1 AND id = ?", showid, function(error, show){
 				try {
 					if (error) {
 						logger.error(error);
