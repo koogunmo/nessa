@@ -119,7 +119,7 @@ module.exports = exports = {
 								});
 							});
 						});
-						event.emit('scanner.episodes', null, show.id);
+						events.emit('scanner.episodes', null, show.id);
 					});
 				} catch(e) {
 					logger.error(e.message);
