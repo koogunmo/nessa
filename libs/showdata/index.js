@@ -166,6 +166,9 @@ var ShowData = {
 					parser.parseString(xml, function(error, json){
 						if (error) return;
 						var results = [];
+						
+						if (!json.rss.channel[0].item) return;
+						
 						json.rss.channel[0].item.forEach(function(item){
 							var res = helper.getEpisodeNumbers(item.title[0]);
 							var record = {
@@ -176,12 +179,15 @@ var ShowData = {
 							};
 							results.push(record);
 						});
+						
+						if (!results) return;
+						
 						results.forEach(function(result){
 							if (show.hd != result.hd) return;
 							db.get("SELECT * FROM show_episode WHERE show_id = ? AND season = ? AND episode = ?", show.id, result.season, result.episode, function(error, row){
 								if (error || typeof(row) == 'undefined' || row.file || row.hash) return;
 								
-								console.log('data:latest', row, result);
+							//	console.log('data:latest', show.name, row.title, result);
 								
 								/* Add to Transmission */
 							//	torrent.add(row.id, result.magnet);

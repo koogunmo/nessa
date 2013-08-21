@@ -132,8 +132,9 @@ app.get('/install', function(req, res){
 });
 
 app.get('/check', function(req, res){
-	var tvshows = plugin('showdata');
-	tvshows.getLatest();
+	var shows = plugin('showdata');
+	
+	shows.getLatest();
 	
 	res.end('Searching for new downloads');
 });
