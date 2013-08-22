@@ -9,15 +9,18 @@ Automated TV Torrent grabber for Shows & Movies
 - Plenty of storage space
 
 ## "Optional" Third-party software
-Nessa doesn't handle uPNP/AV (yet), so you'll need a MediaServer to stream your content. I've used the following, with various degrees of success
+Nessa doesn't handle uPNP/AV (yet), so you'll need a MediaServer if you want to stream your content. I've used the following, with various degrees of success
 
 - [minidlna](minidlna.sourceforge.net) (Open-source)
 - [Twonky 7](http://twonky.com/downloads) (Commercial)
 
+These work reasonably well with VLC and my XBOX 360.
 
 ## Running nessa
 
 > /usr/bin/node /path/to/nessa/server.js
+
+You'll probably want to daemonize the process, I use [forever](https://github.com/nodejitsu/forever).
 
 You can then access the interface at [http://localhost:6377](http://localhost:6377)  
 Alternatively, you could use a reverse proxy like nginx on port 80:
@@ -36,10 +39,13 @@ Alternatively, you could use a reverse proxy like nginx on port 80:
 		}
 	}
 
+
 ## Project Goal
 
-To build a system that functions in a similar manner to SickBeard, using torrents only.
-UI should be responsive, and use AJAX for content changes, etc
+"Build a system that functions in a similar manner to SickBeard, but using torrents only."
+
+I tried to use SickBeard, but it wouldn't easily let me arrange my files in a way I liked.  
+It was also heavily skewed towards using newsgroups, which I don't use.
 
 ### Phase 1
 - ~~Populate a database of known shows~~
@@ -47,6 +53,7 @@ UI should be responsive, and use AJAX for content changes, etc
 	- ~~Retrieve TVRage and TVDB data per show~~
 		- TVDB: Full title, Synopsis, IMDB ID
 		- TVRage: ID
+		- **TO DO: Improve name-based matching**
 	- Poll for updates weekly
 - ~~Scan local filesystem for directories~~
 	- ~~Match show with database entry, flag as enabled~~
@@ -54,13 +61,13 @@ UI should be responsive, and use AJAX for content changes, etc
 - ~~Scan show directories for episodes~~
 	- ~~Update database and rename episode file if necessary~~
 		- (Default format: [BASEDIR]/[SHOWNAME]/Season ##/Episode ## - Title.ext)
-	- Flag episodes as available
-- Schedule for grabbing torrents/magnets
+- ~~Schedule for grabbing torrents/magnets~~
 	- (Again, we're using TVShowsApp's feed for this)
 	- Parse and reformat the magnet link to add a few extra trackers
-	- Automatically add to Transmission
-		- Copy and rename when download completes
+	- ~~Automatically add to Transmission~~
+		- ~~Copy and rename when download completes~~
 		- Delete from Transmission directory when seeding is complete
+			- In, but afraid to use :S
 
 At this point, Nessa will be capable of running 24/7, but limited to downloading new episodes of existing shows only.
 
@@ -79,6 +86,8 @@ At this point, Nessa will be capable of running 24/7, but limited to downloading
 		- Create folder using show name
 	- Pick the episode to start from (or next available)
 	- Start downloading
+
+UI should be responsive, and use AJAX for content changes, etc
 
 ### Phase 3
 - Twilio for SMS download notifications
@@ -130,16 +139,16 @@ Which supports the following formats:
 	S01E02-03
 	1x02
 	1x02-03
-It does *NOT* support:
+**It does *NOT* yet support**:
 
 	S01E02E03
-but it does need to be added at some point.
+but needs to be added at some point.
 
 Any episodes which are similar to:	
 
 	102
 	10203
-are ignored because that format is incredibly stupid.
+are ignored because that format is incredibly stupid, and impossible to accurately parse.
 
 ### Daily Shows/Air-by-date
 

@@ -89,7 +89,7 @@ module.exports = exports = {
 						var ep = helper.zeroPadding(data.episodes[0]);
 					}
 					
-					db.all("SELECT S.name, S.directory, E.* FROM show_episode AS E INNER JOIN show AS S ON S.id = E.show_id WHERE E.hash = ?; -- AND E.file IS NULL", item.hashString, function(error, results){
+					db.all("SELECT S.name, S.directory, E.* FROM show_episode AS E INNER JOIN show AS S ON S.id = E.show_id WHERE E.hash = ? AND E.file IS NULL", item.hashString, function(error, results){
 						if (error) {
 							logger.error(error);
 							return;
@@ -105,7 +105,7 @@ module.exports = exports = {
 						var newName = 'Season '+helper.zeroPadding(data.season)+'/Episode '+ep+' - '+title.join('; ')+path.extname(file);
 						
 						helper.copyFile(file, showdir + '/' + newName, function(){
-							db.exec("UPDATE show_episode SET file = ? WHERE hash = ?", newName, item.hashString, function(error){
+							db.run("UPDATE show_episode SET file = ? WHERE hash = ?", newName, item.hashString, function(error){
 								if (error) logger.error(error);
 							});
 						});
