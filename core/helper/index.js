@@ -44,10 +44,12 @@ exports = module.exports = {
 	// Parse the various formats for TV Shows
 	getEpisodeNumbers: function(file) {
 		
-		var regexp	= /(S|Season)?\s?(\d{1,2})[\/\s]?(E|Episode|x)?\s?([\d\-]{2,})/i;
+	//	var regexp	= /(S|Season)?\s?(\d{1,2})[\/\s]?(E|Episode|x)?\s?([\d\-]{2,})/i;
+		var regex	= /(?:S|Season)?\s?(\d{1,2})[\/\s]?(?:E|Episode|x)?\s?([\d]{2,})(?:(?:E|Episode|x|-)?\s?([\d]{2,})){0,}/i;
 		var abdexp	= /(\d{4})\D?(\d{2})\D?(\d{2})/i;
 		
 		if (match = file.match(regexp)) {
+			/*
 			if (match[2] && match[4]) {
 				var response = {
 					type: 'seasons',
@@ -71,6 +73,28 @@ exports = module.exports = {
 					response.episodes.push(parseInt(episode, 10));
 				}
 			}
+			*/
+			
+			if (match[0] && match[1]) {
+				var response = {
+					type: 'seasons',
+					season: null,
+					episodes: []
+				};
+				var episode	= null;
+				response.season = parseInt(match[0], 10);
+				episode = match[1];
+				
+				if (match[2]) {
+					for (i = match[1]; i <= match[2]; i++) {
+						response.episodes.push(i);
+					}
+				} else {
+					// Single episode
+					response.episodes.push(parseInt(episode, 10));
+				}
+			}
+			
 		} else if (match = file.match(abdexp)) {
 			// Air By Date (e.g. Colbert Report, Daily Show, Craig Ferguson, etc)
 			var reponse = {
