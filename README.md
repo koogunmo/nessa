@@ -129,7 +129,7 @@ We welcome any improvements you can suggest!
 
 ### Episodic content
 	
-	(S|Season)?\s?(\d{1,2})[\/\s]?(E|Episode|x)?\s?([\d\-]{2,})
+	(?:S|Season)?\s?(\d{1,2})[\/\s]?(?:E|Episode|x)?\s?([\d]{2,})(?:(?:E|Episode|x|-)?\s?([\d]{2,})){0,}
 
 Which supports the following formats:
 	
@@ -137,12 +137,9 @@ Which supports the following formats:
 	Season 01/Episode 02-03
 	S01E02
 	S01E02-03
+	S01E02E03
 	1x02
 	1x02-03
-**It does *NOT* yet support**:
-
-	S01E02E03
-but needs to be added at some point.
 
 Any episodes which are similar to:	
 
