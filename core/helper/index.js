@@ -1,4 +1,5 @@
 var fs		= require('fs'),
+	mkdirp	= require('mkdirp'),
 	path	= require('path'),
 	url		= require('url')
 	qs		= require('querystring');
@@ -19,17 +20,25 @@ exports = module.exports = {
 	},
 	
 	copyFile: function(from, to, callback) {
-		var rd = fs.createReadStream(from);
-		rd.on('error', function(error) {
-			logger.error('READ ERROR (%d) - %s', error.errno, error.code);
-		});
-		
-		var wr = fs.createWriteStream(to, {mode: 0664});
-		wr.on('error', function(error){
-			logger.error('WRITE ERROR (%d) - %s ', error.errno, error.code);
-		});
-		wr.on('close', callback);
-		rd.pipe(wr);
+		try {
+			if (!fs.existsSync(path.dirname(to))) {
+				mkdirp.sync(path.dirname(to, 0775));
+			}
+			
+			var rd = fs.createReadStream(from);
+			rd.on('error', function(error) {
+				logger.error('READ ERROR (%d) - %s', error.errno, error.code);
+			});
+			
+			var wr = fs.createWriteStream(to, {mode: 0664});
+			wr.on('error', function(error){
+				logger.error('WRITE ERROR (%d) - %s ', error.errno, error.code);
+			});
+			wr.on('close', callback);
+			rd.pipe(wr);
+		} catch(e) {
+			logger.error(e.message);
+		}
 	},
 	
 	// Parse the various formats for TV Shows
@@ -78,7 +87,7 @@ exports = module.exports = {
 		// Move a file to the correct location
 		try {
 			if (!fs.existsSync(path.dirname(to))) {
-				fs.mkdirSync(path.dirname(to, 0775));
+				mkdirp.sync(path.dirname(to, 0775));
 			}
 			fs.rename(from, to, callback);
 		} catch(e) {
@@ -87,7 +96,7 @@ exports = module.exports = {
 	},
 	
 	niceName: function(showid, season, episodes){
-		
+		// Is this used?
 		if (format = nconf.get('shows:format')) {
 			/*
 			var replace = {

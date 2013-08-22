@@ -177,9 +177,10 @@ var ShowData = {
 						
 						json.rss.channel[0].item.forEach(function(item){
 							var res = helper.getEpisodeNumbers(item.title[0]);
+							
 							var record = {
 								season: res.season,
-								episode: res.episodes[0],
+								episode: res.episodes,
 								hd: (item.title[0].match('720p')) ? true : false,
 								magnet: item.guid[0]['_']	// need to tweak to add multiple trackers...
 							};
@@ -190,18 +191,21 @@ var ShowData = {
 						var now = new Date().getTime();
 						var limit = 60*60*24*7*1000;
 						
+						// TO DO: Allow for multipart episodes (i.e. E01-02)
 						
 						results.forEach(function(result){
 							if (show.hd != result.hd) return;
-							db.get("SELECT * FROM show_episode WHERE show_id = ? AND season = ? AND episode = ?", show.id, result.season, result.episode, function(error, row){
+							db.get("SELECT * FROM show_episode WHERE show_id = ? AND season = ? AND episode = ?", show.id, result.season, result.episode[0], function(error, row){
 								if (error) {
 									logger.error(error);
 									return;
 								}
 								if (typeof(row) == 'undefined') return;
+								
 								/* Limit the shows we add automatically */
 								var aired = new Date(row.airdate).getTime();
 								if (aired < now-limit || row.file || row.hash) return;
+								
 								/* Add to Transmission */
 								torrent.add({
 									id: row.id,

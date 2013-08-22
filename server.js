@@ -142,7 +142,13 @@ app.get('/check', function(req, res){
 	res.end('Searching for new downloads');
 });
 
-torrent.complete();
+app.get('/complete', function(req, res){
+	
+	torrent.complete();
+	
+	res.end('Checking for completed downloads');
+});
+
 
 /*
 // Magnet parser test

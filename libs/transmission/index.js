@@ -1,4 +1,5 @@
 var transmission = require('transmission');
+var path = require('path');
 
 module.exports = exports = {
 	rpc: null,
@@ -41,7 +42,6 @@ module.exports = exports = {
 					return;
 				}
 				args.torrents.forEach(function(torrent){
-				//	console.log(torrent.name, torrent);
 					if (torrent.isFinished) {
 						logger.info('Removing: '+torrent.name);
 				//		this.rpc.remove(torrent.id, true);
@@ -55,29 +55,73 @@ module.exports = exports = {
 	
 	complete: function() {
 		try {
-			// get a list of all completed torrents
+			// Get a list of all completed torrents
 			this.rpc.get(function(error, data){
-				if (error) return;
+				if (error) {
+					logger.error(error);
+					return;
+				}
 				var response = [];
-				data.torrents.forEach(function(torrent){
+				data.torrents.forEach(function(item){
 					// Has it finished downloading?
-					if (torrent.percentDone < 1) return;
+					if (item.percentDone < 1) return;
 					
-					// Have we already moved it?
-					db.get("SELECT * FROM show_episode WHERE hash = ? AND file IS NULL", torrent.hashString, function(error, args){
-						// rename/move/etc
+					if (!item.isFinished) return;
+					
+					/* Copy and rename file */
+					if (item.files.length == 1) {
+						var file = item.downloadDir + '/' + item.files[0].name;
+					} else {
+						var file = null;
+						var size = 0;
+						item.files.forEach(function(k){
+							if (k.length > size) {
+								file = k.name;
+								size = k.size;
+							}
+						});
+					}
+					var data = helper.getEpisodeNumbers(file);
+					if (!data || !data.episodes) return;
+					
+					/* Episode number range */
+					if (data.episodes.length > 1) {
+						var ep = helper.zeroPadding(data.episodes[0])+'-'+helper.zeroPadding(data.episodes[data.episodes.length-1]);
+					} else {
+						var ep = helper.zeroPadding(data.episodes[0]);
+					}
+					
+					db.all("SELECT S.name, S.directory, E.* FROM show_episode AS E INNER JOIN show AS S ON S.id = E.show_id WHERE E.hash = ?; -- AND E.file IS NULL", item.hashString, function(error, results){
+						if (error) {
+							logger.error(error);
+							return;
+						}
+						var showdir = nconf.get('shows:base') + '/' + results[0].directory;
+						var title = [];
 						
+						results.forEach(function(row){
+							title.push(row.title);
+						});
+						var newName = 'Season '+helper.zeroPadding(data.season)+'/Episode '+ep+' - '+title.join('; ')+path.extname(file);
+						
+						helper.copyFile(file, showdir + '/' + newName, function(){
+							db.exec("UPDATE show_episode SET file = ? WHERE hash = ?", newName, item.hashString, function(error){
+								if (error) logger.error(error);
+							});
+						});
 					});
 					
 					// Merge in 'clean' method?
+					/*
 					if (torrent.isFinished) {
 						logger.info('Removing: '+torrent.name);
 					//	exports.rpc.remove(torrent.id);	
 					}
+					*/
 				});
 			});
 		} catch(e) {
-		//	console.log('e.message');
+			logger.error(e.message);
 		}
 	}
 };

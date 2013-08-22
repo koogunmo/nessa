@@ -1,16 +1,18 @@
 /* Check for completed downloads, handle accordingly */
 
 var schedule	= require('node-schedule');
-var bt			= plugin('transmission').connect();
-
 
 var rule = new schedule.RecurrenceRule();
 	rule.minute		= [0,10,20,30,40,50];
 
 schedule.scheduleJob(rule, function(){
-	bt.complete(function(torrents){
-		torrents.forEach(function(torrent){
-			db.get("SELECT * FROM show_episode WHERE hash = ? AND file IS NULL", torrent.hash, function(error, row){
+	
+	torrent.complete();
+	
+	/*
+	torrent.complete(function(items){
+		items.forEach(function(item){
+			db.get("SELECT * FROM show_episode WHERE hash = ? AND file IS NULL", item.hash, function(error, row){
 				if (error || !row) return;
 				
 				var file = null;
@@ -21,7 +23,6 @@ schedule.scheduleJob(rule, function(){
 					size = item.length;
 					file = torrent.dir + '/' + item.name;
 				});
-				/*
 				showhelper.rename(file, row.id, function(name){
 					try {
 						helper.copyFile(file, name, function(){
@@ -31,8 +32,8 @@ schedule.scheduleJob(rule, function(){
 						logger.error(e.message);
 					}
 				});
-				*/
 			});
 		});
 	});
+	*/
 });
