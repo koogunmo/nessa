@@ -45,7 +45,7 @@ exports = module.exports = {
 	getEpisodeNumbers: function(file) {
 		
 	//	var regexp	= /(S|Season)?\s?(\d{1,2})[\/\s]?(E|Episode|x)?\s?([\d\-]{2,})/i;
-		var regex	= /(?:S|Season)?\s?(\d{1,2})[\/\s]?(?:E|Episode|x)?\s?([\d]{2,})(?:(?:E|Episode|x|-)?\s?([\d]{2,})){0,}/i;
+		var regexp	= /(?:S|Season)?\s?(\d{1,2})[\/\s]?(?:E|Episode|x)?\s?([\d]{2,})(?:(?:E|Episode|x|-)?\s?([\d]{2,})){0,}/i;
 		var abdexp	= /(\d{4})\D?(\d{2})\D?(\d{2})/i;
 		
 		if (match = file.match(regexp)) {
@@ -75,19 +75,19 @@ exports = module.exports = {
 			}
 			*/
 			
-			if (match[0] && match[1]) {
+			if (match[1] && match[2]) {
 				var response = {
 					type: 'seasons',
 					season: null,
 					episodes: []
 				};
 				var episode	= null;
-				response.season = parseInt(match[0], 10);
+				response.season = parseInt(match[1], 10);
 				episode = match[1];
 				
 				if (match[2]) {
-					for (i = match[1]; i <= match[2]; i++) {
-						response.episodes.push(i);
+					for (i = match[2]; i <= match[3]; i++) {
+						response.episodes.push(parseInt(i, 10));
 					}
 				} else {
 					// Single episode
