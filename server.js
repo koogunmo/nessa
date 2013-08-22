@@ -136,6 +136,7 @@ app.get('/install', function(req, res){
 app.get('/check', function(req, res){
 	var shows = plugin('showdata');
 	
+	logger.info('Searching torrents');
 	shows.getLatest();
 	
 	res.end('Searching for new downloads');

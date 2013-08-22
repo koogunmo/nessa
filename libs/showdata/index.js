@@ -17,7 +17,10 @@ var ShowData = {
 			}
 			try {
 				parser.parseString(xml, function(error, json){
-					if (error) return;
+					if (error) {
+						logger.error(error);
+						return;
+					}
 					json.shows.show.forEach(function(show){
 						var record = {
 							name: show.name[0],
@@ -164,7 +167,10 @@ var ShowData = {
 				}
 				try {
 					parser.parseString(xml, function(error, json){
-						if (error) return;
+						if (error) {
+							logger.error(error);
+							return;
+						}
 						var results = [];
 						
 						if (!json.rss.channel[0].item) return;
@@ -181,16 +187,27 @@ var ShowData = {
 						});
 						
 						if (!results) return;
+						var now = new Date().getTime();
+						var limit = 60*60*24*7*1000;
+						
 						
 						results.forEach(function(result){
 							if (show.hd != result.hd) return;
 							db.get("SELECT * FROM show_episode WHERE show_id = ? AND season = ? AND episode = ?", show.id, result.season, result.episode, function(error, row){
-								if (error || typeof(row) == 'undefined' || row.file || row.hash) return;
-								
-							//	console.log('data:latest', show.name, row.title, result);
-								
+								if (error) {
+									logger.error(error);
+									return;
+								}
+								if (typeof(row) == 'undefined') return;
+								/* Limit the shows we add automatically */
+								var aired = new Date(row.airdate).getTime();
+								if (aired < now-limit || row.file || row.hash) return;
 								/* Add to Transmission */
-							//	torrent.add(row.id, result.magnet);
+								torrent.add({
+									id: row.id,
+									magnet: result.magnet,
+									title: row.title
+								});
 							});
 						});
 					});

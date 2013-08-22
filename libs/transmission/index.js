@@ -14,14 +14,19 @@ module.exports = exports = {
 		return this;
 	},
 	
-	add: function(id, magnet) {
+	add: function(obj) {
 		try {
-			this.rpc.add(magnet, function(error, args){
+			this.rpc.add(obj.magnet, function(error, args){
 				if (error) {
-					logger.error(error);
+					logger.error('bt:add', error);
 					return;
 				}
-				db.exec("UPDATE show_episode SET hash = ? WHERE id = ?", args.hashString, id);
+				if (args) {
+					console.log(obj, args);
+					db.run("UPDATE show_episode SET hash = ? WHERE id = ?", args.hashString, obj.id, function(error, args){
+						console.log('bt:add:db', error, args);
+					});
+				}
 			});
 		} catch(e) {
 			logger.error(e.message);

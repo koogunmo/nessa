@@ -1,7 +1,7 @@
 /* Check for new episodes */
 
 var schedule	= require('node-schedule');
-var tvshows		= require(process.cwd() + '/libs/tvshows');
+var tvshows		= plugin('showdata');
 
 /* Every 30 mins */
 var rule = new schedule.RecurrenceRule();
