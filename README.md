@@ -68,6 +68,7 @@ It was also heavily skewed towards using newsgroups, which I don't use.
 		- ~~Copy and rename when download completes~~
 		- Delete from Transmission directory when seeding is complete
 			- In, but afraid to use :S
+- Linux init script
 
 At this point, Nessa will be capable of running 24/7, but limited to downloading new episodes of existing shows only.
 
