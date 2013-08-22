@@ -66,8 +66,6 @@ module.exports = exports = {
 					// Has it finished downloading?
 					if (item.percentDone < 1) return;
 					
-					if (!item.isFinished) return;
-					
 					/* Copy and rename file */
 					if (item.files.length == 1) {
 						var file = item.downloadDir + '/' + item.files[0].name;
@@ -96,6 +94,8 @@ module.exports = exports = {
 							logger.error(error);
 							return;
 						}
+						if (!results.length) return;
+						
 						var showdir = nconf.get('shows:base') + '/' + results[0].directory;
 						var title = [];
 						
