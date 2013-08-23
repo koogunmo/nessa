@@ -9,6 +9,7 @@ global.plugin = function(name){
 	}
 	return false;
 }
+
 /* Load Settings */
 global.nconf = require('nconf').defaults({
 	port: 6377,
@@ -73,11 +74,13 @@ if (!fs.existsSync('db/nessa.sqlite')) {
 	global.db = new sqlite.Database(__dirname + '/db/nessa.sqlite', function(error){
 		if (error) logger.error('DB: ', error);
 	});
+	
 	fs.readFile('db/create.sql', 'utf8', function(error, sql){
 		if (error) throw(error);
 		db.exec(sql, function(error){
 			if (error) throw(error);
 		});
+		db.close();
 	});
 }
 
@@ -86,6 +89,8 @@ global.db = new sqlite.Database(__dirname + '/db/nessa.sqlite', function(error){
 });
 
 
+
+// TO DO: Improve Transmission connection handling
 torrent.connect();
 
 /***********************************************************************/
@@ -158,9 +163,6 @@ app.get('/complete', function(req, res){
 	
 	res.end('Checking for completed downloads');
 });
-
-var shows = plugin('showdata');
-shows.info(424);
 
 /*
 // Magnet parser test
