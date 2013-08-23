@@ -9,6 +9,8 @@ lib-cov
 
 .DS_Store
 
+db/*.sqlite
+
 pids
 logs
 results

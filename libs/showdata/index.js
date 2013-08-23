@@ -59,9 +59,7 @@ var ShowData = {
 				console.error(error);
 				return;
 			}
-			
 			logger.info(show.name + ': Fetching show data');
-			
 			request.get('http://thetvdb.com/api/'+nconf.get('tvdb:apikey')+'/series/'+show.tvdb+'/en.xml', function(error, req, xml){
 				if (error) {
 					logger.error(error);
@@ -73,34 +71,30 @@ var ShowData = {
 							logger.error(error);
 							return;
 						}
-						
 						var data = json.Data.Series[0];
 						var record = {
 							id: show.tvdb,
 							name: data.SeriesName[0],
 							synopsis: data.Overview[0],
 							imdb: data.IMDB_ID[0],
-							year: data.FirstAired[0].substring(0,4),
+							year: parseInt(data.FirstAired[0].substring(0,4), 10),
 							tvrage: null
 						};
-						
 						tvrage.search(record.name, function(results){
 							if (results.length > 1) {
 								var list = []
 								var found = false;
-								
-								// TO DO: Improve filtering (use airdates, etc)
-								
 								results.forEach(function(result){
 									if (found) return;
-									
-									if (result.name.indexOf(show.name) == 0)  {
+									// Probably not the best matching method, but it works in all cases I've tried
+									var year = parseInt(result.started.substring(result.started.length-4), 10);
+									if (result.name.indexOf(show.name) == 0 && year == record.year)  {
 										list.push(result);
+										if (show.name == result.name) found = true;
 									}
 								});
 								results = list;
 							}
-							
 							if (results.length == 1) {
 								var result = results[0];
 								record.tvrage = result.id;

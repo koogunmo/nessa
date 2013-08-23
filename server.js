@@ -69,12 +69,22 @@ socket		= require('socket.io').listen(server);
 logger.info('nessa.js: Listening on port ' + nconf.get('port'));
 
 /* Database */
+if (!fs.existsSync('db/nessa.sqlite')) {
+	global.db = new sqlite.Database(__dirname + '/db/nessa.sqlite', function(error){
+		if (error) logger.error('DB: ', error);
+	});
+	fs.readFile('db/create.sql', 'utf8', function(error, sql){
+		if (error) throw(error);
+		db.exec(sql, function(error){
+			if (error) throw(error);
+		});
+	});
+}
+
 global.db = new sqlite.Database(__dirname + '/db/nessa.sqlite', function(error){
-	if (error) {
-		// Unable to open database - Create and try again?
-		logger.error(error);
-	}
+	if (error) logger.error('DB: ', error);
 });
+
 
 torrent.connect();
 
@@ -149,6 +159,8 @@ app.get('/complete', function(req, res){
 	res.end('Checking for completed downloads');
 });
 
+var shows = plugin('showdata');
+shows.info(424);
 
 /*
 // Magnet parser test

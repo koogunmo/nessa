@@ -1,7 +1,7 @@
 /* Update show listings from XML */
 var schedule	= require('node-schedule');
-var tvshows		= plugin('tvshows');
-var tvrage		= plugin('tvrage');
+var tvshows		= plugin('showdata');
+//var tvrage		= plugin('tvrage');
 
 /* Every Sunday at 1am */
 var rule = new schedule.RecurrenceRule();
