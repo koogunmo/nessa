@@ -12,10 +12,9 @@ var rule = new schedule.RecurrenceRule();
 schedule.scheduleJob(rule, function(){
 	// Update shows (current,cancelled,upcoming, etc)
 	tvshows.list();
-	tvshows.ended()
 	
 	// Update episodes for enabled shows
-	
+	tvshows.episodes();
 	
 });
 

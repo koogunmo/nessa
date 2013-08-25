@@ -45,7 +45,7 @@ var ShowData = {
 			}
 		});
 	},
-	
+		
 	info: function(showid){
 		if (typeof(showid) == 'number') {
 			var sql = "SELECT * FROM show WHERE id = "+showid+" AND tvdb IS NOT NULL ORDER BY name ASC";
@@ -111,7 +111,14 @@ var ShowData = {
 	},
 
 	episodes: function(showid){
-		db.each("SELECT * FROM show WHERE id = ? AND status = 1 AND tvrage IS NOT NULL", showid, function(error, show){
+		
+		if (typeof(showid) == 'number') {
+			var sql = "SELECT * FROM show WHERE id = "+showid+" AND status = 1 AND tvrage IS NOT NULL";
+		} else {
+			var sql = "SELECT * FROM show WHERE status = 1 AND ended = 0 AND tvrage IS NOT NULL"
+		}
+		
+		db.each(sql, showid, function(error, show){
 			if (error) {
 				logger.error(error);
 				return;
@@ -215,7 +222,5 @@ var ShowData = {
 			});
 		});
 	}
-
-	
 };
 exports = module.exports = ShowData;
