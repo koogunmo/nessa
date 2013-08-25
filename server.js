@@ -148,6 +148,7 @@ app.get('/install', function(req, res){
 	shows.list();
 });
 
+
 app.get('/check', function(req, res){
 	var shows = plugin('showdata');
 	
@@ -157,12 +158,42 @@ app.get('/check', function(req, res){
 	res.end('Searching for new downloads');
 });
 
+
 app.get('/complete', function(req, res){
 	
 	torrent.complete();
 	
 	res.end('Checking for completed downloads');
 });
+
+app.get('/update', function(req, res){
+	try {
+		var exec = require('child_process').exec;
+		exec('git --git-dir=' + process.cwd() + '/.git pull origin', function(error, stdout, stderr){
+			if (error) {
+				logger.error(error);
+				return;
+			}
+			if (stdout.indexOf('Already up-to-date') == 0) {
+				res.end('No update available.');
+				return;
+			}
+			
+			/*
+			exec('cd ' + process.cwd() + ' && npm update', function(error, stdout, stderr){
+				// Update npm packages
+			});
+			*/
+			
+			res.end('Update complete. Restarting server...');
+			process.kill(process.pid, 'SIGUSR2');
+		});
+	} catch(e) {
+		logger.error(e.message);
+	}
+});
+
+
 
 /*
 // Magnet parser test
