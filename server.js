@@ -65,7 +65,7 @@ app.use(express.bodyParser());
 
 /* Socket.IO */
 server		= app.listen(nconf.get('port'));
-socket		= require('socket.io').listen(server);
+io			= require('socket.io').listen(server);
 
 logger.info('nessa.js: Listening on port ' + nconf.get('port'));
 
@@ -123,9 +123,39 @@ fs.readdir(__dirname + '/core/tasks', function(error, files){
 /***********************************************************************/
 /* Socket Events */
 
+io.configure(function(){
+	// Set log level to 'info' ('debug' is too noisy).
+	io.set('log level', 2);
+	// Compress ALL THE THINGS!
+	io.enable('browser client minification');
+	io.enable('browser client gzip')    
+});
 
-
-
+io.sockets.on('connection', function(socket) {
+	try {
+		var sessionid	= uuid.v4();		
+		logger.info('New connection (' + socket.transport + ') ' + sessionid);
+		
+	} catch(e) {
+		logger.error('connection: ' + e.message);
+	}
+	
+	socket.on('reconnected', function(data) {
+		try {
+			
+		} catch(e) {
+			logger.error('reconnected: ' + e.message);
+		}
+	}).on('disconnect', function(data){
+		// User disconnected
+		try {
+			
+		} catch(e) {
+			logger.error('disconnect: ' + e.message);
+		}
+	});
+	
+});
 
 /***********************************************************************/
 // Default route

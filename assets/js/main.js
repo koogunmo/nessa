@@ -11,7 +11,8 @@ requirejs.config({
 		'angular': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min',
 		'jquery': 'https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min',
 		'jqueryui': 'https://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min',
-		'socket.io': 'https://cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min'
+	//	'socket.io': 'https://cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min'
+		'socket.io': '/socket.io/socket.io'
 	}
 });
 
