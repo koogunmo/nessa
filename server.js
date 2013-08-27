@@ -121,12 +121,21 @@ fs.readdir(__dirname + '/core/tasks', function(error, files){
 });
 
 /***********************************************************************/
-// Below is a chaotic mess of ideas and prototyping
+/* Socket Events */
 
+
+
+
+
+/***********************************************************************/
 // Default route
 app.get('/', function(req, res) {	
-	res.end("We'll make the interface later");
+	res.sendfile('index.html');
 });
+
+
+
+// Below is a chaotic mess of ideas and prototyping
 
 app.get('/install', function(req, res){
 	

@@ -213,7 +213,7 @@ var ShowData = {
 								
 								/* Add to Transmission */
 								torrent.add({
-									id: row.id,
+									id: ids,
 									magnet: result.magnet,
 									title: row.title
 								});
