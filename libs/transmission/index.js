@@ -114,8 +114,16 @@ module.exports = exports = {
 					
 					/* Remove if seeding is completed */
 					if (torrent.isFinished) {
-						logger.info('Removing: '+torrent.name);
-						exports.rpc.remove(torrent.id, true);	
+						db.get("SELECT COUNT(id) AS count FROM show_episode WHERE hash = ? GROUP BY hash", item.hashString, function(error, row){
+							if (error) {
+								logger.error(error);
+								return;
+							}
+							if (row.count >= 1) {
+								logger.info('Removing: ' + item.name);
+								exports.rpc.remove(item.id, true);
+							}
+						});
 					}
 				});
 			});
