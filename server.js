@@ -58,14 +58,12 @@ global.logger = logger;
 global.helper = require('./core/helper');
 global.torrent = plugin('transmission');
 
-/* Express */
-var app		= express();
+var app		= express(),
+	server	= app.listen(nconf.get('port')),
+	io		= require('socket.io').listen(server);
+
 app.use('/assets', express.static(__dirname + '/assets'));
 app.use(express.bodyParser());
-
-/* Socket.IO */
-server		= app.listen(nconf.get('port'));
-io			= require('socket.io').listen(server);
 
 logger.info('nessa.js: Listening on port ' + nconf.get('port'));
 
@@ -83,12 +81,9 @@ if (!fs.existsSync('db/nessa.sqlite')) {
 		db.close();
 	});
 }
-
 global.db = new sqlite.Database(__dirname + '/db/nessa.sqlite', function(error){
 	if (error) logger.error('DB: ', error);
 });
-
-
 
 // TO DO: Improve Transmission connection handling
 torrent.connect();
@@ -123,18 +118,19 @@ fs.readdir(__dirname + '/core/tasks', function(error, files){
 /***********************************************************************/
 /* Socket Events */
 
+
 io.configure(function(){
-	// Set log level to 'info' ('debug' is too noisy).
-	io.set('log level', 2);
-	// Compress ALL THE THINGS!
+	io.set('log level', 1);
 	io.enable('browser client minification');
-	io.enable('browser client gzip')    
+	io.enable('browser client gzip');
 });
 
 io.sockets.on('connection', function(socket) {
 	try {
 		var sessionid	= uuid.v4();		
 		logger.info('New connection (' + socket.transport + ') ' + sessionid);
+		
+		
 		
 	} catch(e) {
 		logger.error('connection: ' + e.message);
@@ -154,6 +150,52 @@ io.sockets.on('connection', function(socket) {
 			logger.error('disconnect: ' + e.message);
 		}
 	});
+	
+	// List shows
+	socket.on('shows.available', function(){
+		db.all("SELECT * FROM show WHERE status = 0 ORDER BY name ASC", function(error, rows){
+			if (error) {
+				logger.error(error);
+				return;
+			}
+			socket.emit('shows.list', rows);
+		});
+	});
+	
+	socket.on('shows.enabled', function(data){
+		db.all("SELECT * FROM show WHERE status = 1 ORDER BY name ASC", function(error, rows){
+			if (error) {
+				logger.error(error);
+				return;
+			}
+			socket.emit('shows.list', rows);
+		});
+	});
+	
+	// Individual show data
+	socket.on('show', function(data){
+		// return show overview, possibly artwork
+		db.get("SELECT * FROM show WHERE id = ?", data.show, function(error, row){
+			socket.emit('show', row);
+		});
+	}).on('show.episodes', function(data){
+		// Returns a list of episodes, grouped by season
+		db.all("SELECT * FROM show_episode WHERE show_id = ? ORDER BY season,episode ASC", data, function(error, rows){
+			var results = {};
+			rows.forEach(function(row){
+				if (!results[row.season]) {
+					results[row.season] = [];
+				}
+				results[row.season].push(row);
+			});
+			socket.emit('show.episodes', {id: data, list: results});
+		});
+		
+	}).on('show.episode', function(data){
+		// return a single episode
+		// data {show, season, episode}
+	});
+	
 	
 });
 

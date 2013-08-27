@@ -78,6 +78,8 @@ It was also heavily skewed towards using newsgroups, which I don't use.
 	- MUST work on mobile devices (iPad/iPhone)
 		- Mobile-first approach
 	- Use Socket.IO
+- Scan for unmatched shows
+	- Find shows without TVShows data, retrieve TVDB/TVRage data
 - Browse show list
 	- Seasons, Episodes - Flag available/missing/downloading
 - Add new show via web

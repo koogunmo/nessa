@@ -1,16 +1,16 @@
 @import url('reset.css');
 
-html {
+html, body {
+	background-color: #4E5969;
 	height: 100%;
 	width: 100%;
 }
 
 body {
-	background-color: #4E5969;
 	color: #FFFFFF;
 	font-family: Helvetica, Verdana, Arial, sans-serif;
 	font-size: 10px;
-	height: 100%;
+	height: auto;
 	position: relative;
 	width: 100%;
 }
@@ -94,7 +94,6 @@ nav ul li a {
 	color: #FFFFFF;
 	font-weight: bold;
 }
-
 #main ul.shows {
 	border-top: 1px solid #CCCCCC;
 	border-left: 1px solid #CCCCCC;
@@ -105,6 +104,10 @@ nav ul li a {
 	padding: 5px;
 }
 
+#main ul.seasons {
+	padding-left: 20px;
+}
+
 footer {
 	bottom: 0px;
 	font-size: 10px;
@@ -112,6 +115,10 @@ footer {
 	left: 0px;
 	position: fixed;
 	width: 100%;
+}
+
+#main ul.episodes {
+	padding-left: 20px;
 }
 
 ul.episodes li {
