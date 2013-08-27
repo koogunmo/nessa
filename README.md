@@ -47,14 +47,13 @@ Alternatively, you could use a reverse proxy like nginx on port 80:
 I tried to use SickBeard, but it wouldn't easily let me arrange my files in a way I liked.  
 It was also heavily skewed towards using newsgroups, which I don't use.
 
-### Phase 1
+### Phase 1 - COMPLETE
 - ~~Populate a database of known shows~~
 	- (We're piggybacking TVShowsApp's XML feeds for now)
 	- ~~Retrieve TVRage and TVDB data per show~~
 		- TVDB: Full title, Synopsis, IMDB ID
 		- TVRage: ID
-		- **TO DO: Improve name-based matching**
-	- Poll for updates weekly
+	- ~~Poll for updates weekly~~
 - ~~Scan local filesystem for directories~~
 	- ~~Match show with database entry, flag as enabled~~
 		- ~~Retrieve episode listings from TVRage~~
@@ -68,9 +67,8 @@ It was also heavily skewed towards using newsgroups, which I don't use.
 		- ~~Copy and rename when download completes~~
 		- Delete from Transmission directory when seeding is complete
 			- In, but afraid to use :S
-- Linux init script
 
-At this point, Nessa will be capable of running 24/7, but limited to downloading new episodes of existing shows only.
+Nessa is now capable of running 24/7, but limited to downloading new episodes of existing shows only.
 
 ### Phase 2
 - ~~Automatic update by schedule~~

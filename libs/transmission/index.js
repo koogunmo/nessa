@@ -23,9 +23,10 @@ module.exports = exports = {
 					return;
 				}
 				if (args) {
-					console.log(obj, args);
-					db.run("UPDATE show_episode SET hash = ? WHERE id = ?", args.hashString, obj.id, function(error, args){
-						console.log('bt:add:db', error, args);
+					obj.id.forEach(function(id){
+						db.run("UPDATE show_episode SET hash = ? WHERE id = ?", args.hashString, id, function(error, args){
+							if (error) logger.error(error);
+						});
 					});
 				}
 			});

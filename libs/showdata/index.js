@@ -195,21 +195,21 @@ var ShowData = {
 						});
 						if (!results) return;
 						
-						// TO DO: Allow for multipart episodes (i.e. E01-02)
-						
 						results.forEach(function(result){
 							if (show.hd != result.hd) return;
 							
-							db.get("SELECT * FROM show_episode WHERE show_id = ? AND season = ? AND episode = ?", show.id, result.season, result.episode[0], function(error, row){
+							db.all("SELECT * FROM show_episode WHERE show_id = ? AND season = ? AND episode IN ("+result.episode.join(',')+")", show.id, result.season, function(error, rows){
 								if (error) {
 									logger.error(error);
 									return;
 								}
-								if (typeof(row) == 'undefined') return;
+								if (typeof(rows) == 'undefined') return;
 								
-								/* Limit the shows we add automatically */
-								var aired = new Date(row.airdate).getTime();
-								if (aired < now-limit || row.file || row.hash) return;
+								var ids = [];
+								rows.forEach(function(row){
+									if (row.file || row.hash) return;
+									ids.push(row.id);
+								});
 								
 								/* Add to Transmission */
 								torrent.add({
