@@ -214,8 +214,7 @@ var ShowData = {
 								/* Add to Transmission */
 								torrent.add({
 									id: ids,
-									magnet: result.magnet,
-									title: row.title
+									magnet: result.magnet
 								});
 							});
 						});
