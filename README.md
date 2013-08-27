@@ -68,7 +68,7 @@ It was also heavily skewed towards using newsgroups, which I don't use.
 		- Delete from Transmission directory when seeding is complete
 			- In, but afraid to use :S
 
-Nessa is now capable of running 24/7, but limited to downloading new episodes of existing shows only.
+**Nessa is now capable of running 24/7, but limited to downloading new episodes of existing shows only.**
 
 ### Phase 2
 - ~~Automatic update by schedule~~

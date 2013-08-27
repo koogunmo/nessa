@@ -112,13 +112,11 @@ module.exports = exports = {
 						});
 					});
 					
-					// Merge in 'clean' method?
-					/*
+					/* Remove if seeding is completed */
 					if (torrent.isFinished) {
 						logger.info('Removing: '+torrent.name);
-					//	exports.rpc.remove(torrent.id);	
+						exports.rpc.remove(torrent.id, true);	
 					}
-					*/
 				});
 			});
 		} catch(e) {
