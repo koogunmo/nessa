@@ -47,37 +47,35 @@ Alternatively, you could use a reverse proxy like nginx on port 80:
 I tried to use SickBeard, but it wouldn't easily let me arrange my files in a way I liked.  
 It was also heavily skewed towards using newsgroups, which I don't use.
 
-### Phase 1 - COMPLETE
-- ~~Populate a database of known shows~~
+### Phase 1 - **COMPLETE**
+- Populate a database of known shows
 	- (We're piggybacking TVShowsApp's XML feeds for now)
-	- ~~Retrieve TVRage and TVDB data per show~~
+	- Retrieve TVRage and TVDB data per show
 		- TVDB: Full title, Synopsis, IMDB ID
 		- TVRage: ID
-	- ~~Poll for updates weekly~~
-- ~~Scan local filesystem for directories~~
-	- ~~Match show with database entry, flag as enabled~~
-		- ~~Retrieve episode listings from TVRage~~
-- ~~Scan show directories for episodes~~
-	- ~~Update database and rename episode file if necessary~~
+	- Poll for updates weekly
+- Scan local filesystem for directories
+	- Match show with database entry, flag as enabled
+		- Retrieve episode listings from TVRage
+- Scan show directories for episodes
+	- Update database and rename episode file if necessary
 		- (Default format: [BASEDIR]/[SHOWNAME]/Season ##/Episode ## - Title.ext)
-- ~~Schedule for grabbing torrents/magnets~~
+- Schedule for grabbing torrents/magnets
 	- (Again, we're using TVShowsApp's feed for this)
 	- Parse and reformat the magnet link to add a few extra trackers
-	- ~~Automatically add to Transmission~~
-		- ~~Copy and rename when download completes~~
+	- Automatically add to Transmission
+		- Copy and rename when download completes
 		- Delete from Transmission directory when seeding is complete
-			- In, but afraid to use :S
 
 **Nessa is now capable of running 24/7, but limited to downloading new episodes of existing shows only.**
 
-### Phase 2
+### Phase 2 - CURRENT
 - ~~Automatic update by schedule~~
 	- Pulls latest version from Github then sends SIGUSR2
 - Build responsive HTML5 interface
-	- Need to find a good templating system (Any suggestions?)
+	- Use Socket.IO
 	- MUST work on mobile devices (iPad/iPhone)
 		- Mobile-first approach
-	- Use Socket.IO
 - Scan for unmatched shows
 	- Find shows without TVShows data, retrieve TVDB/TVRage data
 - Browse show list
@@ -88,7 +86,7 @@ It was also heavily skewed towards using newsgroups, which I don't use.
 	- Pick the episode to start from (or next available)
 	- Start downloading
 
-UI should be responsive, and use AJAX for content changes, etc
+UI should be responsive, and use AJAX/Sockets for content changes, etc
 
 ### Phase 3
 - Twilio for SMS download notifications

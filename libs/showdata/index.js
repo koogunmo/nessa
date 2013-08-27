@@ -41,7 +41,7 @@ var ShowData = {
 				});
 				events.emit('shows.list', null, null);
 			} catch(e) {
-				console.error(e.message);
+				console.error('shows.list', e.message);
 			}
 		});
 	},
@@ -104,21 +104,19 @@ var ShowData = {
 						events.emit('shows.info', null, show.id);
 					});
 				} catch(e) {
-					logger.error(e.message);
+					logger.error('shows.info', e.message);
 				}
 			});
 		});
 	},
 
 	episodes: function(showid){
-		
 		if (typeof(showid) == 'number') {
 			var sql = "SELECT * FROM show WHERE id = "+showid+" AND status = 1 AND tvrage IS NOT NULL";
 		} else {
 			var sql = "SELECT * FROM show WHERE status = 1 AND ended = 0 AND tvrage IS NOT NULL"
 		}
-		
-		db.each(sql, showid, function(error, show){
+		db.each(sql, function(error, show){
 			if (error) {
 				logger.error(error);
 				return;
@@ -136,6 +134,10 @@ var ShowData = {
 								episode.episode
 							];
 							db.get("SELECT COUNT(id) AS count FROM show_episode WHERE show_id = ? AND season = ? AND episode = ?", record[2], record[3], record[4], function(error, result){
+								if (error) {
+									logger.error(error);
+									return;
+								}
 								if (result.count == 1) {
 									db.run("UPDATE show_episode SET title = ?, airdate = ? WHERE show_id = ? AND season = ? AND episode = ?", record);
 								} else {
