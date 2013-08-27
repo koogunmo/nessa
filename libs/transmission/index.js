@@ -119,6 +119,7 @@ module.exports = exports = {
 								logger.error(error);
 								return;
 							}
+							if (typeof(row) == 'undefined') return;
 							if (row.count >= 1) {
 								logger.info('Removing: ' + item.name);
 								exports.rpc.remove(item.id, true);
