@@ -1,0 +1,13 @@
+		<ul class="seasons">{{#seasons}}
+			<li>
+				<a href="#" class="season">Season {{season}}</a>
+				<ul class="episodes">{{#episodes}}
+					<li class="{{#unless file}}unavailable{{/unless}} {{#if hash}}downloading{{/if}}">
+						<span class="episode">{{episode}}</span>
+						<span class="title">{{title}}</span>
+						<span class="duration">{{duration}}</span>
+						<span class="date">{{airdate}}</span>
+					</li>
+					{{/episodes}}</ul>
+			</li>
+		{{/seasons}}</ul>

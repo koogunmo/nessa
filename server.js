@@ -63,6 +63,7 @@ var app		= express(),
 	io		= require('socket.io').listen(server);
 
 app.use('/assets', express.static(__dirname + '/assets'));
+app.use('/views', express.static(__dirname + '/views'));
 app.use(express.bodyParser());
 
 logger.info('nessa.js: Listening on port ' + nconf.get('port'));
@@ -151,58 +152,124 @@ io.sockets.on('connection', function(socket) {
 		}
 	});
 	
-	// List shows
+	
+	/* List shows */
 	socket.on('shows.available', function(){
-		db.all("SELECT * FROM show WHERE status = 0 ORDER BY name ASC", function(error, rows){
+		// List of all shows
+		db.all("SELECT * FROM show WHERE status >= 0 ORDER BY name ASC", function(error, rows){
 			if (error) {
 				logger.error(error);
 				return;
 			}
 			socket.emit('shows.list', rows);
 		});
-	});
-	
-	socket.on('shows.enabled', function(data){
+	}).on('shows.enabled', function(data){
+		// List of enabled/subscribed shows
 		db.all("SELECT * FROM show WHERE status = 1 ORDER BY name ASC", function(error, rows){
 			if (error) {
 				logger.error(error);
 				return;
 			}
-			socket.emit('shows.list', rows);
+			socket.emit('shows.list', {shows: rows});
 		});
 	});
 	
-	// Individual show data
-	socket.on('show', function(data){
-		// return show overview, possibly artwork
+	/* Individual show data */
+	socket.on('show.info', function(data){
+		// Fetch individual show details
 		db.get("SELECT * FROM show WHERE id = ?", data.show, function(error, row){
+			if (error) {
+				logger.error(error);
+				return;
+			}
 			socket.emit('show', row);
 		});
-	}).on('show.episodes', function(data){
-		// Returns a list of episodes, grouped by season
-		db.all("SELECT * FROM show_episode WHERE show_id = ? ORDER BY season,episode ASC", data, function(error, rows){
-			var results = {};
-			rows.forEach(function(row){
-				if (!results[row.season]) {
-					results[row.season] = [];
-				}
-				results[row.season].push(row);
-			});
-			socket.emit('show.episodes', {id: data, list: results});
-		});
+	}).on('show.add', function(data){
+		// Add a show to the database
 		
+		db.run("UPDATE show SET status = 1, directory = ? WHERE id = ?", data.directory, data.id, function(error, result){
+			if (error) {
+				logger.error(error);
+				return;
+			}
+			if (data.status) {
+				// Trigger scanner
+			}
+		});
+	}).on('show.disable', function(data){
+		db.run("UPDATE show SET status = 0 WHERE id = ?", data.id, function(data, result){
+			if (error) {
+				logger.error(error);
+				return;
+			}
+		});
+	}).on('show.season', function(data){
+		// List all episodes of a show in a specific season
+		db.get("SELECT * FROM show_episode AS E WHERE E.show_id = ? AND E.season = ?", data.id, data.season, function(error, row){
+			if (error) {
+				logger.error(error);
+				return;
+			}
+			
+		});
+	}).on('show.episodes', function(data){
+		// List all episodes of a show, grouped by season
+		db.all("SELECT * FROM show_episode WHERE show_id = ? ORDER BY season,episode ASC", data, function(error, rows){
+			if (error) {
+				logger.error(error);
+				return;
+			}
+			var results = [];
+			var seasons = [];
+			var episodes = [];
+			
+			rows.forEach(function(row){
+				if (seasons.indexOf(row.season) == -1) seasons.push(row.season);
+				if (!episodes[row.season]) episodes[row.season] = [];
+				episodes[row.season].push(row);
+			});
+			seasons.forEach(function(season){
+				var record = {
+					season: season,
+					episodes: episodes[season]
+				}
+				results.push(record);
+			});
+			socket.emit('show.episodes', {id: data, seasons: results});
+		});
 	}).on('show.episode', function(data){
-		// return a single episode
-		// data {show, season, episode}
+		// Return a single episode of a show
+		
+		db.get("SELECT S.*, E.* FROM show_episode AS E INNER JOIN show AS S ON S.id = E.show_id WHERE E.id = ?", data.id, function(error, row){
+			if (error) {
+				logger.error(error);
+				return;
+			}
+			socket.emit('show.episode', row);
+		});
 	});
 	
+	
+	
+	
+	
+	// Search
+	socket.on('search', function(data){
+		db.all("SELECT * FROM show WHERE name LIKE '%?%' ORDER BY name ASC", data, function(error, rows){
+			if (error) {
+				logger.error(error);
+				return;
+			}
+			
+		});
+	});
 	
 });
 
 /***********************************************************************/
 // Default route
 app.get('/', function(req, res) {	
-	res.sendfile('index.html');
+	res.sendfile('views/index.html');
 });
 
 
