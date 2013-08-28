@@ -187,7 +187,9 @@ ul.episodes li span {
 	width: auto;
 }
 ul.episodes li span.episode {
-	width: 30px;
+	padding-right: 10px;
+	text-align: right;
+	width: 20px;
 }
 ul.episodes li span.title {
 	overflow: hidden;

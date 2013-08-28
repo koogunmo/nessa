@@ -49,23 +49,22 @@ It was also heavily skewed towards using newsgroups, which I don't use.
 
 ### Phase 1 - **COMPLETE**
 - Populate a database of known shows
-	- (We're piggybacking TVShowsApp's XML feeds for now)
-	- Retrieve TVRage and TVDB data per show
-		- TVDB: Full title, Synopsis, IMDB ID
-		- TVRage: ID
-	- Poll for updates weekly
+	- We're piggybacking TVShowsApp's XML feeds for now
+- Retrieve TVRage and TVDB data per show
+	- TVDB: Full title, Synopsis, IMDB ID
+	- TVRage: ID
+- Update show list weekly
 - Scan local filesystem for directories
 	- Match show with database entry, flag as enabled
-		- Retrieve episode listings from TVRage
+	- Retrieve episode listings from TVRage
 - Scan show directories for episodes
 	- Update database and rename episode file if necessary
-		- (Default format: [BASEDIR]/[SHOWNAME]/Season ##/Episode ## - Title.ext)
-- Schedule for grabbing torrents/magnets
-	- (Again, we're using TVShowsApp's feed for this)
+- Automatically grab new torrents by schedule.
+	- Again, we're using TVShowsApp's feeds for this
 	- Parse and reformat the magnet link to add a few extra trackers
-	- Automatically add to Transmission
-		- Copy and rename when download completes
-		- Delete from Transmission directory when seeding is complete
+	- Add to Transmission
+	- Copy and rename when download completes
+	- Delete from Transmission directory when seeding is complete
 
 **Nessa is now capable of running 24/7, but limited to downloading new episodes of existing shows only.**
 
@@ -74,10 +73,12 @@ It was also heavily skewed towards using newsgroups, which I don't use.
 	- Pulls latest version from Github then sends SIGUSR2
 - Build responsive HTML5 interface
 	- Use Socket.IO
+	- Handlebars for templating
 	- MUST work on mobile devices (iPad/iPhone)
 		- Mobile-first approach
-- Scan for unmatched shows
+- Support for unmatched shows
 	- Find shows without TVShows data, retrieve TVDB/TVRage data
+	- Scan filesystem for episodes
 - Browse show list
 	- Seasons, Episodes - Flag available/missing/downloading
 - Add new show via web
@@ -90,9 +91,13 @@ UI should be responsive, and use AJAX/Sockets for content changes, etc
 
 ### Phase 3
 - Twilio for SMS download notifications
+- Miso integration
+	- Automatically check in when downloading the file
 - Global Settings interface
 	- File/Folder formatting
 	- Global Quality Preference (HD/SD)
+	- TVShow check interval
+		- 30m, 1hr, 3hr, 6hr, 12hr, 1day
 - Show Settings
 	- As per Global Settings
 	- SMS Notifications on/off
@@ -121,6 +126,8 @@ For example:
 
 	Falling Skies/Season 01/Episode 01-02 - Live and Learn; The Armory.avi
 
+We chose this format due to it's tidy structure, ease of navigation, and legibility. We may, in future, add the ability to customise this on a global and per-show basis.
+
 ## RegExp
 
 We use the following Regular Expressions to detect the Season/Episode numbers in the filenames.
@@ -128,7 +135,7 @@ We welcome any improvements you can suggest!
 
 ### Episodic content
 	
-	(?:S|Season)?\s?(\d{1,2})[\/\s]?(?:E|Episode|x)?\s?([\d]{2,})(?:(?:E|Episode|x|-)?\s?([\d]{2,})){0,}
+	(?:S|Season)?\s?(\d{1,2})[\/\s]?(?:E|Episode|x)?\s?([\d]{2,})(?:(?:E|-)\s?([\d]{2,})){0,}
 
 Which supports the following formats:
 	
@@ -139,12 +146,15 @@ Which supports the following formats:
 	S01E02E03
 	1x02
 	1x02-03
+	
+It also supports episode spans of any size. For example, it would handle a file that contains Episodes 1 through 12, although it's unlikely that such a file would ever be released.
 
 Any episodes which are similar to:	
 
 	102
 	10203
-are ignored because that format is incredibly stupid, and impossible to accurately parse.
+	
+are ignored because that format is unbelievably stupid. Sorry folks, but you'll have to rename them yourselves.
 
 ### Daily Shows/Air-by-date
 
@@ -157,17 +167,16 @@ Which will match:
 	20130801
 	
 with any separator in place of the dot.
+At the time of writing, daily shows have not been tested at all.
 
 ### Specials / Miniseries
 
-We need to create expressions for miniseries
-
-						
+We need to create expressions for miniseries.						
 ## Acknowledgments
 
 Nessa utilises the following third-party data sources:
 
-- [TVShowsApp](http://tvshowsapp.com): If you like our software, please donate to them so they can keep up their fantastic work.
+- [TVShowsApp](http://tvshowsapp.com): If you like *our* software, please donate to *them* so they can keep up their fantastic work (and providing us with data)
 - [The TVDB](http://thetvdb.com): Extended show information and artwork
 - [TV Rage](http://www.tvrage.com): Episode data
 
