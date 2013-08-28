@@ -44,37 +44,10 @@ exports = module.exports = {
 	// Parse the various formats for TV Shows
 	getEpisodeNumbers: function(file) {
 		
-	//	var regexp	= /(S|Season)?\s?(\d{1,2})[\/\s]?(E|Episode|x)?\s?([\d\-]{2,})/i;
 		var regexp	= /(?:S|Season)?\s?(\d{1,2})(?:\:[\w\s]+)?[\/\s]?(?:E|Episode|x)?\s?([\d]{2,})(?:(?:E|-)\s?([\d]{2,})){0,}/i;
 		var abdexp	= /(\d{4})\D?(\d{2})\D?(\d{2})/i;
 		
 		if (match = file.match(regexp)) {
-			/*
-			if (match[2] && match[4]) {
-				var response = {
-					type: 'seasons',
-					season: null,
-					episodes: []
-				};
-				var episode	= null;
-				response.season = parseInt(match[2], 10);
-				episode = match[4];
-				if (episode.match('-')) {
-					// Multipart episode
-					var split	= episode.split('-'),
-						start	= parseInt(split[0], 10)
-						stop	= parseInt(split[split.length-1], 10);
-					
-					for (i = start; i <= stop; i++) {
-						response.episodes.push(i);
-					}
-				} else {
-					// Single episode
-					response.episodes.push(parseInt(episode, 10));
-				}
-			}
-			*/
-			
 			if (match[1] && match[2]) {
 				var response = {
 					type: 'seasons',

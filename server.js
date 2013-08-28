@@ -307,6 +307,14 @@ app.get('/check', function(req, res){
 });
 
 
+app.get('/match', function(req, res){
+	var shows = plugin('showdata');
+	
+	shows.match()
+	
+	res.end('Matching...');
+});
+
 app.get('/complete', function(req, res){
 	
 	torrent.complete();
@@ -340,8 +348,6 @@ app.get('/update', function(req, res){
 		logger.error(e.message);
 	}
 });
-
-
 
 /*
 // Magnet parser test

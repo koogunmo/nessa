@@ -50,15 +50,15 @@ module.exports = exports = {
 								}
 								if (row !== undefined) {
 									db.run("UPDATE show SET status = 1, directory = ? WHERE id = ?", dir, row.id);
-									
 								//	events.emit('scanner.shows', null, row.id);
-									
 								} else {
-									/*
-									db.run('INSERT INTO show (status,name,directory) VALUES (1,?,?)', dir, folder, function(error, result){
-										
+									// Not in database, so add to queue for later
+									db.run('INSERT INTO show_unmatched (directory) VALUES (?)', dir, function(error, result){
+										if (error) {
+											logger.error(error);
+											return;
+										}
 									});
-									*/
 								}
 							});
 						}

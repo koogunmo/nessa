@@ -30,16 +30,19 @@ var ShowData = {
 						db.get("SELECT COUNT(id), id AS count FROM show WHERE tvdb = ?", record.tvdb, function(error, row){
 							if (error || row.count >= 1) {
 							//	events.emit('shows.list', null, row.id);
-								return;
 							} else {
-								db.run("INSERT INTO show (tvdb, name, feed) VALUES (?,?,?)", record.tvdb, record.name, record.feed, function(error, resp){
-									console.log('data:list', error, resp);
+								db.run("INSERT INTO show (tvdb, name, feed) VALUES (?,?,?)", record.tvdb, record.name, record.feed, function(error){
+									if (error) {
+										logger.error(error);
+										return;
+									}
+									events.emit('shows.list', null, this.lastID);
 								});
 							}
 						});
 					});
 				});
-				events.emit('shows.list', null, null);
+		//		events.emit('shows.list', null, null);
 			} catch(e) {
 				console.error('shows.list', e.message);
 			}
@@ -109,6 +112,52 @@ var ShowData = {
 			});
 		});
 	},
+	
+	match: function(id){
+		if (id !== undefined) {
+			var sql = "SELECT * FROM show_unmatched WHERE id = "+id;
+		} else {
+			var sql = "SELECT * FROM show_unmatched";
+		}
+		db.each(sql, function(error, row){
+			// Search TVDB (we already have a method to match shows WITH a TVDB id)
+			request.get('http://thetvdb.com/api/GetSeries.php?seriesname='+row.directory, function(error, req, xml){
+				parser.parseString(xml, function(error, json){
+					if (error) {
+						logger.error(error);
+						return;
+					}
+					if (!json.Data.Series) return;
+					if (json.Data.Series.length == 1) {
+						var data = json.Data.Series[0];
+						var record = {
+							id: data.id[0],
+							name: data.SeriesName[0],
+							synopsis: data.Overview[0],
+							imdb: data.IMDB_ID[0],
+						};
+						// Add to main DB
+						db.run("INSERT INTO show (tvdb,imdb,status,name,directory,synopsis) VALUES (?,?,1,?,?,?)", record.id, record.imdb, record.name, row.directory, record.synopsis, function(error, result){
+							if (error) {
+								logger.error(error);
+								return;
+							}
+							ShowData.info(this.lastID);
+						//	events.emit('shows.list', null, this.lastid);
+							db.run("DELETE FROM show_unmatched WHERE id = ?", row.id);
+						});
+					} else {
+						// multiple results. hmmm...
+						json.Data.Series.forEach(function(result){
+							if (result.SeriesName[0].indexOf(row.directory) == 0) {
+								console.log(result.SeriesName[0]);
+							}
+						});
+					}
+				});
+			});
+		})
+	},
 
 	episodes: function(showid){
 		if (typeof(showid) == 'number') {
@@ -150,7 +199,6 @@ var ShowData = {
 				});
 			} catch(e) {
 				logger.error(e.message);
-				
 			}
 		});
 	},
@@ -199,7 +247,6 @@ var ShowData = {
 						
 						results.forEach(function(result){
 							if (show.hd != result.hd) return;
-							
 							db.all("SELECT * FROM show_episode WHERE show_id = ? AND season = ? AND episode IN ("+result.episode.join(',')+")", show.id, result.season, function(error, rows){
 								if (error) {
 									logger.error(error);
@@ -212,7 +259,6 @@ var ShowData = {
 									if (row.file || row.hash) return;
 									ids.push(row.id);
 								});
-								
 								/* Add to Transmission */
 								torrent.add({
 									id: ids,

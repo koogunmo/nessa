@@ -22,9 +22,10 @@ CREATE TABLE "show_episode" (
 	"file" TEXT,
 	"hash" TEXT
 );
+
 CREATE TABLE "show_unmatched" (
 	"id" INTEGER PRIMARY KEY AUTOINCREMENT,
-	"directory" TEXT
+	"directory" TEXT UNIQUE
 )
 
 CREATE INDEX "index" ON "show_episode" ("show_id","season","episode");

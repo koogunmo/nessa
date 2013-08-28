@@ -90,6 +90,7 @@ It was also heavily skewed towards using newsgroups, which I don't use.
 UI should be responsive, and use AJAX/Sockets for content changes, etc
 
 ### Phase 3
+- Get show/episode artwork from TVDB
 - Twilio for SMS download notifications
 - Miso integration
 	- Automatically check in when downloading the file
