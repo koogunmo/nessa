@@ -135,10 +135,11 @@ We welcome any improvements you can suggest!
 
 ### Episodic content
 	
-	(?:S|Season)?\s?(\d{1,2})[\/\s]?(?:E|Episode|x)?\s?([\d]{2,})(?:(?:E|-)\s?([\d]{2,})){0,}
+	(?:S|Season)?\s?(\d{1,2})(?:[\w\s\-\:]+)?[\/\s]?(?:E|Episode|x)?\s?([\d]{2,})(?:(?:E|-)\s?([\d]{2,})){0,}
 
-Which supports the following formats:
+Which supports the following structures:
 	
+	Season 01/Episode 02
 	Season 01/Episode 02
 	Season 01/Episode 02-03
 	S01E02
@@ -146,8 +147,13 @@ Which supports the following formats:
 	S01E02E03
 	1x02
 	1x02-03
+
+It also supports episode spans of any size. For example, it would handle a file that contains Episodes 1 through 12, although it's unlikely that such a file would ever be released.	
+
+Optionally, the Season name may have subtitle:
 	
-It also supports episode spans of any size. For example, it would handle a file that contains Episodes 1 through 12, although it's unlikely that such a file would ever be released.
+	Season 01: Subtitle/Episode 02
+	Season 01 - Subtitle/Episode 02
 
 Any episodes which are similar to:	
 
