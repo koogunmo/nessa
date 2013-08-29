@@ -318,10 +318,15 @@ app.get('/match', function(req, res){
 	res.end('Matching...');
 });
 
-app.get('/data/:show', function(req, res){
+app.get('/info/:show', function(req, res){
+	var shows = plugin('showdata');
+	shows.info(req.params.show);
+});
+app.get('/episodes/:show', function(req, res){
 	var shows = plugin('showdata');
 	shows.episodes(req.params.show);
 });
+
 
 app.get('/complete', function(req, res){
 	
