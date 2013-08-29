@@ -240,3 +240,10 @@ ul.episodes li span.actions {
 .icon.play:hover {
 	background-image: url('../gfx/icons/icon_play_hover.png');
 }
+
+@media screen and (min-width: 600px) {
+	/* Desktop */
+	ul.episodes li span.date {
+		display: table-cell;
+	}
+}

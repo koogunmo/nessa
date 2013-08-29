@@ -283,7 +283,7 @@ app.get('/install', function(req, res){
 		scanner = plugin('scanner');
 	
 	events.on('shows.list', function(error, id){
-		scanner.shows();
+		scanner.shows(id);
 	}).on('scanner.shows', function(error, id){
 		shows.info(id);
 	}).on('shows.info', function(error, id){
@@ -313,6 +313,11 @@ app.get('/match', function(req, res){
 	shows.match()
 	
 	res.end('Matching...');
+});
+
+app.get('/data/:show', function(req, res){
+	var shows = plugin('showdata');
+	shows.episodes(req.params.show);
 });
 
 app.get('/complete', function(req, res){

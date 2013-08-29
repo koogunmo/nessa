@@ -28,7 +28,11 @@ var ShowData = {
 							feed: show.mirrors[0].mirror[0]
 						};
 						db.get("SELECT COUNT(id), id AS count FROM show WHERE tvdb = ?", record.tvdb, function(error, row){
-							if (error || row.count >= 1) {
+							if (error) {
+								logger.error(error);
+								return;
+							}
+							if (row.count) {
 							//	events.emit('shows.list', null, row.id);
 							} else {
 								db.run("INSERT INTO show (tvdb, name, feed) VALUES (?,?,?)", record.tvdb, record.name, record.feed, function(error){
@@ -36,13 +40,13 @@ var ShowData = {
 										logger.error(error);
 										return;
 									}
-									events.emit('shows.list', null, this.lastID);
+							//		events.emit('shows.list', null, this.lastID);
 								});
 							}
 						});
 					});
 				});
-		//		events.emit('shows.list', null, null);
+				events.emit('shows.list', null, null);
 			} catch(e) {
 				console.error('shows.list', e.message);
 			}
@@ -159,11 +163,11 @@ var ShowData = {
 		})
 	},
 
-	episodes: function(showid){
-		if (typeof(showid) == 'number') {
-			var sql = "SELECT * FROM show WHERE id = "+showid+" AND status = 1 AND tvrage IS NOT NULL";
+	episodes: function(id){
+		if (id !== undefined) {
+			var sql = "SELECT * FROM show WHERE id = '"+id+"' AND status = 1 AND tvrage IS NOT NULL";
 		} else {
-			var sql = "SELECT * FROM show WHERE status = 1 AND ended = 0 AND tvrage IS NOT NULL"
+			var sql = "SELECT * FROM show WHERE status = 1 AND ended = 0 AND tvrage IS NOT NULL";
 		}
 		db.each(sql, function(error, show){
 			if (error) {
