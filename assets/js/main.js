@@ -72,7 +72,7 @@ require(['jquery', 'handlebars', 'socket.io'], function($, Handlebars, io){
 		
 		var data = $(this).siblings('a.show').data();
 		// temporary
-		console.log('Scan for episodes:' + );
+		console.log('Scan for episodes:' + data.id);
 		socket.emit('show.scan', {
 			id: data.id
 		}).on('show.scan', function(){
