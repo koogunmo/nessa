@@ -25,7 +25,9 @@ CREATE TABLE "show_episode" (
 
 CREATE TABLE "show_unmatched" (
 	"id" INTEGER PRIMARY KEY AUTOINCREMENT,
-	"directory" TEXT UNIQUE
-)
+	"directory" TEXT UNIQUE,
+	"tvdb" INTEGER,
+	"tvrage" INTEGER
+);
 
 CREATE INDEX "index" ON "show_episode" ("show_id","season","episode");
