@@ -286,11 +286,14 @@ app.get('/install', function(req, res){
 		scanner.shows(id);
 	}).on('scanner.shows', function(error, id){
 		shows.info(id);
+		shows.match();
 	}).on('shows.info', function(error, id){
 		shows.episodes(id);
 	}).on('shows.episodes', function(error, id){
 		scanner.episodes(id);
 	});
+	
+	//
 	
 	res.end('Building database');
 	shows.list();

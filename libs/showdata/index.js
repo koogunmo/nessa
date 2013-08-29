@@ -59,7 +59,6 @@ var ShowData = {
 		} else {
 			var sql = "SELECT * FROM show WHERE tvdb IS NOT NULL ORDER BY name ASC";
 		}
-		
 		// Enhance each show record with additional TVDB data
 		db.each(sql, function(error, show){
 			if (error) {
@@ -146,8 +145,7 @@ var ShowData = {
 								logger.error(error);
 								return;
 							}
-							ShowData.info(this.lastID);
-						//	events.emit('shows.list', null, this.lastid);
+							events.emit('scanner.shows', null, this.lastid);
 							db.run("DELETE FROM show_unmatched WHERE id = ?", row.id);
 						});
 					} else {
