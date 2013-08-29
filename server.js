@@ -55,8 +55,8 @@ var extend	= require('xtend'),
 global.events = new (require('events')).EventEmitter;
 global.logger = logger;
 
-global.helper = require('./core/helper');
-global.torrent = plugin('transmission');
+global.helper	= require('./core/helper');
+global.torrent	= plugin('transmission');
 
 var app		= express(),
 	server	= app.listen(nconf.get('port')),
@@ -91,15 +91,26 @@ torrent.connect();
 
 /***********************************************************************/
 /* Handle events */
-/*
-process.on('SIGTERM', function(){
-	logger.info('Shutting down...');
+
+events.on('shows.list', function(error, id){
+	var scanner = plugin('scanner');
+	scanner.shows(id);
+	
+}).on('scanner.shows', function(error, id){
+	var shows = plugin('showdata');
+	shows.info(id);
+	
+	if (!error) shows.match();
+	
+}).on('shows.info', function(error, id){
+	var shows = plugin('showdata');
+	shows.episodes(id);
+	
+}).on('shows.episodes', function(error, id){
+	var scanner = plugin('scanner');
+	scanner.episodes(id);
+	
 });
-/*
-process.on('SIGUSR2', function(){
-	process.kill(process.pid, 'SIGUSR2');
-});
-*/
 
 /***********************************************************************/
 /* Load tasks */
@@ -249,10 +260,6 @@ io.sockets.on('connection', function(socket) {
 		});
 	});
 	
-	
-	
-	
-	
 	// Search
 	socket.on('search', function(data){
 		db.all("SELECT * FROM show WHERE name LIKE '%?%' ORDER BY name ASC", data, function(error, rows){
@@ -277,26 +284,10 @@ app.get('/', function(req, res) {
 // Below is a chaotic mess of ideas and prototyping
 
 app.get('/install', function(req, res){
-	
-	// Scan FS for show folders
-	var shows = plugin('showdata'),
-		scanner = plugin('scanner');
-	
-	events.on('shows.list', function(error, id){
-		scanner.shows(id);
-	}).on('scanner.shows', function(error, id){
-		shows.info(id);
-		if (!error) shows.match();
-	}).on('shows.info', function(error, id){
-		shows.episodes(id);
-	}).on('shows.episodes', function(error, id){
-		scanner.episodes(id);
-	});
-	
-	//
+	var shows = plugin('showdata');
+	shows.list();
 	
 	res.end('Building database');
-	shows.list();
 });
 
 
@@ -321,10 +312,13 @@ app.get('/match', function(req, res){
 app.get('/info/:show', function(req, res){
 	var shows = plugin('showdata');
 	shows.info(req.params.show);
+	
 });
+
 app.get('/episodes/:show', function(req, res){
 	var shows = plugin('showdata');
 	shows.episodes(req.params.show);
+	
 });
 
 
