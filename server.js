@@ -260,9 +260,9 @@ io.sockets.on('connection', function(socket) {
 		});
 	});
 	
-	socket.on('show.scan', function(id){
+	socket.on('show.scan', function(data){
 		var scanner = plugin('scanner');
-		scanner.episodes(id);
+		scanner.episodes(data.id);
 	});
 	
 	// Search
