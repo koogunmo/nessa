@@ -35,26 +35,8 @@ module.exports = exports = {
 		}
 	},
 	
-	clean: function(){
-		try {
-			this.rpc.get(function(error, args){
-				if (error) {
-					logger.error(error);
-					return;
-				}
-				args.torrents.forEach(function(torrent){
-					if (torrent.isFinished) {
-						logger.info('Removing: '+torrent.name);
-				//		this.rpc.remove(torrent.id, true);
-					}
-				});
-			});
-		} catch(e){
-			logger.error(e.message);
-		}
-	},
-	
 	complete: function() {
+		var self = this;
 		try {
 			// Get a list of all completed torrents
 			this.rpc.get(function(error, data){
@@ -113,16 +95,18 @@ module.exports = exports = {
 					});
 					
 					/* Remove if seeding is completed */
-					if (torrent.isFinished) {
+					if (item.isFinished) {
 						db.get("SELECT COUNT(id) AS count FROM show_episode WHERE hash = ? GROUP BY hash", item.hashString, function(error, row){
 							if (error) {
 								logger.error(error);
 								return;
 							}
-							if (typeof(row) == 'undefined') return;
+							if (row === undefined) return;
 							if (row.count >= 1) {
 								logger.info('Removing: ' + item.name);
-								exports.rpc.remove(item.id, true);
+								self.rpc.remove(item.id, true, function(error){
+									if (error) logger.error(error);
+								});
 							}
 						});
 					}
