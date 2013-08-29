@@ -145,7 +145,7 @@ var ShowData = {
 								logger.error(error);
 								return;
 							}
-							events.emit('scanner.shows', null, this.lastid);
+							events.emit('scanner.shows', true, this.lastid);
 							db.run("DELETE FROM show_unmatched WHERE id = ?", row.id);
 						});
 					} else {
