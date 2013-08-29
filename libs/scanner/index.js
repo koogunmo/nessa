@@ -43,24 +43,24 @@ module.exports = exports = {
 							return;	
 						}
 						if (stat && stat.isDirectory()){
-							db.get("SELECT * FROM show WHERE name LIKE ? AND directory IS NULL", dir, function(error, row){
+							db.get("SELECT * FROM show WHERE name = ?", dir, function(error, row){
 								if (error) {
 									logger.error(error);
 									return;
 								}
-								
-								if (row) {
-									db.run("UPDATE show SET status = 1, directory = ? WHERE id = ?", dir, row.id);
-								//	events.emit('scanner.shows', null, row.id);
-								} else {
-									// Not in database, so add to queue for later
+								if (row === undefined) {
+									// Not in database, queue to find later
 									db.run('INSERT INTO show_unmatched (directory) VALUES (?)', dir, function(error){
 										if (error) {
 											logger.error(error);
 											return;
 										}
-										console.log(this.lastID);
 									});
+									return;
+								}
+								if (!row.directory) {
+									db.run("UPDATE show SET status = 1, directory = ? WHERE id = ?", dir, row.id);
+								//	events.emit('scanner.shows', null, row.id);
 								}
 							});
 						}
