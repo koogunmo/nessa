@@ -260,6 +260,11 @@ io.sockets.on('connection', function(socket) {
 		});
 	});
 	
+	socket.on('show.scan', function(id){
+		var scanner = plugin('scanner');
+		scanner.episodes(id);
+	});
+	
 	// Search
 	socket.on('search', function(data){
 		db.all("SELECT * FROM show WHERE name LIKE '%?%' ORDER BY name ASC", data, function(error, rows){

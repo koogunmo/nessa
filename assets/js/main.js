@@ -70,7 +70,14 @@ require(['jquery', 'handlebars', 'socket.io'], function($, Handlebars, io){
 	}).on('click', 'ul.shows div.settings', function(e){
 		e.preventDefault();
 		
-		console.log('show settings window');
+		// temporary
+		console.log('Scan for episodes');
+		socket.emit('show.scan', {
+			id: $(this).data('id')
+		}).on('show.scan', function(){
+			socket.emit('show.episodes', $(this).data('id'));
+		});
+		
 		// Open colorbox
 		// show artwork, synopsis, etc
 		
