@@ -70,12 +70,13 @@ require(['jquery', 'handlebars', 'socket.io'], function($, Handlebars, io){
 	}).on('click', 'ul.shows div.settings', function(e){
 		e.preventDefault();
 		
+		var data = $(this).siblings('a.show').data();
 		// temporary
-		console.log('Scan for episodes');
+		console.log('Scan for episodes:' + );
 		socket.emit('show.scan', {
-			id: $(this).data('id')
+			id: data.id
 		}).on('show.scan', function(){
-			socket.emit('show.episodes', $(this).data('id'));
+			socket.emit('show.episodes', data.id);
 		});
 		
 		// Open colorbox
