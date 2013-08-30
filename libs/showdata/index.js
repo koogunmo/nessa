@@ -116,7 +116,7 @@ var ShowData = {
 		});
 	},
 	
-	match: function(id){
+	match: function(id, tvdb){
 		if (id !== undefined) {
 			var sql = "SELECT * FROM show_unmatched WHERE id = "+id;
 		} else {
@@ -131,8 +131,18 @@ var ShowData = {
 						return;
 					}
 					if (!json.Data.Series) return;
-					if (json.Data.Series.length == 1) {
-						var data = json.Data.Series[0];
+					var results = json.Data.Series;
+					
+					if (tvdb !== undefined) {
+						var found = null;
+						results.forEach(function(result){
+							if (result.id[0] == tvdb) found.push(result);
+						});
+						if (found) results = found;
+					}
+					
+					if (results.length == 1) {
+						var data = results[0];
 						var record = {
 							id: data.id[0],
 							name: data.SeriesName[0],
@@ -150,7 +160,7 @@ var ShowData = {
 						});
 					} else {
 						// multiple results. hmmm...
-						json.Data.Series.forEach(function(result){
+						results.forEach(function(result){
 							if (result.SeriesName[0].indexOf(row.directory) == 0) {
 								console.log(result.SeriesName[0]);
 							}

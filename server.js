@@ -16,6 +16,15 @@ global.nconf = require('nconf').defaults({
 	run: {
 		user: 'media',
 		group: 'media'
+	},
+	shows: {
+		hd: 0
+	},
+	trakt: {
+		enabled: 0
+	},
+	twilio: {
+		enabled: 0
 	}
 }).file({file: 'settings.json'});
 
@@ -163,6 +172,19 @@ io.sockets.on('connection', function(socket) {
 		}
 	});
 	
+	socket.on('main.settings', function(){
+		socket.emit('main.settings', nconf.get());
+	});
+	
+	socket.on('settings.save', function(settings){
+		var qs = require('querystring');
+		var json = qs.parse(settings);
+		
+		for (var i in json) {
+			nconf.set(i, json[i]);
+		}
+		nconf.save();
+	});
 	
 	/* List shows */
 	socket.on('shows.available', function(){
@@ -183,7 +205,64 @@ io.sockets.on('connection', function(socket) {
 			}
 			socket.emit('shows.list', {shows: rows});
 		});
+	}).on('shows.unmatched', function(){
+		db.all("SELECT id, directory FROM show_unmatched ORDER BY directory", function(error, rows){
+			if (error) {
+				logger.error(error);
+				return;
+			}
+			var response = {
+				shows: []
+			};
+			if (rows) {
+				var parser	= new(require('xml2js')).Parser();
+				var count	= 0;
+				rows.forEach(function(row){
+					request.get('http://thetvdb.com/api/GetSeries.php?seriesname='+row.directory, function(error, req, xml){
+						parser.parseString(xml, function(error, json){
+							if (error) {
+								logger.error(error);
+								return;
+							}
+							try {
+								if (!json.Data.Series) return;
+								if (json.Data.Series.length >= 1) {
+									var results = [];
+									json.Data.Series.forEach(function(data){
+										if (!data) return;
+										var record = {
+											id: data.id[0],
+											name: data.SeriesName[0],
+											year: (data.FirstAired) ? data.FirstAired[0].substring(0,4) : null,
+											synopsis: (data.Overview) ? data.Overview[0] : null,
+											imdb: (data.IMDB_ID) ? data.IMDB_ID[0] : null
+										};
+										if (!record.year || !record.year) return;
+										results.push(record);
+									});
+									row.matches = results;
+									response.shows.push(row);
+								}
+							} catch(e) {
+								logger.error(e);
+							}
+						});
+						count++;
+						if (rows.length == count) {
+							socket.emit('shows.unmatched', response);
+						}
+					});
+				});
+			}
+		//	socket.emit('shows.unmatched', response);
+		});
+	}).on('shows.match', function(data){
+		var qs = require('querystring');
+		
+		console.log(qs.parse(data));
 	});
+	
+	
 	
 	/* Individual show data */
 	socket.on('show.info', function(data){

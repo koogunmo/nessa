@@ -5,8 +5,11 @@
 					<li class="{{#unless file}}unavailable{{/unless}} {{#if hash}}downloading{{/if}}">
 						<span class="episode">{{episode}}</span>
 						<span class="title">{{title}}</span>
+						
 						<span class="duration">{{duration}}</span>
 						<span class="date">{{airdate}}</span>
+						
+						<!-- if !file || !hash show download button -->
 					</li>
 					{{/episodes}}</ul>
 			</li>

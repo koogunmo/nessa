@@ -1,10 +1,9 @@
 requirejs.config({
 	paths: {
-		'colorbox': '/assets/js/lib/jquery.colorbox.min',
+		'bbq': '/assets/js/lib/jquery.bbq.min',
 		'handlebars': 'https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.0.0/handlebars.min',
-		'jquery': 'https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min',
-	//	'jqueryui': 'https://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min',
-		'socket.io': '/socket.io/socket.io'
+		'jquery': 'https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min',
+		'socket.io': 'https://cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min'
 	},
 	shim: {
 		'handlebars': {
@@ -25,13 +24,33 @@ function zeroPad(num, length) {
 	return (pad + num).slice(-length);
 }
 
-require(['jquery', 'handlebars', 'socket.io'], function($, Handlebars, io){
+require(['socket.io', 'jquery', 'handlebars'], function(io, $, Handlebars){
 	var port = (window.location.port) ? window.location.port : 80;
 	
 	var socket = io.connect('http://' + window.location.hostname + ':' + port, {
 		'connect timeout': 2000,
 		'max reconnection attempts': 5,
 		'sync disconnect on unload': true
+	});
+	
+	require(['bbq'], function(){
+		jQuery(window).bind('hashchange', function(e){
+			var url = $.param.fragment();
+			if (url == '') url = 'shows/dashboard';
+			socket.emit(url.replace('/','.'))
+		}).trigger('hashchange');
+	});
+	
+	
+	socket.on('page.template', function(data){
+		var tmpl = Handlebars.compile(data.template);
+		$('#main').html(tmpl(data.repsonse));
+	});
+	
+	
+	
+	socket.on('show.info', function(data){
+		
 	});
 	
 	socket.on('shows.list', function(data){
@@ -53,7 +72,36 @@ require(['jquery', 'handlebars', 'socket.io'], function($, Handlebars, io){
 		});
 	});
 	
-	socket.emit('shows.enabled');
+	socket.on('shows.unmatched', function(data){
+		
+		console.log(data);
+		
+		$.get('views/show/unmatched.html', function(tmpl){
+			var tmpl = Handlebars.compile(tmpl);
+			var html = tmpl(data);
+			
+			$('#main').html(html);
+		});
+	});
+	
+	socket.on('main.settings', function(data){
+		$.get('views/main/settings.html', function(tmpl){
+			var tmpl = Handlebars.compile(tmpl);
+			var html = tmpl(data);
+			$('#main').html(html);
+		});
+	});
+	
+//	socket.emit('main.settings');
+	
+	$(document).on('submit', 'form', function(e){
+		e.preventDefault();
+		var action	= $(this).attr('action').replace('/', '.');
+		var data	= $(this).serialize();
+		
+		socket.emit(action, data);
+	});
+	
 	
 	$(document).on('click', 'ul.shows > li > a', function(e){
 		e.preventDefault();
@@ -69,27 +117,12 @@ require(['jquery', 'handlebars', 'socket.io'], function($, Handlebars, io){
 		
 	}).on('click', 'ul.shows div.settings', function(e){
 		e.preventDefault();
-		
 		var data = $(this).siblings('a.show').data();
-		// temporary
-		console.log('Scan for episodes:' + data.id);
-		socket.emit('show.scan', {
+		
+		// Fetch show information
+		socket.emit('show.info', {
 			id: data.id
-		}).on('show.scan', function(){
-			socket.emit('show.episodes', data.id);
 		});
-		
-		// Open colorbox
-		// show artwork, synopsis, etc
-		
-		/* Set:
-			status: bool
-			hd: bool
-			directory: ?
-			TVDB: int
-			TVRage: int
-		*/
 	});
-	
 });
 

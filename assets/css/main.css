@@ -9,11 +9,13 @@ html, body {
 body {
 	color: #FFFFFF;
 	font-family: Helvetica, Verdana, Arial, sans-serif;
-	font-size: 10px;
+	font-size: 12px;
 	height: auto;
 	position: relative;
 	width: 100%;
 }
+
+/* Basic elements*/
 
 a {
 	color: #CCCCCC;
@@ -22,9 +24,58 @@ a {
 	transition: all 0.5s;
 	-webkit-transition: all 0.5s;
 }
+
 a:hover {
 	color: #FFFFFF;
 }
+
+h1 {
+	font-size: 20px;
+	font-weight: bold;
+}
+
+h2 {
+	border-bottom: 1px solid #FFFFFF;
+	font-size: 15px;
+	font-weight: bold;
+	margin-bottom: 10px;
+	padding: 10px 0px;
+}
+
+dl {
+	margin: 5px 0px;
+}
+dl > dt {
+	font-weight: bold;
+	margin: 5px 0px;
+}
+dl > dd {
+	
+}
+
+
+
+/* Form elements */
+
+input[type=text],input[type=password],select {
+	border: 1px solid #CCCCCC;
+	border-radius: 5px;
+	height: 16px;
+	padding: 2px;
+	width: 250px;
+}
+
+input[type=button], input[type=submit], a.button {
+	background-color: #000000;
+	border: 1px solid #CCCCCC;
+	border-radius: 5px;
+	color: #FFFFFF;
+	display: inline-block;
+	font-size: 12px;
+	padding: 5px 10px;
+}
+
+/* Layout elements */
 
 nav {
 	background-color: #5C697B;
@@ -239,6 +290,15 @@ ul.episodes li span.actions {
 }
 .icon.play:hover {
 	background-image: url('../gfx/icons/icon_play_hover.png');
+}
+
+ul.unmatched h2 {
+	font-size: 20px;
+}
+
+ul.matches {
+	display: block !important;
+	margin: 10px;
 }
 
 @media screen and (min-width: 600px) {
