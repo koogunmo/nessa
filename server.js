@@ -13,6 +13,7 @@ global.plugin = function(name){
 /* Load Settings */
 global.nconf = require('nconf').defaults({
 	port: 6377,
+	installed: true,
 	run: {
 		user: 'media',
 		group: 'media'
@@ -79,10 +80,10 @@ logger.info('nessa.js: Listening on port ' + nconf.get('port'));
 
 /* Database */
 if (!fs.existsSync('db/nessa.sqlite')) {
+	nconf.set('installed', false);
 	global.db = new sqlite.Database(__dirname + '/db/nessa.sqlite', function(error){
 		if (error) logger.error('DB: ', error);
 	});
-	
 	fs.readFile('db/create.sql', 'utf8', function(error, sql){
 		if (error) throw(error);
 		db.exec(sql, function(error){
@@ -172,9 +173,37 @@ io.sockets.on('connection', function(socket) {
 		}
 	});
 	
-	socket.on('main.settings', function(){
-		socket.emit('main.settings', nconf.get());
+	/* Page handlers */
+	
+	socket.on('main.dashboard', function(){
+		socket.emit('page.template', {
+			template: 'views/main/dashboard.html',
+			data: {}
+		});
+	}).on('main.settings', function(){
+		socket.emit('page.template', {
+			template: 'views/main/settings.html',
+			data: nconf.get()
+		});
+	}).on('shows.enabled', function(){
+		// List of enabled/subscribed shows
+		db.all("SELECT * FROM show WHERE status = 1 ORDER BY name ASC", function(error, rows){
+			if (error) {
+				logger.error(error);
+				return;
+			}
+			socket.emit('page.template', {
+				template: 'views/show/list.html',
+				data: {
+					shows: rows
+				}
+			});
+		});
 	});
+	
+	
+	/***************************************************/
+	/* "API" calls */
 	
 	socket.on('settings.save', function(settings){
 		var qs = require('querystring');
@@ -186,26 +215,33 @@ io.sockets.on('connection', function(socket) {
 		nconf.save();
 	});
 	
+	socket.on('show.add', function(data){
+		// Add a show
+		if (!data.id || !data.directory) return;
+		db.run("UPDATE show SET status = 1, directory = ? WHERE id = ?", data.directory, data.id, function(error){
+			if (error) {
+				logger.error(error);
+				return;
+			}
+			// Initialise the setup methods
+			var shows = plugin('showdata');
+			showdata.info(data.id);
+		});
+	}).on('show.disable', function(data){
+		// Needs improving
+		db.run("UPDATE show SET status = 0 WHERE id = ?", data.id, function(error){
+			if (error) {
+				logger.error(error);
+				return;
+			}
+		});
+	})
+	
+	
+	
+	
 	/* List shows */
-	socket.on('shows.available', function(){
-		// List of all shows
-		db.all("SELECT * FROM show WHERE status >= 0 ORDER BY name ASC", function(error, rows){
-			if (error) {
-				logger.error(error);
-				return;
-			}
-			socket.emit('shows.list', rows);
-		});
-	}).on('shows.enabled', function(data){
-		// List of enabled/subscribed shows
-		db.all("SELECT * FROM show WHERE status = 1 ORDER BY name ASC", function(error, rows){
-			if (error) {
-				logger.error(error);
-				return;
-			}
-			socket.emit('shows.list', {shows: rows});
-		});
-	}).on('shows.unmatched', function(){
+	socket.on('shows.unmatched', function(){
 		db.all("SELECT id, directory FROM show_unmatched ORDER BY directory", function(error, rows){
 			if (error) {
 				logger.error(error);
@@ -273,25 +309,6 @@ io.sockets.on('connection', function(socket) {
 				return;
 			}
 			socket.emit('show', row);
-		});
-	}).on('show.add', function(data){
-		// Add a show to the database
-		
-		db.run("UPDATE show SET status = 1, directory = ? WHERE id = ?", data.directory, data.id, function(error, result){
-			if (error) {
-				logger.error(error);
-				return;
-			}
-			if (data.status) {
-				// Trigger scanner
-			}
-		});
-	}).on('show.disable', function(data){
-		db.run("UPDATE show SET status = 0 WHERE id = ?", data.id, function(data, result){
-			if (error) {
-				logger.error(error);
-				return;
-			}
 		});
 	}).on('show.season', function(data){
 		// List all episodes of a show in a specific season

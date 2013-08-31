@@ -1,9 +1,12 @@
-# Nessa for Node
-Automated TV Torrent grabber for Shows & Movies
+# NodeTV
+Automated TV Torrenting acquisition
 
 ## System Requirements
 
-- Linux/OS X
+- Compatible operating system
+	- Linux: Tested on Ubuntu
+	- OS X *should* work too
+	- Windows users: You're on your own for now.
 - Node.js 0.10.x
 - Transmission with RPC Enabled
 - Plenty of storage space
@@ -14,7 +17,7 @@ Nessa doesn't handle uPNP/AV (yet), so you'll need a MediaServer if you want to 
 - [minidlna](minidlna.sourceforge.net) (Open-source)
 - [Twonky 7](http://twonky.com/downloads) (Commercial)
 
-These work reasonably well with VLC and my XBOX 360.
+These work reasonably well with VLC and my XBOX 360. Your mileage may vary.
 
 ## Running nessa
 
@@ -47,6 +50,8 @@ Alternatively, you could use a reverse proxy like nginx on port 80:
 I tried to use SickBeard, but it wouldn't easily let me arrange my files in a way I liked.  
 It was also heavily skewed towards using newsgroups, which I don't use.
 
+## Roadmap
+
 ### Phase 1 - **COMPLETE**
 - Populate a database of known shows
 	- We're piggybacking TVShowsApp's XML feeds for now
@@ -71,47 +76,54 @@ It was also heavily skewed towards using newsgroups, which I don't use.
 ### Phase 2 - CURRENT
 - ~~Automatic update by schedule~~
 	- Pulls latest version from Github then sends SIGUSR2
-- Build responsive HTML5 interface
-	- Use Socket.IO
-	- Handlebars for templating
-	- MUST work on mobile devices (iPad/iPhone)
-		- Mobile-first approach
+- Build responsive HTML5 interface (Ongoing)
+	- ~~Use Socket.IO~~
+	- ~~Handlebars for templating~~
+	- Responsive layout (Mobile-first)
+- Browse show list
+- Add new show via UI
+	- Use existing shows database
+	- Autocomplete style search
+	- Pick the episode to start from (or next available)
+	- Create folder using show name
+	- Start downloading (if applicable)
 - Support for unmatched shows
 	- Find shows without TVShows data, retrieve TVDB/TVRage data
 	- Scan filesystem for episodes
-- Browse show list
-	- Seasons, Episodes - Flag available/missing/downloading
-- Add new show via web
-	- Use existing shows database
-		- Create folder using show name
-	- Pick the episode to start from (or next available)
-	- Start downloading
-
-UI should be responsive, and use AJAX/Sockets for content changes, etc
 
 ### Phase 3
 - Get show/episode artwork from TVDB
 - Twilio for SMS download notifications
+- trakt integration
 - Miso integration
 	- Automatically check in when downloading the file
 - Global Settings interface
-	- File/Folder formatting
+	- ~~File/Folder formatting~~ Not happening
 	- Global Quality Preference (HD/SD)
 	- TVShow check interval
 		- 30m, 1hr, 3hr, 6hr, 12hr, 1day
-- Show Settings
-	- As per Global Settings
+		- How do we reload scheduled tasks?
+- Per-show Settings
+	- Like Global Settings
+	- Folder, SD/HD, etc
 	- SMS Notifications on/off
+	- Integration overrides
+		- trakt
+		- miso
 
 ### Phase 4
 - Ants. Ants EVERYWHERE!
 - Simple torrent management?
 - Setup wizard
+- Clean install test
 
 ### Phase 5
+- Custom templates and/or themes
+	- I'm sure some people won't like my design choices
 - Implement uPNP/DLNA MediaServer?
 	- Removes dependency on Twonky
 		- Need to find/write a good uPnP/AV module?
+
 
 ## File formatting
 
