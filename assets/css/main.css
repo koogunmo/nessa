@@ -62,7 +62,6 @@ input[type=text],input[type=password],select {
 	border-radius: 5px;
 	font-size: 18px;
 	height: 20px;
-	line-height: 22px;
 	padding: 2px;
 	width: 250px;
 }
@@ -345,6 +344,15 @@ ul.matches {
 	margin: 10px;
 }
 
+ul.results {
+	height: 290px;
+	margin: 0px 5px;
+	overflow: auto;
+}
+ul.results li {
+	font-size: 20px;
+	height: 40px;
+}
 
 .settings h2 {
 	cursor: pointer;

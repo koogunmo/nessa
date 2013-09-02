@@ -7,8 +7,11 @@ var feed	= require('feedparser'),
 
 
 var ShowData = {
-	list: function(callback){
+	list: function(rescan){
 		logger.info('Fetching show masterlist.');
+		
+		var rescan = (rescan !== undefined) ? !!rescan : false;
+		
 		// Get the latest showlist feed 
 		request.get('http://tvshowsapp.com/showlist/showlist.xml', function(error, req, xml){
 			if (error) {
@@ -46,7 +49,7 @@ var ShowData = {
 						});
 					});
 				});
-				events.emit('shows.list', null, null);
+				events.emit('shows.list', null, rescan);
 			} catch(e) {
 				console.error('shows.list', e.message);
 			}

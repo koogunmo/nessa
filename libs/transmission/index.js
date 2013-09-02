@@ -58,7 +58,7 @@ module.exports = exports = {
 						var size = 0;
 						item.files.forEach(function(k){
 							if (k.length > size) {
-								file = k.name;
+								file = item.downloadDir + '/' + k.name;
 								size = k.size;
 							}
 						});

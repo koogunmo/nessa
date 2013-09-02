@@ -102,10 +102,11 @@ torrent.connect();
 /***********************************************************************/
 /* Handle events */
 
-events.on('shows.list', function(error, id){
-	var scanner = plugin('scanner');
-	scanner.shows(id);
-	
+events.on('shows.list', function(error, response){
+	if (response) {
+		var scanner = plugin('scanner');
+		scanner.shows();
+	}
 }).on('scanner.shows', function(error, id){
 	var shows = plugin('showdata');
 	shows.info(id);
@@ -419,7 +420,7 @@ app.get('/', function(req, res) {
 
 app.get('/install', function(req, res){
 	var shows = plugin('showdata');
-	shows.list();
+	shows.list(true);
 	
 	res.end('Building database');
 });

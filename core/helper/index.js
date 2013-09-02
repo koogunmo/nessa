@@ -30,7 +30,7 @@ exports = module.exports = {
 				logger.error('READ ERROR (%d) - %s', error.errno, error.code);
 			});
 			
-			var wr = fs.createWriteStream(to, {mode: 0664});
+			var wr = fs.createWriteStream(to, {mode: 0775});
 			wr.on('error', function(error){
 				logger.error('WRITE ERROR (%d) - %s ', error.errno, error.code);
 			});
