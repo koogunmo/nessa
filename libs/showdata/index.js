@@ -271,11 +271,13 @@ var ShowData = {
 									if (row.file || row.hash) return;
 									ids.push(row.id);
 								});
-								/* Add to Transmission */
-								torrent.add({
-									id: ids,
-									magnet: result.magnet
-								});
+								if (ids.length) {
+									/* Add to Transmission */
+									torrent.add({
+										id: ids,
+										magnet: result.magnet
+									});
+								}
 							});
 						});
 					});
