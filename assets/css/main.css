@@ -214,11 +214,12 @@ nav ul li a {
 	bottom: 0px;
 	left: 0px;
 	display: none;
-	position: absolute;
+	position: fixed;
 	right: 0px;
 	top: 0px;
 	z-index: 10;
 }
+
 #modal .content {
 	background-color: #FFFFFF;
 	height: 500px;

@@ -60,18 +60,72 @@ require(['socket.io', 'jquery', 'handlebars'], function(io, $, Handlebars){
 		socket.emit(action, $(this).data());
 	});
 	
+	
+	/* Page */
 	socket.on('page.template', function(response){
 		$.get(response.template, function(tmpl){
 			var tmpl = Handlebars.compile(tmpl);
 			$('#main').html(tmpl(response.data));
 		});
+	}).on('page.reload', function(){
+		window.location.reload();
+	});
+	
+	socket.on('show.search', function(results){
+		$.get('views/show/results.html', function(tmpl){
+			var tmpl = Handlebars.compile(tmpl);
+			$('#modal .results').replaceWith(tmpl(results));
+		});
+	});
+	
+	/***************************************************/
+
+	$(document).on('click', '.show-add', function(e){
+		e.preventDefault()
+		$.get('/views/show/search.html', function(html){
+			$('#modal .content').html(html);
+			$('#modal').fadeIn(function(){
+				$('input:first-child', this).focus();
+			});
+		});
+	});
+	
+	$(document).on('keydown', '#modal', function(e){
+		if (e.which == 27) $('#modal').fadeOut();
+	});
+	
+	$(document).on('keyup', 'input.search', function(e){
+		if ($(this).val().length < 3) {
+			$('#modal .results > li').remove();
+			return;
+		}
+		socket.emit('show.search', $(this).val());
+	});
+	
+	$(document).on('click', '.results a', function(e){
+		e.preventDefault();
+		
+		socket.emit('show.add', $(this).data('id'));
+		
+		$('#modal').fadeOut(function(){
+			$(this).html('');
+		});
+		
 	});
 	
 	
-	
-	
-	
-	
+	/* Settings page */
+	$(document).on('click', '.settings h2', function(){
+		if ($('fieldset.open').length && !$(this).next('fieldset').hasClass('open')) {
+			$('fieldset.open').removeClass('open').slideUp();
+		}
+		$(this).next('fieldset').addClass('open').slideDown();
+	});
+
+
+
+
+
 	/***************************************************/
 	
 	
@@ -129,18 +183,8 @@ require(['socket.io', 'jquery', 'handlebars'], function(io, $, Handlebars){
 		});
 	});
 	
-	$(document).on('click', 'input.switch', function(){
-		
-	});
 	
 	
-	/* Settings page */
-	$(document).on('click', '.settings h2', function(){
-		if ($('fieldset.open').length && !$(this).next('fieldset').hasClass('open')) {
-			$('fieldset.open').removeClass('open').slideUp();
-		}
-		$(this).next('fieldset').addClass('open').slideDown();
-	});
 	
 });
 

@@ -230,18 +230,39 @@ io.sockets.on('connection', function(socket) {
 		nconf.save();
 	});
 	
-	socket.on('show.add', function(data){
+	socket.on('show.add', function(id){
 		// Add a show
-		if (!data.id || !data.directory) return;
-		db.run("UPDATE show SET status = 1, directory = ? WHERE id = ?", data.directory, data.id, function(error){
+		db.get("SELECT * FROM show WHERE id = ?", id, function(error, row){
 			if (error) {
 				logger.error(error);
 				return;
 			}
-			// Initialise the setup methods
-			var shows = plugin('showdata');
-			showdata.info(data.id);
+			if (!row) return;
+			var update = {
+				status: 1,
+				directory: null
+			};
+			if (!row.directory) {
+				try {
+					var mkdir = require('mkdirp');
+					mkdir(nconf.get('shows:base') + '/' + row.name, 0644);
+					update.directory = row.name;
+				} catch(e) {
+					logger.error(e.message);
+				}
+			} else {
+				update.directory = row.directory;
+			}
+			
+			db.run("UPDATE show SET status = ?, directory = ? WHERE id = ?", update.status, update.directory, row.id, function(error){
+				if (error) {
+					logger.error(error);
+					return;
+				}
+				socket.emit('page.reload');
+			});
 		});
+		
 	}).on('show.disable', function(data){
 		// Needs improving
 		db.run("UPDATE show SET status = 0 WHERE id = ?", data.id, function(error){
@@ -377,13 +398,14 @@ io.sockets.on('connection', function(socket) {
 	});
 	
 	// Search
-	socket.on('search', function(data){
-		db.all("SELECT * FROM show WHERE name LIKE '%?%' ORDER BY name ASC", data, function(error, rows){
+	socket.on('show.search', function(data){
+		var query = '%'+data+'%';
+		db.all("SELECT * FROM show WHERE name LIKE ? AND status = 0 ORDER BY name ASC", query, function(error, rows){
 			if (error) {
 				logger.error(error);
 				return;
 			}
-			
+			socket.emit('show.search', {shows: rows});
 		});
 	});
 	
