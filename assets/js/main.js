@@ -40,6 +40,19 @@ require(['socket.io', 'jquery', 'handlebars'], function(io, $, Handlebars){
 		}
 	};
 	
+	
+	
+	$(document).on('resize', function(){
+		// Reposition modal window
+		var modal	= $('#modal');
+		var height	= $('.wrapper', modal).height();
+		var width	= $('.wrapper', modal).width();
+		$('.wrapper', modal).css({
+			'margin-left': 0-(width/2),
+			'margin-top': 0-(height/2) || 0
+		});
+	}).trigger('resize');
+	
 	/*
 	$(document).on('click', 'a.confirm', function(){
 		if (!confirm('Are you sure?')) {
@@ -106,6 +119,7 @@ require(['socket.io', 'jquery', 'handlebars'], function(io, $, Handlebars){
 		$.get('views/show/results.html', function(tmpl){
 			var tmpl = Handlebars.compile(tmpl);
 			$('#modal .results').replaceWith(tmpl(results));
+			$(document).trigger('resize');
 		});
 	});
 	

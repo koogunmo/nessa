@@ -60,8 +60,9 @@ dl > dd {
 input[type=text],input[type=password],select {
 	border: 1px solid #CCCCCC;
 	border-radius: 5px;
-	font-size: 16px;
+	font-size: 18px;
 	height: 20px;
+	line-height: 22px;
 	padding: 2px;
 	width: 250px;
 }
@@ -224,14 +225,16 @@ nav ul li a {
 }
 
 #modal .wrapper {
-	background-color: #FFFFFF;
-	height: 500px;
+	background-color: #4E5969;
+	border-radius: 10px; 
+	height: auto;
 	left: 50%;
-	margin: -250px -250px;
+	height: 350px;
 	top: 50%;
 	position: fixed;
 	width: 500px;
 }
+
 #modal .close {
 	background-image: url('../gfx/icons/close.png');
 	background-position: center center;
@@ -241,10 +244,24 @@ nav ul li a {
 	font-size: 15px;
 	height: 20px;
 	position: absolute;
-	right: 0px;
+	right: 5px;
 	text-align: center;
-	top: 0px;
+	top: 5px;
 	width: 20px;
+}
+
+#modal #search div.query {
+	padding: 10px;
+	text-align: center;
+}
+
+input.search {
+	background-image: url('../gfx/icons/search.png');
+	background-position: 5px center;
+	background-repeat: no-repeat;
+	outline: none;
+	padding-left: 25px;
+	width: 80%;
 }
 
 footer {
