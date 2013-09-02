@@ -1,6 +1,7 @@
 <form class="settings" action="settings/save" method="post">
 	<div class="toolbar">
 		<input type="submit" value="Save settings" />
+		<input type="reset" value="Cancel" />
 	</div>
 	
 	<h2>Global Settings</h2>
@@ -67,8 +68,9 @@
 	
 	<h2>System</h2>
 	<fieldset>
-		<a href="system/restart" class="button">Restart NodeTV</a>
-		<a href="system/update" class="button">Update NodeTV</a>
+		<a href="system/rescan" class="button confirm">Rescan Media</a>
+		<a href="system/update" class="button confirm">Update NodeTV</a>
+		<a href="system/restart" class="button confirm">Restart NodeTV</a>
 	</fieldset>
 </form>
 

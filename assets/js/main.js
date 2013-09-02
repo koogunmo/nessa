@@ -25,6 +25,31 @@ function zeroPad(num, length) {
 }
 
 require(['socket.io', 'jquery', 'handlebars'], function(io, $, Handlebars){
+	
+	var nessa = {
+		init: function(){
+			
+		},
+		modalClose: function(){
+			$('#modal').fadeOut(function(){
+				$('.content', this).html('');
+			});
+		},
+		modalOpen: function(){
+			$('#modal').fadeIn();
+		}
+	};
+	
+	/*
+	$(document).on('click', 'a.confirm', function(){
+		if (!confirm('Are you sure?')) {
+			e.stopPropagation();
+			return false;
+		}
+		return true;
+	});
+	*/
+	
 	var port = (window.location.port) ? window.location.port : 80;
 	
 	var socket = io.connect('http://' + window.location.hostname + ':' + port, {
@@ -34,8 +59,7 @@ require(['socket.io', 'jquery', 'handlebars'], function(io, $, Handlebars){
 	});
 	
 	socket.on('reconnect', function(data) {
-		// Reload the page
-	//	window.location.reload();
+		// ???
 	});
 	
 	require(['bbq'], function(){
@@ -57,7 +81,14 @@ require(['socket.io', 'jquery', 'handlebars'], function(io, $, Handlebars){
 	$(document).on('click', 'a.button', function(e){
 		e.preventDefault()
 		var action	= $(this).attr('href').replace('/', '.');
-		socket.emit(action, $(this).data());
+		
+		if ($(this).hasClass('confirm')) {
+			var msg = ($(this).data('msg')) ? $(this).data('msg') : 'Are you sure?';
+			var confirmed = confirm(msg);
+		} else {
+			var confirmed = true;
+		}
+		if (confirmed) socket.emit(action, $(this).data());
 	});
 	
 	
@@ -79,7 +110,12 @@ require(['socket.io', 'jquery', 'handlebars'], function(io, $, Handlebars){
 	});
 	
 	/***************************************************/
-
+	
+	$('#modal > .wrapper > .close').on('click', function(e){
+		nessa.modalClose();
+	});
+	
+	
 	$(document).on('click', '.show-add', function(e){
 		e.preventDefault()
 		$.get('/views/show/search.html', function(html){
@@ -90,9 +126,11 @@ require(['socket.io', 'jquery', 'handlebars'], function(io, $, Handlebars){
 		});
 	});
 	
-	$(document).on('keydown', '#modal', function(e){
-		if (e.which == 27) $('#modal').fadeOut();
+	$(document).on('keydown', function(e){
+		if (e.which == 27) nessa.modalClose();
 	});
+	
+	
 	
 	$(document).on('keyup', 'input.search', function(e){
 		if ($(this).val().length < 3) {

@@ -187,7 +187,6 @@ io.sockets.on('connection', function(socket) {
 	});
 	
 	
-	
 	/* Page handlers */
 	
 	socket.on('main.dashboard', function(){
@@ -271,10 +270,7 @@ io.sockets.on('connection', function(socket) {
 				return;
 			}
 		});
-	})
-	
-	
-	
+	});
 	
 	/* List shows */
 	socket.on('shows.unmatched', function(){
