@@ -1,4 +1,7 @@
-<ul class="shows">{{#shows}}
+<ul class="shows">
+	<li class="show-add">
+		<a href="#show/add">Add Show</a>
+	</li>{{#shows}}
 	<li id="show-{{id}}">
 		<div class="settings"></div>
 		<a href="#" class="show" data-id="{{id}}">{{name}}</a>
@@ -15,5 +18,8 @@
 					{{/episodes}}</ul>
 			</li>
 		{{/seasons}}</ul>
+	</li>{{/shows}}
+	<li class="show-add">
+		<a href="#show/add">Add Show</a>
 	</li>
-{{/shows}}</ul>
+</ul>

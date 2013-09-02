@@ -75,6 +75,10 @@ input[type=button], input[type=submit], a.button {
 	padding: 5px 10px;
 }
 
+div.toolbar {
+	text-align: right;
+}
+
 /* Layout elements */
 
 nav {
@@ -131,9 +135,8 @@ nav ul li a {
 
 #main {
 	margin: 0px auto;
-	max-width: 960px;
-	padding-top: 50px;
-	
+	max-width: 940px;
+	padding: 50px 10px 0px;
 }
 
 #main ul {
@@ -181,7 +184,7 @@ nav ul li a {
 	width: 16px;
 }
 
-#main ul.shows a.show {
+#main > ul > li > a {
 	display: block;
 	font-size: 20px;
 	font-weight: bold;
@@ -190,6 +193,12 @@ nav ul li a {
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
+#main li.show-add > a {
+	max-width: 100% !important;
+	text-align: right;
+}
+
+
 
 #main ul.seasons {
 	margin: 10px 0px;
@@ -299,6 +308,14 @@ ul.unmatched h2 {
 ul.matches {
 	display: block !important;
 	margin: 10px;
+}
+
+
+.settings h2 {
+	cursor: pointer;
+}
+.settings fieldset {
+	display: none;
 }
 
 @media screen and (min-width: 600px) {

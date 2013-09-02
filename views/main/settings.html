@@ -1,50 +1,74 @@
-<form action="settings/save" method="post">
+<form class="settings" action="settings/save" method="post">
+	<div class="toolbar">
+		<input type="submit" value="Save settings" />
+	</div>
+	
 	<h2>Global Settings</h2>
-	<dl>
-		<dt>Media Directory</dt>
-		<dd><input type="text" name="shows:base" value="{{shows.base}}" /></dd>
-		<dt>Prefer HD Video</dt>
-		<dd><input type="text" name="shows:hd" value="{{shows.hd}}" /></dd>
-	</dl>
+	<fieldset>
+		<dl>
+			<dt>Media Directory</dt>
+			<dd><input type="text" name="shows:base" value="{{shows.base}}" /></dd>
+			<dt>Prefer HD Video</dt>
+			<dd><input type="text" name="shows:hd" value="{{shows.hd}}" /></dd>
+		</dl>
+	</fieldset>
 	
 	<h2>Transmission RPC</h2>
-	<dl>
-		<dt>Username</dt>
-		<dd><input type="text" name="transmission:username" value="{{transmission.username}}" /></dd>
-		<dt>Password</dt>
-		<dd><input type="password" name="transmission:password" value="{{transmission.password}}" /></dd>
-		<dt>Host</dt>
-		<dd><input type="text" name="transmission:host" value="{{transmission.host}}" /></dd>
-		<dt>Port</dt>
-		<dd><input type="text" name="transmission:port" value="{{transmission.port}}" /></dd>
-	</dl>
+	<fieldset>
+		<dl>
+			<dt>Username</dt>
+			<dd><input type="text" name="transmission:username" value="{{transmission.username}}" /></dd>
+			<dt>Password</dt>
+			<dd><input type="password" name="transmission:password" value="{{transmission.password}}" /></dd>
+			<dt>Host</dt>
+			<dd><input type="text" name="transmission:host" value="{{transmission.host}}" /></dd>
+			<dt>Port</dt>
+			<dd><input type="text" name="transmission:port" value="{{transmission.port}}" /></dd>
+		</dl>
+	</fieldset>
 	
 	<h2>Twilio</h2>
-	<dl>
-		<dt>Enable Notifications</dt>
-		<dd><input type="text" name="twilio:enabled" value="{{twilio.enabled}}" /></dd>
-		<dt>Phone Number</dt>
-		<dd><input type="text" name="twilio:phone" value="{{twilio.phone}}" /></dd>
-		<dt>SID</dt>
-		<dd><input type="text" name="twilio:sid" value="{{twilio.sid}}" /></dd>
-		<dt>Token</dt>
-		<dd><input type="text" name="twilio:token" value="{{twilio.token}}" /></dd>
-	</dl>
+	<fieldset>
+		<dl>
+			<dt>Enable Notifications</dt>
+			<dd><input type="text" name="twilio:enabled" value="{{twilio.enabled}}" /></dd>
+			<dt>Phone Number</dt>
+			<dd><input type="text" name="twilio:phone" value="{{twilio.phone}}" /></dd>
+			<dt>SID</dt>
+			<dd><input type="text" name="twilio:sid" value="{{twilio.sid}}" /></dd>
+			<dt>Token</dt>
+			<dd><input type="text" name="twilio:token" value="{{twilio.token}}" /></dd>
+		</dl>
+	</fieldset>
 	
 	<h2>The TVDB</h2>
-	<dl>
-		<dt>API Key</dt>
-		<dd><input type="text" name="tvdb:apikey" value="{{tvdb.apikey}}" /></dd>
-	</dl>
+	<fieldset>
+		<dl>
+			<dt>API Key</dt>
+			<dd><input type="text" name="tvdb:apikey" value="{{tvdb.apikey}}" /></dd>
+		</dl>
+	</fieldset>
 	
 	<h2>trakt</h2>
-	<dl>
-		<dt>Enable checkins</dt>
-		<dd><input type="text" name="trakt:enabled" value="{{trakt.enabled}}" /></dd>
-		<dt>API Key</dt>
-		<dd><input type="text" name="trakt:apikey" value="{{trakt.apikey}}" /></dd>
-	</dl>
+	<fieldset>
+		<dl>
+			<dt>Enable checkins</dt>
+			<dd><input type="text" name="trakt:enabled" value="{{trakt.enabled}}" /></dd>
+			<dt>API Key</dt>
+			<dd><input type="text" name="trakt:apikey" value="{{trakt.apikey}}" /></dd>
+		</dl>
+	</fieldset>
+
+	<h2>Miso</h2>
+	<fieldset>
+		Coming soon
+	</fieldset>
+
 	
-	<input type="submit" value="Save settings" />
+	<h2>System</h2>
+	<fieldset>
+		<a href="system/restart" class="button">Restart NodeTV</a>
+		<a href="system/update" class="button">Update NodeTV</a>
+	</fieldset>
 </form>
 

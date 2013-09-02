@@ -33,10 +33,15 @@ require(['socket.io', 'jquery', 'handlebars'], function(io, $, Handlebars){
 		'sync disconnect on unload': true
 	});
 	
+	socket.on('reconnect', function(data) {
+		// Reload the page
+	//	window.location.reload();
+	});
+	
 	require(['bbq'], function(){
 		jQuery(window).bind('hashchange', function(e){
 			var url = $.param.fragment();
-			if (url == '') url = 'shows/dashboard';
+			if (url == '') url = 'main/dashboard';
 			socket.emit(url.replace('/','.'))
 		}).trigger('hashchange');
 	});
@@ -47,6 +52,12 @@ require(['socket.io', 'jquery', 'handlebars'], function(io, $, Handlebars){
 		var action	= $(this).attr('action').replace('/', '.');
 		var data	= $(this).serialize();
 		socket.emit(action, data);
+	});
+	
+	$(document).on('click', 'a.button', function(e){
+		e.preventDefault()
+		var action	= $(this).attr('href').replace('/', '.');
+		socket.emit(action, $(this).data());
 	});
 	
 	socket.on('page.template', function(response){
@@ -87,9 +98,6 @@ require(['socket.io', 'jquery', 'handlebars'], function(io, $, Handlebars){
 	});
 	
 	socket.on('shows.unmatched', function(data){
-		
-		console.log(data);
-		
 		$.get('views/show/unmatched.html', function(tmpl){
 			var tmpl = Handlebars.compile(tmpl);
 			var html = tmpl(data);
@@ -97,9 +105,6 @@ require(['socket.io', 'jquery', 'handlebars'], function(io, $, Handlebars){
 			$('#main').html(html);
 		});
 	});
-	
-//	socket.emit('main.settings');
-	
 	
 	
 	$(document).on('click', 'ul.shows > li > a', function(e){
@@ -123,5 +128,19 @@ require(['socket.io', 'jquery', 'handlebars'], function(io, $, Handlebars){
 			id: data.id
 		});
 	});
+	
+	$(document).on('click', 'input.switch', function(){
+		
+	});
+	
+	
+	/* Settings page */
+	$(document).on('click', '.settings h2', function(){
+		if ($('fieldset.open').length && !$(this).next('fieldset').hasClass('open')) {
+			$('fieldset.open').removeClass('open').slideUp();
+		}
+		$(this).next('fieldset').addClass('open').slideDown();
+	});
+	
 });
 

@@ -268,7 +268,7 @@ var ShowData = {
 								
 								var ids = [];
 								rows.forEach(function(row){
-									if (row.file || row.hash) return;
+									if (row.hash || row.file) return;
 									ids.push(row.id);
 								});
 								if (ids.length) {

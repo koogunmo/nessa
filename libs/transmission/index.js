@@ -17,6 +17,7 @@ module.exports = exports = {
 	
 	add: function(obj) {
 		try {
+			// TO DO: reformat magnet to add extra trackers
 			this.rpc.add(obj.magnet, function(error, args){
 				if (error) {
 					logger.error('bt:add', error);

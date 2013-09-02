@@ -153,14 +153,13 @@ io.sockets.on('connection', function(socket) {
 		logger.info('New connection (' + socket.transport + ') ' + sessionid);
 		
 		
-		
 	} catch(e) {
 		logger.error('connection: ' + e.message);
 	}
 	
 	socket.on('reconnected', function(data) {
 		try {
-			
+			console.log(data);
 		} catch(e) {
 			logger.error('reconnected: ' + e.message);
 		}
@@ -172,6 +171,22 @@ io.sockets.on('connection', function(socket) {
 			logger.error('disconnect: ' + e.message);
 		}
 	});
+	
+	
+	/* System handlers */
+	socket.on('system.update', function(data){
+		// Force an update from github (if one is available)
+		var system = plugin('system');
+		system.update();
+		
+	}).on('system.restart', function(data){
+		// Restart the process, NOT the server
+		var system = plugin('system');
+		system.restart()
+		
+	});
+	
+	
 	
 	/* Page handlers */
 	
@@ -430,7 +445,8 @@ app.get('/complete', function(req, res){
 	res.end('Checking for completed downloads');
 });
 
-app.get('/update', function(req, res){
+/*
+app.get('/system/update', function(req, res){
 	try {
 		var exec = require('child_process').exec;
 		exec('git --git-dir=' + process.cwd() + '/.git pull origin', function(error, stdout, stderr){
@@ -442,13 +458,9 @@ app.get('/update', function(req, res){
 				res.end('No update available.');
 				return;
 			}
-			
-			/*
-			exec('cd ' + process.cwd() + ' && npm update', function(error, stdout, stderr){
-				// Update npm packages
-			});
-			*/
-			
+		//	exec('cd ' + process.cwd() + ' && npm update', function(error, stdout, stderr){
+		//		// Update npm packages
+		//	});
 			res.end('Update complete. Restarting server...');
 			process.kill(process.pid, 'SIGUSR2');
 		});
@@ -456,6 +468,8 @@ app.get('/update', function(req, res){
 		logger.error(e.message);
 	}
 });
+*/
+
 
 /*
 // Magnet parser test
@@ -464,7 +478,7 @@ console.log(helper.formatMagnet(magnet));
 */
 
 /*
-app.get('/restart', function(req, res){
+app.get('/system/reboot', function(req, res){
 	res.end('Restarting server...');
 	process.kill(process.pid, 'SIGUSR2');
 });
