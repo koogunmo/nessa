@@ -83,6 +83,24 @@ div.toolbar {
 
 /* Layout elements */
 
+#loading {
+	background-color: rgba(0,0,0,0.7);
+	background-image: url('../gfx/spinner.gif');
+	background-position: center center;
+	background-repeat: no-repeat;
+	bottom: 0px;
+	cursor: wait;
+	display: block;
+	left: 0px;
+	height: auto;
+	pointer-events: all;
+	position: fixed;
+	right: 0px;
+	top: 0px;
+	width: auto;
+	z-index: 100;
+}
+
 nav {
 	background-color: #5C697B;
 	border-bottom: 1px solid #CCCCCC;
@@ -218,20 +236,35 @@ nav ul li a {
 	left: 0px;
 	display: none;
 	position: fixed;
+	pointer-events: all;
 	right: 0px;
 	top: 0px;
 	z-index: 10;
 }
 
 #modal .wrapper {
+	/*
 	background-color: #4E5969;
 	border-radius: 10px; 
 	height: auto;
 	left: 50%;
 	height: 350px;
+	margin: 10px;
 	top: 50%;
 	position: fixed;
-	width: 500px;
+	max-width: 500px;
+	min-width: 300px;
+	*/
+	
+	background-color: #4E5969;
+	border-radius: 10px;
+	bottom: 5%;
+	height: auto;
+	left: 5%;
+	top: 5%;
+	position: absolute;
+	right: 5%;
+	width: auto;
 }
 
 #modal .close {

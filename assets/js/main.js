@@ -41,7 +41,7 @@ require(['socket.io', 'jquery', 'handlebars'], function(io, $, Handlebars){
 	};
 	
 	
-	
+	/*
 	$(document).on('resize', function(){
 		// Reposition modal window
 		var modal	= $('#modal');
@@ -52,15 +52,6 @@ require(['socket.io', 'jquery', 'handlebars'], function(io, $, Handlebars){
 			'margin-top': 0-(height/2) || 0
 		});
 	}).trigger('resize');
-	
-	/*
-	$(document).on('click', 'a.confirm', function(){
-		if (!confirm('Are you sure?')) {
-			e.stopPropagation();
-			return false;
-		}
-		return true;
-	});
 	*/
 	
 	var port = (window.location.port) ? window.location.port : 80;
@@ -71,17 +62,30 @@ require(['socket.io', 'jquery', 'handlebars'], function(io, $, Handlebars){
 		'sync disconnect on unload': true
 	});
 	
-	socket.on('reconnect', function(data) {
-		// ???
-	});
 	
 	require(['bbq'], function(){
-		jQuery(window).bind('hashchange', function(e){
+		$(window).bind('hashchange', function(e){
 			var url = $.param.fragment();
 			if (url == '') url = 'main/dashboard';
 			socket.emit(url.replace('/','.'))
-		}).trigger('hashchange');
+		});
 	});
+
+	socket.on('connect', function(data){
+		console.log('connect', data);
+		$(window).trigger('hashchange');
+		$('#loading').hide();
+		
+	}).on('disconnect', function(data){
+		console.log('disconnect', data);
+		$('#loading').show();
+		
+	}).on('reconnect', function(data) {
+		console.log('reconnect', data);
+		$('#loading').hide();
+		
+	});
+
 	
 	$(document).on('submit', 'form', function(e){
 		/* Generic form handler */
