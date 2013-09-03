@@ -6,21 +6,18 @@ lib-cov
 *.out
 *.pid
 *.gz
-
 .DS_Store
 
+assets/artwork/*.*
+cache/*.*
 db/*.sqlite
+npm-debug.log
+settings.json
 
-pids
+docs
 logs
-results
 node_modules
 
-npm-debug.log
-
-cache/*.*
-docs
-settings.json
-test_data/*
+test_data
 test.*
 upnp.js

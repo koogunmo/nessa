@@ -48,6 +48,7 @@ if (process.title) process.title = 'nessa.js';
 var extend	= require('xtend'),
 	express	= require('express'),
 	fs		= require('fs'),
+	http	= require('http'),
 	logger	= require('log4js').getLogger(),
 	mime	= require('mime'),
 	path	= require('path'),
@@ -116,6 +117,7 @@ events.on('shows.list', function(error, response){
 }).on('shows.info', function(error, id){
 	var shows = plugin('showdata');
 	shows.episodes(id);
+	shows.artwork(id);
 	
 }).on('shows.episodes', function(error, id){
 	var scanner = plugin('scanner');
@@ -260,6 +262,8 @@ io.sockets.on('connection', function(socket) {
 					return;
 				}
 				socket.emit('page.reload');
+				var show = plugin('showdata');
+				show.info(row.id);
 			});
 		});
 		
@@ -414,14 +418,11 @@ app.get('/', function(req, res) {
 	res.sendfile('views/index.html');
 });
 
-
-
 // Below is a chaotic mess of ideas and prototyping
 
 app.get('/install', function(req, res){
 	var shows = plugin('showdata');
 	shows.list(true);
-	
 	res.end('Building database');
 });
 

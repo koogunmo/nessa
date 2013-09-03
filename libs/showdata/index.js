@@ -1,5 +1,6 @@
 var feed	= require('feedparser'),
 	fs		= require('fs'),
+	http	= require('http'),
 	parser	= new(require('xml2js')).Parser(),
 	request	= require('request'),
 	tvrage	= plugin('tvrage'),
@@ -55,6 +56,57 @@ var ShowData = {
 			}
 		});
 	},
+	
+	artwork: function(id) {
+		db.get("SELECT * FROM show WHERE id = ? AND tvdb IS NOT NULL", id, function(error, show){
+			if (error) {
+				logger.error(error);
+				return;
+			}
+			request.get('http://thetvdb.com/api/'+nconf.get('tvdb:apikey')+'/series/'+show.tvdb+'/en.xml', function(error, req, xml){
+				if (error) {
+					logger.error(error);
+					return;
+				}
+				try {
+					parser.parseString(xml, function(error, json){
+						if (error) throw error;
+						var data = json.Data.Series[0];
+						if (data.banner) {
+							http.get('http://www.thetvdb.com/banners/'+data.banner[0], function(res){
+								var imagedata = '';
+								res.setEncoding('binary')
+								res.on('data', function(chunk){
+									imagedata += chunk
+								});
+								res.on('end', function(){
+									fs.writeFile(process.cwd() + '/assets/artwork/'+show.tvdb+'.jpg', imagedata, 'binary', function(error){
+										if (error) throw error;
+									});
+								});
+							});
+						}
+						if (data.poster) {
+							http.get('http://www.thetvdb.com/banners/'+data.poster[0], function(res){
+								var imagedata = '';
+								res.setEncoding('binary')
+								res.on('data', function(chunk){
+									imagedata += chunk
+								});
+								res.on('end', function(){
+									fs.writeFile(nconf.get('shows:base')+'/'+show.directory+'/cover.jpg', imagedata, 'binary', function(error){
+										if (error) throw error;
+									});
+								});
+							});
+						}
+					});
+				} catch(e) {
+					logger.error(e.message);
+				}
+			});
+		});
+	},
 		
 	info: function(showid){
 		if (typeof(showid) == 'number') {
@@ -68,6 +120,7 @@ var ShowData = {
 				console.error(error);
 				return;
 			}
+			if (!show) return;
 			logger.info(show.name + ': Fetching show data');
 			request.get('http://thetvdb.com/api/'+nconf.get('tvdb:apikey')+'/series/'+show.tvdb+'/en.xml', function(error, req, xml){
 				if (error) {

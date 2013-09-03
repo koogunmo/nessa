@@ -188,9 +188,15 @@ nav ul li a {
 	margin-bottom: 20px;
 }
 #main ul.shows > li {
+	background-position: left top;
+	background-repeat: no-repeat;
+	background-size: contain;
 	border-bottom: 1px solid #CCCCCC;
 	padding: 10px;
 	position: relative;
+}
+#main ul.shows > li.banner > a.show {
+	text-indent: -999px;
 }
 
 #main ul.shows > li > .settings {

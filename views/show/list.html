@@ -2,7 +2,7 @@
 	<li class="show-add">
 		<a href="#show/add">Add Show</a>
 	</li>{{#shows}}
-	<li id="show-{{id}}">
+	<li id="show-{{id}}" data-tvdb="{{tvdb}}">
 		<div class="settings"></div>
 		<a href="#" class="show" data-id="{{id}}">{{name}}</a>
 		<ul class="seasons">{{#seasons}}

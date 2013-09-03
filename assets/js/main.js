@@ -114,6 +114,15 @@ require(['socket.io', 'jquery', 'handlebars'], function(io, $, Handlebars){
 		$.get(response.template, function(tmpl){
 			var tmpl = Handlebars.compile(tmpl);
 			$('#main').html(tmpl(response.data));
+			/*
+			$('ul.shows > li[data-tvdb]').each(function(){
+				var tvdb = $(this).data('tvdb');
+				if (!tvdb) return;
+				$(this).css({
+					'background-image': 'url(assets/artwork/'+tvdb+'.jpg)'
+				}).addClass('banner');
+			});
+			*/
 		});
 	}).on('page.reload', function(){
 		window.location.reload();
