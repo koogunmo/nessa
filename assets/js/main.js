@@ -114,7 +114,6 @@ require(['socket.io', 'jquery', 'handlebars'], function(io, $, Handlebars){
 		$.get(response.template, function(tmpl){
 			var tmpl = Handlebars.compile(tmpl);
 			$('#main').html(tmpl(response.data));
-			/*
 			$('ul.shows > li[data-tvdb]').each(function(){
 				var tvdb = $(this).data('tvdb');
 				if (!tvdb) return;
@@ -122,7 +121,6 @@ require(['socket.io', 'jquery', 'handlebars'], function(io, $, Handlebars){
 					'background-image': 'url(assets/artwork/'+tvdb+'.jpg)'
 				}).addClass('banner');
 			});
-			*/
 		});
 	}).on('page.reload', function(){
 		window.location.reload();
@@ -232,8 +230,9 @@ require(['socket.io', 'jquery', 'handlebars'], function(io, $, Handlebars){
 		if (!$('li', seasons).length) {
 			socket.emit('show.episodes', $(this).data('id'));
 		} else {
-			$(seasons).slideToggle();
+			$(seasons).slideToggle()
 		}
+		$(this).parent().toggleClass('open');
 	}).on('click', 'ul.shows a.season', function(e){
 		e.preventDefault();
 		$(this).siblings('ul.episodes').slideToggle();

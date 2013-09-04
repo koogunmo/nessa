@@ -8,7 +8,7 @@ html, body {
 
 body {
 	color: #FFFFFF;
-	font-family: 'Myriad Pro', Helvetica, Verdana, Arial, sans-serif;
+	font-family: Helvetica, Verdana, Arial, sans-serif;
 	font-size: 12px;
 	height: auto;
 	position: relative;
@@ -162,7 +162,7 @@ nav ul li a {
 #main ul {
 	font-size: 14px;
 }
-#main ul li:hover {
+#main ul.shows > li:hover {
 	background-color: #545f70;
 }
 #main ul li a {
@@ -195,9 +195,14 @@ nav ul li a {
 	padding: 10px;
 	position: relative;
 }
-#main ul.shows > li.banner > a.show {
+
+/*
+#main ul.shows > li.banner.open > a.show {
 	text-indent: -999px;
+	background-image: none;
 }
+*/
+
 
 #main ul.shows > li > .settings {
 	background-image: url('../gfx/icons/cog.png');
@@ -225,9 +230,8 @@ nav ul li a {
 	text-align: right;
 }
 
-
-
 #main ul.seasons {
+	background-color: rgba(0,0,0,0.5);
 	margin: 10px 0px;
 }
 

@@ -57,12 +57,18 @@ var ShowData = {
 		});
 	},
 	
-	artwork: function(id) {
-		db.get("SELECT * FROM show WHERE id = ? AND tvdb IS NOT NULL", id, function(error, show){
+	artwork: function(showid) {
+		if (typeof(showid) == 'number') {
+			var sql = "SELECT * FROM show WHERE id = "+showid+" AND status = 1 AND tvdb IS NOT NULL ORDER BY name ASC";
+		} else {
+			var sql = "SELECT * FROM show WHERE status = 1 AND tvdb IS NOT NULL ORDER BY name ASC";
+		}
+		db.each(sql, function(error, show){
 			if (error) {
 				logger.error(error);
 				return;
 			}
+			logger.info(show.name+': Fetching artwork');
 			request.get('http://thetvdb.com/api/'+nconf.get('tvdb:apikey')+'/series/'+show.tvdb+'/en.xml', function(error, req, xml){
 				if (error) {
 					logger.error(error);
@@ -70,7 +76,10 @@ var ShowData = {
 				}
 				try {
 					parser.parseString(xml, function(error, json){
-						if (error) throw error;
+						if (error) {
+							logger.error(error);
+							return;
+						}
 						var data = json.Data.Series[0];
 						if (data.banner) {
 							http.get('http://www.thetvdb.com/banners/'+data.banner[0], function(res){
@@ -81,7 +90,10 @@ var ShowData = {
 								});
 								res.on('end', function(){
 									fs.writeFile(process.cwd() + '/assets/artwork/'+show.tvdb+'.jpg', imagedata, 'binary', function(error){
-										if (error) throw error;
+										if (error) {
+											logger.error(error);
+											return;
+										}
 									});
 								});
 							});
@@ -95,7 +107,10 @@ var ShowData = {
 								});
 								res.on('end', function(){
 									fs.writeFile(nconf.get('shows:base')+'/'+show.directory+'/cover.jpg', imagedata, 'binary', function(error){
-										if (error) throw error;
+										if (error) {
+											logger.error(error);
+											return;										
+										}
 									});
 								});
 							});

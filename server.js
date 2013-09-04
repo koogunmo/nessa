@@ -97,9 +97,6 @@ global.db = new sqlite.Database(__dirname + '/db/nessa.sqlite', function(error){
 	if (error) logger.error('DB: ', error);
 });
 
-// TO DO: Improve Transmission connection handling
-torrent.connect();
-
 /***********************************************************************/
 /* Handle events */
 

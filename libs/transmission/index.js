@@ -1,22 +1,58 @@
 var transmission = require('transmission');
 var path = require('path');
 
-module.exports = exports = {
+var torrent = {
 	rpc: null,
 	
-	connect: function() {
-		// Create connection
-		this.rpc = new transmission({
-			host: nconf.get('transmission:host'),
-			port: nconf.get('transmission:port'),
-			username: nconf.get('transmission:username'),
-			password: nconf.get('transmission:password')
-		});
+	// TO DO: improve connection/reconnection
+	
+	init: function(){
+		if (!this.rpc) {
+			this.connect();
+			return this;
+		}
+		var self = this;
+		var recon = setInterval(function(){
+			self.rpc.sessionStats(function(error, data){
+				if (error) {
+					console.log('Transmission: Reconnecting...');
+					self.connect();
+				}
+			});
+		}, 30000);
 		return this;
 	},
 	
+	connect: function() {
+		var self = this;
+		// Create connection
+		var attempt = setInterval(function(){
+			var rpc = new transmission({
+				host: nconf.get('transmission:host'),
+				port: nconf.get('transmission:port'),
+				username: nconf.get('transmission:username'),
+				password: nconf.get('transmission:password')
+			});
+			rpc.sessionStats(function(error, data){
+				if (error) {
+					return;
+				} else {
+					console.log('Transmission: Connected');
+					clearInterval(attempt);
+					self.rpc = rpc;
+				} 
+			});
+			return self;
+		}, 5000);
+	},
+	
+	
 	add: function(obj) {
 		try {
+			if (!this.rpc) {
+				console.log('Unable to connect to Transmission');
+				return;
+			}
 			// TO DO: reformat magnet to add extra trackers
 			this.rpc.add(obj.magnet, function(error, args){
 				if (error) {
@@ -39,6 +75,10 @@ module.exports = exports = {
 	complete: function() {
 		var self = this;
 		try {
+			if (!this.rpc) {
+				console.log('Unable to connect to Transmission');
+				return;
+			}
 			// Get a list of all completed torrents
 			this.rpc.get(function(error, data){
 				if (error) {
@@ -118,3 +158,4 @@ module.exports = exports = {
 		}
 	}
 };
+module.exports = exports = torrent.init();
