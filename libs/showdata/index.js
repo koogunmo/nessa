@@ -286,8 +286,48 @@ var ShowData = {
 		});
 	},
 	
+	download: function(epid){
+		var sql = "SELECT S.name, S.feed, S.hd, E.season, E.episode, E.title FROM show AS S INNER JOIN show_episode AS E ON S.id = E.show_id WHERE E.id = ?";
+		db.get(sql, epid, function(error, row){
+			if (error) {
+				logger.error(error);
+				return;
+			}
+			row.feed = row.feed.replace(/.xml/, '.full.xml');
+			request.get(row.feed, function(error, req, xml){
+				if (error) {
+					logger.error(error);
+					return;
+				}
+				try {
+					parser.parseString(xml, function(error, json){
+						if (error) {
+							logger.error(error);
+							return;
+						}
+						if (!json.rss.channel[0].item) return;
+						json.rss.channel[0].item.forEach(function(item){
+							var title = item.title.toString();
+							if (!row.hd && title.match('720p')) return;
+							// parse filename, does it contain the right season/episode combo?
+							var data = helper.getEpisodeNumbers(title);
+							if (data.season == row.season && data.episodes.indexOf(row.episode) >= 0) {
+								var magnet = item.guid[0]['_'];
+								torrent.add({
+									id: [row.id],
+									magnet: magnet
+								});
+							}
+						});
+					});
+				} catch(e){
+					logger.error(e.message);
+				}
+			});
+		});
+	},
 	
-	getLatest: function() {
+	getLatest: function(){
 		// Check the feeds for new episodes
 		db.each("SELECT * FROM show WHERE status = 1 AND ended = 0 AND feed IS NOT NULL", function(error, show){
 			if (error) {
