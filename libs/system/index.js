@@ -1,32 +1,20 @@
 var git = require('gitty');
 
-module.exports = exports = {
+var system = {
 	update: function(){
-		var self = this;
 		try {
 			var repo = git(process.cwd());
 			repo.pull('origin', 'master', function(error, success){
-				
-				console.log(error, success);
-				
-			});
-			
-			/*
-			var exec = require('child_process').exec;
-			exec('git --git-dir=' + process.cwd() + '/.git pull origin', function(error, stdout, stderr){
 				if (error) {
 					logger.error(error);
 					return;
 				}
-				
-				if (stdout.indexOf('Already up-to-date') == 0) {
-					logger.info('No update available');
+				if (success.indexOf('already up-to-date') == 0) {
 					return;
 				}
-				logger.info('Update complete. Restarting server...');
-				self.restart()
+				console.log('Update installed. Restarting...');
+				system.restart();
 			});
-			*/
 		} catch(e) {
 			logger.error(e.message);
 		}
@@ -39,3 +27,4 @@ module.exports = exports = {
 		}
 	}
 };
+module.exports = exports = system;

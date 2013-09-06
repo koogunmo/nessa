@@ -63,7 +63,7 @@ It was also heavily skewed towards using newsgroups, which I don't use.
 	- Match show with database entry, flag as enabled
 	- Retrieve episode listings from TVRage
 - Scan show directories for episodes
-	- Update database and rename episode file if necessary
+	- Update database and rename episode files if necessary
 - Automatically grab new torrents by schedule.
 	- Again, we're using TVShowsApp's feeds for this
 	- Parse and reformat the magnet link to add a few extra trackers
@@ -89,7 +89,6 @@ It was also heavily skewed towards using newsgroups, which I don't use.
 	- ~~Use existing shows database~~
 	- ~~Autocomplete style search~~
 	- ~~Create folder using show name~~
-	- Start downloading latest episode(s)
 - Support for unmatched shows
 	- ~~Find shows without TVShows data, retrieve TVDB/TVRage data~~
 	- Interface for matching with TVDB/TVRage data

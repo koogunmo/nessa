@@ -450,14 +450,12 @@ app.get('/install', function(req, res){
 	res.end('Building database');
 });
 
-
+/*
 app.get('/artwork', function(req, res){
 	var shows = plugin('showdata');
 	shows.artwork();
 	res.end('fetching show artwork');
 });
-
-
 app.get('/match', function(req, res){
 	var shows = plugin('showdata');
 	
@@ -477,33 +475,10 @@ app.get('/episodes/:show', function(req, res){
 	shows.episodes(req.params.show);
 	
 });
-
-
-app.get('/complete', function(req, res){
-	
-	torrent.complete();
-	
-	res.end('Checking for completed downloads');
-});
-
-
-app.get('/system/update', function(req, res){
-	var system = plugin('system');
-	system.update();
-	
-	res.end('Updating...');
-});
-
+*/
 
 /*
 // Magnet parser test
 var magnet = 'magnet:?xt=urn:btih:60800347c8346ebb16b192290194d64dbe560b0a&dn=Continuum+S02E12+720p+HDTV+x264-KILLERS+%5Beztv%5D&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&tr=udp%3A%2F%2Ftracker.publicbt.com%3A80&tr=udp%3A%2F%2Ftracker.istole.it%3A6969&tr=udp%3A%2F%2Ftracker.ccc.de%3A80&tr=udp%3A%2F%2Fopen.demonii.com%3A1337';
 console.log(helper.formatMagnet(magnet));
-*/
-
-/*
-app.get('/system/reboot', function(req, res){
-	res.end('Restarting server...');
-	process.kill(process.pid, 'SIGUSR2');
-});
 */
