@@ -9,20 +9,29 @@
 		<p>{{synopsis}}</p>
 	</div>
 	
+	<!--
+	<div class="settings">
+		<h3>Settings</h3>
+	</div>
+	-->
+	
 	{{#if seasons}}
 	<div class="episodes">
 		<ul class="seasons">{{#seasons}}
 			<li>
 				<h3>Season {{season}}</h3>
 				<ul class="episodes">{{#episodes}}
-					<li class="{{#unless file}}unavailable{{/unless}} {{#if hash}}downloading{{/if}}">
+					<li class="{{#if hash}}downloading{{/if}} {{#if file}}available{{/if}}">
 						<span class="episode">{{episode}}</span>
 						<span class="title">{{title}}</span>
 						
 						<span class="duration">{{duration}}</span>
+						{{#if status}}
 						<span class="date">{{airdate}}</span>
-						
-						<!-- if !file || !hash show download button -->
+						{{/if}}
+						{{#unless status}}
+						<span class="date">Download</span>
+						{{/unless}}
 					</li>
 					{{/episodes}}</ul>
 			</li>

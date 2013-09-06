@@ -239,6 +239,17 @@ require(['socket.io', 'jquery', 'handlebars'], function(io, $, Handlebars){
 		$(this).toggleClass('open');
 	});
 	
+	$('#modal').on('click', 'ul.seasons h3', function(){
+		var parent = $(this).parent('li');
+		if ($(parent).hasClass('open')) {
+			$(parent).removeClass('open');
+			$(this).siblings('ul.episodes').slideUp();
+		} else {
+			$('#modal ul.seasons > li.open > ul.episodes').slideUp().parent().removeClass('open');
+			$(this).siblings('ul.episodes').slideDown().parent().addClass('open');
+		}
+	});
+	
 	$(document).on('click', 'ul.shows > li > a', function(e){
 		e.preventDefault();
 		socket.emit('show.info', $(this).data('id'));

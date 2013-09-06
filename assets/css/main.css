@@ -53,8 +53,6 @@ dl > dd {
 	
 }
 
-
-
 /* Form elements */
 
 input[type=text],input[type=password],select {
@@ -138,12 +136,8 @@ nav #search {
 	padding: 0px 20px 0px 10px;
 	width: 200px;
 }
-/*
 
-nav ul li:hover {
-	background-color: #545f70;
-}
-*/
+
 nav ul li a {
 	color: #CCCCCC;
 	display: block;
@@ -231,6 +225,8 @@ nav ul li a {
 	text-align: right;
 }
 
+
+/***************************/
 /* Modal window */
 
 #modal {
@@ -244,16 +240,15 @@ nav ul li a {
 	top: 0px;
 	z-index: 10;
 }
-
 #modal .wrapper {
+	background-color: #000000;
 	height: 100%;
 	margin: 0px auto;
 	max-width: 758px;
 	position: relative;
 	width: auto;
 }
-
-#modal .close {
+#modal .wrapper > .close {
 	background-image: url('../gfx/colorbox/controls.png');
 	background-position: -29px 0px;
 	background-repeat: no-repeat;
@@ -269,9 +264,16 @@ nav ul li a {
 	width: 40px;
 	z-index: 11;
 }
-#modal .close:hover {
+#modal .wrapper > .close:hover {
 	background-position: -29px -111px;
 }
+#modal .wrapper > .content {
+	height: 100%;
+	width: 100%;
+}
+
+
+/***************************/
 
 #modal #search div.query {
 	padding: 10px;
@@ -341,14 +343,11 @@ ul.results li {
 
 
 
-
-/* Show Information modal */
+/****************************/
+/* Series Information */
 
 #modal .show {
-	background-color: #000000;
-	height: 100%;
 	margin: 0px auto;
-	max-width: 758px;
 }
 
 #modal .show .title {
@@ -376,7 +375,7 @@ ul.results li {
 	font-weight: bold;
 	margin-bottom: 5px;
 }
-#modal .show .synopsis p {
+#modal .show div.synopsis p {
 	color: #CCCCCC;
 	font-size: 11px;
 	line-height: 18px;
@@ -384,7 +383,7 @@ ul.results li {
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
-#modal .show .synopsis.open p {
+#modal .show div.synopsis.open p {
 	max-height: auto;
 	white-space: normal;
 }
@@ -395,33 +394,37 @@ ul.results li {
 	padding: 0px 20px 20px;
 }
 
-#modal .show ul.seasons > li {
-	margin-bottom: 20px;
+#modal .show ul.seasons > li > h3 {
+	border-bottom: 1px solid #686868;
+	cursor: pointer;
+	font-size: 14px;
+	padding: 4px 0px;
 }
 
 #modal .show ul.episodes {
+	display: none;
 	padding-left: 0px;
+	margin: 20px 0px;
 }
-
-ul.episodes li {
+#modal .show ul.episodes li {
+	color: #999999;
 	display: table;
 	width: 100%;
 }
-
-ul.episodes li.unavailable {
-	color: #999999;
-}
-ul.episodes li.downloading {
+#modal .show ul.episodes li.downloading {
 	color: #FFC200;
 }
-ul.episodes li.recent {
-	color: #9EE088;
+#modal .show ul.episodes li.available {
+	color: #FFFFFF;
 }
+
+
 
 ul.episodes li span {
 	display: table-cell;
 	width: auto;
 }
+
 ul.episodes li span.episode {
 	padding-right: 10px;
 	text-align: right;
