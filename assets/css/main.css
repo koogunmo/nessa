@@ -347,6 +347,7 @@ ul.results li {
 /* Series Information */
 
 #modal .show {
+	font-size: 11px;
 	margin: 0px auto;
 }
 
@@ -375,8 +376,10 @@ ul.results li {
 	font-weight: bold;
 	margin-bottom: 5px;
 }
+
 #modal .show div.synopsis p {
 	color: #CCCCCC;
+	cursor: help;
 	font-size: 11px;
 	line-height: 18px;
 	overflow: hidden;
@@ -384,8 +387,20 @@ ul.results li {
 	white-space: nowrap;
 }
 #modal .show div.synopsis.open p {
-	max-height: auto;
+	cursor: default;
 	white-space: normal;
+}
+
+#modal .show div.settings {
+	padding: 20px;
+}
+
+#modal .show div.settings dl {
+	display: none;
+	margin: 0px 10px;
+}
+#modal .show div.settings.open dl {
+	display: block;
 }
 
 #modal .show div.episodes {
@@ -394,7 +409,7 @@ ul.results li {
 	padding: 0px 20px 20px;
 }
 
-#modal .show ul.seasons > li > h3 {
+#modal .show ul.seasons > li > h2 {
 	border-bottom: 1px solid #686868;
 	cursor: pointer;
 	font-size: 14px;

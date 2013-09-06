@@ -9,23 +9,32 @@
 		<p>{{synopsis}}</p>
 	</div>
 	
-	<!--
 	<div class="settings">
 		<h3>Settings</h3>
+		<dl>
+			<dt>Download new episodes as available</dt>
+			<dd>Yes/No</dd>
+			
+			<dt>Prefer HD Video?</dt>
+			<dd>Yes/No</dd>
+			
+			<dt>Directory</dt>
+			<dd>[BASEDIR]/{{directory}}</dd>
+		</dl>
 	</div>
-	-->
 	
 	{{#if seasons}}
 	<div class="episodes">
 		<ul class="seasons">{{#seasons}}
 			<li>
-				<h3>Season {{season}}</h3>
+				<h2>Season {{season}}</h2>
 				<ul class="episodes">{{#episodes}}
 					<li class="{{#if hash}}downloading{{/if}} {{#if file}}available{{/if}}">
+						<!--div></div>
+						<div></div-->
 						<span class="episode">{{episode}}</span>
 						<span class="title">{{title}}</span>
 						
-						<span class="duration">{{duration}}</span>
 						{{#if status}}
 						<span class="date">{{airdate}}</span>
 						{{/if}}

@@ -66,7 +66,6 @@ require(['socket.io', 'jquery', 'handlebars'], function(io, $, Handlebars){
 		'sync disconnect on unload': true
 	});
 	
-	
 	require(['bbq'], function(){
 		$(window).bind('hashchange', function(e){
 			var url = $.param.fragment();
@@ -76,7 +75,6 @@ require(['socket.io', 'jquery', 'handlebars'], function(io, $, Handlebars){
 	});
 
 	socket.on('connect', function(data){
-		console.log('connect', data);
 		$(window).trigger('hashchange');
 		$('#loading').hide();
 		
@@ -146,11 +144,23 @@ require(['socket.io', 'jquery', 'handlebars'], function(io, $, Handlebars){
 	});
 	
 	/***************************************************/
+	/* Modal methods */
 	
-	$('#modal > .wrapper > .close').on('click', function(e){
+	$('#modal').on('click', function(e){
+		if (this == e.srcElement) nessa.modalClose();
+	}).on('click', '.wrapper > .close', function(){
 		nessa.modalClose();
+		
+	}).on('click', 'ul.seasons h2', function(){
+		var parent = $(this).parent('li');
+		if ($(parent).hasClass('open')) {
+			$(parent).removeClass('open');
+			$(this).siblings('ul.episodes').slideUp();
+		} else {
+			$('#modal ul.seasons > li.open > ul.episodes').slideUp().parent().removeClass('open');
+			$(this).siblings('ul.episodes').slideDown().parent().addClass('open');
+		}
 	});
-	
 	
 	$(document).on('click', '.show-add', function(e){
 		e.preventDefault()
@@ -239,16 +249,8 @@ require(['socket.io', 'jquery', 'handlebars'], function(io, $, Handlebars){
 		$(this).toggleClass('open');
 	});
 	
-	$('#modal').on('click', 'ul.seasons h3', function(){
-		var parent = $(this).parent('li');
-		if ($(parent).hasClass('open')) {
-			$(parent).removeClass('open');
-			$(this).siblings('ul.episodes').slideUp();
-		} else {
-			$('#modal ul.seasons > li.open > ul.episodes').slideUp().parent().removeClass('open');
-			$(this).siblings('ul.episodes').slideDown().parent().addClass('open');
-		}
-	});
+	
+	
 	
 	$(document).on('click', 'ul.shows > li > a', function(e){
 		e.preventDefault();
