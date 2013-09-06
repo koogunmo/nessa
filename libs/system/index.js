@@ -1,7 +1,14 @@
+var git = require('gitty');
+
 module.exports = exports = {
 	update: function(){
 		var self = this;
 		try {
+			git.pull('origin', 'master', function(error, success){
+				
+			});
+			
+			/*
 			var exec = require('child_process').exec;
 			exec('git --git-dir=' + process.cwd() + '/.git pull origin', function(error, stdout, stderr){
 				if (error) {
@@ -13,16 +20,10 @@ module.exports = exports = {
 					logger.info('No update available');
 					return;
 				}
-				
-				/*
-				exec('cd ' + process.cwd() + ' && npm update', function(error, stdout, stderr){
-					// Update npm packages
-				});
-				*/
-				
 				logger.info('Update complete. Restarting server...');
 				self.restart()
 			});
+			*/
 		} catch(e) {
 			logger.error(e.message);
 		}
