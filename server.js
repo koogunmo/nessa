@@ -486,30 +486,13 @@ app.get('/complete', function(req, res){
 	res.end('Checking for completed downloads');
 });
 
-/*
+
 app.get('/system/update', function(req, res){
-	try {
-		var exec = require('child_process').exec;
-		exec('git --git-dir=' + process.cwd() + '/.git pull origin', function(error, stdout, stderr){
-			if (error) {
-				logger.error(error);
-				return;
-			}
-			if (stdout.indexOf('Already up-to-date') == 0) {
-				res.end('No update available.');
-				return;
-			}
-		//	exec('cd ' + process.cwd() + ' && npm update', function(error, stdout, stderr){
-		//		// Update npm packages
-		//	});
-			res.end('Update complete. Restarting server...');
-			process.kill(process.pid, 'SIGUSR2');
-		});
-	} catch(e) {
-		logger.error(e.message);
-	}
+	var system = plugin('system');
+	system.update();
+	
+	res.end('Updating...');
 });
-*/
 
 
 /*
