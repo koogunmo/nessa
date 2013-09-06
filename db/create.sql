@@ -15,12 +15,14 @@ CREATE TABLE "show" (
 CREATE TABLE "show_episode" (
 	"id" INTEGER PRIMARY KEY AUTOINCREMENT,
 	"show_id" INTEGER REFERENCES "show"("id"),
+	"status" INTEGER DEFAULT 0,
 	"season" INTEGER,
 	"episode" INTEGER,
 	"title" TEXT,
 	"airdate" TEXT,
 	"file" TEXT,
-	"hash" TEXT
+	"hash" TEXT,
+	"downloaded" TEXT
 );
 
 CREATE TABLE "show_unmatched" (

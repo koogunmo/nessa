@@ -201,7 +201,7 @@ io.sockets.on('connection', function(socket) {
 		});
 	}).on('shows.enabled', function(){
 		// List of enabled/subscribed shows
-		db.all("SELECT * FROM show WHERE status = 1 ORDER BY name ASC", function(error, rows){
+		db.all("SELECT * FROM show WHERE directory IS NOT NULL ORDER BY name ASC", function(error, rows){
 			if (error) {
 				logger.error(error);
 				return;
@@ -337,12 +337,39 @@ io.sockets.on('connection', function(socket) {
 	/* Individual show data */
 	socket.on('show.info', function(data){
 		// Fetch individual show details
-		db.get("SELECT * FROM show WHERE id = ?", data.show, function(error, row){
+		db.get("SELECT * FROM show WHERE id = ?", data, function(error, show){
 			if (error) {
 				logger.error(error);
 				return;
 			}
-			socket.emit('show', row);
+			if (!show) return;
+			show.seasons = [];
+			
+			db.all("SELECT * FROM show_episode WHERE show_id = ? ORDER BY season,episode ASC", show.id, function(error, rows){
+				if (error) {
+					logger.error(error);
+					return;
+				}
+				var seasons = [];
+				var episodes = [];
+				
+				rows.forEach(function(row){
+					if (seasons.indexOf(row.season) == -1) seasons.push(row.season);
+					if (!episodes[row.season]) episodes[row.season] = [];
+					episodes[row.season].push(row);
+				});
+				seasons.forEach(function(season){
+					var record = {
+						season: season,
+						episodes: episodes[season]
+					}
+					show.seasons.push(record);
+				});
+				socket.emit('modal.template', {
+					template: 'views/show/info.html',
+					data: show
+				});
+			});
 		});
 	}).on('show.season', function(data){
 		// List all episodes of a show in a specific season

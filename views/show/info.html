@@ -1,0 +1,33 @@
+<div class="show">
+	<div class="title">
+		<h1>{{name}}</h1>
+		<img src="assets/artwork/{{tvdb}}.jpg" />
+	</div>
+	
+	<div class="synopsis">
+		<h3>Synopsis</h3>
+		<p>{{synopsis}}</p>
+	</div>
+	
+	{{#if seasons}}
+	<div class="episodes">
+		<ul class="seasons">{{#seasons}}
+			<li>
+				<h3>Season {{season}}</h3>
+				<ul class="episodes">{{#episodes}}
+					<li class="{{#unless file}}unavailable{{/unless}} {{#if hash}}downloading{{/if}}">
+						<span class="episode">{{episode}}</span>
+						<span class="title">{{title}}</span>
+						
+						<span class="duration">{{duration}}</span>
+						<span class="date">{{airdate}}</span>
+						
+						<!-- if !file || !hash show download button -->
+					</li>
+					{{/episodes}}</ul>
+			</li>
+		{{/seasons}}</ul>	
+	</div>
+	{{/if}}
+	
+</div>

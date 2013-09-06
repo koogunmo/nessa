@@ -59,9 +59,9 @@ var ShowData = {
 	
 	artwork: function(showid) {
 		if (typeof(showid) == 'number') {
-			var sql = "SELECT * FROM show WHERE id = "+showid+" AND status = 1 AND tvdb IS NOT NULL ORDER BY name ASC";
+			var sql = "SELECT * FROM show WHERE id = "+showid+" AND directory IS NOT NULL AND tvdb IS NOT NULL ORDER BY name ASC";
 		} else {
-			var sql = "SELECT * FROM show WHERE status = 1 AND tvdb IS NOT NULL ORDER BY name ASC";
+			var sql = "SELECT * FROM show WHERE directory IS NOT NULL AND tvdb IS NOT NULL ORDER BY name ASC";
 		}
 		db.each(sql, function(error, show){
 			if (error) {
@@ -244,9 +244,9 @@ var ShowData = {
 
 	episodes: function(id){
 		if (id !== undefined) {
-			var sql = "SELECT * FROM show WHERE id = '"+id+"' AND status = 1 AND tvrage IS NOT NULL";
+			var sql = "SELECT * FROM show WHERE id = '"+id+"' AND directory IS NOT NULL AND tvrage IS NOT NULL";
 		} else {
-			var sql = "SELECT * FROM show WHERE status = 1 AND ended = 0 AND tvrage IS NOT NULL";
+			var sql = "SELECT * FROM show WHERE directory IS NOT NULL AND tvrage IS NOT NULL";
 		}
 		db.each(sql, function(error, show){
 			if (error) {
@@ -255,6 +255,27 @@ var ShowData = {
 			}
 			logger.info(show.name + ': Fetching episode data');
 			try {
+				// TODO: Maybe we should grab Episode listings from TVDB?
+				// It'd require less matching...
+				/*
+				request.get('http://thetvdb.com/api/'+nconf.get('tvdb:apikey')+'/series/'+show.tvdb+'/en.xml', function(error, req, xml){
+					if (error) {
+						logger.error(error);
+						return;
+					}
+					parser.parseString(xml, function(error, json){
+						if (error) {
+							logger.error(error);
+							return;
+						}
+						if (!json.Data.Episode) return;
+						json.Data.Episode.forEach(function(ep){
+							
+						});
+					});
+				});
+				*/
+				
 				tvrage.episodes(show.tvrage, function(data){
 					data.season.forEach(function(season){
 						season.episode.forEach(function(episode){

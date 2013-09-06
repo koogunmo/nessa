@@ -80,19 +80,27 @@ It was also heavily skewed towards using newsgroups, which I don't use.
 	- ~~Use Socket.IO~~
 	- ~~Handlebars for templating~~
 	- Responsive layout (Mobile-first)
-- Browse show list
+- ~~Browse show list~~
+- ~~Get show artwork from TVDB~~
+- Show information
+	- Modal window
+	- Use artwork banner/poster
+	- Show settings (HD, enabled, etc)
 - Add new show via UI
 	- Use existing shows database
 	- Autocomplete style search
 	- Pick the episode to start from (or next available)
 	- Create folder using show name
 	- Start downloading (if applicable)
-- Support for unmatched shows
-	- Find shows without TVShows data, retrieve TVDB/TVRage data
+- ~~Support for unmatched shows~~
+	- ~~Find shows without TVShows data, retrieve TVDB/TVRage data~~
+	- Interface for matching some shows
 	- Scan filesystem for episodes
 
+ 
 ### Phase 3
-- Get show/episode artwork from TVDB
+
+- Get episode thumbnails from TVDB
 - Twilio for SMS download notifications
 - trakt integration
 - Miso integration

@@ -196,12 +196,13 @@ nav ul li a {
 	position: relative;
 }
 
-/*
-#main ul.shows > li.banner.open > a.show {
-	text-indent: -999px;
-	background-image: none;
+#main ul.shows > li.banner.open {
+	min-height: 154px;
 }
-*/
+
+#main ul.shows > li.banner > a.show {
+	opacity: 0;
+}
 
 
 #main ul.shows > li > .settings {
@@ -230,15 +231,7 @@ nav ul li a {
 	text-align: right;
 }
 
-#main ul.seasons {
-	background-color: rgba(0,0,0,0.5);
-	margin: 10px 0px;
-}
-
-#main ul.seasons a.season {
-	font-size: 15px;
-	padding: 10px 0px;
-}
+/* Modal window */
 
 #modal {
 	background-color: rgba(0,0,0,0.7);
@@ -253,43 +246,31 @@ nav ul li a {
 }
 
 #modal .wrapper {
-	/*
-	background-color: #4E5969;
-	border-radius: 10px; 
-	height: auto;
-	left: 50%;
-	height: 350px;
-	margin: 10px;
-	top: 50%;
-	position: fixed;
-	max-width: 500px;
-	min-width: 300px;
-	*/
-	
-	background-color: #4E5969;
-	border-radius: 10px;
-	bottom: 5%;
-	height: auto;
-	left: 5%;
-	top: 5%;
-	position: absolute;
-	right: 5%;
+	height: 100%;
+	margin: 0px auto;
+	max-width: 758px;
+	position: relative;
 	width: auto;
 }
 
 #modal .close {
-	background-image: url('../gfx/icons/close.png');
-	background-position: center center;
+	background-image: url('../gfx/colorbox/controls.png');
+	background-position: -29px 0px;
 	background-repeat: no-repeat;
 	color: #000000;
 	cursor: pointer;
 	font-size: 15px;
 	height: 20px;
+	overflow: hidden;
 	position: absolute;
 	right: 5px;
-	text-align: center;
-	top: 5px;
-	width: 20px;
+	text-indent: -99px;
+	top: 0px;
+	width: 40px;
+	z-index: 11;
+}
+#modal .close:hover {
+	background-position: -29px -111px;
 }
 
 #modal #search div.query {
@@ -316,9 +297,110 @@ footer {
 	width: 100%;
 }
 
-#main ul.episodes {
-	padding-left: 0px;
+
+
+.icon {
+	background-position: center bottom;
+	background-repeat: no-repeat;
+	display: block !important;
+	height: 16px !important;
+	width: 16px !important;
+}
+.icon.play {
+	background-image: url('../gfx/icons/icon_play.png');
+}
+.icon.play:hover {
+	background-image: url('../gfx/icons/icon_play_hover.png');
+}
+
+ul.unmatched h2 {
+	font-size: 20px;
+}
+
+ul.matches {
+	display: block !important;
 	margin: 10px;
+}
+
+ul.results {
+	height: 290px;
+	margin: 0px 5px;
+	overflow: auto;
+}
+ul.results li {
+	font-size: 20px;
+	height: 40px;
+}
+
+.settings h2 {
+	cursor: pointer;
+}
+.settings fieldset {
+	display: none;
+}
+
+
+
+
+/* Show Information modal */
+
+#modal .show {
+	background-color: #000000;
+	height: 100%;
+	margin: 0px auto;
+	max-width: 758px;
+}
+
+#modal .show .title {
+	position: relative;
+}
+
+#modal .show .title > h1 {
+	bottom: 5px;
+	display: none;
+	position: absolute;
+	right: 5px;
+}
+
+#modal .show .title > img {
+	width: 100%;
+}
+
+#modal .show .synopsis {
+	padding: 20px;
+}
+
+#modal .show h3 {
+	color: #FFFFFF;
+	font-size: 12px;
+	font-weight: bold;
+	margin-bottom: 5px;
+}
+#modal .show .synopsis p {
+	color: #CCCCCC;
+	font-size: 11px;
+	line-height: 18px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+#modal .show .synopsis.open p {
+	max-height: auto;
+	white-space: normal;
+}
+
+#modal .show div.episodes {
+	height: auto;
+	overflow: auto;
+	padding: 0px 20px 20px;
+}
+
+#modal .show ul.seasons > li {
+	margin-bottom: 20px;
+}
+
+#modal .show ul.episodes {
+	padding-left: 0px;
 }
 
 ul.episodes li {
@@ -364,49 +446,21 @@ ul.episodes li span.actions {
 	width: 32px;
 }
 
-.icon {
-	background-position: center bottom;
-	background-repeat: no-repeat;
-	display: block !important;
-	height: 16px !important;
-	width: 16px !important;
-}
-.icon.play {
-	background-image: url('../gfx/icons/icon_play.png');
-}
-.icon.play:hover {
-	background-image: url('../gfx/icons/icon_play_hover.png');
-}
 
-ul.unmatched h2 {
-	font-size: 20px;
-}
+/* Media Queries */
 
-ul.matches {
-	display: block !important;
-	margin: 10px;
-}
-
-ul.results {
-	height: 290px;
-	margin: 0px 5px;
-	overflow: auto;
-}
-ul.results li {
-	font-size: 20px;
-	height: 40px;
-}
-
-.settings h2 {
-	cursor: pointer;
-}
-.settings fieldset {
-	display: none;
+@media screen and (max-width: 600px) {
+	ul.shows > li {
+		background-image: none !important;
+	}
+	ul.shows > li > a.show {
+		opacity: 1 !important;
+	}
 }
 
 @media screen and (min-width: 600px) {
 	/* Desktop */
-	ul.episodes li span.date {
+	ul.episodes li > span.date {
 		display: table-cell;
 	}
 }

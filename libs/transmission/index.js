@@ -4,48 +4,51 @@ var path = require('path');
 var torrent = {
 	rpc: null,
 	
-	// TO DO: improve connection/reconnection
+	// TO DO: improve this to handle disconnection and reconnection
 	
 	init: function(){
 		if (!this.rpc) {
 			this.connect();
-			return this;
+		} else {
+			var recon = setInterval(function(){
+				torrent.rpc.sessionStats(function(error, data){
+					if (error) {
+						console.log('Transmission: Reconnecting...');
+						torrent.connect();
+					}
+				});
+			}, 30000);
 		}
-		var self = this;
-		var recon = setInterval(function(){
-			self.rpc.sessionStats(function(error, data){
-				if (error) {
-					console.log('Transmission: Reconnecting...');
-					self.connect();
-				}
-			});
-		}, 30000);
 		return this;
 	},
 	
 	connect: function() {
 		var self = this;
 		// Create connection
-		var attempt = setInterval(function(){
-			var rpc = new transmission({
-				host: nconf.get('transmission:host'),
-				port: nconf.get('transmission:port'),
-				username: nconf.get('transmission:username'),
-				password: nconf.get('transmission:password')
-			});
-			rpc.sessionStats(function(error, data){
-				if (error) {
-					return;
-				} else {
-					console.log('Transmission: Connected');
-					clearInterval(attempt);
-					self.rpc = rpc;
-				} 
-			});
-			return self;
-		}, 5000);
+		var rpc = new transmission({
+			host: nconf.get('transmission:host'),
+			port: nconf.get('transmission:port'),
+			username: nconf.get('transmission:username'),
+			password: nconf.get('transmission:password')
+		});
+		rpc.sessionStats(function(error, data){
+			if (error) {
+				setTimeout(function(){
+					torrent.connect();
+				}, 5000);
+				return;
+			} else {
+				console.log('Transmission: Connected');
+				self.rpc = rpc;
+			}
+		});
 	},
 	
+	watchdog: function(){
+		
+		
+		
+	},
 	
 	add: function(obj) {
 		try {
@@ -61,7 +64,7 @@ var torrent = {
 				}
 				if (args) {
 					obj.id.forEach(function(id){
-						db.run("UPDATE show_episode SET hash = ? WHERE id = ?", args.hashString, id, function(error, args){
+						db.run("UPDATE show_episode SET hash = ?, status = 1 WHERE id = ?", args.hashString, id, function(error, args){
 							if (error) logger.error(error);
 						});
 					});
@@ -129,7 +132,7 @@ var torrent = {
 						var newName = 'Season '+helper.zeroPadding(data.season)+'/Episode '+ep+' - '+title.join('; ')+path.extname(file);
 						
 						helper.copyFile(file, showdir + '/' + newName, function(){
-							db.run("UPDATE show_episode SET file = ? WHERE hash = ?", newName, item.hashString, function(error){
+							db.run("UPDATE show_episode SET file = ?, status = 2 WHERE hash = ?", newName, item.hashString, function(error){
 								if (error) logger.error(error);
 							});
 						});

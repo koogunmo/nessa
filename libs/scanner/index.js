@@ -76,7 +76,7 @@ module.exports = exports = {
 			if (showid === undefined) {
 				return;
 			}
-			db.get("SELECT id, name, directory FROM show WHERE status = 1 AND id = ?", showid, function(error, show){
+			db.get("SELECT id, name, directory FROM show WHERE directory IS NOT NULL AND id = ?", showid, function(error, show){
 				try {
 					if (error) {
 						logger.error(error);

@@ -35,6 +35,10 @@ require(['socket.io', 'jquery', 'handlebars'], function(io, $, Handlebars){
 				$('.content', this).html('');
 			});
 		},
+		modalLoad: function(html){
+			$('#modal .wrapper .content').html(html);
+			this.modalOpen();
+		},
 		modalOpen: function(){
 			$('#modal').fadeIn();
 		}
@@ -109,11 +113,12 @@ require(['socket.io', 'jquery', 'handlebars'], function(io, $, Handlebars){
 	});
 	
 	
-	/* Page */
+	/* Page Content */
 	socket.on('page.template', function(response){
 		$.get(response.template, function(tmpl){
 			var tmpl = Handlebars.compile(tmpl);
 			$('#main').html(tmpl(response.data));
+			/*
 			$('ul.shows > li[data-tvdb]').each(function(){
 				var tvdb = $(this).data('tvdb');
 				if (!tvdb) return;
@@ -121,6 +126,12 @@ require(['socket.io', 'jquery', 'handlebars'], function(io, $, Handlebars){
 					'background-image': 'url(assets/artwork/'+tvdb+'.jpg)'
 				}).addClass('banner');
 			});
+			*/
+		});
+	}).on('modal.template', function(response){
+		$.get(response.template, function(tmpl){
+			var tmpl = Handlebars.compile(tmpl);
+			nessa.modalLoad(tmpl(response.data))
 		});
 	}).on('page.reload', function(){
 		window.location.reload();
@@ -224,15 +235,14 @@ require(['socket.io', 'jquery', 'handlebars'], function(io, $, Handlebars){
 	});
 	
 	
+	$(document).on('click', '.synopsis', function(){
+		$(this).toggleClass('open');
+	});
+	
 	$(document).on('click', 'ul.shows > li > a', function(e){
 		e.preventDefault();
-		var seasons = $(this).siblings('ul.seasons');
-		if (!$('li', seasons).length) {
-			socket.emit('show.episodes', $(this).data('id'));
-		} else {
-			$(seasons).slideToggle()
-		}
-		$(this).parent().toggleClass('open');
+		socket.emit('show.info', $(this).data('id'));
+		
 	}).on('click', 'ul.shows a.season', function(e){
 		e.preventDefault();
 		$(this).siblings('ul.episodes').slideToggle();
