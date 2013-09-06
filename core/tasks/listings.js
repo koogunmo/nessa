@@ -1,7 +1,6 @@
 /* Update show listings from XML */
 var schedule	= require('node-schedule');
-var tvshows		= plugin('showdata');
-//var tvrage		= plugin('tvrage');
+var shows		= plugin('showdata');
 
 /* Every Sunday at 1am */
 var rule = new schedule.RecurrenceRule();
@@ -10,12 +9,8 @@ var rule = new schedule.RecurrenceRule();
 	rule.minute		= 0;
 
 schedule.scheduleJob(rule, function(){
-	// Update shows (current,cancelled,upcoming, etc)
-	tvshows.list();
-	
-	// Update episodes for enabled shows
-	tvshows.episodes();
-	
+	// Update show listings
+	shows.list();
 });
 
 
