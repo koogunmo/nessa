@@ -4,7 +4,10 @@ module.exports = exports = {
 	update: function(){
 		var self = this;
 		try {
-			git.pull('origin', 'master', function(error, success){
+			var repo = git(process.cwd());
+			repo.pull('origin', 'master', function(error, success){
+				
+				console.log(error, success);
 				
 			});
 			
