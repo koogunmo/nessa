@@ -81,7 +81,7 @@ var ShowData = {
 							return;
 						}
 						var data = json.Data.Series[0];
-						if (data.banner) {
+						if (data.banner && !fs.existsSync(process.cwd() + '/assets/artwork/'+show.tvdb+'.jpg')) {
 							http.get('http://www.thetvdb.com/banners/'+data.banner[0], function(res){
 								var imagedata = '';
 								res.setEncoding('binary')
