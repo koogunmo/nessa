@@ -73,51 +73,49 @@ It was also heavily skewed towards using newsgroups, which I don't use.
 
 **Nessa is now capable of running 24/7, but limited to downloading new episodes of existing shows only.**
 
-### Phase 2 - CURRENT
+### Phase 2 - *CURRENT*
 - ~~Automatic update by schedule~~
-	- Pulls latest version from Github then sends SIGUSR2
-- Build responsive HTML5 interface (Ongoing)
+	- ~~Pull latest version from Github then send SIGUSR2~~
+- *Build responsive HTML5 interface (Ongoing)*
 	- ~~Use Socket.IO~~
 	- ~~Handlebars for templating~~
 	- Responsive layout (Mobile-first)
 - ~~Browse show list~~
 - ~~Get show artwork from TVDB~~
-- Show information
-	- Modal window
-	- Use artwork banner/poster
-	- Show settings (HD, enabled, etc)
-- Add new show via UI
-	- Use existing shows database
-	- Autocomplete style search
-	- Pick the episode to start from (or next available)
-	- Create folder using show name
-	- Start downloading (if applicable)
-- ~~Support for unmatched shows~~
+- ~~Display show information~~
+	- ~~Modal window~~
+	- ~~Use artwork banner or poster~~
+- ~~Add Show~~
+	- ~~Use existing shows database~~
+	- ~~Autocomplete style search~~
+	- ~~Create folder using show name~~
+	- Start downloading latest episode(s)
+- Support for unmatched shows
 	- ~~Find shows without TVShows data, retrieve TVDB/TVRage data~~
-	- Interface for matching some shows
-	- Scan filesystem for episodes
+	- Interface for matching with TVDB/TVRage data
+	- Trigger filesystem scan for episodes
 
- 
 ### Phase 3
 
-- Get episode thumbnails from TVDB
-- Twilio for SMS download notifications
-- trakt integration
-- Miso integration
-	- Automatically check in when downloading the file
 - Global Settings interface
 	- ~~File/Folder formatting~~ Not happening
 	- Global Quality Preference (HD/SD)
 	- TVShow check interval
 		- 30m, 1hr, 3hr, 6hr, 12hr, 1day
-		- How do we reload scheduled tasks?
-- Per-show Settings
+			- How do we reload scheduled tasks?
+- Per-show settings (HD, enabled, etc)
 	- Like Global Settings
 	- Folder, SD/HD, etc
 	- SMS Notifications on/off
 	- Integration overrides
 		- trakt
 		- miso
+- Get episode thumbnails from TVDB?
+- Twilio for SMS download notifications
+- trakt integration
+- Miso integration
+	- Automatically check in when downloading the file
+
 
 ### Phase 4
 - Ants. Ants EVERYWHERE!

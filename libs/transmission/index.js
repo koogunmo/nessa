@@ -25,12 +25,14 @@ var torrent = {
 	connect: function() {
 		var self = this;
 		// Create connection
-		var rpc = new transmission({
+		this.rpc = new transmission({
 			host: nconf.get('transmission:host'),
 			port: nconf.get('transmission:port'),
 			username: nconf.get('transmission:username'),
 			password: nconf.get('transmission:password')
 		});
+		return this;
+		/*
 		rpc.sessionStats(function(error, data){
 			if (error) {
 				setTimeout(function(){
@@ -42,6 +44,7 @@ var torrent = {
 				self.rpc = rpc;
 			}
 		});
+		*/
 	},
 	
 	watchdog: function(){
@@ -161,4 +164,5 @@ var torrent = {
 		}
 	}
 };
-module.exports = exports = torrent.init();
+
+module.exports = exports = torrent.connect();

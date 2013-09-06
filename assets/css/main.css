@@ -127,17 +127,6 @@ nav ul li {
 	width: 33%;
 }
 
-nav #search {
-	border: 1px solid #666666;
-	border-radius: 10px;
-	display: none;
-	height: 20px;
-	outline: none;
-	padding: 0px 20px 0px 10px;
-	width: 200px;
-}
-
-
 nav ul li a {
 	color: #CCCCCC;
 	display: block;
@@ -152,6 +141,18 @@ nav ul li a {
 	max-width: 940px;
 	padding: 50px 10px 0px;
 }
+
+footer {
+	bottom: 0px;
+	display: none;
+	font-size: 10px;
+	height: 20px;
+	left: 0px;
+	position: fixed;
+	width: 100%;
+}
+
+/*******/
 
 #main ul {
 	font-size: 14px;
@@ -272,15 +273,13 @@ nav ul li a {
 	width: 100%;
 }
 
-
 /***************************/
+/* Search */
 
 #modal #search div.query {
-	padding: 10px;
-	text-align: center;
+	padding: 20px;
 }
-
-input.search {
+#modal #search div.query input.search {
 	background-image: url('../gfx/icons/search.png');
 	background-position: 5px center;
 	background-repeat: no-repeat;
@@ -288,32 +287,25 @@ input.search {
 	padding-left: 25px;
 	width: 80%;
 }
-
-footer {
-	bottom: 0px;
-	display: none;
-	font-size: 10px;
-	height: 20px;
-	left: 0px;
-	position: fixed;
-	width: 100%;
+#modal #search ul.results {
+	border-top: 1px solid #686868;
+	height: 290px;
+	margin: 0px 20px;
+	overflow: auto;
+}
+#modal #search ul.results li {
+	border-bottom: 1px solid #686868;
+	font-size: 20px;
+	padding: 10px 0px;
 }
 
 
 
-.icon {
-	background-position: center bottom;
-	background-repeat: no-repeat;
-	display: block !important;
-	height: 16px !important;
-	width: 16px !important;
-}
-.icon.play {
-	background-image: url('../gfx/icons/icon_play.png');
-}
-.icon.play:hover {
-	background-image: url('../gfx/icons/icon_play_hover.png');
-}
+
+
+
+
+
 
 ul.unmatched h2 {
 	font-size: 20px;
@@ -324,15 +316,7 @@ ul.matches {
 	margin: 10px;
 }
 
-ul.results {
-	height: 290px;
-	margin: 0px 5px;
-	overflow: auto;
-}
-ul.results li {
-	font-size: 20px;
-	height: 40px;
-}
+
 
 .settings h2 {
 	cursor: pointer;
@@ -346,38 +330,38 @@ ul.results li {
 /****************************/
 /* Series Information */
 
-#modal .show {
+#modal #show {
 	font-size: 11px;
 	margin: 0px auto;
 }
 
-#modal .show .title {
+#modal #show .title {
+	min-height: 50px;
 	position: relative;
+	padding: 0px;
+	margin: 0px
 }
 
-#modal .show .title > h1 {
-	bottom: 5px;
-	display: none;
-	position: absolute;
-	right: 5px;
-}
-
-#modal .show .title > img {
+#modal #show .title > img {
+	border: none;
+	color: #FFFFFF;
+	font-size: 20px;
+	max-height: 140px;
 	width: 100%;
 }
 
-#modal .show .synopsis {
-	padding: 20px;
-}
-
-#modal .show h3 {
+#modal #show h3 {
 	color: #FFFFFF;
 	font-size: 12px;
 	font-weight: bold;
 	margin-bottom: 5px;
 }
 
-#modal .show div.synopsis p {
+#modal #show div.synopsis {
+	margin: 20px;
+}
+
+#modal #show div.synopsis p {
 	color: #CCCCCC;
 	cursor: help;
 	font-size: 11px;
@@ -386,54 +370,55 @@ ul.results li {
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
-#modal .show div.synopsis.open p {
+#modal #show div.synopsis.open p {
 	cursor: default;
 	white-space: normal;
 }
 
-#modal .show div.settings {
-	padding: 20px;
+#modal #show div.settings {
+	display: none;
+	margin: 20px;
 }
 
-#modal .show div.settings dl {
+#modal #show div.settings dl {
 	display: none;
 	margin: 0px 10px;
 }
-#modal .show div.settings.open dl {
+#modal #show div.settings.open dl {
 	display: block;
 }
 
-#modal .show div.episodes {
+#modal #show div.episodes {
 	height: auto;
 	overflow: auto;
-	padding: 0px 20px 20px;
+	margin: 20px;
 }
 
-#modal .show ul.seasons > li > h2 {
+#modal #show ul.seasons > li > h2 {
 	border-bottom: 1px solid #686868;
 	cursor: pointer;
 	font-size: 14px;
 	padding: 4px 0px;
 }
 
-#modal .show ul.episodes {
+#modal #show ul.episodes {
 	display: none;
 	padding-left: 0px;
 	margin: 20px 0px;
 }
-#modal .show ul.episodes li {
+#modal #show ul.episodes li {
 	color: #999999;
 	display: table;
 	width: 100%;
 }
-#modal .show ul.episodes li.downloading {
+#modal #show ul.episodes li.downloading {
 	color: #FFC200;
 }
-#modal .show ul.episodes li.available {
+#modal #show ul.episodes li.available {
 	color: #FFFFFF;
 }
 
-
+/**/
 
 ul.episodes li span {
 	display: table-cell;

@@ -136,21 +136,27 @@ require(['socket.io', 'jquery', 'handlebars'], function(io, $, Handlebars){
 	});
 	
 	socket.on('show.search', function(results){
-		$.get('views/show/results.html', function(tmpl){
-			var tmpl = Handlebars.compile(tmpl);
-			$('#modal .results').replaceWith(tmpl(results));
-			$(document).trigger('resize');
-		});
+		var tmpl = $('#results-template').html();
+		var tmpl = Handlebars.compile(tmpl);
+		var output = tmpl(results);
+		if ($('#modal #search .results').length) {
+			$('#modal #search .results').replaceWith(output);
+		} else {
+			$('#modal #search').append(output)
+		}
 	});
 	
 	/***************************************************/
 	/* Modal methods */
 	
+	$(document).on('keydown', function(e){
+		if (e.which == 27) nessa.modalClose();
+	});
+
 	$('#modal').on('click', function(e){
 		if (this == e.srcElement) nessa.modalClose();
 	}).on('click', '.wrapper > .close', function(){
 		nessa.modalClose();
-		
 	}).on('click', 'ul.seasons h2', function(){
 		var parent = $(this).parent('li');
 		if ($(parent).hasClass('open')) {
@@ -162,21 +168,27 @@ require(['socket.io', 'jquery', 'handlebars'], function(io, $, Handlebars){
 		}
 	});
 	
+	/***************************************************/
+	/* Open Search panel */
+	
 	$(document).on('click', '.show-add', function(e){
 		e.preventDefault()
+		
 		$.get('/views/show/search.html', function(html){
 			$('#modal .content').html(html);
+			
 			$('#modal').fadeIn(function(){
 				$('input:first-child', this).focus();
 			});
 		});
 	});
 	
-	$(document).on('keydown', function(e){
-		if (e.which == 27) nessa.modalClose();
-	});
 	
 	
+	
+	
+	/***************************************************/
+	/* Search */
 	
 	$(document).on('keyup', 'input.search', function(e){
 		if ($(this).val().length < 3) {
@@ -186,15 +198,10 @@ require(['socket.io', 'jquery', 'handlebars'], function(io, $, Handlebars){
 		socket.emit('show.search', $(this).val());
 	});
 	
-	$(document).on('click', '.results a', function(e){
+	$(document).on('click', '.results > li', function(e){
 		e.preventDefault();
-		
 		socket.emit('show.add', $(this).data('id'));
-		
-		$('#modal').fadeOut(function(){
-			$(this).html('');
-		});
-		
+		nessa.modalClose();
 	});
 	
 	
@@ -212,26 +219,10 @@ require(['socket.io', 'jquery', 'handlebars'], function(io, $, Handlebars){
 
 	/***************************************************/
 	
-	
-	socket.on('show.info', function(data){
-		
-	});
-	
 	socket.on('shows.list', function(data){
 		$.get('views/show/list.html', function(tmpl){
 			var tmpl = Handlebars.compile(tmpl);
 			$('#main').html(tmpl(data));
-		});
-	});
-	
-	socket.on('show.episodes', function(data){
-		$.get('views/show/episodes.html', function(tmpl){
-			var tmpl = Handlebars.compile(tmpl);
-			var html = tmpl(data);
-			
-			var show = $('li#show-'+data.id);
-			$('ul.seasons', show).replaceWith(html);
-			$('ul.seasons', show).slideDown();
 		});
 	});
 	
@@ -252,23 +243,10 @@ require(['socket.io', 'jquery', 'handlebars'], function(io, $, Handlebars){
 	
 	
 	
-	$(document).on('click', 'ul.shows > li > a', function(e){
+	$(document).on('click', 'ul.shows > li', function(e){
 		e.preventDefault();
 		socket.emit('show.info', $(this).data('id'));
-		
-	}).on('click', 'ul.shows a.season', function(e){
-		e.preventDefault();
-		$(this).siblings('ul.episodes').slideToggle();
-		
-	}).on('click', 'ul.shows div.settings', function(e){
-		e.preventDefault();
-		var data = $(this).siblings('a.show').data();
-		
-		// Fetch show information
-		socket.emit('show.info', {
-			id: data.id
-		});
-	});
+	})
 	
 	
 	
