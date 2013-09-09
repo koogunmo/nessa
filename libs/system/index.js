@@ -1,22 +1,41 @@
-var git = require('gitty');
+var git = require('gitty'),
+	npm = require('npm');
 
 var system = {
 	update: function(){
 		try {
 			var repo = git(process.cwd());
-			if (repo.isRepository()){
-				repo.pull('origin', 'master', function(error, success){
+			repo.pull('origin', 'master', function(error, success){
+				if (error) {
+					logger.error(error);
+					return;
+				}
+				var restart = (success.indexOf('already up-to-date') == 0) ? false : true;
+				
+				var interval = setInterval(function(){
+					if (restart) {
+						console.log('Updates installed. Restarting...');
+						system.restart();
+					}
+				}, 5000);
+				npm.load(function(error){
 					if (error) {
 						logger.error(error);
 						return;
 					}
-					if (success.indexOf('already up-to-date') == 0) {
-						return;
-					}
-					console.log('Update installed. Restarting...');
-					system.restart();
+					npm.commands.update(function(error, success){
+						if (error) {
+							logger.error(error);
+							return;
+						}
+						if (!success.length) {
+							clearInterval(interval);
+							return;
+						}
+						restart = true;
+					})
 				});
-			}
+			});
 		} catch(e) {
 			logger.error(e.message);
 		}

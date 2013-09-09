@@ -8,6 +8,10 @@
 		"type": "git",
 		"url": "https://github.com/greebowarrior/nessa.git"
 	},
+	"scripts": {
+		"preinstall": "npm link npm",
+		"start": "node server.js"
+	},
 	"dependencies": {
 		"express": "3.x.x",
 		"feedparser": "0.16.1",
