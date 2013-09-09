@@ -34,6 +34,13 @@ require(['socket.io', 'jquery', 'handlebars', 'bbq'], function(io, $, Handlebars
 		init: function(){
 			
 		},
+		loadingClose: function(){
+			$('#loading p').text('').parent().hide();
+		},
+		loadingOpen: function(data){
+			var msg = (data.message) ? data.message : 'Loading...';
+			$('#loading p').text(msg).parent().show();
+		},
 		modalClose: function(){
 			$('#modal').fadeOut(function(){
 				$('.content', this).html('');
@@ -64,13 +71,17 @@ require(['socket.io', 'jquery', 'handlebars', 'bbq'], function(io, $, Handlebars
 	
 	socket.on('connect', function(data){
 		$(window).trigger('hashchange');
-		$('#loading p').text('Loading...').parent().hide();
-		
+		nessa.loadingClose();
 	}).on('disconnect', function(data){
-		$('#loading p').text('Reconnecting...').parent().show();
-		
+		nessa.loadingOpen('Reconnecting...');
 	}).on('reconnect', function(data) {
 		
+	});
+	
+	socket.on('system.loading', function(data){
+		nessa.loadingOpen(data.message);
+	}).on('system.loaded', function(data){
+		nessa.loadingClose();
 	});
 	
 	$(document).on('submit', 'form', function(e){
