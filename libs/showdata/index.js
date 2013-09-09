@@ -224,8 +224,7 @@ var ShowData = {
 							id: data.id[0],
 							name: data.SeriesName[0],
 							synopsis: data.Overview[0],
-							imdb: data.IMDB_ID[0],
-							ended: (data.Status[0] == 'Ended') ? 1 : 0
+							imdb: data.IMDB_ID[0]
 						};
 						// Update shows table
 						db.get("SELECT COUNT(id), id FROM show WHERE tvdb = ?", record.id, function(error, result){
@@ -234,13 +233,13 @@ var ShowData = {
 								return;
 							}
 							if (result.count == 1) {
-								var params = [record.name, record.ended, row.directory, record.imdb, record.synopsis, result.id];
-								db.run("UPDATE show SET name = ?, status = 1, ended = ?, directory = ?, imdb = ?, synopsis = ? WHERE id = ?", params, function(error){
+								var params = [record.name, row.directory, record.imdb, record.synopsis, result.id];
+								db.run("UPDATE show SET name = ?, status = 1, directory = ?, imdb = ?, synopsis = ? WHERE id = ?", params, function(error){
 									events.emit('scanner.shows', true, result.id);
 								});
 							} else {
-								var params = [record.id, record.imdb, record.ended, record.name, row.directory, record.synopsis];
-								db.run("INSERT INTO show (tvdb,imdb,status,ended,name,directory,synopsis) VALUES (?,?,1,?,?,?)", params, function(error, result){
+								var params = [record.id, record.imdb, record.name, row.directory, record.synopsis];
+								db.run("INSERT INTO show (tvdb,imdb,status,name,directory,synopsis) VALUES (?,?,1,?,?,?)", params, function(error, result){
 									if (error) {
 										logger.error(error);
 										return;
