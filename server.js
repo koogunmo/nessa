@@ -178,6 +178,7 @@ io.sockets.on('connection', function(socket) {
 	socket.on('system.update', function(data){
 		// Force an update from github (if one is available)
 		socket.emit('system.loading', {message: 'Updating...'});
+		
 		var system = plugin('system');
 		system.update(function(){
 			socket.emit('system.loaded');

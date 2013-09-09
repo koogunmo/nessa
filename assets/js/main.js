@@ -18,7 +18,6 @@ requirejs.config({
 		'socket.io': {
 			exports: 'io'
 		},
-		
 	}
 });
 
@@ -37,8 +36,9 @@ require(['socket.io', 'jquery', 'handlebars', 'bbq'], function(io, $, Handlebars
 		loadingClose: function(){
 			$('#loading p').text('').parent().hide();
 		},
-		loadingOpen: function(data){
-			var msg = data.message || 'Loading...';
+		loadingOpen: function(message){
+			var msg = 'Loading...';
+			if (message) msg = message;
 			$('#loading p').text(msg).parent().show();
 		},
 		modalClose: function(){
