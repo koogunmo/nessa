@@ -1,7 +1,7 @@
 var parser	= new(require('xml2js')).Parser(),
-	request	= require('request'),
+	request	= require('request')
 //	tvdb	= new (require('tvdb'))({apiKey: nconf.get('tvdb:apikey')}),
-	tvrage	= plugin('tvrage')
+//	tvrage	= plugin('tvrage')
 
 
 

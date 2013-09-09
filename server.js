@@ -123,6 +123,9 @@ events.on('shows.list', function(error, response){
 	
 });
 
+var shows = plugin('showdata');
+shows.episodes(812);
+
 /***********************************************************************/
 /* Load tasks */
 fs.readdir(__dirname + '/core/tasks', function(error, files){

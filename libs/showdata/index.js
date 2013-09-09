@@ -3,7 +3,7 @@ var feed	= require('feedparser'),
 	http	= require('http'),
 	parser	= new(require('xml2js')).Parser(),
 	request	= require('request'),
-	tvrage	= plugin('tvrage'),
+//	tvrage	= plugin('tvrage'),
 	util = require('util');
 
 
@@ -155,8 +155,13 @@ var ShowData = {
 							synopsis: data.Overview[0],
 							imdb: data.IMDB_ID[0],
 							year: parseInt(data.FirstAired[0].substring(0,4), 10),
-							tvrage: null
+							ended: (data.Status[0] == 'Ended') ? 1 : 0
+							// Deprecate TVRage?
+						//	tvrage: null
 						};
+						db.run("UPDATE show SET name = ?, synopsis = ?, imdb = ?, ended = ? WHERE tvdb = ?", record.name, record.synopsis, record.imdb, record.ended, record.id);
+						/*
+						// Get TVRage ID
 						tvrage.search(record.name, function(results){
 							if (results.length > 1) {
 								var list = []
@@ -178,6 +183,7 @@ var ShowData = {
 							}
 							db.run("UPDATE show SET name = ?, synopsis = ?, imdb = ?, tvrage = ? WHERE tvdb = ?", record.name, record.synopsis, record.imdb, record.tvrage, record.id);
 						});
+						*/
 						events.emit('shows.info', null, show.id);
 					});
 				} catch(e) {
@@ -245,9 +251,9 @@ var ShowData = {
 
 	episodes: function(id){
 		if (id !== undefined) {
-			var sql = "SELECT * FROM show WHERE id = "+id+" AND directory IS NOT NULL AND tvrage IS NOT NULL";
+			var sql = "SELECT * FROM show WHERE id = "+id+" AND directory IS NOT NULL AND tvdb IS NOT NULL";
 		} else {
-			var sql = "SELECT * FROM show WHERE directory IS NOT NULL AND tvrage IS NOT NULL";
+			var sql = "SELECT * FROM show WHERE directory IS NOT NULL AND tvdb IS NOT NULL";
 		}
 		db.each(sql, function(error, show){
 			if (error) {
@@ -256,10 +262,8 @@ var ShowData = {
 			}
 			logger.info(show.name + ': Fetching episode data');
 			try {
-				// TODO: Maybe we should grab Episode listings from TVDB?
-				// It'd require less matching...
-				/*
-				request.get('http://thetvdb.com/api/'+nconf.get('tvdb:apikey')+'/series/'+show.tvdb+'/en.xml', function(error, req, xml){
+				// Get episode listings from TVDB
+				request.get('http://thetvdb.com/api/'+nconf.get('tvdb:apikey')+'/series/'+show.tvdb+'/all/en.xml', function(error, req, xml){
 					if (error) {
 						logger.error(error);
 						return;
@@ -271,12 +275,39 @@ var ShowData = {
 						}
 						if (!json.Data.Episode) return;
 						json.Data.Episode.forEach(function(ep){
-							
+							var record = {
+								id: show.id,
+								season: ep.SeasonNumber[0],
+								episode: ep.EpisodeNumber[0],
+								title: ep.EpisodeName[0],
+								synopsis: ep.Overview[0],
+								airdate: ep.FirstAired[0]
+							};
+							// Ignore specials for now
+							if (record.season == 0) return;
+							var search = [record.id, record.season, record.episode];
+							db.get("SELECT COUNT(id) AS count, id FROM show_episode WHERE show_id = ? AND season = ? AND episode = ?", search, function(error, result){
+								if (error) {
+									logger.error(error);
+									return;
+								}
+								if (result.count == 1) {
+									var params = [record.title, record.synopsis, record.airdate, result.id];
+									db.run("UPDATE show_episode SET title = ?, synopsis = ?, airdate = ? WHERE id = ?", params, function(error){
+										if (error) logger.error(error);
+									});
+								} else {
+									var params = [record.id, record.season, record.episode, record.title, record.synopsis, record.airdate]
+									db.run("INSERT INTO show_episode (show_id,season,episode,title,synopsis,airdate) VALUES (?,?,?,?,?,?)", params, function(error){
+										if (error) logger.error(error);
+									});
+								}
+							});
 						});
 					});
+					events.emit('shows.episodes', null, show.id);
 				});
-				*/
-				
+				/*
 				tvrage.episodes(show.tvrage, function(data){
 					data.season.forEach(function(season){
 						season.episode.forEach(function(episode){
@@ -302,6 +333,7 @@ var ShowData = {
 					});
 					events.emit('shows.episodes', null, show.id);
 				});
+				*/
 			} catch(e) {
 				logger.error(e.message);
 			}
