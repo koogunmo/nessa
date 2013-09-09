@@ -154,7 +154,6 @@ var ShowData = {
 							name: data.SeriesName[0],
 							synopsis: data.Overview[0],
 							imdb: data.IMDB_ID[0],
-							year: parseInt(data.FirstAired[0].substring(0,4), 10),
 							ended: (data.Status[0] == 'Ended') ? 1 : 0
 							// Deprecate TVRage?
 						//	tvrage: null
@@ -226,14 +225,29 @@ var ShowData = {
 							name: data.SeriesName[0],
 							synopsis: data.Overview[0],
 							imdb: data.IMDB_ID[0],
+							ended: (data.Status[0] == 'Ended') ? 1 : 0
 						};
-						// Add to main DB
-						db.run("INSERT INTO show (tvdb,imdb,status,name,directory,synopsis) VALUES (?,?,1,?,?,?)", record.id, record.imdb, record.name, row.directory, record.synopsis, function(error, result){
+						// Update shows table
+						db.get("SELECT COUNT(id), id FROM show WHERE tvdb = ?", record.id, function(error, result){
 							if (error) {
 								logger.error(error);
 								return;
 							}
-							events.emit('scanner.shows', true, this.lastID);
+							if (result.count == 1) {
+								var params = [record.name, record.ended, row.directory, record.imdb, record.synopsis, result.id];
+								db.run("UPDATE show SET name = ?, status = 1, ended = ?, directory = ?, imdb = ?, synopsis = ? WHERE id = ?", params, function(error){
+									events.emit('scanner.shows', true, result.id);
+								});
+							} else {
+								var params = [record.id, record.imdb, record.ended, record.name, row.directory, record.synopsis];
+								db.run("INSERT INTO show (tvdb,imdb,status,ended,name,directory,synopsis) VALUES (?,?,1,?,?,?)", params, function(error, result){
+									if (error) {
+										logger.error(error);
+										return;
+									}
+									events.emit('scanner.shows', true, this.lastID);
+								});
+							}
 							db.run("DELETE FROM show_unmatched WHERE id = ?", row.id);
 						});
 					} else {

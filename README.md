@@ -55,13 +55,12 @@ It was also heavily skewed towards using newsgroups, which I don't use.
 ### Phase 1 - **COMPLETE**
 - Populate a database of known shows
 	- We're piggybacking TVShowsApp's XML feeds for now
-- Retrieve TVRage and TVDB data per show
+- Retrieve TVDB data
 	- TVDB: Full title, Synopsis, IMDB ID
-	- TVRage: ID
 - Update show list weekly
 - Scan local filesystem for directories
 	- Match show with database entry, flag as enabled
-	- Retrieve episode listings from TVRage
+	- Retrieve episode listings from TVDB
 - Scan show directories for episodes
 	- Update database and rename episode files if necessary
 - Automatically grab new torrents by schedule.
@@ -71,15 +70,17 @@ It was also heavily skewed towards using newsgroups, which I don't use.
 	- Copy and rename when download completes
 	- Delete from Transmission directory when seeding is complete
 
-**Nessa is now capable of running 24/7, but limited to downloading new episodes of existing shows only.**
+**NodeTV is now capable of running 24/7, but limited to downloading new episodes of existing shows only.**
 
-### Phase 2 - *CURRENT*
+---
+
+### Phase 2 - COMPLETE
 - ~~Automatic update by schedule~~
 	- ~~Pull latest version from Github then send SIGUSR2~~
 - *Build responsive HTML5 interface (Ongoing)*
 	- ~~Use Socket.IO~~
 	- ~~Handlebars for templating~~
-	- Responsive layout (Mobile-first)
+	- ~~Responsive layout (Mobile-first)~~
 - ~~Browse show list~~
 - ~~Get show artwork from TVDB~~
 - ~~Display show information~~
@@ -90,20 +91,30 @@ It was also heavily skewed towards using newsgroups, which I don't use.
 	- ~~Use existing shows database~~
 	- ~~Autocomplete style search~~
 	- ~~Create folder using show name~~
-- Support for unmatched shows
-	- ~~Find shows without TVShows data, retrieve TVDB/TVRage data~~
-	- Interface for matching with TVDB/TVRage data
-	- Trigger filesystem scan for episodes
-- Use TVDB for episode data instead of TVRage?
-	- TVDB seems to have better listings
-- Handle series "specials"
-	- e.g. Doctor Who christmas specials
-		- TVDB data appears to be wrong!
+- ~~Support for unmatched shows~~
+	- ~~Find shows without TVShows data, retrieve TVDB data~~
+	- ~~Interface for matching with TVDB~~
+		- Use modal instead
+	- ~~Trigger filesystem scan for episodes~~
 
-### Phase 3
+**NodeTV now has a usable, if basic, interface**
 
+---
+
+### Phase 3 - *CURRENT*
+
+- Dashboard
+	- Show recently downloaded
+	- Show upcoming episodes (next 7 days)
+- Episode modal
+	- Trigger rescan/info update?
+- Notification system
+	- info bubbles?
+- trakt integration
+- Miso integration
+	- Automatically check in when downloading the file
+- Twilio for SMS download notifications
 - Global Settings interface
-	- ~~File/Folder formatting~~ Not happening
 	- Global Quality Preference (HD/SD)
 	- TVShow check interval
 		- 30m, 1hr, 3hr, 6hr, 12hr, 1day
@@ -115,11 +126,10 @@ It was also heavily skewed towards using newsgroups, which I don't use.
 	- Integration overrides
 		- trakt
 		- miso
+- Handle series "specials"
+	- e.g. Doctor Who christmas specials
 - Get episode thumbnails from TVDB?
-- Twilio for SMS download notifications
-- trakt integration
-- Miso integration
-	- Automatically check in when downloading the file
+
 
 
 ### Phase 4
@@ -207,8 +217,7 @@ We need to create expressions for miniseries.
 Nessa utilises the following third-party data sources:
 
 - [TVShowsApp](http://tvshowsapp.com): If you like *our* software, please donate to *them* so they can keep up their fantastic work (and providing us with data)
-- [The TVDB](http://thetvdb.com): Extended show information and artwork
-- [TV Rage](http://www.tvrage.com): Episode data
+- [The TVDB](http://thetvdb.com): Show information, Episodes, and artwork
 
 ## Licence
 
