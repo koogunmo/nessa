@@ -38,7 +38,7 @@ require(['socket.io', 'jquery', 'handlebars', 'bbq'], function(io, $, Handlebars
 			$('#loading p').text('').parent().hide();
 		},
 		loadingOpen: function(data){
-			var msg = (data.message) ? data.message : 'Loading...';
+			var msg = data.message || 'Loading...';
 			$('#loading p').text(msg).parent().show();
 		},
 		modalClose: function(){

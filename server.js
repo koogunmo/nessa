@@ -179,7 +179,9 @@ io.sockets.on('connection', function(socket) {
 		// Force an update from github (if one is available)
 		socket.emit('system.loading', {message: 'Updating...'});
 		var system = plugin('system');
-		system.update();
+		system.update(function(){
+			socket.emit('system.loaded');
+		});
 		
 	}).on('system.restart', function(data){
 		// Restart the process, NOT the server

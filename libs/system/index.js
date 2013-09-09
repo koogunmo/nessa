@@ -2,7 +2,7 @@ var git = require('gitty'),
 	npm = require('npm');
 
 var system = {
-	update: function(){
+	update: function(callback){
 		try {
 			var repo = git(process.cwd());
 			repo.pull('origin', 'master', function(error, success){
@@ -18,6 +18,7 @@ var system = {
 						system.restart();
 					}
 				}, 5000);
+				
 				npm.load(function(error){
 					if (error) {
 						logger.error(error);
@@ -30,6 +31,7 @@ var system = {
 						}
 						if (!success.length) {
 							clearInterval(interval);
+							if (typeof(callback) == 'function') callback();
 							return;
 						}
 						restart = true;
