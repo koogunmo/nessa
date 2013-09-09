@@ -98,6 +98,15 @@ div.toolbar {
 	width: auto;
 	z-index: 100;
 }
+#loading > p {
+	color: #CCCCCC;
+	font-weight: bold;
+	margin-top: 25px;
+	position: absolute;
+	text-align: center;
+	top: 50%;
+	width: 100%;
+}
 
 nav {
 	background-color: #5C697B;
