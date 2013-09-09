@@ -96,7 +96,7 @@ var torrent = {
 						var newName = 'Season '+helper.zeroPadding(data.season)+'/Episode '+ep+' - '+title.join('; ')+path.extname(file);
 						
 						helper.copyFile(file, showdir + '/' + newName, function(){
-							db.run("UPDATE show_episode SET file = ?, status = 2 WHERE hash = ?", newName, item.hashString, function(error){
+							db.run("UPDATE show_episode SET file = ?, status = 2, downloaded = ? WHERE hash = ?", newName, item.hashString, null, function(error){
 								if (error) logger.error(error);
 							});
 						});

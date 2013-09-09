@@ -92,25 +92,53 @@ exports = module.exports = {
 		}
 	},
 	
-	niceName: function(showid, season, episodes){
+	niceName: function(data){
 		// Is this used?
+		var data = {
+			episode: [],
+			ext: '',
+			format: 'Season %S/Episode %E - %T.%X',
+			name: '',
+			season: '',
+			title: []
+		};
+		
+		var output = '';
+		if (season) {
+			output += 'Season '+helper.zeroPadding(data.season)+'/';
+		} else {
+			output += 'Specials/';
+		}
+		if (episode.length > 1) {
+			var ep = helper.zeroPadding(data.episodes[0])+'-'+helper.zeroPadding(data.episodes[data.episodes.length-1]);
+		} else {
+			var ep = helper.zeroPadding(data.episodes[0]);
+		}
+		
+		output += 'Episode '+ep;
+		if (title) {
+			output += ' - '+title.join('; ');
+		}
+		output += ext;
+		
+		return output;
+		
+		
+		/*
 		if (format = nconf.get('shows:format')) {
-			/*
 			var replace = {
-				'E': helper.zeroPadding(row.episode, 2),
-				'N': row.show,
-				'S': helper.zeroPadding(row.season, 2),
-				'T': row.title,
-				'X': path.extname(file).replace('.', '')
+				'E': ep
+			//	'N': data.name,
+				'S': helper.zeroPadding(data.season, 2),
+				'T': title.join('; '),
+				'X': ext.replace(/^\./, '')
 			};
-			*/
 			var name = format.replace(/%(\w)/g, function(match, key){			
 				return replace[key];
 			});
-			
 			name = nconf.get('shows:base') + '/' + row.directory + '/' + name;
-			
 		}
+		*/
 	},
 	
 	formatMagnet: function(magnet, name){

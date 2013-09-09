@@ -329,8 +329,15 @@ io.sockets.on('connection', function(socket) {
 		});
 	}).on('shows.match', function(data){
 		var qs = require('querystring');
-		
-		console.log(qs.parse(data));
+		var match = qs.parse(data);
+		try {
+			var shows = plugin('showdata');
+			for (var id in match) {
+				shows.match(id, match[id]);
+			}
+		} catch(e) {
+			logger.error(e.message);
+		}
 	});
 	
 	

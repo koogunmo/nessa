@@ -85,6 +85,7 @@ It was also heavily skewed towards using newsgroups, which I don't use.
 - ~~Display show information~~
 	- ~~Modal window~~
 	- ~~Use artwork banner or poster~~
+	- ~~list episodes~~
 - ~~Add Show~~
 	- ~~Use existing shows database~~
 	- ~~Autocomplete style search~~
@@ -93,6 +94,11 @@ It was also heavily skewed towards using newsgroups, which I don't use.
 	- ~~Find shows without TVShows data, retrieve TVDB/TVRage data~~
 	- Interface for matching with TVDB/TVRage data
 	- Trigger filesystem scan for episodes
+- Use TVDB for episode data instead of TVRage?
+	- TVDB seems to have better listings
+- Handle series "specials"
+	- e.g. Doctor Who christmas specials
+		- TVDB data appears to be wrong!
 
 ### Phase 3
 

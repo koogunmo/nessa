@@ -1,13 +1,15 @@
-<form action="shows/match" method="post">
-	<ul class="unmatched">
-		{{#shows}}<li data-id="{{id}}">
-			<h2>{{directory}}</h2>
-			<ul class="matches">
-				{{#matches}}<li>
-					<input type="radio" name="{{../id}}" value="{{this.id}}" /> {{name}} ({{year}})
-				</li>{{/matches}}
-			</ul>
-		</li>{{/shows}}
-	</ul>
-	<input type="submit" value="Match" />
-</form>
+<div id="match">
+	<form action="shows/match" method="post">
+		<ul class="unmatched">
+			{{#shows}}<li data-id="{{id}}">
+				<h2>{{directory}}</h2>
+				<ul class="matches">
+					{{#matches}}<li>
+						<input type="radio" name="{{../id}}" value="{{this.id}}" /> {{name}} ({{year}})
+					</li>{{/matches}}
+				</ul>
+			</li>{{/shows}}
+		</ul>
+		<input type="submit" value="Match" />
+	</form>
+</div>

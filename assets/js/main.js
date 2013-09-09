@@ -6,6 +6,9 @@ requirejs.config({
 		'socket.io': 'https://cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min'
 	},
 	shim: {
+		'bbq': {
+			deps: ['jquery']
+		},
 		'handlebars': {
 			exports: 'Handlebars'
 		},
@@ -14,7 +17,8 @@ requirejs.config({
 		},
 		'socket.io': {
 			exports: 'io'
-		}
+		},
+		
 	}
 });
 
@@ -24,7 +28,7 @@ function zeroPad(num, length) {
 	return (pad + num).slice(-length);
 }
 
-require(['socket.io', 'jquery', 'handlebars'], function(io, $, Handlebars){
+require(['socket.io', 'jquery', 'handlebars', 'bbq'], function(io, $, Handlebars){
 	
 	var nessa = {
 		init: function(){
@@ -43,21 +47,7 @@ require(['socket.io', 'jquery', 'handlebars'], function(io, $, Handlebars){
 			$('#modal').fadeIn();
 		}
 	};
-	
-	
-	/*
-	$(document).on('resize', function(){
-		// Reposition modal window
-		var modal	= $('#modal');
-		var height	= $('.wrapper', modal).height();
-		var width	= $('.wrapper', modal).width();
-		$('.wrapper', modal).css({
-			'margin-left': 0-(width/2),
-			'margin-top': 0-(height/2) || 0
-		});
-	}).trigger('resize');
-	*/
-	
+		
 	var port = (window.location.port) ? window.location.port : 80;
 	
 	var socket = io.connect('http://' + window.location.hostname + ':' + port, {
@@ -66,28 +56,22 @@ require(['socket.io', 'jquery', 'handlebars'], function(io, $, Handlebars){
 		'sync disconnect on unload': true
 	});
 	
-	require(['bbq'], function(){
-		$(window).bind('hashchange', function(e){
-			var url = $.param.fragment();
-			if (url == '') url = 'main/dashboard';
-			socket.emit(url.replace('/','.'))
-		});
+	$(window).bind('hashchange', function(e){
+		var url = $.param.fragment();
+		if (url == '') url = 'main/dashboard';
+		socket.emit(url.replace('/','.'))
 	});
-
+	
 	socket.on('connect', function(data){
 		$(window).trigger('hashchange');
-		$('#loading').hide();
+		$('#loading p').text('Loading...').parent().hide();
 		
 	}).on('disconnect', function(data){
-		console.log('disconnect', data);
-		$('#loading').show();
+		$('#loading p').text('Reconnecting...').parent().show();
 		
 	}).on('reconnect', function(data) {
-		console.log('reconnect', data);
-		$('#loading').hide();
 		
 	});
-
 	
 	$(document).on('submit', 'form', function(e){
 		/* Generic form handler */

@@ -124,7 +124,7 @@ var ShowData = {
 	},
 		
 	info: function(showid){
-		if (typeof(showid) == 'number') {
+		if (showid) {
 			var sql = "SELECT * FROM show WHERE id = "+showid+" AND tvdb IS NOT NULL ORDER BY name ASC";
 		} else {
 			var sql = "SELECT * FROM show WHERE tvdb IS NOT NULL ORDER BY name ASC";
@@ -192,6 +192,7 @@ var ShowData = {
 			var sql = "SELECT * FROM show_unmatched WHERE id = "+id;
 		} else {
 			var sql = "SELECT * FROM show_unmatched";
+			tvdb	= null;
 		}
 		db.each(sql, function(error, row){
 			// Search TVDB (we already have a method to match shows WITH a TVDB id)
@@ -205,11 +206,11 @@ var ShowData = {
 					var results = json.Data.Series;
 					
 					if (tvdb !== undefined) {
-						var found = null;
+						var found = [];
 						results.forEach(function(result){
 							if (result.id[0] == tvdb) found.push(result);
 						});
-						if (found) results = found;
+						if (found.length) results = found;
 					}
 					
 					if (results.length == 1) {
@@ -226,7 +227,7 @@ var ShowData = {
 								logger.error(error);
 								return;
 							}
-							events.emit('scanner.shows', true, this.lastid);
+							events.emit('scanner.shows', true, this.lastID);
 							db.run("DELETE FROM show_unmatched WHERE id = ?", row.id);
 						});
 					} else {
@@ -244,7 +245,7 @@ var ShowData = {
 
 	episodes: function(id){
 		if (id !== undefined) {
-			var sql = "SELECT * FROM show WHERE id = '"+id+"' AND directory IS NOT NULL AND tvrage IS NOT NULL";
+			var sql = "SELECT * FROM show WHERE id = "+id+" AND directory IS NOT NULL AND tvrage IS NOT NULL";
 		} else {
 			var sql = "SELECT * FROM show WHERE directory IS NOT NULL AND tvrage IS NOT NULL";
 		}
@@ -330,7 +331,6 @@ var ShowData = {
 						json.rss.channel[0].item.forEach(function(item){
 							var title = item.title.toString();
 							if (!row.hd && title.match('720p')) return;
-							// parse filename, does it contain the right season/episode combo?
 							var data = helper.getEpisodeNumbers(title);
 							if (data.season == row.season && data.episodes.indexOf(row.episode) >= 0) {
 								var magnet = item.guid[0]['_'];
@@ -346,6 +346,11 @@ var ShowData = {
 				}
 			});
 		});
+	},
+	
+	getName: function(){
+	
+	
 	},
 	
 	getLatest: function(){
