@@ -1,4 +1,5 @@
 <div id="match">
+	{{#if shows}}
 	<form action="shows/match" method="post">
 		<ul class="unmatched">
 			{{#shows}}<li data-id="{{id}}">
@@ -12,4 +13,7 @@
 		</ul>
 		<input type="submit" value="Match" />
 	</form>
+	{{else}}
+	<p>There are no unmatched TV shows</p>
+	{{/if}}
 </div>
