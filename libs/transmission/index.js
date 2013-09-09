@@ -3,25 +3,6 @@ var path = require('path');
 
 var torrent = {
 	rpc: null,
-	
-	// TO DO: improve this to handle disconnection and reconnection
-	
-	init: function(){
-		if (!this.rpc) {
-			this.connect();
-		} else {
-			var recon = setInterval(function(){
-				torrent.rpc.sessionStats(function(error, data){
-					if (error) {
-						console.log('Transmission: Reconnecting...');
-						torrent.connect();
-					}
-				});
-			}, 30000);
-		}
-		return this;
-	},
-	
 	connect: function() {
 		var self = this;
 		// Create connection
@@ -32,27 +13,7 @@ var torrent = {
 			password: nconf.get('transmission:password')
 		});
 		return this;
-		/*
-		rpc.sessionStats(function(error, data){
-			if (error) {
-				setTimeout(function(){
-					torrent.connect();
-				}, 5000);
-				return;
-			} else {
-				console.log('Transmission: Connected');
-				self.rpc = rpc;
-			}
-		});
-		*/
 	},
-	
-	watchdog: function(){
-		
-		
-		
-	},
-	
 	add: function(obj) {
 		try {
 			if (!this.rpc) {

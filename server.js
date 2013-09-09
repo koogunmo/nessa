@@ -30,10 +30,11 @@ global.nconf = require('nconf').defaults({
 }).file({file: 'settings.json'});
 
 /* Change ownership of the process */
-if (process.getuid && process.getuid) {
+if (process.getuid) {
 	try {
 		if (nconf.get('run:group')) process.setgid(nconf.get('run:group'));
 		if (nconf.get('run:user')) process.setuid(nconf.get('run:user'));
+		process.env['HOME'] = process.cwd();
 	} catch(e) {
 		console.error(e.message);
 	}
