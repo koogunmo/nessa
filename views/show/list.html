@@ -4,6 +4,7 @@
 			<a href="#show/add">Add Show</a>
 		</li>
 		{{#shows}}<li id="show-{{id}}" data-id="{{id}}">
+			<img src="/media/{{directory}}/cover.jpg" />
 			<a href="#shows/{{id}}" class="show">{{name}}</a>
 		</li>{{/shows}}
 		<li class="show-add">

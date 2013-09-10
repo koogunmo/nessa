@@ -75,7 +75,9 @@ var app		= express(),
 	io		= require('socket.io').listen(server);
 
 app.use('/assets', express.static(__dirname + '/assets'));
+app.use('/media', express.static(nconf.get('shows:base')));
 app.use('/views', express.static(__dirname + '/views'));
+
 app.use(express.bodyParser());
 
 logger.info('nessa.js: Listening on port ' + nconf.get('port'));

@@ -163,12 +163,17 @@ footer {
 
 /*******/
 
+#shows ul.shows li > img {
+	display: none;
+}
+
 #main ul {
 	font-size: 14px;
 }
 #main ul.shows > li:hover {
 	background-color: #545f70;
 }
+
 #main ul li a {
 	display: block;
 	height: 100%;
@@ -176,14 +181,6 @@ footer {
 }
 #main li > ul {
 	display: none;
-}
-#main li.open > ul {
-	display: block;
-	margin: 10px 20px;
-}
-#main li.open > a {
-	color: #FFFFFF;
-	font-weight: bold;
 }
 #main ul.shows {
 	border-top: 1px solid #CCCCCC;
@@ -198,14 +195,6 @@ footer {
 	border-bottom: 1px solid #CCCCCC;
 	padding: 10px;
 	position: relative;
-}
-
-#main ul.shows > li.banner.open {
-	min-height: 154px;
-}
-
-#main ul.shows > li.banner > a.show {
-	opacity: 0;
 }
 
 #main ul.shows > li > a {
@@ -519,7 +508,42 @@ ul.episodes li.downloaded span.download {
 
 @media screen and (min-width: 600px) {
 	/* Desktop */
+	#shows ul.shows {
+		border: none;
+	}
+	#shows .show-add {
+		display: none !important;
+	}
+	#shows ul.shows li {
+		border: none;
+		cursor: pointer;
+		display: inline-block;
+		height: 120px;
+		padding: 0px 0px 10px;
+		text-align: center;
+		width: 25%;
+	}
+	#shows ul.shows li > img {
+		background-color: #000000;
+		display: block;
+		height: 100px;
+		margin: 0px auto;
+		width: 68px;
+	}
+	#shows ul.shows li > a {
+		font-size: 11px;
+		height: auto;
+		margin: 10px 0px 0px;
+		max-width: 100%;
+		width: auto;
+	}
+	
 	ul.episodes li span.airdate {
 		display: table-cell;
+	}
+}
+@media screen and (min-width: 780px) {
+	#shows ul.shows li {
+		width: 20%;
 	}
 }
