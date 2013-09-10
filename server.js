@@ -384,55 +384,22 @@ io.sockets.on('connection', function(socket) {
 				});
 			});
 		});
-	}).on('show.season', function(data){
-		// List all episodes of a show in a specific season
-		db.get("SELECT * FROM show_episode AS E WHERE E.show_id = ? AND E.season = ?", data.id, data.season, function(error, row){
-			if (error) {
-				logger.error(error);
-				return;
-			}
-			
-		});
-	}).on('show.episodes', function(data){
-		// List all episodes of a show, grouped by season
-		db.all("SELECT * FROM show_episode WHERE show_id = ? ORDER BY season,episode ASC", data, function(error, rows){
-			if (error) {
-				logger.error(error);
-				return;
-			}
-			var results = [];
-			var seasons = [];
-			var episodes = [];
-			
-			rows.forEach(function(row){
-				if (seasons.indexOf(row.season) == -1) seasons.push(row.season);
-				if (!episodes[row.season]) episodes[row.season] = [];
-				episodes[row.season].push(row);
-			});
-			seasons.forEach(function(season){
-				var record = {
-					season: season,
-					episodes: episodes[season]
-				}
-				results.push(record);
-			});
-			socket.emit('show.episodes', {id: data, seasons: results});
-		});
-	}).on('show.episode', function(data){
-		// Return a single episode of a show
 		
-		db.get("SELECT S.*, E.* FROM show_episode AS E INNER JOIN show AS S ON S.id = E.show_id WHERE E.id = ?", data.id, function(error, row){
-			if (error) {
-				logger.error(error);
-				return;
-			}
-			socket.emit('show.episode', row);
-		});
-	});
-	
-	socket.on('show.scan', function(data){
+	}).on('show.rescan', function(data){
 		var scanner = plugin('scanner');
 		scanner.episodes(data.id);
+	}).on('show.settings', function(data){
+		var qs = require('querystring');
+		var json = qs.parse(data);
+		console.log(json);
+		
+		db.run("UPDATE show SET status = ?, hd = ? WHERE id = ?", json.status, json.hd, json.id, function(error){
+			if (error) logger.error(error);
+		});
+	}).on('show.update', function(data){
+		var shows = plugin('showdata');
+		shows.info(data.id);
+		
 	});
 	
 	// Search

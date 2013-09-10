@@ -84,6 +84,8 @@ require(['socket.io', 'jquery', 'handlebars', 'bbq'], function(io, $, Handlebars
 		nessa.loadingClose();
 	});
 	
+	
+	
 	$(document).on('submit', 'form', function(e){
 		/* Generic form handler */
 		e.preventDefault();
@@ -201,17 +203,24 @@ require(['socket.io', 'jquery', 'handlebars', 'bbq'], function(io, $, Handlebars
 	
 	
 	/* Settings page */
-	$(document).on('click', '.settings h2', function(){
-		if ($('fieldset.open').length && !$(this).next('fieldset').hasClass('open')) {
-			$('fieldset.open').removeClass('open').slideUp();
+	$(document).on('click', 'span.cog', function(){
+		if ($('#show.settings').length) {
+			$('#show.settings').removeClass('settings');
+		} else {
+			$('#modal #show').addClass('settings');
 		}
-		$(this).next('fieldset').addClass('open').slideDown();
 	});
-
-
-
-
-
+	
+	$(document).on('click', '#show ul.episodes .header > .title', function(){
+		var parent = $(this).parents('.episode');
+		if ($(parent).hasClass('open')) {
+			$(parent).removeClass('open').children('.extended').slideUp();
+		} else {
+			$('ul.episodes .episode.open').removeClass('open').children('.extended').slideUp();
+			$(parent).addClass('open').children('.extended').slideDown();
+		}
+	});
+	
 	/***************************************************/
 	
 	socket.on('shows.list', function(data){

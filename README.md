@@ -103,17 +103,9 @@ It was also heavily skewed towards using newsgroups, which I don't use.
 
 ### Phase 3 - *CURRENT*
 
-- Dashboard
-	- Show recently downloaded
-	- Show upcoming episodes (next 7 days)
-- Episode modal
-	- Trigger rescan/info update?
-- Notification system
-	- info bubbles?
-- trakt integration
-- Miso integration
-	- Automatically check in when downloading the file
-- Twilio for SMS download notifications
+- ~~Improve show modal~~
+	- ~~Trigger rescan/info update~~
+	- ~~Settings tab/section~~
 - Global Settings interface
 	- Global Quality Preference (HD/SD)
 	- TVShow check interval
@@ -121,15 +113,20 @@ It was also heavily skewed towards using newsgroups, which I don't use.
 			- How do we reload scheduled tasks?
 - Per-show settings (HD, enabled, etc)
 	- Like Global Settings
-	- Folder, SD/HD, etc
+	- ~~Folder, SD/HD, etc~~
 	- SMS Notifications on/off
 	- Integration overrides
 		- trakt
-		- miso
+- Dashboard
+	- Show recently downloaded
+	- Show upcoming episodes (next 7 days)
+- Notification system
+	- info bubbles?
+- trakt integration
+- Twilio for SMS download notifications
+- Get episode thumbnails from TVDB?
 - Handle series "specials"
 	- e.g. Doctor Who christmas specials
-- Get episode thumbnails from TVDB?
-
 
 
 ### Phase 4

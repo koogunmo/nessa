@@ -208,19 +208,6 @@ footer {
 	opacity: 0;
 }
 
-
-#main ul.shows > li > .settings {
-	background-image: url('../gfx/icons/cog.png');
-	background-position: center center;
-	background-repeat: no-repeat;
-	cursor: pointer;
-	height: 16px;
-	position: absolute;
-	right: 7px;
-	top: 14px;
-	width: 16px;
-}
-
 #main > ul > li > a {
 	display: block;
 	font-size: 20px;
@@ -360,10 +347,12 @@ ul.matches {
 }
 
 #modal #show h3 {
+	border-bottom: 1px solid #686868;
 	color: #FFFFFF;
 	font-size: 12px;
 	font-weight: bold;
 	margin-bottom: 5px;
+	padding: 5px 0px;
 }
 
 #modal #show div.synopsis {
@@ -384,20 +373,47 @@ ul.matches {
 	white-space: normal;
 }
 
-#modal #show div.settings {
+
+#modal #show .cog {
+	background-image: url('../gfx/icons/cog.png');
+	background-position: center center;
+	background-repeat: no-repeat;
+	cursor: pointer;
+	display: block;
+	height: 20px;
+	position: absolute;
+	right: 20px;
+	top: 150px;
+	width: 20px;
+}
+#modal #show.settings .cog {
+	background-image: url('../gfx/icons/cross.png');
+}
+
+#modal #show div.config {
 	display: none;
 	margin: 20px;
 }
 
-#modal #show div.settings dl {
-	display: none;
-	margin: 0px 10px;
-}
-#modal #show div.settings.open dl {
+#modal #show.settings div.config {
 	display: block;
 }
 
+#modal #show.settings div.synopsis,
+#modal #show.settings div.episodes {
+	display: none !important;
+}
+
+#modal #show div.config dl {
+	margin: 10px 0px;
+}
+#modal #show div.config dl > dd {
+	margin-bottom: 10px;
+}
+
+
 #modal #show div.episodes {
+	font-size: 12px;
 	height: auto;
 	overflow: auto;
 	margin: 20px;
@@ -413,13 +429,29 @@ ul.matches {
 #modal #show ul.episodes {
 	display: none;
 	padding-left: 0px;
-	margin: 20px 0px;
+	margin: 10px 0px;
 }
 #modal #show ul.episodes li {
-	color: #999999;
+	margin-bottom: 10px;
+}
+#modal #show ul.episodes li .header {
+	
 	display: table;
+	/* margin: 10px 0px; */
 	width: 100%;
 }
+#modal #show ul.episodes li .extended {
+	color: #CCCCCC;
+	display: none;
+	margin-top: 10px;
+}
+#modal #show ul.episodes li .extended p.synopsis {
+	margin: 0px 30px;
+}
+
+
+
+
 #modal #show ul.episodes li.downloading {
 	color: #FFC200;
 }
@@ -440,25 +472,17 @@ ul.episodes li span.episode {
 	width: 20px;
 }
 ul.episodes li span.title {
+	cursor: pointer;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
+	width: auto;
 }
-ul.episodes li span.duration {
-	text-align: right;
-	width: 50px;
-}
-ul.episodes li span.date {
+ul.episodes li span.airdate {
 	display: none;
 	text-align: right;
 	width: 100px;
 }
-ul.episodes li span.actions {
-	text-align: right;
-	width: 32px;
-}
-
-
 /* Media Queries */
 
 @media screen and (max-width: 600px) {
@@ -472,7 +496,7 @@ ul.episodes li span.actions {
 
 @media screen and (min-width: 600px) {
 	/* Desktop */
-	ul.episodes li > span.date {
+	ul.episodes li span.airdate {
 		display: table-cell;
 	}
 }

@@ -3,26 +3,38 @@
 		<img src="assets/artwork/{{tvdb}}.jpg" alt="{{name}}" />
 	</div>
 	
+	<span class="cog"></span>
+
+	<div class="config">
+		<h3>Settings</h3>
+		<form action="show/settings" method="post">
+			<dl>
+				<dt>Download new episodes as available</dt>
+				<dd><input type="text" name="status" value="{{status}}" /></dd>
+				
+				<dt>Prefer HD Video?</dt>
+				<dd><input type="text" name="hd" value="{{hd}}" /></dd>
+				
+				<dt>Directory</dt>
+				<dd><input type="text" value="{{directory}}" readonly="readonly" /></dd>
+			</dl>
+			
+			<div>
+				<input type="hidden" name="id" value="{{id}}" />
+				<input type="submit" value="Save" class="button" />
+				
+				<a href="show/update" data-id="{{id}}" class="button">Update info</a>
+				<a href="show/scan" data-id="{{id}}" class="button">Rescan files</a>
+			</div>
+			
+		</form>
+	</div>
+	
 	<div class="synopsis">
 		<h3>Synopsis</h3>
 		<p>{{synopsis}}</p>
 	</div>
 	
-	<!--div class="settings">
-		<h3>Settings</h3>
-		<form action="show/settings" method="post">
-			<dl>
-				<dt>Download new episodes as available</dt>
-				<dd>Yes/No</dd>
-				
-				<dt>Prefer HD Video?</dt>
-				<dd>Yes/No</dd>
-				
-				<dt>Directory</dt>
-				<dd>[BASEDIR]/{{directory}}</dd>
-			</dl>
-		</form>
-	</div-->
 	
 	{{#if seasons}}
 	<div class="episodes">
@@ -30,18 +42,18 @@
 			<li>
 				<h2>Season {{season}}</h2>
 				<ul class="episodes">{{#episodes}}
-					<li class="{{#if hash}}downloading{{/if}} {{#if file}}available{{/if}}">
-						<!--div></div>
-						<div></div-->
-						<span class="episode">{{episode}}</span>
-						<span class="title">{{title}}</span>
-						
-						{{#if status}}
-						<span class="date">{{airdate}}</span>
-						{{/if}}
-						{{#unless status}}
-						<span class="date">Download</span>
-						{{/unless}}
+					<li class="episode {{#if hash}}downloading{{/if}} {{#if file}}available{{/if}}">
+						<div class="header">
+							<span class="episode">{{episode}}</span>
+							<span class="title">{{title}}</span>
+							<span class="airdate">{{airdate}}</span>
+						</div>
+						<div class="extended">
+							<p class="synopsis">{{synopsis}}</p>
+							<div class="tools">
+								
+							</div>
+						</div>
 					</li>
 					{{/episodes}}</ul>
 			</li>
