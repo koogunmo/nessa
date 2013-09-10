@@ -69,7 +69,7 @@ require(['socket.io', 'jquery', 'handlebars', 'bbq'], function(io, $, Handlebars
 		// Check if the episode has aired
 		var now = new Date().getTime()/1000;
 		var date = airdate.split('-');
-		var airs = new Date(date[0], date[1]-1, date[2]-1, 0, 0, 0, 0).getTime()/1000;
+		var airs = new Date(date[0], date[1]-1, date[2], 0, 0, 0, 0).getTime()/1000;
 		return (now >= airs) ? 'aired' : 'upcoming';
 	});
 	

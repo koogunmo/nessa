@@ -94,7 +94,6 @@ It was also heavily skewed towards using newsgroups, which I don't use.
 - ~~Support for unmatched shows~~
 	- ~~Find shows without TVShows data, retrieve TVDB data~~
 	- ~~Interface for matching with TVDB~~
-		- Use modal instead
 	- ~~Trigger filesystem scan for episodes~~
 
 **NodeTV now has a usable, if basic, interface**
@@ -103,17 +102,17 @@ It was also heavily skewed towards using newsgroups, which I don't use.
 
 ### Phase 3 - *CURRENT*
 
-- ~~Improve show modal~~
+- Improve show modal
 	- ~~Trigger rescan/info update~~
 	- ~~Settings tab/section~~
+	- Episode list needs to scroll
 - Authentication
 	- IP Whitelist
 	- User/Pass
+- Matching
+	- Use modal window
 - Global Settings interface
 	- Global Quality Preference (HD/SD)
-	- TVShow check interval
-		- 30m, 1hr, 3hr, 6hr, 12hr, 1day
-			- How do we reload scheduled tasks?
 - Per-show settings (HD, enabled, etc)
 	- Like Global Settings
 	- ~~Folder, SD/HD, etc~~
@@ -134,6 +133,7 @@ It was also heavily skewed towards using newsgroups, which I don't use.
 
 ### Phase 4
 - Ants. Ants EVERYWHERE!
+- Better navigation
 - Simple torrent management?
 - Setup wizard
 	- Clean install test

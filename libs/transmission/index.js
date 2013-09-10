@@ -95,8 +95,11 @@ var torrent = {
 						});
 						var newName = 'Season '+helper.zeroPadding(data.season)+'/Episode '+ep+' - '+title.join('; ')+path.extname(file);
 						
+						var date = new Date();
+						var downloaded = date.getFullYear()+'-'+helper.zeroPadding(date.getMonth()+1)+'-'+helper.zeroPadding(date.getDay());
+						
 						helper.copyFile(file, showdir + '/' + newName, function(){
-							db.run("UPDATE show_episode SET file = ?, status = 2, downloaded = ? WHERE hash = ?", newName, item.hashString, null, function(error){
+							db.run("UPDATE show_episode SET file = ?, status = 2, downloaded = ? WHERE hash = ?", newName, downloaded, item.hashString, null, function(error){
 								if (error) logger.error(error);
 							});
 						});
