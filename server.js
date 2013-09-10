@@ -401,7 +401,6 @@ io.sockets.on('connection', function(socket) {
 	}).on('show.update', function(data){
 		var shows = plugin('showdata');
 		shows.info(data.id);
-		
 	});
 	
 	// Search
@@ -433,18 +432,6 @@ app.get('/install', function(req, res){
 });
 
 /*
-app.get('/artwork', function(req, res){
-	var shows = plugin('showdata');
-	shows.artwork();
-	res.end('fetching show artwork');
-});
-app.get('/match', function(req, res){
-	var shows = plugin('showdata');
-	
-	shows.match()
-	
-	res.end('Matching...');
-});
 
 app.get('/info/:show', function(req, res){
 	var shows = plugin('showdata');
