@@ -111,7 +111,6 @@ It was also heavily skewed towards using newsgroups, which I don't use.
 	- User/Pass
 - Global Settings interface
 	- Global Quality Preference (HD/SD)
-	- 
 	- TVShow check interval
 		- 30m, 1hr, 3hr, 6hr, 12hr, 1day
 			- How do we reload scheduled tasks?

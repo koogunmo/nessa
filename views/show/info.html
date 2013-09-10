@@ -42,18 +42,18 @@
 			<li>
 				<h2>Season {{season}}</h2>
 				<ul class="episodes">{{#episodes}}
-					<li class="episode {{#if hash}}downloading{{/if}} {{#if file}}available{{/if}}">
+					<li class="episode {{status status}} {{aired airdate}}">
 						<div class="header">
 							<span class="episode">{{episode}}</span>
 							<span class="title">{{title}}</span>
 							<span class="airdate">{{airdate}}</span>
+							<span class="download"><a href="" class="button">Download</a></span>
 						</div>
+						{{#if synopsis}}
 						<div class="extended">
 							<p class="synopsis">{{synopsis}}</p>
-							<div class="tools">
-								
-							</div>
 						</div>
+						{{/if}}
 					</li>
 					{{/episodes}}</ul>
 			</li>

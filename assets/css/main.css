@@ -429,11 +429,16 @@ ul.matches {
 #modal #show ul.episodes {
 	display: none;
 	padding-left: 0px;
-	margin: 10px 0px;
 }
 #modal #show ul.episodes li {
-	margin-bottom: 10px;
+	border-bottom: 1px solid #212121;
+	color: #CCCCCC;
+	padding: 10px 0px;
 }
+#modal #show ul.episodes li:last-child {
+	border-bottom: none;
+}
+
 #modal #show ul.episodes li .header {
 	
 	display: table;
@@ -448,14 +453,16 @@ ul.matches {
 #modal #show ul.episodes li .extended p.synopsis {
 	margin: 0px 30px;
 }
-
+#modal #show ul.episodes li .extended .tools {
+	text-align: right;
+}
 
 
 
 #modal #show ul.episodes li.downloading {
 	color: #FFC200;
 }
-#modal #show ul.episodes li.available {
+#modal #show ul.episodes li.downloaded {
 	color: #FFFFFF;
 }
 
@@ -481,7 +488,23 @@ ul.episodes li span.title {
 ul.episodes li span.airdate {
 	display: none;
 	text-align: right;
-	width: 100px;
+	width: 85px;
+}
+ul.episodes li.aired span.airdate {
+	display: none !important
+}
+ul.episodes li.downloaded span.airdate {
+	display: table-cell !important;
+}
+
+ul.episodes li span.download {
+	text-align: right;
+	width: 85px;
+}
+
+ul.episodes li.upcoming span.download,
+ul.episodes li.downloaded span.download {
+	display: none !important;
 }
 /* Media Queries */
 

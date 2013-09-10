@@ -54,7 +54,25 @@ require(['socket.io', 'jquery', 'handlebars', 'bbq'], function(io, $, Handlebars
 			$('#modal').fadeIn();
 		}
 	};
-		
+	
+	Handlebars.registerHelper('status', function(status){
+		switch (status) {
+			case 1:
+				return 'downloading';
+			case 2:
+				return 'downloaded';
+			default:
+				return '';
+		}
+	});
+	Handlebars.registerHelper('aired', function(airdate){
+		// Check if the episode has aired
+		var now = new Date().getTime()/1000;
+		var date = airdate.split('-');
+		var airs = new Date(date[0], date[1]-1, date[2]-1, 0, 0, 0, 0).getTime()/1000;
+		return (now >= airs) ? 'aired' : 'upcoming';
+	});
+	
 	var port = (window.location.port) ? window.location.port : 80;
 	
 	var socket = io.connect('http://' + window.location.hostname + ':' + port, {
