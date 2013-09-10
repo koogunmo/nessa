@@ -32,4 +32,10 @@ CREATE TABLE "show_unmatched" (
 	"tvrage" INTEGER
 );
 
+CREATE TABLE "user" (
+	"id" INTEGER PRIMARY KEY AUTOINCREMENT,
+	"username" TEXT UNIQUE,
+	"password" TEXT
+);
+
 CREATE INDEX "index" ON "show_episode" ("show_id","season","episode");
