@@ -247,11 +247,22 @@ require(['socket.io', 'jquery', 'handlebars', 'bbq'], function(io, $, Handlebars
 	
 	
 	
-	$(document).on('click', 'ul.shows > li', function(e){
+	$(document).on('click', '#shows ul.shows > li', function(e){
 		e.preventDefault();
 		socket.emit('show.info', $(this).data('id'));
 	})
 	
+	
+	
+	$(document).on('click', '#settings h2', function(){
+		var fieldset = $(this).next('fieldset');
+		if ($(fieldset).hasClass('open')) {
+			$(fieldset).removeClass('open').slideUp();
+		} else {
+			$('#settings fieldset.open').removeClass('open').slideUp();
+			$(fieldset).addClass('open').slideDown();
+		}
+	});
 	
 	
 	

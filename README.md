@@ -106,8 +106,12 @@ It was also heavily skewed towards using newsgroups, which I don't use.
 - ~~Improve show modal~~
 	- ~~Trigger rescan/info update~~
 	- ~~Settings tab/section~~
+- Authentication
+	- IP Whitelist
+	- User/Pass
 - Global Settings interface
 	- Global Quality Preference (HD/SD)
+	- 
 	- TVShow check interval
 		- 30m, 1hr, 3hr, 6hr, 12hr, 1day
 			- How do we reload scheduled tasks?
@@ -133,11 +137,11 @@ It was also heavily skewed towards using newsgroups, which I don't use.
 - Ants. Ants EVERYWHERE!
 - Simple torrent management?
 - Setup wizard
-- Clean install test
+	- Clean install test
 
 ### Phase 5
 - Custom templates and/or themes
-	- I'm sure some people won't like my design choices
+	- I'm sure some people won't like my idea of design
 - Implement uPNP/DLNA MediaServer?
 	- Removes dependency on Twonky
 		- Need to find/write a good uPnP/AV module?

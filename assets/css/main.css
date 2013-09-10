@@ -208,7 +208,7 @@ footer {
 	opacity: 0;
 }
 
-#main > ul > li > a {
+#main ul.shows > li > a {
 	display: block;
 	font-size: 20px;
 	font-weight: bold;
@@ -314,10 +314,10 @@ ul.matches {
 
 
 
-.settings h2 {
+#settings h2 {
 	cursor: pointer;
 }
-.settings fieldset {
+#settings fieldset {
 	display: none;
 }
 
