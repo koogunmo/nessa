@@ -47,6 +47,18 @@ require(['socket.io', 'jquery', 'handlebars', 'bbq'], function(io, $, Handlebars
 			});
 		},
 		modalLoad: function(html){
+			/*
+			$('img.blend', html).bind('load', function(e){
+				var colorThief = new ColorThief();
+				var image = e.target;
+				var $image = $(image);
+				var c = colorThief.getColor(e.target);
+				var p = colorThief.getPalette(e.target)[7];
+				$('#modal .wrapper').css({
+					'background-color': 'rgb('+c[0]+','+c[1]+','+c[2]+')'
+				});
+			});
+			*/
 			$('#modal .wrapper .content').html(html);
 			this.modalOpen();
 		},
@@ -54,7 +66,7 @@ require(['socket.io', 'jquery', 'handlebars', 'bbq'], function(io, $, Handlebars
 			$('#modal').fadeIn();
 		}
 	};
-	
+		
 	Handlebars.registerHelper('status', function(status){
 		switch (status) {
 			case 1:
@@ -257,12 +269,9 @@ require(['socket.io', 'jquery', 'handlebars', 'bbq'], function(io, $, Handlebars
 		});
 	});
 	
-	
 	$(document).on('click', '.synopsis', function(){
 		$(this).toggleClass('open');
 	});
-	
-	
 	
 	
 	$(document).on('click', '#shows ul.shows > li', function(e){

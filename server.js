@@ -252,7 +252,7 @@ io.sockets.on('connection', function(socket) {
 			if (!row.directory) {
 				try {
 					var mkdir = require('mkdirp');
-					mkdir(nconf.get('shows:base') + '/' + row.name, 0644);
+					mkdir(nconf.get('shows:base') + '/' + row.name, 0775);
 					update.directory = row.name;
 				} catch(e) {
 					logger.error(e.message);

@@ -102,13 +102,16 @@ It was also heavily skewed towards using newsgroups, which I don't use.
 
 ### Phase 3 - *CURRENT*
 
-- Improve show modal
+- ~~Improve show modal~~
 	- ~~Trigger rescan/info update~~
 	- ~~Settings tab/section~~
-	- Episode list needs to scroll
+	- ~~Episode list needs to scroll~~
 - Authentication
 	- IP Whitelist
 	- User/Pass
+- Dashboard
+	- Show recently downloaded
+	- Show upcoming episodes (next 7 days)
 - Matching
 	- Use modal window
 - Global Settings interface
@@ -119,9 +122,6 @@ It was also heavily skewed towards using newsgroups, which I don't use.
 	- SMS Notifications on/off
 	- Integration overrides
 		- trakt
-- Dashboard
-	- Show recently downloaded
-	- Show upcoming episodes (next 7 days)
 - Notification system
 	- info bubbles?
 - trakt integration

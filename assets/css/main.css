@@ -22,9 +22,10 @@ a {
 	font-weight: normal;
 	text-decoration: none;
 	transition: all 0.5s;
+	-moz-transition: all 0.5s;
+	-ms-transition: all 0.5s;
 	-webkit-transition: all 0.5s;
 }
-
 a:hover {
 	color: #FFFFFF;
 }
@@ -132,6 +133,8 @@ nav ul li {
 	position: relative;
 	text-align: center;
 	transition: all 0.5s;
+	-moz-transition: all 0.5s;
+	-ms-transition: all 0.5s;
 	-webkit-transition: all 0.5s;
 	width: 25%;
 }
@@ -170,9 +173,6 @@ footer {
 #main ul {
 	font-size: 14px;
 }
-#main ul.shows > li:hover {
-	background-color: #545f70;
-}
 
 #main ul li a {
 	display: block;
@@ -193,6 +193,7 @@ footer {
 	background-repeat: no-repeat;
 	background-size: contain;
 	border-bottom: 1px solid #CCCCCC;
+	cursor: pointer;
 	padding: 10px;
 	position: relative;
 }
@@ -325,15 +326,23 @@ ul.matches {
 	min-height: 50px;
 	position: relative;
 	padding: 0px;
-	margin: 0px
+	margin: 0px;
+	z-index: 1;
 }
 
 #modal #show .title > img {
 	border: none;
 	color: #FFFFFF;
+	display: block;
 	font-size: 20px;
 	max-height: 140px;
+	position: relative;
 	width: 100%;
+	z-index: 0;
+}
+
+#modal #show .title > img.blend {
+	-webkit-mask-image: -webkit-gradient(linear, left 90%, left bottom, from(rgba(0,0,0,1)), to(rgba(0,0,0,0)));
 }
 
 #modal #show h3 {
@@ -503,16 +512,19 @@ ul.episodes li.downloaded span.download {
 }
 /* Media Queries */
 
-@media screen and (max-width: 600px) {
-	ul.shows > li {
-		background-image: none !important;
+@media (max-width: 600px) {
+	#shows ul.shows > li > img {
+		display: none;
+	}
+	#shows ul.shows > li:hover {
+		background-color: #545f70;
 	}
 	ul.shows > li > a.show {
 		opacity: 1 !important;
 	}
 }
 
-@media screen and (min-width: 600px) {
+@media (min-width: 600px) {
 	/* Desktop */
 	#shows ul.shows {
 		border: none;
@@ -527,14 +539,34 @@ ul.episodes li.downloaded span.download {
 		height: 120px;
 		padding: 0px 0px 10px;
 		text-align: center;
+		margin: 0px auto;
+		transition: all 0.5s;
+		-moz-transition: all 0.5s;
+		-ms-transition: all 0.5s;
+		-webkit-transition: all 0.5s;
 		width: 25%;
+		z-index: auto;
+	}
+	#shows ul.shows li:hover {
+		z-index: 5;
 	}
 	#shows ul.shows li > img {
 		background-color: #000000;
+		border: 1px solid #FFFFFF;
 		display: block;
 		height: 100px;
 		margin: 0px auto;
+		transition: all 0.5s;
+		-moz-transition: all 0.5s;
+		-ms-transition: all 0.5s;
+		-webkit-transition: all 0.5s;
 		width: 68px;
+	}
+	#shows ul.shows li > img:hover {
+		box-shadow: #000000 0px 0px 20px;
+		height: 200px;
+		margin-top: -50px;
+		width: 136px;
 	}
 	#shows ul.shows li > a {
 		color: #FFFFFF !important;
@@ -542,10 +574,17 @@ ul.episodes li.downloaded span.download {
 		height: auto;
 		margin: 10px 0px 0px;
 		max-width: 100%;
+		transition: all 0.5s;
+		-moz-transition: all 0.5s;
+		-ms-transition: all 0.5s;
+		-webkit-transition: all 0.5s;
 		width: auto;
 	}
+	#shows ul.shows li:hover > a {
+		text-shadow: #000000 0px 2px 10px;
+	}
 	
-	ul.episodes li span.airdate {
+	#show ul.episodes li span.airdate {
 		display: table-cell;
 	}
 }
