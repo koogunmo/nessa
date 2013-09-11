@@ -151,7 +151,7 @@ nav ul li a {
 #main {
 	margin: 0px auto;
 	max-width: 940px;
-	padding: 50px 10px 0px;
+	padding: 50px 10px;
 }
 
 footer {
@@ -207,12 +207,6 @@ footer {
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
-/*
-#main li.show-add > a {
-	max-width: 100% !important;
-	text-align: right;
-}
-*/
 
 /***************************/
 /* Modal window */
@@ -514,6 +508,10 @@ ul.episodes li.downloaded span.download {
 /* Media Queries */
 
 @media (max-width: 600px) {
+	#shows ul.shows > li.show-add > a {
+		text-align: right;
+		max-width: 100%;
+	}
 	#shows ul.shows > li > img {
 		display: none;
 	}
