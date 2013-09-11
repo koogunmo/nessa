@@ -118,7 +118,7 @@ nav {
 	position: fixed;
 	top: 0px;
 	width: 100%;
-	z-index: 10;
+	z-index: 2;
 }
 nav ul {
 	border-collapse: collapse;
@@ -207,11 +207,12 @@ footer {
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
+/*
 #main li.show-add > a {
 	max-width: 100% !important;
 	text-align: right;
 }
-
+*/
 
 /***************************/
 /* Modal window */
@@ -526,13 +527,10 @@ ul.episodes li.downloaded span.download {
 
 @media (min-width: 600px) {
 	/* Desktop */
-	#shows ul.shows {
+	#shows ul.shows.grid {
 		border: none;
 	}
-	#shows .show-add {
-		display: none !important;
-	}
-	#shows ul.shows li {
+	#shows ul.shows.grid li {
 		border: none;
 		cursor: pointer;
 		display: inline-block;
@@ -547,10 +545,10 @@ ul.episodes li.downloaded span.download {
 		width: 25%;
 		z-index: auto;
 	}
-	#shows ul.shows li:hover {
+	#shows ul.shows.grid li:hover {
 		z-index: 5;
 	}
-	#shows ul.shows li > img {
+	#shows ul.shows.grid li > img {
 		background-color: #000000;
 		border: 1px solid #FFFFFF;
 		display: block;
@@ -562,13 +560,13 @@ ul.episodes li.downloaded span.download {
 		-webkit-transition: all 0.5s;
 		width: 68px;
 	}
-	#shows ul.shows li > img:hover {
+	#shows ul.shows.grid li > img:hover {
 		box-shadow: #000000 0px 0px 20px;
 		height: 200px;
 		margin-top: -50px;
 		width: 136px;
 	}
-	#shows ul.shows li > a {
+	#shows ul.shows.grid li > a {
 		color: #FFFFFF !important;
 		font-size: 11px;
 		height: auto;
@@ -580,7 +578,7 @@ ul.episodes li.downloaded span.download {
 		-webkit-transition: all 0.5s;
 		width: auto;
 	}
-	#shows ul.shows li:hover > a {
+	#shows ul.shows.grid li:hover > a {
 		text-shadow: #000000 0px 2px 10px;
 	}
 	
@@ -589,7 +587,7 @@ ul.episodes li.downloaded span.download {
 	}
 }
 @media screen and (min-width: 780px) {
-	#shows ul.shows li {
+	#shows ul.shows.grid li {
 		width: 20%;
 	}
 }

@@ -1,14 +1,14 @@
 <div id="shows">
-	<ul class="shows">
+	<ul class="shows grid">
 		<li class="show-add">
+			<img />
 			<a href="#show/add">Add Show</a>
-		</li>
-		{{#shows}}<li id="show-{{id}}" data-id="{{id}}">
+		</li>{{#shows}}<li id="show-{{id}}" data-id="{{id}}">
 			<img src="/media/{{directory}}/cover.jpg" />
 			<a href="#shows/{{id}}" class="show">{{name}}</a>
 		</li>{{/shows}}
-		<li class="show-add">
+		<!--li class="show-add">
 			<a href="#show/add">Add Show</a>
-		</li>
+		</li-->
 	</ul>
 </div>
