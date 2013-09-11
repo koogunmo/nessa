@@ -1,4 +1,5 @@
-var feed	= require('feedparser'),
+var exec	= require('child_process').exec,
+	feed	= require('feedparser'),
 	fs		= require('fs'),
 	http	= require('http'),
 	parser	= new(require('xml2js')).Parser(),
@@ -89,11 +90,16 @@ var ShowData = {
 									imagedata += chunk
 								});
 								res.on('end', function(){
-									fs.writeFile(process.cwd() + '/assets/artwork/'+show.tvdb+'.jpg', imagedata, 'binary', function(error){
+									var file = process.cwd() + '/assets/artwork/'+show.tvdb+'.jpg';
+									fs.writeFile(file, imagedata, 'binary', function(error){
 										if (error) {
 											logger.error(error);
 											return;
 										}
+										// Compress image
+										exec('/usr/bin/jpegoptim --strip-all -m80 '+file, function(error){
+											if (error) logger.error(error);
+										});
 									});
 								});
 							});
@@ -106,11 +112,16 @@ var ShowData = {
 									imagedata += chunk
 								});
 								res.on('end', function(){
-									fs.writeFile(nconf.get('shows:base')+'/'+show.directory+'/cover.jpg', imagedata, 'binary', function(error){
+									var file = nconf.get('shows:base')+'/'+show.directory+'/cover.jpg';
+									fs.writeFile(file, imagedata, 'binary', function(error){
 										if (error) {
 											logger.error(error);
 											return;										
 										}
+										// Compress image
+										exec('/usr/bin/jpegoptim --strip-all -m80 '+file, function(error){
+											if (error) logger.error(error);
+										});
 									});
 								});
 							});
