@@ -308,6 +308,27 @@ ul.matches {
 }
 
 
+/****************************/
+/* Dashboard */
+
+
+#dashboard .latest li {
+	border-bottom: 1px solid #AAAAAA;
+	padding: 10px 0px;
+}
+#dashboard .latest h3 {
+	font-size: 14px;
+	font-weight: bold;
+}
+#dashboard .latest h4 {
+	font-size: 12px;
+}
+#dashboard .latest p.synopsis {
+	font-size: 12px;
+	padding: 10px;
+}
+
+
 
 /****************************/
 /* Series Information */

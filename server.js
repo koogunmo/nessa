@@ -198,10 +198,23 @@ io.sockets.on('connection', function(socket) {
 	/* Page handlers */
 	
 	socket.on('main.dashboard', function(){
-		socket.emit('page.template', {
-			template: 'views/main/dashboard.html',
-			data: {}
+		// Latest downloads
+		db.all("SELECT S.name, E.season, E.episode, E.title, E.synopsis, E.airdate FROM show AS S INNER JOIN show_episode AS E ON S.id = E.show_id ORDER BY downloaded DESC LIMIT 10", function(error, rows){
+			if (error) {
+				logger.error(error);
+				return;
+			}
+			socket.emit('page.template', {
+				template: 'views/main/dashboard.html',
+				data: {
+					latest: rows
+				}
+			});
 		});
+		
+		
+		
+		
 	}).on('main.settings', function(){
 		socket.emit('page.template', {
 			template: 'views/main/settings.html',

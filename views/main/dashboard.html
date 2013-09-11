@@ -1,2 +1,14 @@
-<p>List latest downloads</p>
-<p>Display any notifications, etc</p>
+<div id="dashboard">
+	{{#if latest}}
+	<div class="latest">
+		<h2>Latest Episodes</h2>
+		<ul>
+			{{#latest}}<li>
+				<h3>{{name}} - {{title}}</h3>
+				<h4>Season {{season}}, Episode {{episode}}</h4>
+				{{#if synopsis}}<p class="synopsis">{{synopsis}}</p>{{/if}}
+			</li>{{/latest}}
+		</ul>
+	</div>
+	{{/if}}
+</div>
