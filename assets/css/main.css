@@ -166,7 +166,7 @@ footer {
 
 /*******/
 
-#shows ul.shows li > img {
+#shows ul.shows li > div.image {
 	display: none;
 }
 
@@ -548,8 +548,12 @@ ul.episodes li.downloaded span.download {
 	#shows ul.shows.grid li:hover {
 		z-index: 5;
 	}
-	#shows ul.shows.grid li > img {
+	#shows ul.shows.grid li > div.image {
 		background-color: #000000;
+		background-image: url('../gfx/no-cover.png');
+		background-position: center center;
+		background-repeat: no-repeat;
+		background-size: contain;
 		border: 1px solid #FFFFFF;
 		display: block;
 		height: 100px;
@@ -560,7 +564,12 @@ ul.episodes li.downloaded span.download {
 		-webkit-transition: all 0.5s;
 		width: 68px;
 	}
-	#shows ul.shows.grid li > img:hover {
+	#shows ul.shows.grid li > div.image > img {
+		display: none;
+		height: 100%;
+		width: 100%;
+	}
+	#shows ul.shows.grid li > div.image:hover {
 		box-shadow: #000000 0px 0px 20px;
 		height: 200px;
 		margin-top: -50px;

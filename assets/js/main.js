@@ -114,8 +114,6 @@ require(['socket.io', 'jquery', 'handlebars', 'bbq'], function(io, $, Handlebars
 		nessa.loadingClose();
 	});
 	
-	
-	
 	$(document).on('submit', 'form', function(e){
 		/* Generic form handler */
 		e.preventDefault();
@@ -143,15 +141,13 @@ require(['socket.io', 'jquery', 'handlebars', 'bbq'], function(io, $, Handlebars
 		$.get(response.template, function(tmpl){
 			var tmpl = Handlebars.compile(tmpl);
 			$('#main').html(tmpl(response.data));
-			/*
-			$('ul.shows > li[data-tvdb]').each(function(){
-				var tvdb = $(this).data('tvdb');
-				if (!tvdb) return;
-				$(this).css({
-					'background-image': 'url(assets/artwork/'+tvdb+'.jpg)'
-				}).addClass('banner');
+			$('div.image:visible img[data-src]').each(function(){
+				$(this).on('load', function(){
+					$(this).fadeIn();
+				}).attr({
+					src: $(this).data('src')
+				});
 			});
-			*/
 		});
 	}).on('modal.template', function(response){
 		$.get(response.template, function(tmpl){
@@ -267,7 +263,7 @@ require(['socket.io', 'jquery', 'handlebars', 'bbq'], function(io, $, Handlebars
 			
 			$('#main').html(html);
 		});
-	});
+	});	
 	
 	$(document).on('click', '.synopsis', function(){
 		$(this).toggleClass('open');
