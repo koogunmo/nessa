@@ -47,23 +47,13 @@ require(['socket.io', 'jquery', 'handlebars', 'bbq'], function(io, $, Handlebars
 			});
 		},
 		modalLoad: function(html){
-			/*
-			$('img.blend', html).bind('load', function(e){
-				var colorThief = new ColorThief();
-				var image = e.target;
-				var $image = $(image);
-				var c = colorThief.getColor(e.target);
-				var p = colorThief.getPalette(e.target)[7];
-				$('#modal .wrapper').css({
-					'background-color': 'rgb('+c[0]+','+c[1]+','+c[2]+')'
-				});
-			});
-			*/
 			$('#modal .wrapper .content').html(html);
 			this.modalOpen();
 		},
 		modalOpen: function(){
-			$('#modal').fadeIn();
+			$('#modal').fadeIn(function(){
+				$(document).trigger('lazyload');
+			});
 		}
 	};
 		
@@ -97,6 +87,19 @@ require(['socket.io', 'jquery', 'handlebars', 'bbq'], function(io, $, Handlebars
 		var url = $.param.fragment();
 		if (url == '') url = 'main/dashboard';
 		socket.emit(url.replace('/','.'))
+	}).on('resize', function(){
+		$(document).trigger('lazyload');
+	});
+	
+	$(document).on('lazyload', function(){
+		$('div.image:visible img[data-src]').each(function(){
+			if ($(this).attr('src')) return;
+			$(this).on('load', function(){
+				$(this).fadeIn();
+			}).attr({
+				src: $(this).data('src')
+			});
+		});
 	});
 	
 	socket.on('connect', function(data){
@@ -136,18 +139,13 @@ require(['socket.io', 'jquery', 'handlebars', 'bbq'], function(io, $, Handlebars
 	});
 	
 	
+	
 	/* Page Content */
 	socket.on('page.template', function(response){
 		$.get(response.template, function(tmpl){
 			var tmpl = Handlebars.compile(tmpl);
 			$('#main').html(tmpl(response.data));
-			$('div.image:visible img[data-src]').each(function(){
-				$(this).on('load', function(){
-					$(this).fadeIn();
-				}).attr({
-					src: $(this).data('src')
-				});
-			});
+			$(document).trigger('lazyload');
 		});
 	}).on('modal.template', function(response){
 		$.get(response.template, function(tmpl){
