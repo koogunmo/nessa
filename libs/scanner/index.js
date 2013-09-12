@@ -60,14 +60,14 @@ module.exports = exports = {
 								}
 								if (!row.directory) {
 									db.run("UPDATE show SET status = 1, directory = ? WHERE id = ?", dir, row.id);
-								//	events.emit('scanner.shows', null, row.id);
+									events.emit('scanner.shows', null, row.id);
 								}
 							});
 						}
 					});
 				});
 			});
-			events.emit('scanner.shows', null, null);
+		//	events.emit('scanner.shows', null, null);
 		}
 	},
 	

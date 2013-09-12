@@ -418,6 +418,7 @@ io.sockets.on('connection', function(socket) {
 	}).on('show.rescan', function(data){
 		var scanner = plugin('scanner');
 		scanner.episodes(data.id);
+		
 	}).on('show.settings', function(data){
 		var qs = require('querystring');
 		var json = qs.parse(data);
