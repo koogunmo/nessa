@@ -447,15 +447,6 @@ app.get('/', ensureAuthenticated, function(req, res) {
 	res.sendfile('views/index.html');
 });
 
-
-app.get("/*", function(req, res, next){
-	if (typeof req.cookies['connect.sid'] !== 'undefined'){
-		console.log(req.cookies['connect.sid']);
-	}
-	next();
-});
-
-
 // Authentication
 passport.use(new LocalStrategy(
 	function(username, password, done) {
