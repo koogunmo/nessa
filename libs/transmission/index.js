@@ -29,7 +29,7 @@ var torrent = {
 				if (args) {
 					obj.id.forEach(function(id){
 						db.run("UPDATE show_episode SET hash = ?, status = 1 WHERE id = ?", args.hashString, id, function(error, args){
-							if (error) logger.error(error);
+							if (error) logger.error('transmission#32 ' + error);
 						});
 					});
 				}
@@ -100,7 +100,7 @@ var torrent = {
 						
 						helper.copyFile(file, showdir + '/' + newName, function(){
 							db.run("UPDATE show_episode SET file = ?, status = 2, downloaded = ? WHERE hash = ?", newName, downloaded, item.hashString, null, function(error){
-								if (error) logger.error(error);
+								if (error) logger.error('transmission#103 '+ error);
 							});
 						});
 					});
@@ -116,7 +116,7 @@ var torrent = {
 							if (row.count >= 1) {
 								logger.info('Removing: ' + item.name);
 								self.rpc.remove(item.id, true, function(error){
-									if (error) logger.error(error);
+									if (error) logger.error('transmission#119 ' + error);
 								});
 							}
 						});
