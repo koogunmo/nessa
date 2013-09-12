@@ -29,7 +29,7 @@ var torrent = {
 				if (args) {
 					obj.id.forEach(function(id){
 						db.run("UPDATE show_episode SET hash = ?, status = 1 WHERE id = ?", args.hashString, id, function(error, args){
-							if (error) logger.error('transmission#32 ' + error);
+							if (error) logger.error(error);
 						});
 					});
 				}
@@ -82,7 +82,7 @@ var torrent = {
 					
 					db.all("SELECT S.name, S.directory, E.* FROM show_episode AS E INNER JOIN show AS S ON S.id = E.show_id WHERE E.hash = ? AND E.file IS NULL", item.hashString, function(error, results){
 						if (error) {
-							logger.error('transmission#85 ' + error);
+							logger.error(error);
 							return;
 						}
 						if (!results.length) return;
@@ -99,8 +99,8 @@ var torrent = {
 						var downloaded = date.getFullYear()+'-'+helper.zeroPadding(date.getMonth()+1)+'-'+helper.zeroPadding(date.getDay());
 						
 						helper.copyFile(file, showdir + '/' + newName, function(){
-							db.run("UPDATE show_episode SET file = ?, status = 2, downloaded = ? WHERE hash = ?", newName, downloaded, item.hashString, null, function(error){
-								if (error) logger.error('transmission#103 '+ error);
+							db.run("UPDATE show_episode SET file = ?, status = 2, downloaded = ? WHERE hash = ?", newName, downloaded, item.hashString, function(error){
+								if (error) logger.error(error);
 							});
 						});
 					});
@@ -109,14 +109,14 @@ var torrent = {
 					if (item.isFinished) {
 						db.get("SELECT COUNT(id) AS count FROM show_episode WHERE hash = ? GROUP BY hash", item.hashString, function(error, row){
 							if (error) {
-								logger.error('transmission#112 ' + error);
+								logger.error(error);
 								return;
 							}
 							if (row === undefined) return;
 							if (row.count >= 1) {
 								logger.info('Removing: ' + item.name);
 								self.rpc.remove(item.id, true, function(error){
-									if (error) logger.error('transmission#119 ' + error);
+									if (error) logger.error(error);
 								});
 							}
 						});
