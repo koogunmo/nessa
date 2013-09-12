@@ -107,10 +107,12 @@ It was also heavily skewed towards using newsgroups, which I don't use.
 	- ~~Settings tab/section~~
 	- ~~Episode list needs to scroll~~
 - Authentication
+	- UI
+	- ~~User/Pass~~
+		- Need interface to manage users
 	- IP Whitelist
-	- User/Pass
 - Dashboard
-	- Show recently downloaded
+	- ~~Show recently downloaded~~
 	- Show upcoming episodes (next 7 days)
 - Matching
 	- Use modal window

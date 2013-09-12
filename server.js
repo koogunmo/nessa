@@ -63,6 +63,9 @@ var extend	= require('xtend'),
 	
 	xml2js	= new (require('xml2js')).Parser();
 
+var passport		= require('passport'),
+	LocalStrategy	= require('passport-local').Strategy;
+
 /* Global methods */
 global.events = new (require('events')).EventEmitter;
 global.logger = logger;
@@ -74,11 +77,18 @@ var app		= express(),
 	server	= app.listen(nconf.get('port')),
 	io		= require('socket.io').listen(server);
 
-app.use('/assets', express.static(__dirname + '/assets'));
-app.use('/media', express.static(nconf.get('shows:base')));
-app.use('/views', express.static(__dirname + '/views'));
-
-app.use(express.bodyParser());
+app.configure(function(){
+	app.use('/assets', express.static(__dirname + '/assets'));
+	app.use('/media', express.static(nconf.get('shows:base')));
+	app.use('/views', express.static(__dirname + '/views'));
+	
+	app.use(express.cookieParser());
+	app.use(express.bodyParser());
+	app.use(express.session({secret: 'correct horse battery staple'}));
+	app.use(passport.initialize());
+	app.use(passport.session());
+	app.use(app.router);
+});
 
 logger.info('nessa.js: Listening on port ' + nconf.get('port'));
 
@@ -211,8 +221,6 @@ io.sockets.on('connection', function(socket) {
 				}
 			});
 		});
-		
-		
 		
 		
 	}).on('main.settings', function(){
@@ -431,27 +439,78 @@ io.sockets.on('connection', function(socket) {
 });
 
 /***********************************************************************/
-// Default route
-app.get('/', function(req, res) {	
+// Routing
+
+app.get('/', ensureAuthenticated, function(req, res) {	
 	res.sendfile('views/index.html');
 });
 
+
+app.get("/*", function(req, res, next){
+	if (typeof req.cookies['connect.sid'] !== 'undefined'){
+		console.log(req.cookies['connect.sid']);
+	}
+	next();
+});
+
+
+// Authentication
+passport.use(new LocalStrategy(
+	function(username, password, done) {
+		var sha1 = require('crypto').createHash('sha1');
+		var pass = sha1.update(password).digest('hex');
+		
+		db.get("SELECT * FROM user WHERE username = ? AND password = ?", username, pass, function(error, user){
+			if (error) return done(error);
+			if (!user) return done(null, false, {message: 'Incorrect'});
+			return done(null, user);
+		});
+	}
+));
+
+
+passport.serializeUser(function(user, done) {
+	return done(null, user.id);
+});
+
+passport.deserializeUser(function(id, done) {
+	db.get("SELECT * FROM user WHERE id = ?", id, function(error, user){
+		if (error) return done(error);
+		return done(null, user);
+	});
+});
+
+function ensureAuthenticated(req, res, next) {
+	if (req.isAuthenticated()) {
+		next();
+	} else {
+		res.redirect('/login');
+	}
+}
+
+app.get('/login',  function(req, res){
+	res.sendfile('views/login.html');
+});
+
+app.post('/login', passport.authenticate('local', {
+	successRedirect: '/',
+	failureRedirect: '/login'
+}));
+
+
 // Below is a chaotic mess of ideas and prototyping
 
+/*
 app.get('/install', function(req, res){
 	var shows = plugin('showdata');
 	shows.list(true);
 	res.end('Building database');
 });
-
-/*
-
 app.get('/info/:show', function(req, res){
 	var shows = plugin('showdata');
 	shows.info(req.params.show);
 	
 });
-
 app.get('/episodes/:show', function(req, res){
 	var shows = plugin('showdata');
 	shows.episodes(req.params.show);
