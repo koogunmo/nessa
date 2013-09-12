@@ -116,18 +116,15 @@ It was also heavily skewed towards using newsgroups, which I don't use.
 	- Show upcoming episodes (next 7 days)
 - Matching
 	- Use modal window
-- Global Settings interface
-	- Global Quality Preference (HD/SD)
+- trakt integration
+- Twilio for SMS download notifications
 - Per-show settings (HD, enabled, etc)
-	- Like Global Settings
-	- ~~Folder, SD/HD, etc~~
+	- ~~SD/HD~~
 	- SMS Notifications on/off
 	- Integration overrides
 		- trakt
 - Notification system
 	- info bubbles?
-- trakt integration
-- Twilio for SMS download notifications
 - Get episode thumbnails from TVDB?
 - Handle series "specials"
 	- e.g. Doctor Who christmas specials

@@ -9,10 +9,10 @@
 		<form action="show/settings" method="post">
 			<dl>
 				<dt>Download new episodes as available</dt>
-				<dd><input type="text" name="status" value="{{status}}" /></dd>
+				<dd><input type="text" name="status" value="{{status}}" class="toggle" /></dd>
 				
 				<dt>Prefer HD Video?</dt>
-				<dd><input type="text" name="hd" value="{{hd}}" /></dd>
+				<dd><input type="text" name="hd" value="{{hd}}" class="toggle" /></dd>
 				
 				<dt>Directory</dt>
 				<dd><input type="text" value="{{directory}}" readonly="readonly" /></dd>
@@ -41,7 +41,7 @@
 			<li>
 				<h2>Season {{season}}</h2>
 				<ul class="episodes">{{#episodes}}
-					<li class="episode {{status status}} {{aired airdate}}">
+					<li class="episode {{aired airdate}} {{available status}}">
 						<div class="header">
 							<span class="episode">{{episode}}</span>
 							<span class="title">{{title}}</span>

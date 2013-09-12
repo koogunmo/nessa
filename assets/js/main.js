@@ -48,16 +48,36 @@ require(['socket.io', 'jquery', 'handlebars', 'bbq'], function(io, $, Handlebars
 		},
 		modalLoad: function(html){
 			$('#modal .wrapper .content').html(html);
+			this.toggle('#modal');
 			this.modalOpen();
 		},
 		modalOpen: function(){
 			$('#modal').fadeIn(function(){
 				$(document).trigger('lazyload');
 			});
+		},
+		toggle: function(context){
+			$('input.toggle', context).each(function(){
+				var input = $(this);
+				var button = $('<span class="toggle"></span>').on('click', function(){
+					switch ($(input).val()) {
+						case '0':
+							$(input).val('1');
+							$(this).addClass('on');
+							break;
+						case '1':
+							$(input).val('0');
+							$(this).removeClass('on');
+							break;
+					}
+				});
+				if ($(this).val() == 1) $(button).addClass('on');
+				$(this).after(button);
+			});
 		}
 	};
 		
-	Handlebars.registerHelper('status', function(status){
+	Handlebars.registerHelper('available', function(status){
 		switch (status) {
 			case 1:
 				return 'downloading';
@@ -67,6 +87,7 @@ require(['socket.io', 'jquery', 'handlebars', 'bbq'], function(io, $, Handlebars
 				return '';
 		}
 	});
+	
 	Handlebars.registerHelper('aired', function(airdate){
 		// Check if the episode has aired
 		var now = new Date().getTime()/1000;
@@ -145,8 +166,10 @@ require(['socket.io', 'jquery', 'handlebars', 'bbq'], function(io, $, Handlebars
 		$.get(response.template, function(tmpl){
 			var tmpl = Handlebars.compile(tmpl);
 			$('#main').html(tmpl(response.data));
+			nessa.toggle('#main');
 			$(document).trigger('lazyload');
 		});
+		
 	}).on('modal.template', function(response){
 		$.get(response.template, function(tmpl){
 			var tmpl = Handlebars.compile(tmpl);

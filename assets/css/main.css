@@ -76,6 +76,23 @@ input[type=button], input[type=submit], input[type=reset], a.button {
 	padding: 5px 10px;
 }
 
+input.toggle {
+	display: none;
+}
+
+input.toggle + span.toggle {
+	background-image: url('../gfx/switch.png');
+	background-position: 0px -20px;
+	background-repeat: no-repeat;
+	cursor: pointer;
+	display: inline-block;
+	height: 20px;
+	width: 49px;
+}
+input.toggle + span.toggle.on {
+	background-position: 0px 0px;
+}
+
 div.toolbar {
 	text-align: right;
 }

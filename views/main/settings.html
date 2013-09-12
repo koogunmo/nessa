@@ -11,7 +11,7 @@
 				<dt>Media Directory</dt>
 				<dd><input type="text" name="shows:base" value="{{shows.base}}" /></dd>
 				<dt>Prefer HD Video</dt>
-				<dd><input type="text" name="shows:hd" value="{{shows.hd}}" /></dd>
+				<dd><input type="text" name="shows:hd" value="{{shows.hd}}" class="toggle" /></dd>
 			</dl>
 		</fieldset>
 		
@@ -33,7 +33,7 @@
 		<fieldset>
 			<dl>
 				<dt>Enable Notifications</dt>
-				<dd><input type="text" name="twilio:enabled" value="{{twilio.enabled}}" /></dd>
+				<dd><input type="text" name="twilio:enabled" value="{{twilio.enabled}}" class="toggle" /></dd>
 				<dt>Phone Number</dt>
 				<dd><input type="text" name="twilio:phone" value="{{twilio.phone}}" /></dd>
 				<dt>SID</dt>
@@ -55,17 +55,11 @@
 		<fieldset>
 			<dl>
 				<dt>Enable checkins</dt>
-				<dd><input type="text" name="trakt:enabled" value="{{trakt.enabled}}" /></dd>
+				<dd><input type="text" name="trakt:enabled" value="{{trakt.enabled}}" class="toggle" /></dd>
 				<dt>API Key</dt>
 				<dd><input type="text" name="trakt:apikey" value="{{trakt.apikey}}" /></dd>
 			</dl>
 		</fieldset>
-	
-		<h2>Miso</h2>
-		<fieldset>
-			Coming soon
-		</fieldset>
-	
 		
 		<h2>System</h2>
 		<fieldset>

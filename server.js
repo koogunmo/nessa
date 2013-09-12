@@ -381,6 +381,8 @@ io.sockets.on('connection', function(socket) {
 			if (!show) return;
 			show.seasons = [];
 			
+			show.directory = nconf.get('shows:base')+'/'+show.directory;
+			
 			db.all("SELECT * FROM show_episode WHERE show_id = ? ORDER BY season,episode ASC", show.id, function(error, rows){
 				if (error) {
 					logger.error(error);
