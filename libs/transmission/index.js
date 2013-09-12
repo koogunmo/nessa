@@ -82,7 +82,7 @@ var torrent = {
 					
 					db.all("SELECT S.name, S.directory, E.* FROM show_episode AS E INNER JOIN show AS S ON S.id = E.show_id WHERE E.hash = ? AND E.file IS NULL", item.hashString, function(error, results){
 						if (error) {
-							logger.error(error);
+							logger.error('transmission#85 ' + error);
 							return;
 						}
 						if (!results.length) return;
@@ -109,7 +109,7 @@ var torrent = {
 					if (item.isFinished) {
 						db.get("SELECT COUNT(id) AS count FROM show_episode WHERE hash = ? GROUP BY hash", item.hashString, function(error, row){
 							if (error) {
-								logger.error(error);
+								logger.error('transmission#112 ' + error);
 								return;
 							}
 							if (row === undefined) return;
