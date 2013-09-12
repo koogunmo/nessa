@@ -196,6 +196,11 @@ io.sockets.on('connection', function(socket) {
 			socket.emit('system.loaded');
 		});
 		
+	}).on('system.rescan', function(){
+		var scanner = plugin('scanner');
+		
+		scanner.shows();
+		
 	}).on('system.restart', function(data){
 		// Restart the process, NOT the server
 		socket.emit('system.loading', {message: 'Restarting...'});
