@@ -101,7 +101,9 @@ div.toolbar {
 	background-color: #000000;
 	border: 1px solid #FFFFFF;
 	border-radius: 5px;
-	margin: 20px auto;
+	display: block;
+	height: 138px;
+	margin: 15% auto;
 	padding: 10px;
 	width: 260px;
 }

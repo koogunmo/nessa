@@ -62,6 +62,7 @@ module.exports = exports = {
 									db.run("UPDATE show SET status = 1, directory = ? WHERE id = ?", dir, row.id);
 									events.emit('scanner.shows', null, row.id);
 								}
+								if (row.tvdb) trakt.show.library(row.tvdb);
 							});
 						}
 					});
@@ -102,13 +103,16 @@ module.exports = exports = {
 							var ep = helper.zeroPadding(data.episodes[0]);
 						}
 						// Title formatting
-						db.all("SELECT * FROM show_episode WHERE show_id = ? AND season = ?", show.id, data.season, function(error, rows){
+						db.all("SELECT E.*, S.tvdb FROM show_episode AS E INNER JOIN show AS S ON S.id = E.show_id WHERE E.show_id = ? AND E.season = ?", show.id, data.season, function(error, rows){
 							if (error) {
 								logger.error(error);
 								return;
 							}
+							var library = [];
 							var title = [];
+							var tvdb = null;
 							rows.forEach(function(row){
+								tvdb = row.tvdb;
 								if (data.episodes.indexOf(row.episode) >= 0) {
 									title.push(row.title);
 								}
@@ -122,7 +126,12 @@ module.exports = exports = {
 								db.run("UPDATE show_episode SET status = 2, file = ? WHERE show_id = ? AND season = ? AND episode = ?", newName, show.id, data.season, episode, function(error){
 									if (error) logger.error(error);
 								});
+								library.push({
+									season: data.season,
+									episode: episode
+								})
 							});
+							trakt.show.episode.library(tvdb, library);
 						});
 						events.emit('scanner.episodes', null, show.id);
 					});

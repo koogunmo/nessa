@@ -293,7 +293,7 @@ require(['socket.io', 'jquery', 'handlebars', 'bbq'], function(io, $, Handlebars
 	
 	$(document).on('click', '#shows ul.shows > li', function(e){
 		e.preventDefault();
-		socket.emit('show.info', $(this).data('id'));
+		socket.emit('show.overview', $(this).data('id'));
 	})
 	
 	

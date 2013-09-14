@@ -88,10 +88,14 @@ var torrent = {
 						if (!results.length) return;
 						
 						var showdir = nconf.get('shows:base') + '/' + results[0].directory;
-						var title = [];
-						
+						var title	= [];
+						var library	= [];
 						results.forEach(function(row){
 							title.push(row.title);
+							library.push({
+								season: row.season,
+								episode.row.episode
+							})
 						});
 						var newName = 'Season '+helper.zeroPadding(data.season)+'/Episode '+ep+' - '+title.join('; ')+path.extname(file);
 						
@@ -102,6 +106,7 @@ var torrent = {
 							db.run("UPDATE show_episode SET file = ?, status = 2, downloaded = ? WHERE hash = ?", newName, downloaded, item.hashString, function(error){
 								if (error) logger.error(error);
 							});
+							trakt.show.episode.library(show.tvdb, library);
 						});
 					});
 					

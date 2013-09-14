@@ -73,6 +73,12 @@ global.logger = logger;
 global.helper	= require('./core/helper');
 global.torrent	= plugin('transmission');
 
+global.trakt = plugin('trakt').init({
+	username: nconf.get('trakt:username'),
+	password: nconf.get('trakt:password'),
+	apikey: nconf.get('trakt:apikey')
+});
+
 var app		= express(),
 	server	= app.listen(nconf.get('port')),
 	io		= require('socket.io').listen(server);
@@ -233,13 +239,11 @@ io.sockets.on('connection', function(socket) {
 			template: 'views/main/settings.html',
 			data: nconf.get()
 		});
+		
 	}).on('shows.enabled', function(){
 		// List of enabled/subscribed shows
-		db.all("SELECT * FROM show WHERE directory IS NOT NULL ORDER BY name ASC", function(error, rows){
-			if (error) {
-				logger.error(error);
-				return;
-			}
+		var shows = plugin('showdata');
+		shows.enabled(function(json){
 			socket.emit('page.template', {
 				template: 'views/show/list.html',
 				data: {
@@ -265,100 +269,23 @@ io.sockets.on('connection', function(socket) {
 	
 	socket.on('show.add', function(id){
 		// Add a show
-		db.get("SELECT * FROM show WHERE id = ?", id, function(error, row){
-			if (error) {
-				logger.error(error);
-				return;
-			}
-			if (!row) return;
-			var update = {
-				status: 1,
-				directory: null
-			};
-			if (!row.directory) {
-				try {
-					var mkdir = require('mkdirp');
-					mkdir(nconf.get('shows:base') + '/' + row.name, 0775);
-					update.directory = row.name;
-				} catch(e) {
-					logger.error(e.message);
-				}
-			} else {
-				update.directory = row.directory;
-			}
-			
-			db.run("UPDATE show SET status = ?, directory = ? WHERE id = ?", update.status, update.directory, row.id, function(error){
-				if (error) {
-					logger.error(error);
-					return;
-				}
-				socket.emit('page.reload');
-				var show = plugin('showdata');
-				show.info(row.id);
-			});
+		var shows = plugin('showdata');
+		shows.add(id, function(){
+			socket.emit('page.reload');
 		});
 		
 	}).on('show.disable', function(data){
-		// Needs improving
-		db.run("UPDATE show SET status = 0 WHERE id = ?", data.id, function(error){
-			if (error) {
-				logger.error(error);
-				return;
-			}
+		var show = plugin('showdata');
+		show.disable(data.id, function(json){
+			
 		});
 	});
 	
 	/* List shows */
 	socket.on('shows.unmatched', function(){
-		db.all("SELECT id, directory FROM show_unmatched ORDER BY directory", function(error, rows){
-			if (error) {
-				logger.error(error);
-				return;
-			}
-			var response = {
-				shows: []
-			};
-			if (rows) {
-				var parser	= new(require('xml2js')).Parser();
-				var count	= 0;
-				rows.forEach(function(row){
-					request.get('http://thetvdb.com/api/GetSeries.php?seriesname='+row.directory, function(error, req, xml){
-						parser.parseString(xml, function(error, json){
-							if (error) {
-								logger.error(error);
-								return;
-							}
-							try {
-								if (!json.Data.Series) return;
-								if (json.Data.Series.length >= 1) {
-									var results = [];
-									json.Data.Series.forEach(function(data){
-										if (!data) return;
-										var record = {
-											id: data.id[0],
-											name: data.SeriesName[0],
-											year: (data.FirstAired) ? data.FirstAired[0].substring(0,4) : null,
-											synopsis: (data.Overview) ? data.Overview[0] : null,
-											imdb: (data.IMDB_ID) ? data.IMDB_ID[0] : null
-										};
-										if (!record.year || !record.year) return;
-										results.push(record);
-									});
-									row.matches = results;
-									response.shows.push(row);
-								}
-							} catch(e) {
-								logger.error(e);
-							}
-						});
-						count++;
-						if (rows.length == count) {
-							socket.emit('shows.unmatched', response);
-						}
-					});
-				});
-			}
-		//	socket.emit('shows.unmatched', response);
+		var shows = plugin('showdata');
+		shows.unmatched(function(){
+			socket.emit('shows.unmatched', response);
 		});
 	}).on('shows.match', function(data){
 		var qs = require('querystring');
@@ -373,45 +300,14 @@ io.sockets.on('connection', function(socket) {
 		}
 	});
 	
-	
-	
 	/* Individual show data */
-	socket.on('show.info', function(data){
+	socket.on('show.overview', function(id){
 		// Fetch individual show details
-		db.get("SELECT * FROM show WHERE id = ?", data, function(error, show){
-			if (error) {
-				logger.error(error);
-				return;
-			}
-			if (!show) return;
-			show.seasons = [];
-			
-			show.directory = nconf.get('shows:base')+'/'+show.directory;
-			
-			db.all("SELECT * FROM show_episode WHERE show_id = ? ORDER BY season,episode ASC", show.id, function(error, rows){
-				if (error) {
-					logger.error(error);
-					return;
-				}
-				var seasons = [];
-				var episodes = [];
-				
-				rows.forEach(function(row){
-					if (seasons.indexOf(row.season) == -1) seasons.push(row.season);
-					if (!episodes[row.season]) episodes[row.season] = [];
-					episodes[row.season].push(row);
-				});
-				seasons.forEach(function(season){
-					var record = {
-						season: season,
-						episodes: episodes[season]
-					}
-					show.seasons.push(record);
-				});
-				socket.emit('modal.template', {
-					template: 'views/show/info.html',
-					data: show
-				});
+		var show = plugin('showdata');
+		show.overview(id, function(json){
+			socket.emit('modal.template', {
+				template: 'views/show/info.html',
+				data: json
 			});
 		});
 		
@@ -421,26 +317,22 @@ io.sockets.on('connection', function(socket) {
 		
 	}).on('show.settings', function(data){
 		var qs = require('querystring');
-		var json = qs.parse(data);
-		console.log(json);
+		var show = plugin('showdata');
 		
-		db.run("UPDATE show SET status = ?, hd = ? WHERE id = ?", json.status, json.hd, json.id, function(error){
-			if (error) logger.error(error);
+		var json = qs.parse(data);
+		show.settings(data, function(json){
+			
 		});
 	}).on('show.update', function(data){
-		var shows = plugin('showdata');
-		shows.info(data.id);
+		var show = plugin('showdata');
+		show.info(data.id);
 	});
 	
 	// Search
 	socket.on('show.search', function(data){
-		var query = '%'+data+'%';
-		db.all("SELECT * FROM show WHERE name LIKE ? AND status = 0 ORDER BY name ASC", query, function(error, rows){
-			if (error) {
-				logger.error(error);
-				return;
-			}
-			socket.emit('show.search', {shows: rows});
+		var shows = plugin('showdata');
+		shows.search(data, function(results){
+			socket.emit('show.search', {shows: results});
 		});
 	});
 	
@@ -448,6 +340,39 @@ io.sockets.on('connection', function(socket) {
 
 /***********************************************************************/
 // Routing
+
+
+db.each("SELECT * FROM show WHERE directory IS NOT NULL AND status = 1", function(error, row) {
+	/*
+	var shows = [];
+	rows.forEach(function(row){
+		shows.push(row.tvdb);
+	});
+	*/
+	trakt.show.library(row.tvdb, function(json){
+		console.log(json);
+	});
+});
+
+
+/*
+trakt.calendar.shows(function(json){
+	var upcoming = [];
+	json.forEach(function(day){
+		upcoming[day.date] = [];
+		day.episodes.forEach(function(show){
+			if (!show.show.in_watchlist) return;
+			var record = {
+				tvdb: show.show.tvdb_id,
+				season: show.episode.season,
+				episode: show.episode.number
+			};
+			upcoming[day.date].push(record);
+		});
+	});
+	console.log(upcoming);
+});
+*/
 
 app.get('/', ensureAuthenticated, function(req, res) {	
 	res.sendfile('views/index.html');
