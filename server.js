@@ -284,8 +284,8 @@ io.sockets.on('connection', function(socket) {
 	/* List shows */
 	socket.on('shows.unmatched', function(){
 		var shows = plugin('showdata');
-		shows.unmatched(function(){
-			socket.emit('shows.unmatched', response);
+		shows.unmatched(function(json){
+			socket.emit('shows.unmatched', json);
 		});
 	}).on('shows.match', function(data){
 		var qs = require('querystring');
