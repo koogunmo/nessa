@@ -340,21 +340,6 @@ io.sockets.on('connection', function(socket) {
 
 /***********************************************************************/
 // Routing
-
-
-db.each("SELECT * FROM show WHERE directory IS NOT NULL AND status = 1", function(error, row) {
-	/*
-	var shows = [];
-	rows.forEach(function(row){
-		shows.push(row.tvdb);
-	});
-	*/
-	trakt.show.library(row.tvdb, function(json){
-		console.log(json);
-	});
-});
-
-
 /*
 trakt.calendar.shows(function(json){
 	var upcoming = [];

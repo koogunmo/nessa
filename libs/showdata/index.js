@@ -457,10 +457,16 @@ var ShowData = {
 	settings: function(data, callback){
 		if (!data.id) return;
 		db.get("SELECT * FROM show WHERE id = ?", data.id, function(error, row){
+			if (error) {
+				logger.error(error);
+				return;
+			}
+			if (row === undefined) return;
 			var update = {
 				status: row.status,
 				hd: row.hd
 			};
+			// TODO: Improve this
 			data.forEach(function(k,v){
 				update[k] = v;
 			});
@@ -530,7 +536,7 @@ var ShowData = {
 				logger.error(error);
 				return;
 			}
-			if (!row) return;
+			if (row === undefined) return;
 			db.run("UPDATE show_episode SET watched = 1 WHERE id = ?", row.id);
 			trakt.show.episode.seen(row.tvdb, [{season: row.season, episode: row.episode}]);
 		});
