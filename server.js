@@ -247,7 +247,7 @@ io.sockets.on('connection', function(socket) {
 			socket.emit('page.template', {
 				template: 'views/show/list.html',
 				data: {
-					shows: rows
+					shows: json
 				}
 			});
 		});

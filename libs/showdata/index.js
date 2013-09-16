@@ -175,6 +175,7 @@ var ShowData = {
 				logger.error(error);
 				return;
 			}
+			if (rows === undefined) return;
 			if (typeof(callback) == 'function') callback(rows);
 		});
 	},
