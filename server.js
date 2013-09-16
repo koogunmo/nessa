@@ -211,7 +211,7 @@ io.sockets.on('connection', function(socket) {
 	
 	socket.on('main.dashboard', function(){
 		// Latest downloads
-		db.all("SELECT S.name, E.season, E.episode, E.title, E.synopsis, E.airdate FROM show AS S INNER JOIN show_episode AS E ON S.id = E.show_id ORDER BY downloaded DESC LIMIT 10", function(error, rows){
+		db.all("SELECT S.name, E.season, E.episode, E.title, E.synopsis, E.airdate FROM show AS S INNER JOIN show_episode AS E ON S.id = E.show_id ORDER BY downloaded DESC, episode DESC LIMIT 10", function(error, rows){
 			if (error) {
 				logger.error(error);
 				return;
