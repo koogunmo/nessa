@@ -16,7 +16,11 @@ var Trakt = {
 	
 	/* Utility Methods */
 	password: function() {
-		return require('crypto').createHash('sha1').update(Trakt.settings.password).digest('hex');
+		try {
+			return require('crypto').createHash('sha1').update(Trakt.settings.password).digest('hex');
+		} catch(e) {
+			logger.error(e.message);
+		}
 	},
 	
 	get: function(path, callback) {

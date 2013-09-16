@@ -168,7 +168,7 @@ io.configure(function(){
 
 io.sockets.on('connection', function(socket) {
 	try {
-		var sessionid	= uuid.v4();		
+		var sessionid	= uuid.v4();
 		logger.info('New connection (' + socket.transport + ') ' + sessionid);
 		
 		

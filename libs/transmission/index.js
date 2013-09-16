@@ -1,5 +1,6 @@
 var transmission = require('transmission');
 var path = require('path');
+var uuid = require('node-uuid');
 
 var torrent = {
 	rpc: null,
@@ -37,6 +38,20 @@ var torrent = {
 		} catch(e) {
 			logger.error(e.message);
 		}
+	},
+	
+	blocklist: function(callback){
+		// In theory, this should trigger a blocklist update
+		this.rpc.callServer({
+			method : this.rpc.methods.other.blockList,
+			tag : uuid.v4()
+		}, function(err, result) {
+			if (err) {
+				return callback(err)
+			}
+			var torrent = result['torrent-added']
+			callback(err, torrent)
+		})
 	},
 	
 	complete: function() {
