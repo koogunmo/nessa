@@ -12,6 +12,8 @@
 				<dd><input type="text" name="shows:base" value="{{shows.base}}" /></dd>
 				<dt>Prefer HD Video</dt>
 				<dd><input type="text" name="shows:hd" value="{{shows.hd}}" class="toggle" /></dd>
+				<dt>IP Whitelist</dt>
+				<dd><input type="text" name="security:whitelist" value="{{security.whitelist}}" /></dd>
 			</dl>
 		</fieldset>
 		
@@ -28,7 +30,21 @@
 				<dd><input type="text" name="transmission:port" value="{{transmission.port}}" /></dd>
 			</dl>
 		</fieldset>
-		
+
+		<h2>trakt</h2>
+		<fieldset>
+			<dl>
+				<dt>Enable checkins</dt>
+				<dd><input type="text" name="trakt:enabled" value="{{trakt.enabled}}" class="toggle" /></dd>
+				<dt>API Key</dt>
+				<dd><input type="text" name="trakt:apikey" value="{{trakt.apikey}}" /></dd>
+				<dt>Username</dt>
+				<dd><input type="text" name="trakt:username" value="{{trakt.username}}" /></dd>
+				<dt>Password</dt>
+				<dd><input type="password" name="trakt:password" value="{{trakt.password}}" /></dd>
+			</dl>
+		</fieldset>
+
 		<h2>Twilio</h2>
 		<fieldset>
 			<dl>
@@ -43,21 +59,11 @@
 			</dl>
 		</fieldset>
 		
-		<h2>The TVDB</h2>
+		<h2>TVDB</h2>
 		<fieldset>
 			<dl>
 				<dt>API Key</dt>
 				<dd><input type="text" name="tvdb:apikey" value="{{tvdb.apikey}}" /></dd>
-			</dl>
-		</fieldset>
-		
-		<h2>trakt</h2>
-		<fieldset>
-			<dl>
-				<dt>Enable checkins</dt>
-				<dd><input type="text" name="trakt:enabled" value="{{trakt.enabled}}" class="toggle" /></dd>
-				<dt>API Key</dt>
-				<dd><input type="text" name="trakt:apikey" value="{{trakt.apikey}}" /></dd>
 			</dl>
 		</fieldset>
 		

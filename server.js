@@ -17,15 +17,6 @@ global.nconf = require('nconf').defaults({
 	run: {
 		user: 'media',
 		group: 'media'
-	},
-	shows: {
-		hd: 0
-	},
-	trakt: {
-		enabled: 0
-	},
-	twilio: {
-		enabled: 0
 	}
 }).file({file: 'settings.json'});
 
@@ -390,7 +381,25 @@ passport.deserializeUser(function(id, done) {
 });
 
 function ensureAuthenticated(req, res, next) {
-	if (req.isAuthenticated()) {
+	
+	var allowed	= false;
+	if (nconf.get('security:whitelist')) {
+		var blocks = nconf.get('security:whitelist').split(',');
+		
+		console.log(blocks);
+	}
+	
+	if (blocks) {
+		var netmask = require('netmask').Netmask;
+		blocks.forEach(function(mask){
+			var block = new netmask(mask);
+			if (block.contains(req.connection.remoteAddress)) {
+				allowed = true;
+			}
+		});
+	}
+	if (req.isAuthenticated()) allowed = true;
+	if (allowed) {
 		next();
 	} else {
 		res.redirect('/login');

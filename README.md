@@ -107,25 +107,21 @@ It was also heavily skewed towards using newsgroups, which I don't use.
 	- ~~Settings tab/section~~
 	- ~~Episode list needs to scroll~~
 - Authentication
-	- UI
 	- ~~User/Pass~~
 		- Need interface to manage users
-	- IP Whitelist
+	- ~~IP Whitelisting~~
 - Dashboard
 	- ~~Show recently downloaded~~
 	- Show upcoming episodes (next 7 days)
-- Matching
+- Matching UI
 	- Use modal window
-- trakt integration
-- Twilio for SMS download notifications
+- ~~trakt integration~~
+- Twilio for SMS download notifications?
 - Per-show settings (HD, enabled, etc)
 	- ~~SD/HD~~
 	- SMS Notifications on/off
-	- Integration overrides
-		- trakt
 - Notification system
 	- info bubbles?
-- Get episode thumbnails from TVDB?
 - Handle series "specials"
 	- e.g. Doctor Who christmas specials
 
@@ -133,6 +129,8 @@ It was also heavily skewed towards using newsgroups, which I don't use.
 ### Phase 4
 - Ants. Ants EVERYWHERE!
 - Better navigation
+- Integration Overrides
+	- Trakt
 - Simple torrent management?
 - Setup wizard
 	- Clean install test

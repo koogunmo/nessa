@@ -20,6 +20,7 @@
 		"mime": "1.2.9",
 		"nconf": "0.6.x",
 		"mkdirp": "0.3.x",
+		"netmask": "0.0.2",
 		"node-schedule": "0.1.x",
 		"node-ssdp": "0.0.2",
 		"node-uuid": "1.4.x",

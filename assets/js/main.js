@@ -71,7 +71,7 @@ require(['socket.io', 'jquery', 'handlebars', 'bbq'], function(io, $, Handlebars
 							break;
 					}
 				});
-				if ($(this).val() == 1) $(button).addClass('on');
+				if ($(input).val() == 1) $(button).addClass('on');
 				$(this).after(button);
 			});
 		}
