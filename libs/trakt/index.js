@@ -137,7 +137,7 @@ var Trakt = {
 					tvdb_id: tvdb,
 					season: season
 				};
-				Trakt.post('season/library', payload, function(json){
+				Trakt.post('show/season/library', payload, function(json){
 					if (typeof(callback) == 'function') callback(json);
 				});
 			},
@@ -146,7 +146,7 @@ var Trakt = {
 					tvdb_id: tvdb,
 					season: season
 				};
-				Trakt.post('season/seen', payload, function(json){
+				Trakt.post('show/season/seen', payload, function(json){
 					if (typeof(callback) == 'function') callback(json);
 				});
 			}
