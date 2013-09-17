@@ -122,21 +122,23 @@ events.on('shows.list', function(error, response){
 		var scanner = plugin('scanner');
 		scanner.shows();
 	}
-}).on('scanner.shows', function(error, id){
+}).on('scanner.shows', function(error, id, match){
 	var shows = plugin('showdata');
 	shows.info(id);
 	
-	if (!error) shows.match();
+	var match = (match !== undefined) ? !!match : true;
+	if (match) shows.match();
 	
-}).on('shows.info', function(error, id){
+}).on('shows.info', function(error, id, rescan){
 	var shows = plugin('showdata');
-	shows.episodes(id);
+	shows.episodes(id, rescan);
 	shows.artwork(id);
 	
-}).on('shows.episodes', function(error, id){
-	var scanner = plugin('scanner');
-	scanner.episodes(id);
-	
+}).on('shows.episodes', function(error, id, rescan){
+	if (rescan) {
+		var scanner = plugin('scanner');
+		scanner.episodes(id);
+	}
 });
 
 /***********************************************************************/

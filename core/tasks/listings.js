@@ -11,6 +11,11 @@ var rule = new schedule.RecurrenceRule();
 schedule.scheduleJob(rule, function(){
 	// Update show listings
 	shows.list();
+	// Update show information (synopsis, etc)
+	db.each("SELECT * FROM show WHERE directory IS NOT NULL", function(error, show){
+		if (error || !show) return;
+		shows.info(show.id, false);
+	});
 });
 
 

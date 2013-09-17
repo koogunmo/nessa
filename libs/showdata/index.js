@@ -180,7 +180,10 @@ var ShowData = {
 		});
 	},
 
-	episodes: function(id){
+	episodes: function(id, rescan){
+		
+		var rescan = (rescan !== undefined) ? !!rescan : true;
+		
 		if (id !== undefined) {
 			var sql = "SELECT * FROM show WHERE id = "+id+" AND directory IS NOT NULL AND tvdb IS NOT NULL";
 		} else {
@@ -236,7 +239,7 @@ var ShowData = {
 							});
 						});
 					});
-					events.emit('shows.episodes', null, show.id);
+					events.emit('shows.episodes', null, show.id, rescan);
 				});
 			} catch(e) {
 				logger.error(e.message);
@@ -244,7 +247,9 @@ var ShowData = {
 		});
 	},
 		
-	info: function(showid){
+	info: function(showid, rescan){
+		var rescan = (rescan !== undefined) ? !!rescan : true;
+		
 		if (showid) {
 			var sql = "SELECT * FROM show WHERE id = "+showid+" AND tvdb IS NOT NULL ORDER BY name ASC";
 		} else {
@@ -276,11 +281,9 @@ var ShowData = {
 							synopsis: data.Overview[0],
 							imdb: data.IMDB_ID[0],
 							ended: (data.Status[0] == 'Ended') ? 1 : 0
-							// Deprecate TVRage?
-						//	tvrage: null
 						};
 						db.run("UPDATE show SET name = ?, synopsis = ?, imdb = ?, ended = ? WHERE tvdb = ?", record.name, record.synopsis, record.imdb, record.ended, record.id);
-						events.emit('shows.info', null, show.id);
+						events.emit('shows.info', null, show.id, rescan);
 					});
 				} catch(e) {
 					logger.error('shows.info', e.message);
@@ -381,7 +384,7 @@ var ShowData = {
 							if (result.count == 1) {
 								var params = [record.name, row.directory, record.imdb, record.synopsis, result.id];
 								db.run("UPDATE show SET name = ?, status = 1, directory = ?, imdb = ?, synopsis = ? WHERE id = ?", params, function(error){
-									events.emit('scanner.shows', true, result.id);
+									events.emit('scanner.shows', null, result.id, false);
 								});
 							} else {
 								var params = [record.id, record.imdb, record.name, row.directory, record.synopsis];
@@ -390,7 +393,7 @@ var ShowData = {
 										logger.error(error);
 										return;
 									}
-									events.emit('scanner.shows', true, this.lastID);
+									events.emit('scanner.shows', null, this.lastID, false);
 								});
 							}
 							db.run("DELETE FROM show_unmatched WHERE id = ?", row.id);
