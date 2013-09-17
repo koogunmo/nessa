@@ -160,8 +160,6 @@ require(['socket.io', 'jquery', 'handlebars', 'bbq'], function(io, $, Handlebars
 		if (confirmed) socket.emit(action, $(this).data());
 	});
 	
-	
-	
 	/* Page Content */
 	socket.on('page.template', function(response){
 		$.get(response.template, function(tmpl){
@@ -211,6 +209,10 @@ require(['socket.io', 'jquery', 'handlebars', 'bbq'], function(io, $, Handlebars
 			$('#modal ul.seasons > li.open > ul.episodes').slideUp().parent().removeClass('open');
 			$(this).siblings('ul.episodes').slideDown().parent().addClass('open');
 		}
+	});
+	
+	$('#modal').on('click', '#show ul.episodes span.episode', function(e){
+		socket.emit('episode.watched', $(this).parents('li').data('id'));
 	});
 	
 	/***************************************************/

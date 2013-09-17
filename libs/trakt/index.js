@@ -103,18 +103,20 @@ var Trakt = {
 					episodes: list
 				};
 				/* list = {season: 1, episode: 1} */
-				Trakt.post('episode/library', payload, function(json){
+				Trakt.post('show/episode/library', payload, function(json){
 					if (typeof(callback) == 'function') callback(json);
 				});
 			},
-			seen: function(tvdb, season, episode){
+			seen: function(tvdb, season, episode, callback){
 				// Mark episode as watched
 				var payload = {
 					tvdb_id: tvdb,
-					season: season,
-					episodes: episode
+					episodes: [{
+						season: season,
+						episode: episode
+					}]
 				};
-				Trakt.post('episode/library', payload, function(json){
+				Trakt.post('show/episode/seen', payload, function(json){
 					if (typeof(callback) == 'function') callback(json);
 				});
 			}

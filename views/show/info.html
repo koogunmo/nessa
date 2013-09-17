@@ -41,7 +41,7 @@
 			<li>
 				<h2>Season {{season}}</h2>
 				<ul class="episodes">{{#episodes}}
-					<li class="episode {{aired airdate}} {{available status}}">
+					<li data-id="{{id}}" class="episode {{aired airdate}} {{available status}} {{#if watched}}watched{{/if}}">
 						<div class="header">
 							<span class="episode">{{episode}}</span>
 							<span class="title">{{title}}</span>

@@ -247,6 +247,16 @@ io.sockets.on('connection', function(socket) {
 		});
 	});
 	
+	socket.on('episode.watched', function(id){
+		db.get("SELECT E.id, S.tvdb, E.season, E.episode FROM show AS S INNER JOIN show_episode AS E ON S.id = E.show_id WHERE E.id = ?", id, function(error, row){
+			if (error || !row) return;
+			trakt.show.episode.seen(row.tvdb, row.season, row.episode, function(json){
+				console.log(json);
+				db.run("UPDATE show_episode SET watched = 1 WHERE id = ?", row.id);
+				socket.emit('episode.watched', {id: row.id});
+			});
+		});
+	});
 	
 	/***************************************************/
 	/* "API" calls */
