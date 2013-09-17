@@ -19,8 +19,9 @@ var system = {
 					}
 				}, 5000);
 				
-				npm.config.set('loglevel', 'warn');
-				npm.load(function(error){
+				npm.load({
+					loglevel: 'warn',
+				},function(error){
 					if (error) {
 						logger.error(error);
 						return;
