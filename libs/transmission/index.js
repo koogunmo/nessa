@@ -95,7 +95,7 @@ var torrent = {
 						var ep = helper.zeroPadding(data.episodes[0]);
 					}
 					
-					db.all("SELECT S.name, S.directory, E.* FROM show_episode AS E INNER JOIN show AS S ON S.id = E.show_id WHERE E.hash = ? AND E.file IS NULL", item.hashString, function(error, results){
+					db.all("SELECT S.name, S.directory, S.tvdb, E.* FROM show_episode AS E INNER JOIN show AS S ON S.id = E.show_id WHERE E.hash = ? AND E.file IS NULL", item.hashString, function(error, results){
 						if (error) {
 							logger.error(error);
 							return;
@@ -105,7 +105,9 @@ var torrent = {
 						var showdir = nconf.get('shows:base') + '/' + results[0].directory;
 						var title	= [];
 						var library	= [];
+						var tvdb	= null;
 						results.forEach(function(row){
+							if (!tvdb) tvdb = row.tvdb;
 							title.push(row.title);
 							library.push({
 								season: row.season,
@@ -121,7 +123,7 @@ var torrent = {
 							db.run("UPDATE show_episode SET file = ?, status = 2, downloaded = ? WHERE hash = ?", newName, downloaded, item.hashString, function(error){
 								if (error) logger.error(error);
 							});
-							trakt.show.episode.library(show.tvdb, library);
+							trakt.show.episode.library(tvdb, library);
 						});
 					});
 					

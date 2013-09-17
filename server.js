@@ -11,14 +11,21 @@ global.plugin = function(name){
 }
 
 /* Load Settings */
-global.nconf = require('nconf').defaults({
+global.nconf = require('nconf');
+
+global.nconf.file({
+	file: 'settings.json'
+}).defaults({
 	port: 6377,
-	installed: true,
+	installed: false,
 	run: {
 		user: 'media',
 		group: 'media'
+	},
+	tvdb: {
+		apikey: "B77582079E378FF3"
 	}
-}).file({file: 'settings.json'});
+});
 
 /* Change ownership of the process */
 if (process.getuid) {
@@ -134,22 +141,23 @@ events.on('shows.list', function(error, response){
 
 /***********************************************************************/
 /* Load tasks */
-fs.readdir(__dirname + '/core/tasks', function(error, files){
-	if (error) {
-		logger.error(error);
-		return;
-	}
-	if (files === undefined) return;
-	files.filter(function(file){
-		return (file.substr(-3) == '.js');
-	}).forEach(function(file){
-		require(__dirname + '/core/tasks/' + file);
+if (nconf.get('installed')) {
+	fs.readdir(__dirname + '/core/tasks', function(error, files){
+		if (error) {
+			logger.error(error);
+			return;
+		}
+		if (files === undefined) return;
+		files.filter(function(file){
+			return (file.substr(-3) == '.js');
+		}).forEach(function(file){
+			require(__dirname + '/core/tasks/' + file);
+		});
 	});
-});
+}
 
 /***********************************************************************/
 /* Socket Events */
-
 
 io.configure(function(){
 	io.set('log level', 1);
@@ -161,7 +169,6 @@ io.sockets.on('connection', function(socket) {
 	try {
 		var sessionid	= uuid.v4();
 		logger.info('New connection (' + socket.transport + ') ' + sessionid);
-		
 		
 	} catch(e) {
 		logger.error('connection: ' + e.message);
@@ -176,18 +183,16 @@ io.sockets.on('connection', function(socket) {
 	}).on('disconnect', function(data){
 		// User disconnected
 		try {
-			
+			// ???
 		} catch(e) {
 			logger.error('disconnect: ' + e.message);
 		}
 	});
 	
-	
 	/* System handlers */
 	socket.on('system.update', function(data){
 		// Force an update from github (if one is available)
 		socket.emit('system.loading', {message: 'Updating...'});
-		
 		var system = plugin('system');
 		system.update(function(){
 			socket.emit('system.loaded');
@@ -195,7 +200,6 @@ io.sockets.on('connection', function(socket) {
 		
 	}).on('system.rescan', function(){
 		var scanner = plugin('scanner');
-		
 		scanner.shows();
 		
 	}).on('system.restart', function(data){
@@ -206,9 +210,7 @@ io.sockets.on('connection', function(socket) {
 		system.restart()
 	});
 	
-	
 	/* Page handlers */
-	
 	socket.on('main.dashboard', function(){
 		// Latest downloads
 		db.all("SELECT S.name, E.season, E.episode, E.title, E.synopsis, E.airdate FROM show AS S INNER JOIN show_episode AS E ON S.id = E.show_id ORDER BY downloaded DESC, episode DESC LIMIT 10", function(error, rows){
@@ -223,7 +225,6 @@ io.sockets.on('connection', function(socket) {
 				}
 			});
 		});
-		
 		
 	}).on('main.settings', function(){
 		socket.emit('page.template', {
@@ -248,14 +249,19 @@ io.sockets.on('connection', function(socket) {
 	/***************************************************/
 	/* "API" calls */
 	
-	socket.on('settings.save', function(settings){
+	socket.on('settings.save', function(settings, callback){
 		var qs = require('querystring');
 		var json = qs.parse(settings);
-		
 		for (var i in json) {
 			nconf.set(i, json[i]);
 		}
-		nconf.save();
+		nconf.save(function(error){
+			if (error) {
+				logger.error(error);
+				return;
+			}
+			if (typeof(callback) == 'function') callback();
+		});
 	});
 	
 	socket.on('show.add', function(id){
@@ -331,30 +337,13 @@ io.sockets.on('connection', function(socket) {
 
 /***********************************************************************/
 // Routing
-/*
-trakt.calendar.shows(function(json){
-	var upcoming = [];
-	json.forEach(function(day){
-		upcoming[day.date] = [];
-		day.episodes.forEach(function(show){
-			if (!show.show.in_watchlist) return;
-			var record = {
-				tvdb: show.show.tvdb_id,
-				season: show.episode.season,
-				episode: show.episode.number
-			};
-			upcoming[day.date].push(record);
-		});
-	});
-	console.log(upcoming);
-});
-*/
 
 app.get('/', ensureAuthenticated, function(req, res) {	
 	res.sendfile('views/index.html');
 });
 
-// Authentication
+/* User Authentication */
+
 passport.use(new LocalStrategy(
 	function(username, password, done) {
 		var sha1 = require('crypto').createHash('sha1');
@@ -368,7 +357,6 @@ passport.use(new LocalStrategy(
 	}
 ));
 
-
 passport.serializeUser(function(user, done) {
 	return done(null, user.id);
 });
@@ -381,15 +369,15 @@ passport.deserializeUser(function(id, done) {
 });
 
 function ensureAuthenticated(req, res, next) {
-	
 	var allowed	= false;
-	if (nconf.get('security:whitelist')) {
-		var blocks = nconf.get('security:whitelist').split(',');
-		
-		console.log(blocks);
+	if (!nconf.get('installed')) {
+		// First run? Redirect to installer
+		res.redirect('/install');
+		return;
 	}
-	
-	if (blocks) {
+	if (nconf.get('security:whitelist')) {
+		// Is there a list of allowed IPs?
+		var blocks = nconf.get('security:whitelist').split(',');
 		var netmask = require('netmask').Netmask;
 		blocks.forEach(function(mask){
 			var block = new netmask(mask);
@@ -398,32 +386,64 @@ function ensureAuthenticated(req, res, next) {
 			}
 		});
 	}
-	if (req.isAuthenticated()) allowed = true;
-	if (allowed) {
-		next();
-	} else {
-		res.redirect('/login');
-	}
+	
+	db.get("SELECT COUNT(id) AS count FROM user", function(error, result){
+		if (!result.count) {
+			allowed = true;
+		} else {
+			if (req.isAuthenticated()) allowed = true;
+		}
+		if (allowed) {
+			next();
+		} else {
+			res.redirect('/login');
+		}
+	});
 }
 
 app.get('/login',  function(req, res){
 	res.sendfile('views/login.html');
-});
-
-app.post('/login', passport.authenticate('local', {
+}).post('/login', passport.authenticate('local', {
 	successRedirect: '/',
 	failureRedirect: '/login'
 }));
 
 
+/* Installer */
+app.get('/install', function(req, res){
+	if (nconf.get('installed')) {
+		res.redirect('/');
+		return;
+	}
+	// Display the install form
+	res.sendfile('views/install.html');
+	
+}).post('/install', function(){
+	// Save settings, redirect to settings page
+	var qs = require('querystring');
+	var json = qs.parse(settings);
+	for (var i in json) {
+		nconf.set(i, json[i]);
+	}
+	nconf.set('installed', true);
+	nconf.save(function(error){
+		if (error) {
+			logger.error(error);
+			return;
+		}
+		// Start building the database
+		var shows = plugin('showdata');
+		shows.list();
+		req.redirect('/#main/settings');
+	});
+});
+
+
+
+
 // Below is a chaotic mess of ideas and prototyping
 
 /*
-app.get('/install', function(req, res){
-	var shows = plugin('showdata');
-	shows.list(true);
-	res.end('Building database');
-});
 app.get('/info/:show', function(req, res){
 	var shows = plugin('showdata');
 	shows.info(req.params.show);

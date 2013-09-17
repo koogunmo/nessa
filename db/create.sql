@@ -22,7 +22,8 @@ CREATE TABLE "show_episode" (
 	"airdate" TEXT,
 	"file" TEXT,
 	"hash" TEXT,
-	"downloaded" TEXT
+	"downloaded" TEXT,
+	"watched" INTEGER
 );
 
 CREATE TABLE "show_unmatched" (
