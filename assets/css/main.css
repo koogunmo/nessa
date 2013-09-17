@@ -566,18 +566,65 @@ ul.episodes li.upcoming span.download,
 ul.episodes li.downloaded span.download {
 	display: none !important;
 }
+
 /* Media Queries */
 
 @media (max-width: 600px) {
+/*@media (device-aspect-ratio: 40/71), (device-aspect-ratio: 2/3) {*/
+	/* iPhone - iOS7 styling */
+	html, body {
+		background-color: #FFFFFF;
+		font-family: 'HelveticaNeue', Helvetica, Arial, sans-serif;
+		letter-spacing: 1px;
+	}
+	body {
+		color: #999999;
+	}
+	h2 {
+		font-weight: 100;
+		border-bottom: 1px solid #CCCCCC;
+	}
+	#main input[type=button], #main input[type=submit], #main input[type=reset], #main a.button {
+		background-color: #F5F5F5;
+		border: none;
+		color: #FF0000;
+	}
+	nav {
+		background-color: #F5F5F5;
+		box-shadow: none;
+		font-family: 'HelveticaNeue-UltraLight';
+	}
+	nav ul li a {
+		color: #FF0000 !important;
+		font-size: 15px;
+		font-weight: 100;
+	}
+	nav ul li:hover a {
+		color: #000000 !important;
+	}
+	#shows ul.shows {
+		border: none;
+	}
+	#shows ul.shows > li {
+		border-bottom: 1px solid #F5F5F5 !important;
+	}
+	#shows ul.shows > li > a {
+		color: #999999;
+		font-size: 18px;
+		font-weight: normal;
+	}
+	#shows ul.shows > li:hover > a {
+		color: #FF0000;
+	}
+}
+
+@media (max-width: 600px) {	
 	#shows ul.shows > li.show-add > a {
 		text-align: right;
 		max-width: 100%;
 	}
 	#shows ul.shows > li > img {
 		display: none;
-	}
-	#shows ul.shows > li:hover {
-		background-color: #545f70;
 	}
 	ul.shows > li > a.show {
 		opacity: 1 !important;

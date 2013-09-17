@@ -105,6 +105,7 @@ require(['socket.io', 'jquery', 'handlebars', 'bbq'], function(io, $, Handlebars
 	});
 	
 	$(window).bind('hashchange', function(e){
+		window.scrollTo(0,0);
 		var url = $.param.fragment();
 		if (url == '') url = 'main/dashboard';
 		socket.emit(url.replace('/','.'))
