@@ -150,7 +150,6 @@ require(['socket.io', 'jquery', 'handlebars', 'bbq'], function(io, $, Handlebars
 	$(document).on('click', 'a.button', function(e){
 		e.preventDefault()
 		var action	= $(this).attr('href').replace('/', '.');
-		
 		if ($(this).hasClass('confirm')) {
 			var msg = ($(this).data('msg')) ? $(this).data('msg') : 'Are you sure?';
 			var confirmed = confirm(msg);
@@ -211,10 +210,6 @@ require(['socket.io', 'jquery', 'handlebars', 'bbq'], function(io, $, Handlebars
 		}
 	});
 	
-	$('#modal').on('click', '#show ul.episodes span.episode', function(e){
-		socket.emit('episode.watched', $(this).parents('li').data('id'));
-	});
-	
 	/***************************************************/
 	/* Open Search panel */
 	
@@ -253,7 +248,8 @@ require(['socket.io', 'jquery', 'handlebars', 'bbq'], function(io, $, Handlebars
 	
 	
 	/* Settings page */
-	$(document).on('click', 'span.cog', function(){
+	$(document).on('click', '.cog', function(e){
+		e.preventDefault();
 		if ($('#show.settings').length) {
 			$('#show.settings').removeClass('settings');
 		} else {
@@ -312,6 +308,22 @@ require(['socket.io', 'jquery', 'handlebars', 'bbq'], function(io, $, Handlebars
 	});
 	
 	
+	
+	$('#modal').on('click', '.seen', function(e){
+		e.preventDefault();
+		e.stopPropagation();
+		
+		var data = $(this).data();
+		var type = null;
+		if (data.episode) {
+			type = 'show.episode.watched';
+		} else if (data.season) {
+			type = 'show.season.watched';
+		} else if (data.id) {
+			type = 'show.watched';
+		}
+		if (type) socket.emit(type, data)
+	});
 	
 });
 

@@ -35,7 +35,8 @@ var Trakt = {
 			}
 			try {
 				if (typeof(response) != 'object') response = JSON.parse(response);
-				callback(response);
+				var error = (response.status == 'success') ? false : true;
+				callback(error, response);
 			} catch(e) {
 				logger.error(e.message);
 			}
@@ -55,7 +56,9 @@ var Trakt = {
 			}
 			try {
 				if (typeof(response) != 'object') response = JSON.parse(response);
-				callback(response);
+				var error = null;
+				if (response.status == 'failed') error = response.message;
+				callback(error, response);
 			} catch(e) {
 				logger.error(path + ': ' + e.message);
 			}
@@ -67,7 +70,7 @@ var Trakt = {
 	account: {
 		test: function(){
 			var payload = {};
-			Trakt.post('account/test', payload, function(json){
+			Trakt.post('account/test', payload, function(error, json){
 				console.log(json);
 			});
 		}
@@ -77,7 +80,7 @@ var Trakt = {
 	
 	calendar: {
 		shows: function(callback){
-			Trakt.get('calendar/shows.json', function(json){
+			Trakt.get('calendar/shows.json', function(error, json){
 				if (typeof(callback) == 'function') callback(json);
 			});
 		}
@@ -90,7 +93,7 @@ var Trakt = {
 				season: null,
 				episode: null
 			}
-			Trakt.post('show/checkin', payload, function(json){
+			Trakt.post('show/checkin', payload, function(error, json){
 				if (typeof(callback) == 'function') callback(json);
 			});
 		},
@@ -103,7 +106,7 @@ var Trakt = {
 					episodes: list
 				};
 				/* list = {season: 1, episode: 1} */
-				Trakt.post('show/episode/library', payload, function(json){
+				Trakt.post('show/episode/library', payload, function(error, json){
 					if (typeof(callback) == 'function') callback(json);
 				});
 			},
@@ -116,7 +119,7 @@ var Trakt = {
 						episode: episode
 					}]
 				};
-				Trakt.post('show/episode/seen', payload, function(json){
+				Trakt.post('show/episode/seen', payload, function(error, json){
 					if (typeof(callback) == 'function') callback(json);
 				});
 			}
@@ -126,7 +129,7 @@ var Trakt = {
 			var payload = {
 				tvdb_id: tvdb
 			};
-			Trakt.post('show/library', payload, function(json){
+			Trakt.post('show/library', payload, function(error, json){
 				if (typeof(callback) == 'function') callback(json);
 			});
 		},
@@ -137,7 +140,7 @@ var Trakt = {
 					tvdb_id: tvdb,
 					season: season
 				};
-				Trakt.post('show/season/library', payload, function(json){
+				Trakt.post('show/season/library', payload, function(error, json){
 					if (typeof(callback) == 'function') callback(json);
 				});
 			},
@@ -146,7 +149,7 @@ var Trakt = {
 					tvdb_id: tvdb,
 					season: season
 				};
-				Trakt.post('show/season/seen', payload, function(json){
+				Trakt.post('show/season/seen', payload, function(error, json){
 					if (typeof(callback) == 'function') callback(json);
 				});
 			}
@@ -155,7 +158,7 @@ var Trakt = {
 			var payload = {
 				tvdb_id: tvdb
 			};
-			Trakt.post('show/seen', payload, function(json){
+			Trakt.post('show/seen', payload, function(error, json){
 				if (typeof(callback) == 'function') callback(json);
 			});
 		},
@@ -173,7 +176,7 @@ var Trakt = {
 			} else {
 				payload.shows.push(shows)
 			}
-			Trakt.post('show/watchlist', payload, function(json){
+			Trakt.post('show/watchlist', payload, function(error, json){
 				if (typeof(callback) == 'function') callback(json);
 			})
 		}

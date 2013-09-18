@@ -28,8 +28,7 @@ CREATE TABLE "show_episode" (
 CREATE TABLE "show_unmatched" (
 	"id" INTEGER PRIMARY KEY AUTOINCREMENT,
 	"directory" TEXT UNIQUE,
-	"tvdb" INTEGER,
-	"tvrage" INTEGER
+	"tvdb" INTEGER
 );
 
 CREATE TABLE "user" (

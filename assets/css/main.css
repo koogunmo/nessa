@@ -272,23 +272,23 @@ footer {
 	width: auto;
 }
 #modal .wrapper > .close {
-	background-image: url('../gfx/controls.png');
+	background-image: url('../gfx/overlay-close.png');
 	background-position: 0px 0px;
 	background-repeat: no-repeat;
 	color: #000000;
 	cursor: pointer;
 	font-size: 15px;
-	height: 19px;
+	height: 30px;
 	overflow: hidden;
 	position: absolute;
-	right: 5px;
+	right: 3px;
 	text-indent: -99px;
-	top: 0px;
-	width: 40px;
+	top: 3px;
+	width: 30px;
 	z-index: 11;
 }
 #modal .wrapper > .close:hover {
-	background-position: 0px -20px;
+	/* background-position: 0px -20px; */
 }
 #modal .wrapper > .content {
 	height: 100%;
@@ -383,6 +383,7 @@ ul.matches {
 	position: relative;
 	padding: 0px;
 	margin: 0px;
+	min-height: 50px;
 	z-index: 1;
 }
 
@@ -395,6 +396,15 @@ ul.matches {
 	position: relative;
 	width: 100%;
 	z-index: 0;
+}
+
+#modal #show .title > .tools {
+	background-color: rgba(255, 255, 255, 0.3);
+	border-radius: 5px;
+	bottom: 5px;
+	padding: 5px 10px;
+	position: absolute;
+	left: 10px;
 }
 
 #modal #show .title > img.blend {
@@ -426,28 +436,6 @@ ul.matches {
 #modal #show div.synopsis.open p {
 	cursor: default;
 	white-space: normal;
-}
-
-
-#modal #show .cog {
-	background-image: url('../gfx/controls.png');
-	background-position: -40px 0px;
-	background-repeat: no-repeat;
-	bottom: 3px;
-	cursor: pointer;
-	display: block;
-	height: 19px;
-	position: absolute;
-	right: 5px;
-	width: 40px;
-}
-#modal #show .cog:hover {
-	background-position: -40px -20px;
-}
-
-
-#modal #show.settings .cog {
-	/* background-image: url('../gfx/icons/cross.png'); */
 }
 
 #modal #show div.config {
@@ -484,6 +472,22 @@ ul.matches {
 	cursor: pointer;
 	font-size: 14px;
 	padding: 4px 0px;
+	position: relative;
+}
+#modal #show ul.seasons > li > h2 .seen {
+	background-image: url('../gfx/seen.png');
+	background-position: center center;
+	background-repeat: no-repeat;
+	background-size: contain;
+	display: none;
+	height: 20px;
+	position: absolute;
+	right: 0px;
+	top: 0px;
+	width: 25px;
+}
+#modal #show ul.seasons > li > h2:hover .seen {
+	display: block;
 }
 
 #modal #show ul.episodes {
@@ -513,11 +517,6 @@ ul.matches {
 #modal #show ul.episodes li .extended p.synopsis {
 	margin: 0px 30px;
 }
-#modal #show ul.episodes li .extended .tools {
-	text-align: right;
-}
-
-
 
 #modal #show ul.episodes li.downloading {
 	color: #FFC200;

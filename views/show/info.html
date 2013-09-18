@@ -1,7 +1,9 @@
 <div id="show">
 	<div class="title">
 		<img src="assets/artwork/{{tvdb}}.jpg" alt="{{name}}" class="blend" />
-		<span class="cog"></span>
+		<div class="tools">
+			<a href="#" class="cog">Settings</a> - <a href="#" class="seen" data-id="{{id}}" title="Mark all episodes as watched">Watched</a>
+		</div>
 	</div>
 	
 	<div class="config">
@@ -10,22 +12,17 @@
 			<dl>
 				<dt>Download new episodes as available</dt>
 				<dd><input type="text" name="status" value="{{status}}" class="toggle" /></dd>
-				
 				<dt>Prefer HD Video?</dt>
 				<dd><input type="text" name="hd" value="{{hd}}" class="toggle" /></dd>
-				
 				<dt>Directory</dt>
 				<dd><input type="text" value="{{directory}}" readonly="readonly" /></dd>
 			</dl>
-			
 			<div>
 				<input type="hidden" name="id" value="{{id}}" />
 				<input type="submit" value="Save" class="button" />
-				
 				<a href="show/update" data-id="{{id}}" class="button">Update info</a>
 				<a href="show/rescan" data-id="{{id}}" class="button">Rescan files</a>
 			</div>
-			
 		</form>
 	</div>
 	
@@ -39,11 +36,11 @@
 	<div class="episodes">
 		<ul class="seasons">{{#seasons}}
 			<li>
-				<h2>Season {{season}}</h2>
+				<h2>Season {{season}} <span class="seen" data-id="{{../id}}" data-season="{{season}}" title="Mark all episodes of this season as watched"></span></h2>
 				<ul class="episodes">{{#episodes}}
-					<li data-id="{{id}}" class="episode {{aired airdate}} {{available status}} {{#if watched}}watched{{/if}}">
+					<li data-id="{{id}}" class="episode {{aired airdate}} {{available status}}">
 						<div class="header">
-							<span class="episode">{{episode}}</span>
+							<span class="episode seen" data-episode="{{id}}" title="Mark this episode as watched">{{episode}}</span>
 							<span class="title">{{title}}</span>
 							<span class="airdate">{{airdate}}</span>
 							<span class="download"><a href="" class="button">Download</a></span>
