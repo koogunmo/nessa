@@ -36,8 +36,8 @@ var Trakt = {
 			}
 			try {
 				if (typeof(response) != 'object') response = JSON.parse(response);
-				var error = (response.status == 'success') ? false : true;
-				callback(error, response);
+			//	var error = (response.status == 'success') ? false : true;
+				callback(false, response);
 			} catch(e) {
 				logger.error(url+': '+e.message);
 			}
@@ -138,7 +138,7 @@ var Trakt = {
 		season: {
 			info: function(tvdb, season, callback){
 				var payload = [tvdb, season];
-				Trakt.get('show/season.json', payload, function(json){
+				Trakt.get('show/season.json', payload, function(error, json){
 					if (typeof(callback) == 'function') callback(json);
 				});
 			},
