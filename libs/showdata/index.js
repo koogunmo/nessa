@@ -289,6 +289,15 @@ var ShowData = {
 					logger.error('shows.info', e.message);
 				}
 			});
+			db.each("SELECT DISTINCT(E.season) FROM show AS S INNER JOIN show_episode AS E ON S.id = E.show_id WHERE S.tvdb = ?", show.tvdb, function(error, row){
+				Trakt.show.season.info(show.tvdb, row.season, function(json){
+					json.forEach(function(episode){
+						var watched = (episode.watched) ? 1 : 0;
+						var record = [watched, show.id, episode.season, episode.episode];
+						db.run("UPDATE show_episode SET watched = ? WHERE show_id = ? AND season = ? AND episode = ?", record)
+					});
+				});
+			});
 		});
 	},
 

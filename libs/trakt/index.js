@@ -23,10 +23,11 @@ var Trakt = {
 		}
 	},
 	
-	get: function(path, callback) {
+	get: function(url, data, callback) {
 	//	if (!Trakt.settings.enabled) return;
+		var path = (data) ? '/' + data.join('/') : '';
 		request({
-			uri: 'http://api.trakt.tv/'+path+'/'+Trakt.settings.apikey,
+			uri: 'http://api.trakt.tv/'+url+'/'+Trakt.settings.apikey + path,
 			method: 'GET'
 		}, function(error, req, response){
 			if (error) {
@@ -38,20 +39,20 @@ var Trakt = {
 				var error = (response.status == 'success') ? false : true;
 				callback(error, response);
 			} catch(e) {
-				logger.error(e.message);
+				logger.error(url+': '+e.message);
 			}
 		}).auth(Trakt.settings.username, Trakt.password());
 	},
 	
-	post: function(path, data, callback) {
+	post: function(url, data, callback) {
 	//	if (!Trakt.settings.enabled) return;
 		request({
-			uri: 'http://api.trakt.tv/'+path+'/'+Trakt.settings.apikey,
+			uri: 'http://api.trakt.tv/'+url+'/'+Trakt.settings.apikey,
 			json: data,
 			method: 'POST'
 		}, function(error, req, response){
 			if (error) {
-				logger.error(path + ': ' +error);
+				logger.error(url+': '+error);
 				return;
 			}
 			try {
@@ -60,7 +61,7 @@ var Trakt = {
 				if (response.status == 'failed') error = response.message;
 				callback(error, response);
 			} catch(e) {
-				logger.error(path + ': ' + e.message);
+				logger.error(url+': '+e.message);
 			}
 		}).auth(Trakt.settings.username, Trakt.password());
 	},
@@ -80,7 +81,7 @@ var Trakt = {
 	
 	calendar: {
 		shows: function(callback){
-			Trakt.get('calendar/shows.json', function(error, json){
+			Trakt.get('calendar/shows.json', null, function(error, json){
 				if (typeof(callback) == 'function') callback(json);
 			});
 		}
@@ -135,6 +136,12 @@ var Trakt = {
 		},
 		
 		season: {
+			info: function(tvdb, season, callback){
+				var payload = [tvdb, season];
+				Trakt.get('show/season.json', payload, function(json){
+					if (typeof(callback) == 'function') callback(json);
+				});
+			},
 			library: function(tvdb, season, callback){
 				var payload = {
 					tvdb_id: tvdb,

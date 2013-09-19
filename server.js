@@ -250,32 +250,25 @@ io.sockets.on('connection', function(socket) {
 	
 	/* Trakt integration */
 	socket.on('show.watched', function(data){
-		db.get("SELECT * FROM show WHERE id = ?", data.id, function(error, show){
+		db.get("SELECT id, tvdb FROM show WHERE id = ?", data.id, function(error, show){
 			trakt.show.seen(show.tvdb, function(json){
-				if (json.status == 'success') {
-					db.run("UPDATE show_episode SET watched = 1 WHERE show_id = ?", show.id);
-				};
+				db.run("UPDATE show_episode SET watched = 1 WHERE show_id = ?", show.id);
 			});
 		});
 	}).on('show.season.watched', function(data){
-		db.get("SELECT * FROM show WHERE id = ?", data.id, function(error, show){
+		db.get("SELECT id, tvdb FROM show WHERE id = ?", data.id, function(error, show){
 			trakt.show.season.seen(show.tvdb, data.season, function(json){
-				if (json.status == 'success') {
-					db.run("UPDATE show_episode SET watched = 1 WHERE show_id = ? AND season = ?", show.id, data.season);
-				};
+				db.run("UPDATE show_episode SET watched = 1 WHERE show_id = ? AND season = ?", show.id, data.season);
 			});
 		});
 	}).on('show.episode.watched', function(data){
 		db.get("SELECT E.id, S.tvdb, E.season, E.episode FROM show AS S INNER JOIN show_episode AS E ON S.id = E.show_id WHERE E.id = ?", data.episode, function(error, row){
 			if (error || !row) return;
 			trakt.show.episode.seen(row.tvdb, row.season, row.episode, function(json){
-				if (json.status == 'success') {
-					db.run("UPDATE show_episode SET watched = 1 WHERE id = ?", row.id);
-				}
+				db.run("UPDATE show_episode SET watched = 1 WHERE id = ?", row.id);
 			});
 		});
 	});
-	
 	
 	/***************************************************/
 	/* "API" calls */
