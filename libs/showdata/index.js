@@ -476,14 +476,15 @@ var ShowData = {
 			}
 			if (row === undefined) return;
 			var update = {
-				status: row.status,
-				hd: row.hd
+				feed: row.feed,
+				hd: row.hd,
+				status: row.status
 			};
 			// TODO: Improve this
 			data.forEach(function(k,v){
 				update[k] = v;
 			});
-			db.run("UPDATE show SET status = ?, hd = ? WHERE id = ?", update.status, update.hd, data.id, function(error){
+			db.run("UPDATE show SET status = ?, hd = ?, feed = ? WHERE id = ?", update.status, update.hd, update.feed, data.id, function(error){
 				if (error) logger.error(error);
 			});
 			if (typeof(callback) == 'function') callback();

@@ -116,6 +116,8 @@ It was also heavily skewed towards using newsgroups, which I don't use.
 - Matching UI
 	- Use modal window
 - ~~trakt integration~~
+- Scan Transmission for *manually* added shows
+	- Move to right place, rename, etc
 - Twilio for SMS download notifications?
 - Per-show settings (HD, enabled, etc)
 	- ~~SD/HD~~
