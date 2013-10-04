@@ -19,4 +19,4 @@ var rule = new schedule.RecurrenceRule();
 	rule.hour		= 1;
 	rule.minute		= 0;
 
-schedule.scheduleJob(rule, updatelistings);
+schedule.scheduleJob(rule, updateListings);
