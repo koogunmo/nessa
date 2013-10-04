@@ -341,7 +341,7 @@ io.sockets.on('connection', function(socket) {
 		var show = plugin('showdata');
 		
 		var json = qs.parse(data);
-		show.settings(data, function(json){
+		show.settings(json, function(response){
 			
 		});
 	}).on('show.update', function(data){

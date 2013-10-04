@@ -480,10 +480,10 @@ var ShowData = {
 				hd: row.hd,
 				status: row.status
 			};
-			// TODO: Improve this
-			data.forEach(function(k,v){
-				update[k] = v;
-			});
+			for (var k in data) {
+				if (!data[k]) continue;
+				update[k] = data[k];
+			}
 			db.run("UPDATE show SET status = ?, hd = ?, feed = ? WHERE id = ?", update.status, update.hd, update.feed, data.id, function(error){
 				if (error) logger.error(error);
 			});
