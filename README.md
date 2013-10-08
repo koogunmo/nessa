@@ -19,6 +19,11 @@ Nessa doesn't handle uPNP/AV (yet), so you'll need a MediaServer if you want to 
 
 These work reasonably well with VLC and my XBOX 360. Your mileage may vary.
 
+## Installing
+
+
+
+
 ## Running nessa
 
 > /usr/bin/node /path/to/nessa/server.js

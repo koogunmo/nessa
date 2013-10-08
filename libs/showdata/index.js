@@ -50,6 +50,10 @@ var ShowData = {
 		} else {
 			var sql = "SELECT * FROM show WHERE directory IS NOT NULL AND tvdb IS NOT NULL ORDER BY name ASC";
 		}
+		
+		// Create artwork directory
+		if (!fs.existsSync(process.cwd() + '/assets/artwork/')) mkdir(process.cwd() + '/assets/artwork', 0775);
+		
 		db.each(sql, function(error, show){
 			if (error) {
 				logger.error(error);
@@ -83,8 +87,8 @@ var ShowData = {
 											return;
 										}
 										// Compress image
-										exec('/usr/bin/jpegoptim --strip-all -m80 '+file, function(error){
-											if (error) logger.error(error);
+										exec('jpegoptim --strip-all -m80 '+file, function(error){
+										//	if (error) logger.error(error);
 										});
 									});
 								});
@@ -105,8 +109,8 @@ var ShowData = {
 											return;										
 										}
 										// Compress image
-										exec('/usr/bin/jpegoptim --strip-all -m80 '+file, function(error){
-											if (error) logger.error(error);
+										exec('jpegoptim --strip-all -m80 '+file, function(error){
+										//	if (error) logger.error(error);
 										});
 									});
 								});

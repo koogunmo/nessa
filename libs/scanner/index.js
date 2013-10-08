@@ -91,11 +91,8 @@ module.exports = exports = {
 					listDirectory(showdir, function(filepath){
 						var file = filepath.replace(showdir + '/', '');
 						var data = helper.getEpisodeNumbers(file);
+						if (!data || !data.episodes) return;
 						
-						if (!data || !data.episodes) {
-							logger.error(data);
-							return;
-						}
 						// Episode number range
 						if (data.episodes.length > 1) {
 							var ep = helper.zeroPadding(data.episodes[0])+'-'+helper.zeroPadding(data.episodes[data.episodes.length-1]);
