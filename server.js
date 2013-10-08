@@ -23,7 +23,7 @@ global.nconf.file({
 		group: 'media'
 	},
 	tvdb: {
-		apikey: "B77582079E378FF3"
+		apikey: 'B77582079E378FF3'
 	}
 });
 
@@ -83,7 +83,7 @@ var app		= express(),
 
 app.configure(function(){
 	app.use('/assets', express.static(__dirname + '/assets'));
-	app.use('/media', express.static(nconf.get('shows:base')));
+	if (nconf.get('shows:base')) app.use('/media', express.static(nconf.get('shows:base')));
 	app.use('/views', express.static(__dirname + '/views'));
 	
 	app.use(express.cookieParser());
@@ -436,16 +436,16 @@ app.get('/login',  function(req, res){
 /* Installer */
 app.get('/install', function(req, res){
 	if (nconf.get('installed')) {
-		res.redirect('/');
-		return;
+//		res.redirect('/');
+//		return;
 	}
 	// Display the install form
 	res.sendfile(__dirname + '/views/install.html');
 	
-}).post('/install', function(){
+}).post('/install', function(req, res){
 	// Save settings, redirect to settings page
 	var qs = require('querystring');
-	var json = qs.parse(settings);
+	var json = qs.parse(req.body);
 	for (var i in json) {
 		nconf.set(i, json[i]);
 	}
@@ -455,10 +455,11 @@ app.get('/install', function(req, res){
 			logger.error(error);
 			return;
 		}
+		app.use('/media', express.static(nconf.get('shows:base')));
 		// Start building the database
 		var shows = plugin('showdata');
 		shows.list();
-		req.redirect('/#main/settings');
+		res.redirect('/#main/settings');
 	});
 });
 
