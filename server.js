@@ -27,6 +27,14 @@ global.nconf.file({
 	}
 });
 
+if (process.cwd() != __dirname) {
+	try {
+		process.chdir(__dirname);
+	} catch(e) {
+		console.error(e.message);
+	}
+}
+
 /* Change ownership of the process */
 if (process.getuid) {
 	try {
