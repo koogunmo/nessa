@@ -18,6 +18,7 @@ CREATE TABLE "show_episode" (
 	"season" INTEGER,
 	"episode" INTEGER,
 	"title" TEXT,
+	"synopsis" TEXT,
 	"airdate" TEXT,
 	"file" TEXT,
 	"hash" TEXT,
