@@ -54,6 +54,11 @@ dl > dd {
 	
 }
 
+.note {
+	font-size: 11px;
+	margin-top: 5px;
+}
+
 /* Form elements */
 
 input[type=text],input[type=password],select {
