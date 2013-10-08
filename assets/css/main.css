@@ -648,7 +648,6 @@ ul.episodes li.downloaded span.download {
 		-ms-transition: all 0.5s;
 		-webkit-transition: all 0.5s;
 		width: 25%;
-		z-index: auto;
 	}
 	#shows ul.shows.grid li:hover {
 		z-index: 5;
@@ -675,10 +674,13 @@ ul.episodes li.downloaded span.download {
 		width: 100%;
 	}
 	#shows ul.shows.grid li > div.image:hover {
+		/*
 		box-shadow: #000000 0px 0px 20px;
 		height: 200px;
 		margin-top: -50px;
 		width: 136px;
+		z-index: 10;
+		*/
 	}
 	#shows ul.shows.grid li > a {
 		color: #FFFFFF !important;

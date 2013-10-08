@@ -3,7 +3,7 @@
 
 global.plugin = function(name){
 	try {
-		return require('./libs/' + name);
+		return require(__dirname + '/libs/' + name);
 	} catch(e) {
 		logger.error(e.message);
 	}
@@ -14,7 +14,7 @@ global.plugin = function(name){
 global.nconf = require('nconf');
 
 global.nconf.file({
-	file: 'settings.json'
+	file: __dirname + '/settings.json'
 }).defaults({
 	port: 6377,
 	installed: false,
@@ -97,12 +97,12 @@ app.configure(function(){
 logger.info('nessa.js: Listening on port ' + nconf.get('port'));
 
 /* Database */
-if (!fs.existsSync('db/nessa.sqlite')) {
+if (!fs.existsSync(__dirname + '/db/nessa.sqlite')) {
 	nconf.set('installed', false);
 	global.db = new sqlite.Database(__dirname + '/db/nessa.sqlite', function(error){
 		if (error) logger.error('DB: ', error);
 	});
-	fs.readFile('db/create.sql', 'utf8', function(error, sql){
+	fs.readFile(__dirname + '/db/create.sql', 'utf8', function(error, sql){
 		if (error) throw(error);
 		db.exec(sql, function(error){
 			if (error) throw(error);

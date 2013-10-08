@@ -113,11 +113,15 @@ It was also heavily skewed towards using newsgroups, which I don't use.
 - Dashboard
 	- ~~Show recently downloaded~~
 	- Show upcoming episodes (next 7 days)
-- Matching UI
-	- Use modal window
 - ~~trakt integration~~
-- Scan Transmission for *manually* added shows
+- Add custom show
+	- Enter name
+	- Search TVDB
+	- Add custom RSS url
+- Scan Transmission for *manually* added shows?
 	- Move to right place, rename, etc
+- Improve Matching UI
+	- Use modal window
 - Twilio for SMS download notifications?
 - Per-show settings (HD, enabled, etc)
 	- ~~SD/HD~~
@@ -125,12 +129,11 @@ It was also heavily skewed towards using newsgroups, which I don't use.
 - Notification system
 	- info bubbles?
 - Handle series "specials"
-	- e.g. Doctor Who christmas specials
-
+	- e.g. Doctor Who christmas episodes
 
 ### Phase 4
 - Ants. Ants EVERYWHERE!
-- Better navigation
+- Better UI & navigation
 - Integration Overrides
 	- Trakt
 - Simple torrent management?
@@ -141,7 +144,7 @@ It was also heavily skewed towards using newsgroups, which I don't use.
 - Custom templates and/or themes
 	- I'm sure some people won't like my idea of design
 - Implement uPNP/DLNA MediaServer?
-	- Removes dependency on Twonky
+	- Removes dependency on Twonky/miniDLNA
 		- Need to find/write a good uPnP/AV module?
 
 
