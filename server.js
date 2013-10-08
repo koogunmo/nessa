@@ -363,7 +363,7 @@ io.sockets.on('connection', function(socket) {
 // Routing
 
 app.get('/', ensureAuthenticated, function(req, res) {	
-	res.sendfile('views/index.html');
+	res.sendfile(__dirname + '/views/index.html');
 });
 
 /* User Authentication */
@@ -426,7 +426,7 @@ function ensureAuthenticated(req, res, next) {
 }
 
 app.get('/login',  function(req, res){
-	res.sendfile('views/login.html');
+	res.sendfile(__dirname + '/views/login.html');
 }).post('/login', passport.authenticate('local', {
 	successRedirect: '/',
 	failureRedirect: '/login'
@@ -440,7 +440,7 @@ app.get('/install', function(req, res){
 		return;
 	}
 	// Display the install form
-	res.sendfile('views/install.html');
+	res.sendfile(__dirname + '/views/install.html');
 	
 }).post('/install', function(){
 	// Save settings, redirect to settings page
