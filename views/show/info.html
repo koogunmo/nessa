@@ -33,7 +33,6 @@
 		<p>{{synopsis}}</p>
 	</div>
 	
-	
 	{{#if seasons}}
 	<div class="episodes">
 		<ul class="seasons">{{#seasons}}
@@ -45,9 +44,11 @@
 							<span class="episode seen" data-episode="{{id}}" title="Mark this episode as watched">{{episode}}</span>
 							<span class="title">{{title}}</span>
 							<span class="airdate">{{airdate}}</span>
+							{{#if feed}}
 							{{#unless hash}}
 							<span class="download"><a href="show/episode/download" class="button" data-id="{{id}}">Download</a></span>
 							{{/unless}}
+							{{/if}}
 						</div>
 						{{#if synopsis}}
 						<div class="extended">
