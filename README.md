@@ -12,21 +12,21 @@ Automated TV Torrenting acquisition
 - Plenty of storage space
 
 ## "Optional" Third-party software
-Nessa doesn't handle uPNP/AV (yet), so you'll need a MediaServer if you want to stream your content. I've used the following, with various degrees of success
+NodeTV doesn't handle uPNP/AV (yet), so you'll need a MediaServer if you want to stream your content. I've used the following, with various degrees of success
 
-- [minidlna](minidlna.sourceforge.net) (Open-source)
+- [ReadyMedia](minidlna.sourceforge.net) (Open-source)
 - [Twonky 7](http://twonky.com/downloads) (Commercial)
 
 These work reasonably well with VLC and my XBOX 360. Your mileage may vary.
 
 ## Installing
 
+Once you've cloned the repository, you'll need to install the dependencies
+> npm install
 
+## Running NodeTV
 
-
-## Running nessa
-
-> /usr/bin/node /path/to/nessa/server.js
+> /usr/bin/node /path/to/nodetv/server.js
 
 You'll probably want to daemonize the process, I use [forever](https://github.com/nodejitsu/forever).
 
@@ -221,7 +221,7 @@ At the time of writing, daily shows have not been tested at all.
 We need to create expressions for miniseries.						
 ## Acknowledgments
 
-Nessa utilises the following third-party data sources:
+NodeTV utilises the following third-party data sources:
 
 - [TVShowsApp](http://tvshowsapp.com): If you like *our* software, please donate to *them* so they can keep up their fantastic work (and providing us with data)
 - [The TVDB](http://thetvdb.com): Show information, Episodes, and artwork

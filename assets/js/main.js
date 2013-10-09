@@ -149,7 +149,7 @@ require(['socket.io', 'jquery', 'handlebars', 'bbq'], function(io, $, Handlebars
 	
 	$(document).on('click', 'a.button', function(e){
 		e.preventDefault()
-		var action	= $(this).attr('href').replace('/', '.');
+		var action	= $(this).attr('href').replace(/\//g, '.');
 		if ($(this).hasClass('confirm')) {
 			var msg = ($(this).data('msg')) ? $(this).data('msg') : 'Are you sure?';
 			var confirmed = confirm(msg);

@@ -45,7 +45,9 @@
 							<span class="episode seen" data-episode="{{id}}" title="Mark this episode as watched">{{episode}}</span>
 							<span class="title">{{title}}</span>
 							<span class="airdate">{{airdate}}</span>
-							<span class="download"><a href="" class="button">Download</a></span>
+							{{#unless hash}}
+							<span class="download"><a href="show/episode/download" class="button" data-id="{{id}}">Download</a></span>
+							{{/unless}}
 						</div>
 						{{#if synopsis}}
 						<div class="extended">

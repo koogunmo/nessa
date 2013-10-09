@@ -134,13 +134,12 @@ var ShowData = {
 	},
 	
 	download: function(epid){
-		var sql = "SELECT S.name, S.feed, S.hd, E.season, E.episode, E.title FROM show AS S INNER JOIN show_episode AS E ON S.id = E.show_id WHERE E.id = ?";
+		var sql = "SELECT E.id, S.name, S.feed, S.hd, E.season, E.episode, E.title FROM show AS S INNER JOIN show_episode AS E ON S.id = E.show_id WHERE E.id = ?";
 		db.get(sql, epid, function(error, row){
 			if (error) {
 				logger.error(error);
 				return;
 			}
-			row.feed = row.feed.replace(/.xml/, '.full.xml');
 			request.get(row.feed, function(error, req, xml){
 				if (error) {
 					logger.error(error);
@@ -326,7 +325,7 @@ var ShowData = {
 						var record = {
 							name: show.name[0],
 							tvdb: show.tvdbid[0],
-							feed: show.mirrors[0].mirror[0]
+							feed: show.mirrors[0].mirror[0].replace(/.xml/, '.full.xml');
 						};
 						db.get("SELECT COUNT(id), id AS count FROM show WHERE tvdb = ?", record.tvdb, function(error, row){
 							if (error) {

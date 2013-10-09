@@ -357,6 +357,12 @@ io.sockets.on('connection', function(socket) {
 		show.info(data.id);
 	});
 	
+	
+	socket.on('show.episode.download', function(data){
+		var show = plugin('showdata');
+		show.download(data.id);
+	});
+	
 	// Search
 	socket.on('show.search', function(data){
 		var shows = plugin('showdata');
