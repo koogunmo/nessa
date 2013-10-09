@@ -140,6 +140,11 @@ var ShowData = {
 				logger.error(error);
 				return;
 			}
+			
+			if (row.feed.indexOf('tvshowsapp.com') >= 0) {
+				row.feed = row.feed.replace(/.xml/, '.full.xml')
+			}
+			
 			request.get(row.feed, function(error, req, xml){
 				if (error) {
 					logger.error(error);
@@ -325,7 +330,7 @@ var ShowData = {
 						var record = {
 							name: show.name[0],
 							tvdb: show.tvdbid[0],
-							feed: show.mirrors[0].mirror[0].replace(/.xml/, '.full.xml');
+							feed: show.mirrors[0].mirror[0]
 						};
 						db.get("SELECT COUNT(id), id AS count FROM show WHERE tvdb = ?", record.tvdb, function(error, row){
 							if (error) {
