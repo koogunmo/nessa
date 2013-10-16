@@ -477,9 +477,6 @@ app.get('/install', function(req, res){
 	});
 });
 
-
-
-
 // Below is a chaotic mess of ideas and prototyping
 
 /*

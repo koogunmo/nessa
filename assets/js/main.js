@@ -1,11 +1,16 @@
 requirejs.config({
 	paths: {
+		'angular': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.min',
 		'bbq': '/assets/js/lib/jquery.bbq.min',
+		'domReady': '/assets/js/lib/domReady',
 		'handlebars': 'https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.0.0/handlebars.min',
 		'jquery': 'https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min',
 		'socket.io': 'https://cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min'
 	},
 	shim: {
+		'angular': {
+			exports: 'angular'
+		},
 		'bbq': {
 			deps: ['jquery']
 		},

@@ -79,12 +79,14 @@ var torrent = {
 						var file = null;
 						var size = 0;
 						item.files.forEach(function(k){
+							// The largest file is most likely the right one.
 							if (k.length > size) {
+								size = k.length;
 								file = item.downloadDir + '/' + k.name;
-								size = k.size;
 							}
 						});
 					}
+					
 					var data = helper.getEpisodeNumbers(file);
 					if (!data || !data.episodes) return;
 					
