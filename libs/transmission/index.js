@@ -24,7 +24,7 @@ var torrent = {
 			// TO DO: reformat magnet to add extra trackers
 			this.rpc.add(obj.magnet, function(error, args){
 				if (error) {
-					logger.error('bt:add', error);
+					logger.error('bt:add', error, obj);
 					return;
 				}
 				if (args) {
@@ -86,7 +86,6 @@ var torrent = {
 							}
 						});
 					}
-					
 					var data = helper.getEpisodeNumbers(file);
 					if (!data || !data.episodes) return;
 					

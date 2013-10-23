@@ -95,7 +95,11 @@ app.configure(function(){
 	app.use('/views', express.static(__dirname + '/views'));
 	
 	app.use(express.cookieParser());
-	app.use(express.bodyParser());
+//	app.use(express.bodyParser());
+	
+	app.use(express.urlencoded());
+	app.use(express.json());
+	
 	app.use(express.session({secret: 'correct horse battery staple'}));
 	app.use(passport.initialize());
 	app.use(passport.session());
