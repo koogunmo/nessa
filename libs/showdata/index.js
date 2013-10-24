@@ -608,13 +608,13 @@ var ShowData = {
 							var res = helper.getEpisodeNumbers(item.title[0]);
 							
 							var sources = [];
-							if (item.enclosure[0]) sources.push(item.enclosure[0].url);
-							if (item.link[0]) sources.push(item.link[0]['_']);
-							if (item.guid[0]) sources.push(item.guid[0]['_']);
+							if (item.enclosure) sources.push(item.enclosure[0].url);
+							if (item.link) sources.push(item.link[0]['_']);
+							if (item.guid) sources.push(item.guid[0]['_']);
 							
 							var magnet = null;
 							sources.forEach(function(source){
-								if (source.indexOf('magnet:?') == 0) magnet = source;
+								if (source && source.indexOf('magnet:?') == 0) magnet = source;
 							});
 							
 							var record = {
@@ -624,7 +624,7 @@ var ShowData = {
 								magnet: magnet,
 								aired: airdate
 							};
-							results.push(record);
+							if (magnet) results.push(record);
 						});
 						if (!results) return;
 						
