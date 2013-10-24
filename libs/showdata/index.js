@@ -45,6 +45,8 @@ var ShowData = {
 	},
 	
 	artwork: function(showid) {
+		var easyimg = require('easyimage');
+		
 		if (typeof(showid) == 'number') {
 			var sql = "SELECT * FROM show WHERE id = "+showid+" AND directory IS NOT NULL AND tvdb IS NOT NULL ORDER BY name ASC";
 		} else {
@@ -86,10 +88,16 @@ var ShowData = {
 											logger.error(error);
 											return;
 										}
-										// Compress image
-										exec('jpegoptim --strip-all -m80 '+file, function(error){
-										//	if (error) logger.error(error);
+										easyimg.resize({
+											src: file,
+											dst: file,
+											height: 300,
+											width: 204,
+										}, function(error, image){
+											if (error) logger.error(error);
 										});
+										// Compress image
+									//	exec('jpegoptim --strip-all -m80 '+file, function(error){});
 									});
 								});
 							});
@@ -109,9 +117,7 @@ var ShowData = {
 											return;										
 										}
 										// Compress image
-										exec('jpegoptim --strip-all -m80 '+file, function(error){
-										//	if (error) logger.error(error);
-										});
+										exec('jpegoptim --strip-all -m80 '+file, function(error){});
 									});
 								});
 							});
@@ -159,7 +165,7 @@ var ShowData = {
 						if (!json.rss.channel[0].item) return;
 						json.rss.channel[0].item.forEach(function(item){
 							var title = item.title.toString();
-							if (!row.hd && title.match('720p')) return;
+							if (!row.hd && title.match(/720p|1080p/i)) return;
 							var data = helper.getEpisodeNumbers(title);
 							if (data.season == row.season && data.episodes.indexOf(row.episode) >= 0) {
 								var magnet = item.guid[0]['_'];
@@ -600,11 +606,22 @@ var ShowData = {
 							if (airdate < now-limit) return;
 							
 							var res = helper.getEpisodeNumbers(item.title[0]);
+							
+							var sources = [];
+							if (item.enclosure[0]) sources.push(item.enclosure[0].url);
+							if (item.link[0]) sources.push(item.link[0]['_']);
+							if (item.guid[0]) sources.push(item.guid[0]['_']);
+							
+							var magnet = null;
+							sources.forEach(function(source){
+								if (source.indexOf('magnet:?') == 0) magnet = source;
+							});
+							
 							var record = {
 								season: res.season,
 								episode: res.episodes,
-								hd: (item.title[0].match('720p')) ? true : false,
-								magnet: item.guid[0]['_'],
+								hd: (item.title[0].match(/720p|1080p/i)) ? true : false,
+								magnet: magnet,
 								aired: airdate
 							};
 							results.push(record);

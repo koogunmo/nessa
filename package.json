@@ -13,6 +13,7 @@
 		"start": "node server.js"
 	},
 	"dependencies": {
+		"easyimage": "0.1.3",
 		"express": "3.x.x",
 		"feedparser": "0.16.1",
 		"gitty": "1.2.x",

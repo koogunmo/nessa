@@ -10,6 +10,7 @@ var rule = new schedule.RecurrenceRule();
 schedule.scheduleJob(rule, function(){
 	tvshows.getLatest();
 });
+tvshows.getLatest();
 
 
 
