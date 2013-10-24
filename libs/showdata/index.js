@@ -7,9 +7,7 @@ var exec	= require('child_process').exec,
 	request	= require('request'),
 	util	= require('util');
 
-
 var ShowData = {
-	
 	add: function(id, callback){
 		db.get("SELECT * FROM show WHERE id = ?", id, function(error, row){
 			if (error) {
@@ -583,6 +581,7 @@ var ShowData = {
 				logger.error(error);
 				return;
 			}
+			
 			request.get(show.feed, function(error, req, xml){
 				if (error) {
 					logger.error(error);
@@ -608,14 +607,18 @@ var ShowData = {
 							var res = helper.getEpisodeNumbers(item.title[0]);
 							
 							var sources = [];
-							if (item.enclosure) sources.push(item.enclosure[0].url);
-							if (item.link) sources.push(item.link[0]['_']);
+							if (item.enclosure) sources.push(item.enclosure[0]['$'].url);
+							if (item.link) sources.push(item.link[0]);
 							if (item.guid) sources.push(item.guid[0]['_']);
 							
 							var magnet = null;
-							sources.forEach(function(source){
-								if (source && source.indexOf('magnet:?') == 0) magnet = source;
-							});
+							for (var i in sources) {
+								var source = sources[i];
+								if (source.indexOf('magnet:?') == 0) {
+									magnet = source;
+									break;
+								}
+							}
 							
 							var record = {
 								season: res.season,
@@ -626,6 +629,7 @@ var ShowData = {
 							};
 							if (magnet) results.push(record);
 						});
+						
 						if (!results) return;
 						
 						results.forEach(function(result){
