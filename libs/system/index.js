@@ -14,7 +14,7 @@ var system = {
 				
 				var interval = setInterval(function(){
 					if (restart) {
-						console.log('Updates installed. Restarting...');
+						logger.info('Updates installed. Restarting...');
 						system.restart();
 					}
 				}, 5000);

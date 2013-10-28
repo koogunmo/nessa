@@ -86,20 +86,14 @@ var ShowData = {
 											logger.error(error);
 											return;
 										}
-										easyimg.resize({
-											src: file,
-											dst: file,
-											height: 300,
-											width: 204,
-										}, function(error, image){
-											if (error) logger.error(error);
-										});
+										
 										// Compress image
 									//	exec('jpegoptim --strip-all -m80 '+file, function(error){});
 									});
 								});
 							});
 						}
+						
 						if (data.poster) {
 							http.get('http://www.thetvdb.com/banners/'+data.poster[0], function(res){
 								var imagedata = '';
@@ -114,6 +108,15 @@ var ShowData = {
 											logger.error(error);
 											return;										
 										}
+										easyimg.resize({
+											src: file,
+											dst: file,
+											height: 300,
+											width: 204,
+										}, function(error, image){
+											if (error) logger.error(error);
+										});
+										
 										// Compress image
 										exec('jpegoptim --strip-all -m80 '+file, function(error){});
 									});
