@@ -481,6 +481,14 @@ app.get('/install', function(req, res){
 	});
 });
 
+
+app.get('/artwork', function(req, res){
+	var show = plugin('showdata');
+	db.each("SELECT id FROM show WHERE status = 1", function(error, row){
+		show.artwork(row.id);
+	});
+});
+
 // Below is a chaotic mess of ideas and prototyping
 
 /*
