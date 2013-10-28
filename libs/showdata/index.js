@@ -73,6 +73,7 @@ var ShowData = {
 						}
 						var data = json.Data.Series[0];
 						if (data.banner && !fs.existsSync(process.cwd() + '/assets/artwork/'+show.tvdb+'.jpg')) {
+							// Banner Artwork
 							http.get('http://www.thetvdb.com/banners/'+data.banner[0], function(res){
 								var imagedata = '';
 								res.setEncoding('binary')
@@ -86,15 +87,15 @@ var ShowData = {
 											logger.error(error);
 											return;
 										}
-										
 										// Compress image
-									//	exec('jpegoptim --strip-all -m80 '+file, function(error){});
+										exec('jpegoptim --strip-all -m80 '+file, function(error){});
 									});
 								});
 							});
 						}
 						
 						if (data.poster) {
+							// Poster/DVD Image
 							http.get('http://www.thetvdb.com/banners/'+data.poster[0], function(res){
 								var imagedata = '';
 								res.setEncoding('binary')
@@ -112,13 +113,11 @@ var ShowData = {
 											src: file,
 											dst: file,
 											height: 300,
-											width: 204,
+											width: 204
 										}, function(error, image){
 											if (error) logger.error(error);
+											exec('jpegoptim --strip-all -m80 '+file, function(error){});
 										});
-										
-										// Compress image
-										exec('jpegoptim --strip-all -m80 '+file, function(error){});
 									});
 								});
 							});
