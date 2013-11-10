@@ -654,6 +654,8 @@ var ShowData = {
 										id: ids,
 										magnet: result.magnet
 									});
+									// Update the episode listings
+									events.emit('shows.info', null, show.id, false);
 								}
 							});
 						});
