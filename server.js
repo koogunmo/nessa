@@ -384,6 +384,13 @@ app.get('/', ensureAuthenticated, function(req, res) {
 	res.sendfile(__dirname + '/views/index.html');
 });
 
+
+app.get('/angular', function(req, res) {	
+	res.sendfile(__dirname + '/views/index-ng.html');
+});
+
+
+
 /* User Authentication */
 
 passport.use(new LocalStrategy(

@@ -1,28 +1,23 @@
 requirejs.config({
 	paths: {
-		'angular': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.min',
-		'bbq': '/assets/js/lib/jquery.bbq.min',
-		'domReady': '/assets/js/lib/domReady',
 		'handlebars': 'https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.0.0/handlebars.min',
-		'jquery': 'https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min',
+		'jquery': 'https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min',
+		'bbq': '//cdnjs.cloudflare.com/ajax/libs/jquery.ba-bbq/1.2.1/jquery.ba-bbq.min',
 		'socket.io': 'https://cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min'
 	},
 	shim: {
-		'angular': {
-			exports: 'angular'
-		},
-		'bbq': {
-			deps: ['jquery']
-		},
 		'handlebars': {
 			exports: 'Handlebars'
 		},
 		'jquery': {
 			exports: '$'
 		},
+		'bbq': {
+			depends: ['jquery']
+		},
 		'socket.io': {
 			exports: 'io'
-		},
+		}
 	}
 });
 
@@ -32,7 +27,7 @@ function zeroPad(num, length) {
 	return (pad + num).slice(-length);
 }
 
-require(['socket.io', 'jquery', 'handlebars', 'bbq'], function(io, $, Handlebars){
+require(['jquery', 'socket.io', 'handlebars', 'bbq'], function(jQuery, io, Handlebars){
 	
 	var nessa = {
 		init: function(){
@@ -118,9 +113,10 @@ require(['socket.io', 'jquery', 'handlebars', 'bbq'], function(io, $, Handlebars
 		$(document).trigger('lazyload');
 	});
 	
+	
 	$(document).on('lazyload', function(){
 		$('div.image:visible img[data-src]').each(function(){
-			if ($(this).attr('src')) return;
+				if ($(this).attr('src')) return;
 			$(this).on('load', function(){
 				$(this).fadeIn();
 			}).attr({

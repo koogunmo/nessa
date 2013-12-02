@@ -19,6 +19,10 @@ NodeTV doesn't handle uPNP/AV (yet), so you'll need a MediaServer if you want to
 
 These work reasonably well with VLC and my XBOX 360. Your mileage may vary.
 
+## Browser Support
+
+NodeTV works in all current browsers. IE 8.0 and earlier are *NOT* supported.
+
 ## Installing
 
 Once you've cloned the repository, you'll need to install the dependencies
@@ -123,6 +127,7 @@ It was also heavily skewed towards using newsgroups, which I don't use.
 	- Enter name
 	- Search TVDB
 	- Add custom RSS url
+- REPACK support?
 - Scan Transmission for *manually* added shows?
 	- Move to right place, rename, etc
 - Improve Matching UI
@@ -146,6 +151,11 @@ It was also heavily skewed towards using newsgroups, which I don't use.
 	- Clean install test
 
 ### Phase 5
+- Remove dependency on TVShows
+	- Feeds seem to be unreliable at times
+	- Migrate to ShowRSS
+
+### Phase 6
 - Custom templates and/or themes
 	- I'm sure some people won't like my idea of design
 - Implement uPNP/DLNA MediaServer?

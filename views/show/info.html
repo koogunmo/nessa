@@ -43,7 +43,6 @@
 						<div class="header">
 							<span class="episode seen" data-episode="{{id}}" title="Mark this episode as watched">{{episode}}</span>
 							<span class="title">{{title}}</span>
-							<span class="airdate">{{airdate}}</span>
 							{{#if feed}}
 							{{#unless hash}}
 							<span class="download"><a href="show/episode/download" class="button" data-id="{{id}}">Download</a></span>
@@ -53,6 +52,8 @@
 						{{#if synopsis}}
 						<div class="extended">
 							<p class="synopsis">{{synopsis}}</p>
+							<hr />
+							<div class="airdate">{{airdate}}</div>
 						</div>
 						{{/if}}
 					</li>

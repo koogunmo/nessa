@@ -51,6 +51,16 @@ var ShowData = {
 			var sql = "SELECT * FROM show WHERE directory IS NOT NULL AND tvdb IS NOT NULL ORDER BY name ASC";
 		}
 		
+		// TO DO - get artwork from trakt
+		
+		// Show
+		// http://slurm.trakt.us/images/posters/198.jpg
+		// 198 is the show ID
+		
+		// Episode
+		// http://trakt.us/images/episodes/198-1-1.jpg
+		// -1-1 = season, episode
+		
 		// Create artwork directory
 		if (!fs.existsSync(process.cwd() + '/assets/artwork/')) mkdir(process.cwd() + '/assets/artwork', 0775);
 		
