@@ -232,6 +232,9 @@ io.sockets.on('connection', function(socket) {
 				logger.error(error);
 				return;
 			}
+			
+			socket.emit('main.dashboard', rows);
+			
 			socket.emit('page.template', {
 				template: 'views/main/dashboard.html',
 				data: {
@@ -241,6 +244,8 @@ io.sockets.on('connection', function(socket) {
 		});
 		
 	}).on('main.settings', function(){
+		socket.emit('system.settings', nconf.get());
+		
 		socket.emit('page.template', {
 			template: 'views/main/settings.html',
 			data: nconf.get()
@@ -250,6 +255,9 @@ io.sockets.on('connection', function(socket) {
 		// List of enabled/subscribed shows
 		var shows = plugin('showdata');
 		shows.enabled(function(json){
+			
+			socket.emit('shows.enabled', json);
+			
 			socket.emit('page.template', {
 				template: 'views/show/list.html',
 				data: {
@@ -342,6 +350,9 @@ io.sockets.on('connection', function(socket) {
 				template: 'views/show/info.html',
 				data: json
 			});
+			
+			socket.emit('show.overview', json);
+			
 		});
 		
 	}).on('show.rescan', function(data){
