@@ -1,6 +1,6 @@
 "use strict";
 
-require(['jquery','socket.io','app'], function($,io,nessa){
+require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 	
 	$('#loading').hide();
 	

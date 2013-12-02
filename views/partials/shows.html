@@ -1,14 +1,20 @@
 <div id="shows">
-	<ul class="shows grid">
-		<li class="show-add">
+	<div class="row">
+		<div class="col-md-3">
 			<div class="image"></div>
 			<a href="#/show/add">Add Show</a>
-		</li>
-		<li ng-repeat="show in shows" id="show-{{show.id}}" data-id="{{show.id}}" ng-click="modalShow(show.id)">
+		</div>
+		
+		<div class="col-md-3" ng-repeat="show in shows" id="show-{{show.id}}" data-id="{{show.id}}" ng-click="modalShow(show.id)">
 			<div class="image">
 				<img data-src="/media/{{show.directory}}/cover.jpg" alt="" />
 			</div>
 			<span>{{show.name}}</span>
-		</li>
-	</ul>
+		</div>
+		
+		<div class="col-md-3">
+			<div class="image"></div>
+			<a href="#/show/add">Add Show</a>
+		</div>
+	</div>
 </div>

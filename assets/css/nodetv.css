@@ -1,0 +1,44 @@
+#shows div.image {
+	display: none;
+}
+
+@media screen and (min-width: 768px) {
+	body {
+		padding-top: 50px;
+	}
+	
+	#dashboard ul {
+		list-style: none;
+	}
+	
+	#shows ul {
+		list-style: none;
+	}
+	#shows ul > li {
+		text-align: center;
+	}
+	
+	#shows div.image {
+		background-color: #000000;
+		background-image: url('../gfx/no-cover.png');
+		background-position: center center;
+		background-repeat: no-repeat;
+		background-size: contain;
+		border: 1px solid #FFFFFF;
+		display: block;
+		height: 100px;
+		margin: 0px auto;
+		transition: all 0.5s;
+		-moz-transition: all 0.5s;
+		-ms-transition: all 0.5s;
+		-webkit-transition: all 0.5s;
+		width: 68px;
+	}
+	#shows div.image > img {
+		display: none;
+		height: 100%;
+		width: 100%;
+	}
+
+}
+

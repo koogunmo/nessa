@@ -3,6 +3,7 @@
 requirejs.config({
 	paths: {
 		'app': 'app',
+		'bootstrap': './libs/bootstrap.min',
 		'jquery': 'https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min',
 		'angular': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.2.3/angular.min',
 		'ngCookies': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.2.3/angular-cookies.min',
@@ -13,6 +14,9 @@ requirejs.config({
 	shim: {
 		'angular': {
 			exports: 'angular'
+		},
+		'bootstrap': {
+			deps: ['jquery']
 		},
 		'ngCookies': {
 			depends: ['angular']

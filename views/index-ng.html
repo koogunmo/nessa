@@ -5,31 +5,46 @@
 	<meta name="apple-mobile-web-app-capable" content="yes" />
 	<meta name="apple-mobile-web-app-status-bar-style" content="black" />
 	
-	<meta name="viewport" content="initial-scale=1.0,user-scalable=no,maximum-scale=1,width=device-width">
-	<meta name="viewport" content="initial-scale=1.0,user-scalable=no,maximum-scale=1" media="(max-device-width: 566px)" />
+	<meta name="viewport" content="initial-scale=1.0,width=device-width">
 	<link rel="shortcut icon" href="assets/favicon.ico" />
 	
-	<link rel="stylesheet" type="text/css" href="assets/css/main.css" />
+	<link rel="stylesheet" type="text/css" href="assets/css/bootstrap.min.css" />
+	<link rel="stylesheet" type="text/css" href="assets/css/bootstrap-theme.min.css" />
+	<link rel="stylesheet" type="text/css" href="assets/css/nodetv.css" />
+	
+	<!--
 	<link rel="apple-touch-icon" sizes="54x54" href="assets/apple-touch-icon.png" />
 	<link rel="apple-touch-icon" sizes="72x72" href="assets/apple-touch-icon-ipad.png" />
 	<link rel="apple-touch-icon" sizes="114x114" href="assets/apple-touch-icon-retina.png" />
 	
 	<link rel="apple-touch-icon" sizes="120x120" href="assets/icon-ios7-iphone.png" />
 	<link rel="apple-touch-icon" sizes="152x152" href="assets/icon-ios7-ipad.png" />
-	
+	-->
 </head>
+
 <body ng-controller="mainController">
+	<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+		<div class="container">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="#">NodeTV</a>
+			</div>
+			<div class="collapse navbar-collapse">
+				<ul class="nav navbar-nav">
+					<li><a href="#/dashboard">Dashboard</a></li>
+					<li><a href="#/shows">Shows</a></li>
+					<li><a href="#/settings">Settings</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
 	
-	<nav>
-		<ul>
-			<li><a href="#/dashboard">Home</a></li>
-			<li><a href="#/shows">Shows</a></li>
-			<li><a href="#/shows/unmatched">Match</a></li>
-			<li><a href="#/settings">Settings</a></li>
-		</ul>
-	</nav>
-	
-	<div id="main" role="main" ng-view></div>
+	<div id="main" class="container" role="main" ng-view></div>
 	
 	<div id="modal">
 		<div class="wrapper">
@@ -38,6 +53,7 @@
 		</div>
 	</div>
 	<div id="loading"><p>loading...</p></div>
+	
 	<script type="text/javascript" src="assets/js/require.js" data-main="assets/js/init.js"></script>
 </body>
 </html>

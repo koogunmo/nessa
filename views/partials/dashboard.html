@@ -1,14 +1,16 @@
 <div id="dashboard">
-	<h1>Dashboard</h1>
-	
 	<div class="latest">
 		<h2>Latest Shows</h2>
-		<ul>
-			<li ng-repeat="item in latest">
-				<h3>{{item.name}} - {{item.title}}</h3>
-				<h4>Season {{item.season}}, Episode {{item.episode}}</h4>
-				<p class="synopsis">{{item.synopsis}}</p>
-			</li>
-		</ul>
+		
+		<div ng-repeat="item in latest">
+			<h3>{{item.name}} - {{item.title}}</h3>
+			<h4>{{item.airdate}} - Season {{item.season}}, Episode {{item.episode}}</h4>
+			<p class="synopsis">{{item.synopsis}}</p>
+		</div>
 	</div>
+	
+	<div class="stats">
+		display library statistics (Total shows, episodes, watched, unwatched, etc)
+	</div>
+	
 </div>
