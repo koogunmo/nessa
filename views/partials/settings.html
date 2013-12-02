@@ -1,78 +1,100 @@
 <div id="settings">
 	<form action="settings/save" method="post">
 		<div class="toolbar">
-			<input type="submit" value="Save settings" />
-			<input type="reset" value="Cancel" />
+			<input type="submit" value="Save settings" class="btn btn-success" />
+			<input type="reset" value="Reset" class="btn btn-default" />
 		</div>
 		
 		<h2>Global Settings</h2>
 		<fieldset>
-			
-			<dl>
-				<dt>Media Directory</dt>
-				<dd><input type="text" name="shows:base" value="{{settings.shows.base}}" /></dd>
-				<dt>Prefer HD Video</dt>
-				<dd><input type="text" name="shows:hd" value="{{settings.shows.hd}}" class="toggle" /></dd>
-				<dt>IP Whitelist</dt>
-				<dd><input type="text" name="security:whitelist" value="{{settings.security.whitelist}}" /></dd>
-			</dl>
+			<div class="form-group">
+				<label for="ipt_shows_base">Media Directory</label>
+				<input type="text" id="ipt_shows_base" name="shows:base" value="{{settings.shows.base}}" class="form-control" />
+			</div>
+			<div class="form-group">
+				<label for="ipt_shows_hd">Prefer HD Video</label>
+				<input type="text" id="ipt_shows_hd" name="shows:hd" value="{{settings.shows.hd}}" class="toggle" />
+			</div>
+			<div class="form-group">
+				<label for="ipt_security_whitelist">IP Whitelist</label>
+				<input type="text" id="ipt_security_whitelist" name="security:whitelist" value="{{settings.security.whitelist}}" class="form-control" />
+			</div>
 		</fieldset>
 		
 		<h2>Transmission RPC</h2>
 		<fieldset>
-			<dl>
-				<dt>Username</dt>
-				<dd><input type="text" name="transmission:username" value="{{settings.transmission.username}}" /></dd>
-				<dt>Password</dt>
-				<dd><input type="password" name="transmission:password" value="{{settings.transmission.password}}" /></dd>
-				<dt>Host</dt>
-				<dd><input type="text" name="transmission:host" value="{{settings.transmission.host}}" /></dd>
-				<dt>Port</dt>
-				<dd><input type="text" name="transmission:port" value="{{settings.transmission.port}}" /></dd>
-			</dl>
+			<div class="form-group">
+				<label for="ipt_bt_username">Username</label>
+				<input type="text" id="ipt_bt_username" name="transmission:username" value="{{settings.transmission.username}}" class="form-control" />
+			</div>
+			<div class="form-group">
+				<label for="ipt_bt_password">Password</label>
+				<input type="password" id="ipt_bt_password" name="transmission:password" value="{{settings.transmission.password}}" class="form-control" />
+			</div>
+			<div class="form-group">
+				<label for="ipt_bt_host">Host</label>
+				<input type="text" id="ipt_bt_host" name="transmission:host" value="{{settings.transmission.host}}" class="form-control" />
+			</div>
+			<div class="form-group">
+				<label for="ipt_bt_port">Port</label>
+				<input type="text" for="ipt_bt_port" name="transmission:port" value="{{settings.transmission.port}}" class="form-control" />
+			</div>
 		</fieldset>
 
 		<h2>trakt.tv</h2>
 		<fieldset>
-			<dl>
-				<dt>Enable integration</dt>
-				<dd><input type="text" name="trakt:enabled" value="{{settings.trakt.enabled}}" class="toggle" /></dd>
-				<dt>Username</dt>
-				<dd><input type="text" name="trakt:username" value="{{settings.trakt.username}}" /></dd>
-				<dt>Password</dt>
-				<dd><input type="password" name="trakt:password" value="{{settings.trakt.password}}" /></dd>
-				<dt>API Key</dt>
-				<dd><input type="text" name="trakt:apikey" value="{{settings.trakt.apikey}}" /></dd>
-			</dl>
+			<div class="form-group">
+				<label for="ipt_trakt_enable">Enable Integration</label>
+				<input type="text" id="ipt_trakt_enable" name="trakt:enabled" value="{{settings.trakt.enabled}}" class="toggle" />
+			</div>
+			<div class="form-group">
+				<label for="ipt_trakt_username">Username</label>
+				<input type="text" id="ipt_trakt_username" name="trakt:username" value="{{settings.trakt.username}}" class="form-control" />
+			</div>
+			<div class="form-group">
+				<label for="ipt_trakt_password">Password</label>
+				<input type="password" id="ipt_trakt_password" name="trakt:password" value="{{settings.trakt.password}}" class="form-control" />
+			</div>
+			<div class="form-group">
+				<label for="ipt_trakt_api">API Key</label>
+				<input type="text" id="ipt_trakt_api" name="trakt:apikey" value="{{settings.trakt.apikey}}" class="form-control" />
+			</div>
 		</fieldset>
 
 		<h2>Twilio</h2>
 		<fieldset>
-			<dl>
-				<dt>Enable Notifications</dt>
-				<dd><input type="text" name="twilio:enabled" value="{{settings.twilio.enabled}}" class="toggle" /></dd>
-				<dt>Phone Number</dt>
-				<dd><input type="text" name="twilio:phone" value="{{settings.twilio.phone}}" /></dd>
-				<dt>SID</dt>
-				<dd><input type="text" name="twilio:sid" value="{{settings.twilio.sid}}" /></dd>
-				<dt>Token</dt>
-				<dd><input type="text" name="twilio:token" value="{{settings.twilio.token}}" /></dd>
-			</dl>
+			<div class="form-group">
+				<label for="ipt_twilio_enabled">Enable Notifications</label>
+				<input type="text" id="ipt_twilio_enabled" name="twilio:enabled" value="{{settings.twilio.enabled}}" class="toggle" />
+			</div>
+			<div class="form-group">
+				<label for="ipt_twilio_phone">Phone</label>
+				<input type="text" id="ipt_twilio_phone" name="twilio:phone" value="{{settings.twilio.phone}}" class="form-control" />
+			</div>
+			<div class="form-group">
+				<label for="ipt_twilio_sid">SID</label>
+				<input type="text" id="ipt_twilio_sid" name="twilio:sid" value="{{settings.twilio.sid}}" class="form-control" />
+			</div>
+			<div class="form-group">
+				<label for="ipt_twilio_token">Token</label>
+				<input type="text" id="ipt_twilio_token" name="twilio:token" value="{{settings.twilio.token}}" class="form-control" />
+			</div>
 		</fieldset>
 		
 		<h2>TVDB</h2>
 		<fieldset>
-			<dl>
-				<dt>API Key</dt>
-				<dd><input type="text" name="tvdb:apikey" value="{{settings.tvdb.apikey}}" /></dd>
-			</dl>
+			<div class="form-group">
+				<label for="ipt_tvdb_api">API Key</label>
+				<input type="text" id="ipt_tvdb_api" name="tvdb:apikey" value="{{settings.tvdb.apikey}}" class="form-control" />
+			</div>
 		</fieldset>
 		
 		<h2>System</h2>
 		<fieldset>
-			<a href="system/rescan" class="button confirm">Rescan Media</a>
-			<a href="system/update" class="button confirm">Update NodeTV</a>
-			<a href="system/restart" class="button confirm">Restart NodeTV</a>
+			<a href="system/rescan" class="btn btn-info confirm">Rescan Media</a>
+			<a href="system/update" class="btn btn-warning confirm">Update NodeTV</a>
+			<a href="system/restart" class="btn btn-danger confirm">Restart NodeTV</a>
+			
 			<p class="note">NodeTV checks for updates at 3am (local) every night, and automatically installs if available.</p>
 		</fieldset>
 	</form>

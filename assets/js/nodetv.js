@@ -20,6 +20,8 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 		socket.on('main.dashboard', function(data){
 			$scope.latest = data;
 		});
+		
+		console.log($scope);
 	});
 	
 	nessa.controller('showController', function($scope, $routeParams, socket) {
@@ -73,4 +75,13 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 	
 	// Bootstrap
 	angular.bootstrap(document, ['nessa'])
+	
+	
+	$(document).on('click', '#dashboard .latest', function(){
+		$('.synopsis', this).slideToggle();
+	});
+	
+	
+	
+	
 });

@@ -1,8 +1,11 @@
 body {
 	background-color: #F7F7F7;
+	font-weight: 200;
 	padding-top: 50px;
 }
-	
+
+/* Global elements */
+
 #loading {
 	background-color: rgba(0,0,0,0.7);
 	background-image: url('../gfx/spinner.gif');
@@ -35,6 +38,19 @@ body {
 	display: none;
 }
 
+/* Dashboard */
+
+#dashboard .latest {
+	border-bottom: 1px solid #999999;
+}
+
+#dashboard .latest .synopsis {
+	display: none;
+}
+
+
+/* Shows */
+
 #shows div.image {
 	display: none;
 }
@@ -43,6 +59,25 @@ body {
 	border-bottom: 1px solid #333333;
 	cursor: pointer;
 	padding: 10px;
+}
+
+/* Settings */
+
+#settings {
+	padding-bottom: 50px;
+}
+
+#settings .toolbar {
+	background-color: #EEEEEE;
+	border-top: 1px solid #CCCCCC;
+	bottom: 0px;
+	box-sizing: border-box;
+	height: 45px;
+	left: 0px;
+	padding: 5px 10px;
+	position: fixed;
+	text-align: right;
+	width: 100%;
 }
 
 @media screen and (min-width: 768px) {
