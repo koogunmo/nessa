@@ -40,7 +40,7 @@
 	</header>
 	
 	<div class="container alert-container" ng-controller="alertsCtrl" ng-cloak>
-		<div ng-repeat="alert in alerts" class="alert alert-{{alert.type}}" ng-click="closeAlert($index)">
+		<div ng-repeat="alert in alerts" class="alert alert-{{alert.type}} alert-dismissable" ng-click="closeAlert($index)">
 			<strong>{{alert.message}}</strong>
 			<a class="close" data-dismiss="alert" href="#" aria-hidden="true">&times;</a>
 		</div>

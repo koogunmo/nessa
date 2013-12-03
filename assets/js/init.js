@@ -4,7 +4,7 @@ requirejs.config({
 	paths: {
 		'app': 'app',
 		'bootstrap': './libs/bootstrap.min',
-		'jquery': 'https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min',
+		'jquery': 'https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min',
 		'angular': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.2.3/angular.min',
 		'ngCookies': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.2.3/angular-cookies.min',
 		'ngResource': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.2.3/angular-resource.min',
