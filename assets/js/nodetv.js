@@ -2,14 +2,27 @@
 
 require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 	
-	nessa.controller('mainController', function($scope, socket) {
+	nessa.controller('mainController', function($scope, socket){
 		socket.emit('main.dashboard');
 		socket.on('main.dashboard', function(data){
 			$scope.latest = data;
 		});
 	});
 	
-	nessa.controller('showController', function($scope, $routeParams, socket) {
+	nessa.controller('navController', function($scope, $location){
+		$scope.isActive = function(viewLocation){
+			return viewLocation === $location.path();
+		};
+	});
+	
+	nessa.controller('alertsController', function($scope, socket){
+		$scope.alerts = [];
+		socket.on('system.alert', function(alert){
+			$scope.alerts.push(alert);
+		});
+	});
+	
+	nessa.controller('showController', function($scope, $routeParams, socket){
 		socket.emit('shows.enabled');
 		socket.on('shows.enabled', function(data){
 			$scope.shows = data;
@@ -25,19 +38,15 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 			socket.on('show.overview', function(json){
 				$scope.detail = json;
 				
-				$('#show-modal').modal()
+				$('#show-modal').modal({
+					keyboard: true
+				});
 			});
 		};
 	});
 	
-	nessa.controller('alertsController', function($scope, socket) {
-		$scope.alerts = [];
-		socket.on('system.alert', function(alert){
-			$scope.alerts.push(alert);
-		});
-	});
 	
-	nessa.controller('settingsController', function($scope, socket) {
+	nessa.controller('settingsController', function($scope, socket){
 		$scope.settings = {};
 		socket.emit('system.settings');
 		socket.on('system.settings', function(data){
@@ -51,7 +60,7 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 			socket.emit('system.rescan');
 		};
 		$scope.reboot = function(){
-			socket.emit('system.reboot');
+			socket.emit('system.restart');
 		};
 		$scope.update = function(){
 			socket.emit('system.update');
@@ -62,7 +71,8 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 	// Routing 
 	nessa.config(['$routeProvider', function($routeProvider){
 		$routeProvider.when('/dashboard', {
-			templateUrl: 'views/partials/dashboard.html'
+			templateUrl: 'views/partials/dashboard.html',
+			controller: 'mainController'
 			
 		}).when('/shows', {
 			templateUrl: 'views/partials/shows.html',
@@ -82,8 +92,6 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 	
 	
 	// jQuery below
-	
-	$('#loading').hide();
 	
 	$(document).on('lazyload', function(){
 		$('div.image:visible img[data-src]').each(function(){

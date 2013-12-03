@@ -31,5 +31,6 @@ requirejs.config({
 			exports: 'io'
 		}
 	},
+	priority: ['angular'],
 	deps: ['./nodetv']
 });

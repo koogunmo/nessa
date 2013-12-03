@@ -23,6 +23,7 @@
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 				<img src="assets/artwork/{{detail.tvdb}}.jpg" alt="{{detail.name}}" class="img-responsive" />
 			</div>
 			
@@ -33,12 +34,16 @@
 					<p>{{detail.synopsis}}</p>
 				</div>
 			
-				<div class="episodes">
-					<ul class="seasons" ng-repeat="season in detail.seasons">
-						<li>
-							<h2>Season {{season.season}} <span class="seen" data-id="{{detail.id}}" data-season="{{season.season}}" title="Mark all episodes of this season as watched"></span></h2>
-							<ul class="episodes" ng-repeat="episode in season.episodes">
-								<li data-id="{{episode.id}}" class="episode">
+				<div id="seasons" class="panel-group">
+					<div class="panel" ng-repeat="season in detail.seasons">
+						<div class="panel-heading">
+							<h4 class="panel-title">
+								<a data-toggle="collapse" data-parent="#seasons" href="#season-{{season.season}}">Season {{season.season}}</a>
+							</h4>
+						</div>
+						<div id="season-{{season.season}}" class="panel-collapse collapse">
+							<div class="panel-body">
+								<div class="episodes" ng-repeat="episode in season.episodes">
 									<div class="header">
 										<span class="episode seen" data-episode="{{episode.id}}" title="Mark this episode as watched">{{episode.episode}}</span>
 										<span class="title">{{episode.title}}</span>
@@ -49,12 +54,11 @@
 										<hr />
 										<div class="airdate">{{episode.airdate}}</div>
 									</div>
-								</li>
-							</ul>
-						</li>
-					</ul>	
+								</div>
+							</div>
+						</div>
+					</div>	
 				</div>
-			
 			</div>
 		</div>
 	</div>

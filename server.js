@@ -233,13 +233,35 @@ io.sockets.on('connection', function(socket) {
 		}
 		socket.emit('system.settings', nconf.get());
 		
+	}).on('system.rescan', function(){
+		socket.emit('system.alert', {
+			type: 'info',
+			message: 'Rescanning media directory'
+		});
+		/*
+		var scanner = plugin('scanner');
+		scanner.shows();
+		*/
+	}).on('system.restart', function(){
+		socket.emit('system.alert', {
+			type: 'warning',
+			message: 'NodeTV is restarting'
+		});
+		/*
+		var system = plugin('system');
+		system.restart()
+		*/
 	}).on('system.update', function(){
 		socket.emit('system.alert', {
 			type: 'info',
 			message: 'Update in progress'
 		});
-		
-		
+		/*
+		var system = plugin('system');
+		system.update(function(){
+			socket.emit('system.loaded');
+		});
+		*/
 	});
 
 	
@@ -261,24 +283,13 @@ io.sockets.on('connection', function(socket) {
 		});
 		
 	}).on('system.rescan', function(){
-		socket.emit('system.alert', {
-			type: 'info',
-			message: 'Rescanning media files'
-		});
-
 		var scanner = plugin('scanner');
 		scanner.shows();
 		
 	}).on('system.restart', function(data){
 		// Restart the process, NOT the server
-		socket.emit('system.warning', {
-			type: 'info',
-			message: 'System is rebooting'
-		});
-		
 		socket.emit('system.loading', {message: 'Restarting...'});
 		var system = plugin('system');
-		
 		system.restart()
 	});
 	
@@ -304,8 +315,6 @@ io.sockets.on('connection', function(socket) {
 		});
 		
 	}).on('main.settings', function(){
-		socket.emit('system.settings', nconf.get());
-		
 		socket.emit('page.template', {
 			template: 'views/main/settings.html',
 			data: nconf.get()
@@ -456,7 +465,7 @@ app.get('/', ensureAuthenticated, function(req, res) {
 });
 
 
-app.get('/angular', function(req, res) {	
+app.get('/beta', ensureAuthenticated, function(req, res) {	
 	res.sendfile(__dirname + '/views/index-ng.html');
 });
 
