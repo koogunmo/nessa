@@ -18,3 +18,44 @@
 		</div>
 	</div>
 </div>
+
+<div id="show-modal" class="modal" role="dialog" ng-cloak>
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<img src="assets/artwork/{{detail.tvdb}}.jpg" alt="{{detail.name}}" class="img-responsive" />
+			</div>
+			
+			<div class="modal-body">
+			
+				<div class="synopsis">
+					<h3>Synopsis</h3>
+					<p>{{detail.synopsis}}</p>
+				</div>
+			
+				<div class="episodes">
+					<ul class="seasons" ng-repeat="season in detail.seasons">
+						<li>
+							<h2>Season {{season.season}} <span class="seen" data-id="{{detail.id}}" data-season="{{season.season}}" title="Mark all episodes of this season as watched"></span></h2>
+							<ul class="episodes" ng-repeat="episode in season.episodes">
+								<li data-id="{{episode.id}}" class="episode">
+									<div class="header">
+										<span class="episode seen" data-episode="{{episode.id}}" title="Mark this episode as watched">{{episode.episode}}</span>
+										<span class="title">{{episode.title}}</span>
+									</div>
+									
+									<div class="extended">
+										<p class="synopsis">{{episode.synopsis}}</p>
+										<hr />
+										<div class="airdate">{{episode.airdate}}</div>
+									</div>
+								</li>
+							</ul>
+						</li>
+					</ul>	
+				</div>
+			
+			</div>
+		</div>
+	</div>
+</div>

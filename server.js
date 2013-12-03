@@ -232,7 +232,15 @@ io.sockets.on('connection', function(socket) {
 			});
 		}
 		socket.emit('system.settings', nconf.get());
-	})
+		
+	}).on('system.update', function(){
+		socket.emit('system.alert', {
+			type: 'info',
+			message: 'Update in progress'
+		});
+		
+		
+	});
 
 	
 	
@@ -249,10 +257,6 @@ io.sockets.on('connection', function(socket) {
 		socket.emit('system.loading', {message: 'Updating...'});
 		var system = plugin('system');
 		system.update(function(){
-			socket.emit('system.alert', {
-				type: 'info',
-				message: 'Update in progress'
-			});
 			socket.emit('system.loaded');
 		});
 		

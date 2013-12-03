@@ -18,22 +18,22 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 			}, 500);
 		});
 		
-		$scope.showData = {};
+		$scope.detail = {};
 		
 		$scope.modalShow = function(id){
 			socket.emit('show.overview', id);
 			socket.on('show.overview', function(json){
-				$scope.apply(function(){
-					$scope.showData = json;
-				});
+				$scope.detail = json;
+				
+				$('#show-modal').modal()
 			});
 		};
 	});
 	
 	nessa.controller('alertsController', function($scope, socket) {
-		socket.on('system.alert', function(data){
-			// create an alert?
-			console.log(data);
+		$scope.alerts = [];
+		socket.on('system.alert', function(alert){
+			$scope.alerts.push(alert);
 		});
 	});
 	

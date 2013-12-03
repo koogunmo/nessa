@@ -38,6 +38,20 @@ body {
 	display: none;
 }
 
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+	display: none !important;
+}
+
+/* Alerts */
+
+.alert-container {
+	height: auto;
+	position: fixed;
+	top: 60px;
+	width: 100%;
+}
+
+
 /* Dashboard */
 
 #dashboard .latest {
@@ -59,6 +73,10 @@ body {
 	border-bottom: 1px solid #333333;
 	cursor: pointer;
 	padding: 10px;
+}
+
+#show-modal .modal-header {
+	padding: 0px;
 }
 
 /* Settings */
