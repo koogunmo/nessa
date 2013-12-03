@@ -2,27 +2,31 @@
 
 require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 	
-	nessa.controller('mainController', function($scope, socket){
+	nessa.controller('navCtrl', function($scope, $location){
+		$scope.isActive = function(viewLocation){
+			return viewLocation === $location.path();
+		};
+	});
+	
+	nessa.controller('alertsCtrl', function($scope, socket){
+		$scope.alerts = [];
+		socket.on('system.alert', function(alert){
+			$scope.alerts.push(alert);
+		});
+		$scope.closeAlert = function(index){
+			$scope.alerts.splice(index, 1);
+		};
+	});
+	
+	
+	nessa.controller('homeCtrl', function($scope, socket){
 		socket.emit('main.dashboard');
 		socket.on('main.dashboard', function(data){
 			$scope.latest = data;
 		});
 	});
 	
-	nessa.controller('navController', function($scope, $location){
-		$scope.isActive = function(viewLocation){
-			return viewLocation === $location.path();
-		};
-	});
-	
-	nessa.controller('alertsController', function($scope, socket){
-		$scope.alerts = [];
-		socket.on('system.alert', function(alert){
-			$scope.alerts.push(alert);
-		});
-	});
-	
-	nessa.controller('showController', function($scope, $routeParams, socket){
+	nessa.controller('showCtrl', function($scope, $routeParams, socket){
 		socket.emit('shows.enabled');
 		socket.on('shows.enabled', function(data){
 			$scope.shows = data;
@@ -46,7 +50,7 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 	});
 	
 	
-	nessa.controller('settingsController', function($scope, socket){
+	nessa.controller('settingsCtrl', function($scope, socket){
 		$scope.settings = {};
 		socket.emit('system.settings');
 		socket.on('system.settings', function(data){
@@ -72,15 +76,15 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 	nessa.config(['$routeProvider', function($routeProvider){
 		$routeProvider.when('/dashboard', {
 			templateUrl: 'views/partials/dashboard.html',
-			controller: 'mainController'
+			controller: 'homeCtrl'
 			
 		}).when('/shows', {
 			templateUrl: 'views/partials/shows.html',
-			controller: 'showController'
+			controller: 'showCtrl'
 			
 		}).when('/settings', {
 			templateUrl: 'views/partials/settings.html',
-			controller: 'settingsController'
+			controller: 'settingsCtrl'
 			
 		}).otherwise({
 			redirectTo: '/dashboard'

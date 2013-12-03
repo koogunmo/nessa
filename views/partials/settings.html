@@ -47,17 +47,20 @@
 				<input type="checkbox" id="ipt_trakt_enable" name="trakt:enabled" ng-model="settings.trakt.enabled" />
 				<label for="ipt_trakt_enable">Enable Integration</label>
 			</div>
-			<div class="form-group">
-				<label for="ipt_trakt_username">Username</label>
-				<input type="text" id="ipt_trakt_username" name="trakt:username" ng-model="settings.trakt.username" class="form-control" />
-			</div>
-			<div class="form-group">
-				<label for="ipt_trakt_password">Password</label>
-				<input type="password" id="ipt_trakt_password" name="trakt:password" ng-model="settings.trakt.password" class="form-control" />
-			</div>
-			<div class="form-group">
-				<label for="ipt_trakt_api">API Key</label>
-				<input type="text" id="ipt_trakt_api" name="trakt:apikey" ng-model="settings.trakt.apikey" class="form-control" />
+			
+			<div ng-switch on="settings.trakt.enabled">
+				<div class="form-group" ng-switch-when="true">
+					<label for="ipt_trakt_username">Username</label>
+					<input type="text" id="ipt_trakt_username" name="trakt:username" ng-model="settings.trakt.username" class="form-control" />
+				</div>
+				<div class="form-group" ng-switch-when="true">
+					<label for="ipt_trakt_password">Password</label>
+					<input type="password" id="ipt_trakt_password" name="trakt:password" ng-model="settings.trakt.password" class="form-control" />
+				</div>
+				<div class="form-group" ng-switch-when="true">
+					<label for="ipt_trakt_api">API Key</label>
+					<input type="text" id="ipt_trakt_api" name="trakt:apikey" ng-model="settings.trakt.apikey" class="form-control" />
+				</div>
 			</div>
 		</fieldset>
 
@@ -67,17 +70,19 @@
 				<input type="checkbox" id="ipt_twilio_enabled" name="twilio:enabled" ng-model="settings.twilio.enabled" />
 				<label for="ipt_twilio_enabled">Enable Notifications</label>
 			</div>
-			<div class="form-group">
-				<label for="ipt_twilio_phone">Phone</label>
-				<input type="text" id="ipt_twilio_phone" name="twilio:phone" ng-model="settings.twilio.phone" class="form-control" />
-			</div>
-			<div class="form-group">
-				<label for="ipt_twilio_sid">SID</label>
-				<input type="text" id="ipt_twilio_sid" name="twilio:sid" ng-model="settings.twilio.sid" class="form-control" />
-			</div>
-			<div class="form-group">
-				<label for="ipt_twilio_token">Token</label>
-				<input type="text" id="ipt_twilio_token" name="twilio:token" ng-model="settings.twilio.token" class="form-control" />
+			<div ng-switch on="settings.twilio.enabled">
+				<div class="form-group" ng-switch-when="true">
+					<label for="ipt_twilio_phone">Phone</label>
+					<input type="text" id="ipt_twilio_phone" name="twilio:phone" ng-model="settings.twilio.phone" class="form-control" />
+				</div>
+				<div class="form-group" ng-switch-when="true">
+					<label for="ipt_twilio_sid">SID</label>
+					<input type="text" id="ipt_twilio_sid" name="twilio:sid" ng-model="settings.twilio.sid" class="form-control" />
+				</div>
+				<div class="form-group" ng-switch-when="true">
+					<label for="ipt_twilio_token">Token</label>
+					<input type="text" id="ipt_twilio_token" name="twilio:token" ng-model="settings.twilio.token" class="form-control" />
+				</div>
 			</div>
 		</fieldset>
 		

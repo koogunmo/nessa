@@ -19,13 +19,13 @@ requirejs.config({
 			deps: ['jquery']
 		},
 		'ngCookies': {
-			depends: ['angular']
+			deps: ['angular']
 		},
 		'ngResource': {
-			depends: ['angular']
+			deps: ['angular']
 		},
 		'ngRoute': {
-			depends: ['angular']
+			deps: ['angular']
 		},
 		'socket.io': {
 			exports: 'io'

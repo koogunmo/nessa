@@ -6,22 +6,19 @@
 	<meta name="apple-mobile-web-app-status-bar-style" content="black">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 	
-	<link rel="shortcut icon" href="assets/favicon.ico" />
+	<link rel="shortcut icon" href="assets/icons/favicon.ico" />
 	
 	<link rel="stylesheet" type="text/css" href="assets/css/bootstrap.min.css" />
 	<link rel="stylesheet" type="text/css" href="assets/css/nodetv.css" />
 	
-	<!--
-	<link rel="apple-touch-icon" sizes="54x54" href="assets/apple-touch-icon.png" />
-	<link rel="apple-touch-icon" sizes="72x72" href="assets/apple-touch-icon-ipad.png" />
-	<link rel="apple-touch-icon" sizes="114x114" href="assets/apple-touch-icon-retina.png" />
-	
-	<link rel="apple-touch-icon" sizes="120x120" href="assets/icon-ios7-iphone.png" />
-	<link rel="apple-touch-icon" sizes="152x152" href="assets/icon-ios7-ipad.png" />
-	-->
+	<link rel="apple-touch-icon" sizes="54x54" href="assets/icons/apple-touch-icon.png" />
+	<link rel="apple-touch-icon" sizes="72x72" href="assets/icons/apple-touch-icon-ipad.png" />
+	<link rel="apple-touch-icon" sizes="114x114" href="assets/icons/apple-touch-icon-retina.png" />
+	<link rel="apple-touch-icon" sizes="120x120" href="assets/icons/icon-ios7-iphone.png" />
+	<link rel="apple-touch-icon" sizes="152x152" href="assets/icons/icon-ios7-ipad.png" />
 </head>
 <body>
-	<header class="navbar navbar-default navbar-inverse navbar-fixed-top" role="navigation" ng-controller="navController">
+	<header class="navbar navbar-default navbar-inverse navbar-fixed-top" role="navigation" ng-controller="navCtrl">
 		<div class="container">
 			<div class="navbar-header">
 				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -42,16 +39,14 @@
 		</div>
 	</header>
 	
-	<div class="container alert-container" ng-controller="alertsController" ng-cloak>
-		<div ng-repeat="alert in alerts" class="alert alert-{{alert.type}}">
+	<div class="container alert-container" ng-controller="alertsCtrl" ng-cloak>
+		<div ng-repeat="alert in alerts" class="alert alert-{{alert.type}}" ng-click="closeAlert($index)">
 			<strong>{{alert.message}}</strong>
 			<a class="close" data-dismiss="alert" href="#" aria-hidden="true">&times;</a>
 		</div>
 	</div>
 	
 	<div id="main" class="container" role="main" ng-view></div>
-	
-	<!-- <div id="loading"><p>loading...</p></div> -->
 	
 	<script type="text/javascript" src="assets/js/require.js" data-main="assets/js/init.js"></script>
 </body>
