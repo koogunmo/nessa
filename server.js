@@ -263,7 +263,16 @@ io.sockets.on('connection', function(socket) {
 		});
 		*/
 	});
-
+	
+	
+	socket.on('show.settings', function(data){
+		// update record?
+		
+		socket.emit('system.alert', {
+			type: 'success',
+			message: 'Show settings updated'
+		});
+	});
 	
 	
 	
@@ -415,6 +424,7 @@ io.sockets.on('connection', function(socket) {
 		// Fetch individual show details
 		var show = plugin('showdata');
 		show.overview(id, function(json){
+			
 			socket.emit('modal.template', {
 				template: 'views/show/info.html',
 				data: json

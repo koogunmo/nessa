@@ -451,9 +451,13 @@ var ShowData = {
 				return;
 			}
 			if (!show) return;
-			show.seasons = [];
 			
-			show.directory = nconf.get('shows:base')+'/'+show.directory;
+			var response = {
+				general: show,
+				seasons: []
+			}
+			
+			response.general.directory = nconf.get('shows:base')+'/'+show.directory;
 			
 			db.all("SELECT * FROM show_episode WHERE show_id = ? ORDER BY season,episode ASC", show.id, function(error, rows){
 				if (error) {
@@ -473,9 +477,9 @@ var ShowData = {
 						season: season,
 						episodes: episodes[season]
 					}
-					show.seasons.push(record);
+					response.seasons.push(record);
 				});
-				if (typeof(callback) == 'function') callback(show);
+				if (typeof(callback) == 'function') callback(response);
 			});
 		});
 	},

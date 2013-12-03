@@ -45,14 +45,17 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 			socket.emit('show.overview', id);
 			socket.on('show.overview', function(json){
 				$scope.detail = json;
-				
 				$('#show-modal').modal({
 					keyboard: true
 				});
 			});
 		};
+		
+		$scope.save = function(){
+			console.log($scope.detail.general);
+		//	socket.emit('show.settings', $scope.detail.general);
+		};
 	});
-	
 	
 	nessa.controller('settingsCtrl', function($scope, socket){
 		$scope.settings = {};

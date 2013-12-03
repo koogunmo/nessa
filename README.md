@@ -1,6 +1,13 @@
 # NodeTV
 Automated TV Torrenting acquisition
 
+Now with 100% more [Angular](http://angularjs.org) and [Bootstrap](http://getbootstrap.com)!
+
+## Angular/Bootstrap Todos
+
+- Show settings (save)
+- Add show
+
 ## System Requirements
 
 - Compatible operating system

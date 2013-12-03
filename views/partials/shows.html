@@ -19,45 +19,82 @@
 	</div>
 </div>
 
-<div id="show-modal" class="modal" role="dialog" ng-cloak>
+<div id="show-modal" class="modal fade" role="dialog" ng-cloak>
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-				<img src="assets/artwork/{{detail.tvdb}}.jpg" alt="{{detail.name}}" class="img-responsive" />
+				<img src="assets/artwork/{{detail.general.tvdb}}.jpg" alt="{{detail.general.name}}" class="img-responsive" />
 			</div>
 			
+			<ul class="nav nav-tabs">
+				<li class="active"><a href="#synopsis" data-toggle="tab">Synopsis</a></li>
+				<li><a href="#episodes" data-toggle="tab">Episodes</a></li>
+				<li><a href="#settings" data-toggle="tab">Settings</a></li>
+			</ul>
+			
 			<div class="modal-body">
-			
-				<div class="synopsis">
-					<h3>Synopsis</h3>
-					<p>{{detail.synopsis}}</p>
-				</div>
-			
-				<div id="seasons" class="panel-group">
-					<div class="panel" ng-repeat="season in detail.seasons">
-						<div class="panel-heading">
-							<h4 class="panel-title">
-								<a data-toggle="collapse" data-parent="#seasons" href="#season-{{season.season}}">Season {{season.season}}</a>
-							</h4>
+				<div class="tab-content">
+					<div class="tab-pane active" id="synopsis">
+						<div class="synopsis">
+							<h3>Synopsis</h3>
+							<p>{{detail.general.synopsis}}</p>
 						</div>
-						<div id="season-{{season.season}}" class="panel-collapse collapse">
-							<div class="panel-body">
-								<div class="episodes" ng-repeat="episode in season.episodes">
-									<div class="header">
-										<span class="episode seen" data-episode="{{episode.id}}" title="Mark this episode as watched">{{episode.episode}}</span>
-										<span class="title">{{episode.title}}</span>
-									</div>
-									
-									<div class="extended">
-										<p class="synopsis">{{episode.synopsis}}</p>
-										<hr />
-										<div class="airdate">{{episode.airdate}}</div>
+					</div>
+					
+					<div class="tab-pane" id="episodes">
+						<div id="seasons" class="panel-group">
+							<div class="panel" ng-repeat="season in detail.seasons">
+								<div class="panel-heading">
+									<h4 class="panel-title">
+										<a data-toggle="collapse" data-parent="#seasons" href="#season-{{season.season}}">Season {{season.season}}</a>
+									</h4>
+								</div>
+								<div id="season-{{season.season}}" class="panel-collapse collapse">
+									<div class="panel-body">
+										<div class="episodes" ng-repeat="episode in season.episodes">
+											<h5>
+												<span class="episode seen" data-episode="{{episode.id}}" title="Mark this episode as watched">{{episode.episode}}</span>
+												<span class="title">{{episode.title}}</span>
+											</h5>
+											
+											<div class="extended">
+												<p class="synopsis">{{episode.synopsis}}</p>
+												<!-- <div class="airdate">{{episode.airdate}}</div> -->
+											</div>
+											
+											<hr />
+										</div>
 									</div>
 								</div>
-							</div>
+							</div>	
 						</div>
-					</div>	
+					</div>
+					
+					<div class="tab-pane" id="settings">
+						<form ng-submit="save()">
+							<div class="form-group">
+								<label for="ipt_setting_directory">Media Directory</label>
+								<input type="text" ng-model="detail.general.directory" readonly="readonly" class="form-control" />
+							</div>
+							<div class="form-group">
+								<label for="ipt_setting_feed">RSS Feed</label>
+								<input type="text" name="feed" ng-model="detail.general.feed" class="form-control" />
+							</div>
+							<div class="form-group">
+								<input type="checkbox" name="status" ng-model="detail.general.status" />
+								<label for="ipt_setting_status">Download new episodes when available</label>
+							</div>
+							<div class="form-group">
+								<input type="checkbox" name="hd" ng-model="detail.general.hd" />
+								<label for="ipt_setting_hd">Prefer HD video</label>
+							</div>
+							<div class="">
+								<button type="submit" class="btn btn-success">Submit</button>
+								<button type="reset" class="btn btn-default">Reset</button>
+							</div>
+						</form>
+					</div>
 				</div>
 			</div>
 		</div>
