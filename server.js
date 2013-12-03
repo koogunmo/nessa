@@ -203,26 +203,82 @@ io.sockets.on('connection', function(socket) {
 		}
 	});
 	
+	
+	// New methods for angular interface
+	
+	socket.on('system.settings', function(json, callback){
+		if (json) {
+			for (var i in json) {
+				nconf.set(i, json[i]);
+			}
+			nconf.save(function(error){
+				if (error) {
+					socket.emit('system.alert', {
+						type: 'danger',
+						message: 'Settings were not saved'
+					});
+					logger.error(error);
+					return;
+				}
+				socket.emit('system.alert', {
+					type: 'success',
+					message: 'Settings saved'
+				});
+				
+				if (typeof(callback) == 'function') {
+					// alerts, etc
+					callback();
+				}
+			});
+		}
+		socket.emit('system.settings', nconf.get());
+	})
+
+	
+	
+	
+	
+	
+	
+	// Old methods
+	
+	
 	/* System handlers */
 	socket.on('system.update', function(data){
 		// Force an update from github (if one is available)
 		socket.emit('system.loading', {message: 'Updating...'});
 		var system = plugin('system');
 		system.update(function(){
+			socket.emit('system.alert', {
+				type: 'info',
+				message: 'Update in progress'
+			});
 			socket.emit('system.loaded');
 		});
 		
 	}).on('system.rescan', function(){
+		socket.emit('system.alert', {
+			type: 'info',
+			message: 'Rescanning media files'
+		});
+
 		var scanner = plugin('scanner');
 		scanner.shows();
 		
 	}).on('system.restart', function(data){
 		// Restart the process, NOT the server
+		socket.emit('system.warning', {
+			type: 'info',
+			message: 'System is rebooting'
+		});
+		
 		socket.emit('system.loading', {message: 'Restarting...'});
 		var system = plugin('system');
 		
 		system.restart()
 	});
+	
+	
 	
 	/* Page handlers */
 	socket.on('main.dashboard', function(){

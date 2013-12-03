@@ -2,26 +2,11 @@
 
 require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 	
-	$('#loading').hide();
-	
-	$(document).on('lazyload', function(){
-		$('div.image:visible img[data-src]').each(function(){
-				if ($(this).attr('src')) return;
-			$(this).on('load', function(){
-				$(this).fadeIn();
-			}).attr({
-				src: $(this).data('src')
-			});
-		});
-	});
-	
 	nessa.controller('mainController', function($scope, socket) {
 		socket.emit('main.dashboard');
 		socket.on('main.dashboard', function(data){
 			$scope.latest = data;
 		});
-		
-		console.log($scope);
 	});
 	
 	nessa.controller('showController', function($scope, $routeParams, socket) {
@@ -33,25 +18,44 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 			}, 500);
 		});
 		
+		$scope.showData = {};
+		
 		$scope.modalShow = function(id){
-			console.log(id);
-			//fetch data, open modal?
+			socket.emit('show.overview', id);
+			socket.on('show.overview', function(json){
+				$scope.apply(function(){
+					$scope.showData = json;
+				});
+			});
 		};
 	});
-
+	
+	nessa.controller('alertsController', function($scope, socket) {
+		socket.on('system.alert', function(data){
+			// create an alert?
+			console.log(data);
+		});
+	});
+	
 	nessa.controller('settingsController', function($scope, socket) {
-		socket.emit('main.settings');
+		$scope.settings = {};
+		socket.emit('system.settings');
 		socket.on('system.settings', function(data){
 			$scope.settings = data;
 		});
+		
+		$scope.save = function(form){
+			socket.emit('system.settings', $scope.settings)
+		};
+		$scope.rescan = function(){
+			socket.emit('system.rescan');
+		};
 		$scope.reboot = function(){
-			// Reboot nodeTV
 			socket.emit('system.reboot');
-		}
+		};
 		$scope.update = function(){
-			// Update NodeTV
 			socket.emit('system.update');
-		}
+		};
 	});
 	
 	
@@ -77,11 +81,23 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 	angular.bootstrap(document, ['nessa'])
 	
 	
-	$(document).on('click', '#dashboard .latest', function(){
+	// jQuery below
+	
+	$('#loading').hide();
+	
+	$(document).on('lazyload', function(){
+		$('div.image:visible img[data-src]').each(function(){
+				if ($(this).attr('src')) return;
+			$(this).on('load', function(){
+				$(this).fadeIn();
+			}).attr({
+				src: $(this).data('src')
+			});
+		});
+	}).on('click', '#dashboard .latest', function(){
 		$('.synopsis', this).slideToggle();
+		
 	});
-	
-	
 	
 	
 });

@@ -1,5 +1,5 @@
 <div id="settings">
-	<form action="settings/save" method="post">
+	<form ng-submit="save(this)">
 		<div class="toolbar">
 			<input type="submit" value="Save settings" class="btn btn-success" />
 			<input type="reset" value="Reset" class="btn btn-default" />
@@ -9,15 +9,15 @@
 		<fieldset>
 			<div class="form-group">
 				<label for="ipt_shows_base">Media Directory</label>
-				<input type="text" id="ipt_shows_base" name="shows:base" value="{{settings.shows.base}}" class="form-control" />
+				<input type="text" id="ipt_shows_base" name="shows:base" ng-model="settings.shows.base" class="form-control" />
 			</div>
 			<div class="form-group">
+				<input type="checkbox" id="ipt_shows_hd" name="shows:hd" ng-model="settings.shows.hd" />
 				<label for="ipt_shows_hd">Prefer HD Video</label>
-				<input type="text" id="ipt_shows_hd" name="shows:hd" value="{{settings.shows.hd}}" class="toggle" />
 			</div>
 			<div class="form-group">
 				<label for="ipt_security_whitelist">IP Whitelist</label>
-				<input type="text" id="ipt_security_whitelist" name="security:whitelist" value="{{settings.security.whitelist}}" class="form-control" />
+				<input type="text" id="ipt_security_whitelist" name="security:whitelist" ng-model="settings.security.whitelist" class="form-control" />
 			</div>
 		</fieldset>
 		
@@ -25,59 +25,59 @@
 		<fieldset>
 			<div class="form-group">
 				<label for="ipt_bt_username">Username</label>
-				<input type="text" id="ipt_bt_username" name="transmission:username" value="{{settings.transmission.username}}" class="form-control" />
+				<input type="text" id="ipt_bt_username" name="transmission:username" ng-model="settings.transmission.username" class="form-control" />
 			</div>
 			<div class="form-group">
 				<label for="ipt_bt_password">Password</label>
-				<input type="password" id="ipt_bt_password" name="transmission:password" value="{{settings.transmission.password}}" class="form-control" />
+				<input type="password" id="ipt_bt_password" name="transmission:password" ng-model="settings.transmission.password" class="form-control" />
 			</div>
 			<div class="form-group">
 				<label for="ipt_bt_host">Host</label>
-				<input type="text" id="ipt_bt_host" name="transmission:host" value="{{settings.transmission.host}}" class="form-control" />
+				<input type="text" id="ipt_bt_host" name="transmission:host" ng-model="settings.transmission.host" class="form-control" />
 			</div>
 			<div class="form-group">
 				<label for="ipt_bt_port">Port</label>
-				<input type="text" for="ipt_bt_port" name="transmission:port" value="{{settings.transmission.port}}" class="form-control" />
+				<input type="text" for="ipt_bt_port" name="transmission:port" ng-model="settings.transmission.port" class="form-control" />
 			</div>
 		</fieldset>
 
 		<h2>trakt.tv</h2>
 		<fieldset>
 			<div class="form-group">
+				<input type="checkbox" id="ipt_trakt_enable" name="trakt:enabled" ng-model="settings.trakt.enabled" />
 				<label for="ipt_trakt_enable">Enable Integration</label>
-				<input type="text" id="ipt_trakt_enable" name="trakt:enabled" value="{{settings.trakt.enabled}}" class="toggle" />
 			</div>
 			<div class="form-group">
 				<label for="ipt_trakt_username">Username</label>
-				<input type="text" id="ipt_trakt_username" name="trakt:username" value="{{settings.trakt.username}}" class="form-control" />
+				<input type="text" id="ipt_trakt_username" name="trakt:username" ng-model="settings.trakt.username" class="form-control" />
 			</div>
 			<div class="form-group">
 				<label for="ipt_trakt_password">Password</label>
-				<input type="password" id="ipt_trakt_password" name="trakt:password" value="{{settings.trakt.password}}" class="form-control" />
+				<input type="password" id="ipt_trakt_password" name="trakt:password" ng-model="settings.trakt.password" class="form-control" />
 			</div>
 			<div class="form-group">
 				<label for="ipt_trakt_api">API Key</label>
-				<input type="text" id="ipt_trakt_api" name="trakt:apikey" value="{{settings.trakt.apikey}}" class="form-control" />
+				<input type="text" id="ipt_trakt_api" name="trakt:apikey" ng-model="settings.trakt.apikey" class="form-control" />
 			</div>
 		</fieldset>
 
 		<h2>Twilio</h2>
 		<fieldset>
 			<div class="form-group">
+				<input type="checkbox" id="ipt_twilio_enabled" name="twilio:enabled" ng-model="settings.twilio.enabled" />
 				<label for="ipt_twilio_enabled">Enable Notifications</label>
-				<input type="text" id="ipt_twilio_enabled" name="twilio:enabled" value="{{settings.twilio.enabled}}" class="toggle" />
 			</div>
 			<div class="form-group">
 				<label for="ipt_twilio_phone">Phone</label>
-				<input type="text" id="ipt_twilio_phone" name="twilio:phone" value="{{settings.twilio.phone}}" class="form-control" />
+				<input type="text" id="ipt_twilio_phone" name="twilio:phone" ng-model="settings.twilio.phone" class="form-control" />
 			</div>
 			<div class="form-group">
 				<label for="ipt_twilio_sid">SID</label>
-				<input type="text" id="ipt_twilio_sid" name="twilio:sid" value="{{settings.twilio.sid}}" class="form-control" />
+				<input type="text" id="ipt_twilio_sid" name="twilio:sid" ng-model="settings.twilio.sid" class="form-control" />
 			</div>
 			<div class="form-group">
 				<label for="ipt_twilio_token">Token</label>
-				<input type="text" id="ipt_twilio_token" name="twilio:token" value="{{settings.twilio.token}}" class="form-control" />
+				<input type="text" id="ipt_twilio_token" name="twilio:token" ng-model="settings.twilio.token" class="form-control" />
 			</div>
 		</fieldset>
 		
@@ -85,17 +85,17 @@
 		<fieldset>
 			<div class="form-group">
 				<label for="ipt_tvdb_api">API Key</label>
-				<input type="text" id="ipt_tvdb_api" name="tvdb:apikey" value="{{settings.tvdb.apikey}}" class="form-control" />
+				<input type="text" id="ipt_tvdb_api" name="tvdb:apikey" ng-model="settings.tvdb.apikey" class="form-control" />
 			</div>
 		</fieldset>
-		
-		<h2>System</h2>
-		<fieldset>
-			<a href="system/rescan" class="btn btn-info confirm">Rescan Media</a>
-			<a href="system/update" class="btn btn-warning confirm">Update NodeTV</a>
-			<a href="system/restart" class="btn btn-danger confirm">Restart NodeTV</a>
-			
-			<p class="note">NodeTV checks for updates at 3am (local) every night, and automatically installs if available.</p>
-		</fieldset>
 	</form>
+		
+	<h2>System</h2>
+	<fieldset>
+		<button class="btn btn-info confirm" ng-click="rescan()">Rescan Media</button>
+		<button class="btn btn-warning confirm" ng-click="update()">Update NodeTV</button>
+		<button class="btn btn-danger confirm" ng-click="reboot()">Restart NodeTV</button>
+		
+		<p class="note">NodeTV checks for updates at 3am (local) every night, and automatically installs if available.</p>
+	</fieldset>
 </div>
