@@ -12,6 +12,10 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 		$scope.alerts = [];
 		socket.on('system.alert', function(alert){
 			$scope.alerts.push(alert);
+			setTimeout(function(){
+				$scope.closeAlert(0);
+				$scope.$apply();
+			}, 3500);
 		});
 		$scope.closeAlert = function(index){
 			$scope.alerts.splice(index, 1);
