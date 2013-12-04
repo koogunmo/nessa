@@ -496,26 +496,32 @@ var ShowData = {
 	},
 	
 	settings: function(data, callback){
+		var err = null;
+		
 		if (!data.id) return;
 		db.get("SELECT * FROM show WHERE id = ?", data.id, function(error, row){
 			if (error) {
-				logger.error(error);
-				return;
+				err = error;
+			} else {
+				if (row === undefined) return;
+				var update = {
+					feed: row.feed,
+					hd: row.hd,
+					status: row.status
+				};
+				for (var k in data) {
+					if (!data[k]) continue;
+					update[k] = data[k];
+				}
+				
+				db.run("UPDATE show SET status = ?, hd = ?, feed = ? WHERE id = ?", update.status, update.hd, update.feed, data.id, function(error){
+					if (error) {
+						logger.error(error);
+						if (typeof(callback) == 'function') callback(null);
+					}
+				});
 			}
-			if (row === undefined) return;
-			var update = {
-				feed: row.feed,
-				hd: row.hd,
-				status: row.status
-			};
-			for (var k in data) {
-				if (!data[k]) continue;
-				update[k] = data[k];
-			}
-			db.run("UPDATE show SET status = ?, hd = ?, feed = ? WHERE id = ?", update.status, update.hd, update.feed, data.id, function(error){
-				if (error) logger.error(error);
-			});
-			if (typeof(callback) == 'function') callback();
+			if (typeof(callback) == 'function') callback(err);
 		});
 	},
 	

@@ -18,7 +18,7 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute'], functi
 					});
 				});
 			},
-			emit: function(eventName, data, callback){
+			emit: function(eventName, data, callback){	
 				socket.emit(eventName, data, function(){
 					var args = arguments;
 					$rootScope.$apply(function(){

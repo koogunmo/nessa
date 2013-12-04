@@ -34,8 +34,11 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 	
 	nessa.controller('homeCtrl', function($scope, socket){
 		socket.emit('main.dashboard');
-		socket.on('main.dashboard', function(data){
+		socket.on('main.dashboard.latest', function(data){
 			$scope.latest = data;
+		});
+		socket.on('main.dashboard.stats', function(data){
+			$scope.stats = data;
 		});
 	});
 	
@@ -54,15 +57,19 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 			socket.emit('show.overview', id);
 			socket.on('show.overview', function(json){
 				$scope.detail = json;
-				$('#show-modal').modal({
-					keyboard: true
-				});
+				if (!$('.modal-open').length) {
+					$('#show-modal').modal();
+				}
 			});
 		};
+		$scope.update = function(id){
+			socket.emit('show.update', {id: id}, function(){
+				socket.emit('show.overview', id);
+			});
+		}
 		
 		$scope.save = function(){
-			console.log($scope.detail.general);
-		//	socket.emit('show.settings', $scope.detail.general);
+			socket.emit('show.settings', $scope.detail.general);
 		};
 	});
 	

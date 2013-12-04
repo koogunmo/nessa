@@ -204,8 +204,10 @@ io.sockets.on('connection', function(socket) {
 	});
 	
 	
-	// New methods for angular interface
+	/*************** New methods for angular interface ***************/
 	
+	
+	// System
 	socket.on('system.settings', function(json, callback){
 		if (json) {
 			for (var i in json) {
@@ -264,16 +266,60 @@ io.sockets.on('connection', function(socket) {
 		*/
 	});
 	
-	
-	socket.on('show.settings', function(data){
-		// update record?
-		
-		socket.emit('system.alert', {
-			type: 'success',
-			message: 'Show settings updated'
+	// Dashboard
+	socket.on('main.dashboard', function(){
+		// Latest downloads
+		db.all("SELECT S.name, E.season, E.episode, E.title, E.synopsis, E.airdate FROM show AS S INNER JOIN show_episode AS E ON S.id = E.show_id ORDER BY downloaded DESC, episode DESC LIMIT 10", function(error, rows){
+			if (error) {
+				logger.error(error);
+				return;
+			}
+			socket.emit('main.dashboard.latest', rows);
 		});
+		
+		// Generate some stats for the homepage
+		
+		
+		// socket.emit('main.dashboard.stats', stats);
 	});
 	
+	
+	// Shows
+	
+	socket.on('show.settings', function(data){
+		var show = plugin('showdata');
+		show.settings(data, function(error){
+			if (error) {
+				socket.emit('system.alert', {
+					type: 'danger',
+					message: 'Show settings not updated'
+				});			
+			} else {
+				socket.emit('system.alert', {
+					type: 'success',
+					message: 'Show settings updated'
+				});
+			}
+		});
+		
+	}).on('show.rescan', function(data){
+		var scanner = plugin('scanner');
+		scanner.episodes(data.id);
+		
+		socket.emit('system.alert', {
+			type: 'info',
+			message: 'Show rescan in progress'
+		});
+	})
+	
+	
+	
+	
+	
+	
+	
+	
+	/*************** Old methods to be deprecated ***************/
 	
 	
 	
@@ -434,21 +480,11 @@ io.sockets.on('connection', function(socket) {
 			
 		});
 		
-	}).on('show.rescan', function(data){
-		var scanner = plugin('scanner');
-		scanner.episodes(data.id);
-		
-	}).on('show.settings', function(data){
-		var qs = require('querystring');
-		var show = plugin('showdata');
-		
-		var json = qs.parse(data);
-		show.settings(json, function(response){
-			
-		});
-	}).on('show.update', function(data){
+	}).on('show.update', function(data, callback){
 		var show = plugin('showdata');
 		show.info(data.id);
+		
+		if (callback) callback();
 	});
 	
 	

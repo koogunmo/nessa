@@ -46,6 +46,7 @@ body {
 	position: fixed;
 	top: 60px;
 	width: 100%;
+	z-index: 1030;
 }
 
 .modal-header > img {
