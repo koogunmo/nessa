@@ -34,9 +34,6 @@ body {
 	width: 100%;
 }
 
-#modal {
-	display: none;
-}
 
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
 	display: none !important;
@@ -51,6 +48,9 @@ body {
 	width: 100%;
 }
 
+.modal-header > img {
+	border-radius: 6px 6px 0px 0px;
+}
 
 /* Dashboard */
 
@@ -97,6 +97,19 @@ body {
 	text-align: right;
 	width: 100%;
 }
+
+.modal-header {
+    position: relative;
+}
+
+.close.close-corner {
+	margin: 0;
+	opacity: 1;
+	position: absolute;
+	right: -10px;
+	top: -10px;
+}
+
 
 @media screen and (min-width: 768px) {
 	#shows .show {

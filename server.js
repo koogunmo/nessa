@@ -471,9 +471,8 @@ io.sockets.on('connection', function(socket) {
 // Routing
 
 app.get('/', ensureAuthenticated, function(req, res) {	
-	res.sendfile(__dirname + '/views/index.html');
+	res.sendfile(__dirname + '/views/index-ng.html');
 });
-
 
 app.get('/beta', ensureAuthenticated, function(req, res) {	
 	res.sendfile(__dirname + '/views/index-ng.html');

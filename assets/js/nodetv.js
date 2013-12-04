@@ -22,6 +22,15 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 		};
 	});
 	
+	nessa.controller('loginCtrl', function($scope){
+		$scope.username = null;
+		$scope.password = null;
+		
+		$scope.login = function(){
+			
+		};
+	});
+	
 	
 	nessa.controller('homeCtrl', function($scope, socket){
 		socket.emit('main.dashboard');
