@@ -246,13 +246,12 @@ io.sockets.on('connection', function(socket) {
 		*/
 	}).on('system.restart', function(){
 		socket.emit('system.alert', {
-			type: 'warning',
+			type: 'info',
 			message: 'NodeTV is restarting'
 		});
-		/*
 		var system = plugin('system');
 		system.restart()
-		*/
+		
 	}).on('system.update', function(){
 		socket.emit('system.alert', {
 			type: 'info',
@@ -336,14 +335,7 @@ io.sockets.on('connection', function(socket) {
 	});
 	
 	
-	
-	
-	
-	
 	/*************** Old methods to be deprecated ***************/
-	
-	
-	
 	
 	
 	// Old methods
@@ -362,11 +354,6 @@ io.sockets.on('connection', function(socket) {
 		var scanner = plugin('scanner');
 		scanner.shows();
 		
-	}).on('system.restart', function(data){
-		// Restart the process, NOT the server
-		socket.emit('system.loading', {message: 'Restarting...'});
-		var system = plugin('system');
-		system.restart()
 	});
 	
 	
