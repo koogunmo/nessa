@@ -96,12 +96,10 @@
 								<label for="ipt_setting_directory">Media Directory</label>
 								<input type="text" ng-model="detail.general.directory" readonly="readonly" class="form-control" />
 							</div>
-							
 							<div class="form-group">
 								<input type="checkbox" name="status" ng-model="detail.general.status" ng-checked="detail.general.status==1" ng-true-value="1" ng-false-value="0" />
 								<label for="ipt_setting_status">Download new episodes when available</label>
 							</div>
-							
 							<div class="form-group" ng-switch-when="1">
 								<label for="ipt_setting_feed">RSS Feed</label>
 								<input type="text" name="feed" ng-model="detail.general.feed" class="form-control" />

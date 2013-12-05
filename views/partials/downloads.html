@@ -1,18 +1,11 @@
 <div id="downloads">
-	<div ng-repeat="download in downloads">
-		<h4>{{download.name}}</h4>	
+	<div class="download" ng-repeat="download in downloads">
+		<button class="btn btn-xs btn-danger pull-right" ng-click="remove(download.id);">Remove</button>
+		<h4>{{download.name}}</h4>
 		<div class="progress progress-striped">
-			<div class="progress-bar" role="progressbar" style="width: {{download.percentDone*100}}%;" ng-class="{'progress-bar-success': download.percentDone==1}"></div>
+			<div class="progress-bar" role="progressbar" style="width: {{download.percentDone*100}}%;" ng-class="{'progress-bar-success': download.percentDone==1}">
+				{{download.percentDone*100}}% Complete
+			</div>
 		</div>
-		<div class="tools" ng-switch="download.status">
-			<!--
-			<button class="btn btn-warning" ng-switch-default>Pause</button>
-			<button class="btn btn-success" ng-switch-when="0">Resume</button>
-			-->
-			<button class="btn btn-danger" ng-click="remove(download.id);">Remove</button>
-		</div>
-		
-		<hr />
 	</div>
-	
 </div>

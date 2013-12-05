@@ -124,10 +124,10 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 		socket.on('download.list', function(data){
 			if ($scope.sort == 'alpha') {
 				data.sort(function(a,b){
-					a.name = a.name.replace(' ', '.');
-					b.name = b.name.replace(' ', '.');
-					if (a.name < b.name) return -1;
-					if (a.name > b.name) return 1;
+					var an = a.name.replace(' ', '.');
+					var bn = b.name.replace(' ', '.');
+					if (an < bn) return -1;
+					if (an > bn) return 1;
 					return 0;
 				});
 			} else if ($scope.sort == 'age'){

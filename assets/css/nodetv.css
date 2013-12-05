@@ -6,35 +6,6 @@ body {
 
 /* Global elements */
 
-#loading {
-	background-color: rgba(0,0,0,0.7);
-	background-image: url('../gfx/spinner.gif');
-	background-position: center center;
-	background-repeat: no-repeat;
-	bottom: 0px;
-	cursor: wait;
-	display: block;
-	left: 0px;
-	height: auto;
-	pointer-events: all;
-	position: fixed;
-	right: 0px;
-	top: 0px;
-	width: auto;
-	z-index: 100;
-}
-
-#loading > p {
-	color: #CCCCCC;
-	font-weight: bold;
-	margin-top: 25px;
-	position: absolute;
-	text-align: center;
-	top: 50%;
-	width: 100%;
-}
-
-
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
 	display: none !important;
 }
@@ -49,13 +20,11 @@ body {
 	z-index: 1030;
 }
 
-
 /* Modals */
 .modal .modal-body {
 	max-height: 320px;
 	overflow-y: auto;
 }
-
 .modal-header > img {
 	border-radius: 6px 6px 0px 0px;
 }
@@ -65,11 +34,9 @@ body {
 #dashboard .latest {
 	border-bottom: 1px solid #999999;
 }
-
 #dashboard .latest .synopsis {
 	display: none;
 }
-
 
 /* Shows */
 
@@ -78,13 +45,19 @@ body {
 }
 
 #shows .show {
-	border-bottom: 1px solid #333333;
+	border-bottom: 1px solid #EEEEEE;
 	cursor: pointer;
 	padding: 10px;
 }
 
 #show-modal .modal-header {
 	padding: 0px;
+}
+
+/* Downloads */
+
+#downloads .download {
+	border-bottom: 1px solid #EEEEEE;
 }
 
 /* Settings */
@@ -109,7 +82,6 @@ body {
 .modal-header {
     position: relative;
 }
-
 .close.close-corner {
 	margin: 0;
 	opacity: 1;
