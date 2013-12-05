@@ -94,6 +94,8 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 		socket.on('download.list', function(data){
 			if ($scope.sort == 'alpha') {
 				data.sort(function(a,b){
+					a.name = a.name.replace(' ', '.');
+					b.name = b.name.replace(' ', '.');
 					if (a.name < b.name) return -1;
 					if (a.name > b.name) return 1;
 					return 0;
@@ -101,6 +103,7 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 			} else if ($scope.sort == 'age'){
 				
 			}
+			
 			$scope.downloads = data;
 		});
 		
