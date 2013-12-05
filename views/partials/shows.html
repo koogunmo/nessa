@@ -4,54 +4,35 @@
 			<div class="image"></div>
 			<div>Add Show</div>
 		</div>
-		
 		<div class="show col-sm-3" ng-repeat="show in shows" ng-click="modalDetail(show.id)">
 			<div class="image">
 				<img data-src="/media/{{show.directory}}/cover.jpg" alt="" class="img-responsive" />
 			</div>
 			<div>{{show.name}}</div>
 		</div>
-		
 	</div>
 </div>
 
 <div id="add-modal" class="modal" role="dialog" ng-cloak>
 	<div class="modal-dialog">
 		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal">&times;</button>
-				<h4 class="modal-title">Add show</h4>
-			</div>
-			<div class="modal-body">
-				
-				
-				Overhauling search system. Sorry!
-				
-				
-				<form>
-					<div class="form-group">
-						<input type="text" list="shows-available" class="form-control" autofocus="autofocus" ng-model="query" ng-change="search()" />
-						<datalist id="shows-available">
-							<option ng-repeat="show in available" value="{{show.name}}" data-id="{{show.id}}">{{show.name}}</option>
-						</datalist>
-					</div>
-				</form>
-				
-				
-				
-				<div>
-					{{result.id}}
-					
-					<div>
-						<button class="btn btn-success">Add show</button>
+			<form ng-submit="showAdd()">
+				<div class="modal-header">
+					<input type="text" list="shows-available" class="form-control" autofocus="autofocus" placeholder="Type to search" ng-model="query" ng-change="search()" />
+				</div>
+				<div class="modal-body" ng-show="results">
+					<div class="results" >
+						<div class="result" ng-repeat="result in results">
+							<input type="radio" id="ipt_show_{{$index}}" name="selected" value="{{result.id}}" ng-model="$parent.selected" />
+							<label for="ipt_show_{{$index}}">{{result.name}}</label>
+						</div>
 					</div>
 				</div>
-				
-				
-			</div>
-			<div class="modal-footer">
-				<button class="btn btn-default" data-dismiss="modal">Close</button>
-			</div>
+				<div class="modal-footer">
+					<button class="btn btn-success" ng-show="selected">Add Show</button>
+					<button class="btn btn-default" data-dismiss="modal">Close</button>
+				</div>
+			</form>
 		</div>
 	</div>
 </div>
@@ -59,60 +40,58 @@
 <div id="show-modal" class="modal" role="dialog" ng-cloak>
 	<div class="modal-dialog">
 		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close close-corner" data-dismiss="modal" aria-hidden="true">
-					<img src="assets/gfx/overlay-close.png" />
-				</button>
-				<img src="assets/artwork/{{detail.general.tvdb}}.jpg" alt="{{detail.general.name}}" class="img-responsive" />
-			</div>
+			<form ng-submit="save()" ng-switch="detail.general.status">
+				<div class="modal-header">
+					<button type="button" class="close close-corner" data-dismiss="modal" aria-hidden="true">
+						<img src="assets/gfx/overlay-close.png" />
+					</button>
+					<img src="assets/artwork/{{detail.general.tvdb}}.jpg" alt="{{detail.general.name}}" class="img-responsive" />
+				</div>
+				
+				<ul class="nav nav-tabs">
+					<li class="active"><a href="#synopsis" data-toggle="tab">Synopsis</a></li>
+					<li><a href="#episodes" data-toggle="tab">Episodes</a></li>
+					<li><a href="#settings" data-toggle="tab">Settings</a></li>
+				</ul>
 			
-			<ul class="nav nav-tabs">
-				<li class="active"><a href="#synopsis" data-toggle="tab">Synopsis</a></li>
-				<li><a href="#episodes" data-toggle="tab">Episodes</a></li>
-				<li><a href="#settings" data-toggle="tab">Settings</a></li>
-			</ul>
-			
-			<div class="modal-body">
-				<div class="tab-content">
-					<div class="tab-pane active" id="synopsis">
-						<div class="synopsis">
-							<h3>Synopsis</h3>
-							<p>{{detail.general.synopsis}}</p>
+				<div class="modal-body">
+					<div class="tab-content">
+						<div class="tab-pane active" id="synopsis">
+							<div class="synopsis">
+								<h3>Synopsis</h3>
+								<p>{{detail.general.synopsis}}</p>
+							</div>
 						</div>
-					</div>
 					
-					<div class="tab-pane" id="episodes">
-						<div id="seasons" class="panel-group">
-							<div class="panel" ng-repeat="season in detail.seasons">
-								<div class="panel-heading">
-									<h4 class="panel-title">
-										<a data-toggle="collapse" data-parent="#seasons" href="#season-{{season.season}}">Season {{season.season}}</a>
-									</h4>
-								</div>
-								<div id="season-{{season.season}}" class="panel-collapse collapse">
-									<div class="panel-body">
-										<div class="episodes" ng-repeat="episode in season.episodes">
-											<h5>
-												<span class="episode seen" data-episode="{{episode.id}}" title="Mark this episode as watched">{{episode.episode}}</span>
-												<span class="title">{{episode.title}}</span>
-											</h5>
-											
-											<div class="extended">
-												<p class="synopsis">{{episode.synopsis}}</p>
-												<!-- <div class="airdate">{{episode.airdate}}</div> -->
+						<div class="tab-pane" id="episodes">
+							<div id="seasons" class="panel-group">
+								<div class="panel" ng-repeat="season in detail.seasons">
+									<div class="panel-heading">
+										<h4 class="panel-title">
+											<a data-toggle="collapse" data-parent="#seasons" href="#season-{{season.season}}">Season {{season.season}}</a>
+										</h4>
+									</div>
+									<div id="season-{{season.season}}" class="panel-collapse collapse">
+										<div class="panel-body">
+											<div class="episodes" ng-repeat="episode in season.episodes">
+												<h5>
+													<span class="episode seen" data-episode="{{episode.id}}" title="Mark this episode as watched">{{episode.episode}}</span>
+													<span class="title">{{episode.title}}</span>
+												</h5>
+												
+												<div class="extended">
+													<p class="synopsis">{{episode.synopsis}}</p>
+													<!-- <div class="airdate">{{episode.airdate}}</div> -->
+												</div>
+												<hr />
+												
 											</div>
-											
-											<hr />
 										</div>
 									</div>
-								</div>
-							</div>	
+								</div>	
+							</div>
 						</div>
-					</div>
-					
-					<div class="tab-pane" id="settings">
-						<form ng-submit="save()" ng-switch="detail.general.status">
-							
+						<div class="tab-pane" id="settings">
 							<div class="form-group">
 								<label for="ipt_setting_directory">Media Directory</label>
 								<input type="text" ng-model="detail.general.directory" readonly="readonly" class="form-control" />
@@ -131,19 +110,18 @@
 								<input type="checkbox" name="hd" ng-model="detail.general.hd" ng-checked="detail.general.hd==1" ng-true-value="1" ng-false-value="0" />
 								<label for="ipt_setting_hd">Prefer HD video</label>
 							</div>
-							
-							<div class="">
-								
-								<button type="submit" class="btn btn-success">Save</button>
-								<button type="reset" class="btn btn-default">Reset</button>
-								<hr />
-								<button type="button" class="btn btn-info" ng-click="update(detail.general.id)">Update listings</button>
-								<button type="button" class="btn btn-warning" ng-click="rescan(detail.general.id)">Rescan Files</button>
-							</div>
-						</form>
+						</div>
 					</div>
 				</div>
-			</div>
+			
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-success">Save</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+					
+					<button type="button" class="btn btn-info" ng-click="update(detail.general.id)">Update listings</button>
+					<button type="button" class="btn btn-warning" ng-click="rescan(detail.general.id)">Rescan Files</button>
+				</div>
+			</form>
 		</div>
 	</div>
 </div>

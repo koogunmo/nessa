@@ -310,20 +310,24 @@ io.sockets.on('connection', function(socket) {
 		});
 	})
 	
+	// Search methods
+	
 	socket.on('show.search', function(data){
 		var shows = plugin('showdata');
 		shows.search(data, function(results){
+			
 			socket.emit('show.search', results);
 		});
-	});
-	
-	
-	
-	
-	socket.on('shows.available', function(){
+		
+	}).on('show.add', function(id){
+		// Add a show
 		var shows = plugin('showdata');
-		shows.available(function(results){
-			socket.emit('shows.available', results);
+		shows.add(id, function(){
+			socket.emit('system.alert', {
+				type: 'success',
+				message: 'Show added'
+			});
+			socket.emit('show.added', {id: id});
 		});
 	});
 	
@@ -407,34 +411,7 @@ io.sockets.on('connection', function(socket) {
 	/***************************************************/
 	/* "API" calls */
 	
-	socket.on('settings.save', function(settings, callback){
-		var qs = require('querystring');
-		var json = qs.parse(settings);
-		for (var i in json) {
-			nconf.set(i, json[i]);
-		}
-		nconf.save(function(error){
-			if (error) {
-				logger.error(error);
-				return;
-			}
-			if (typeof(callback) == 'function') callback();
-		});
-	});
 	
-	socket.on('show.add', function(id){
-		// Add a show
-		var shows = plugin('showdata');
-		shows.add(id, function(){
-			socket.emit('page.reload');
-		});
-		
-	}).on('show.disable', function(data){
-		var show = plugin('showdata');
-		show.disable(data.id, function(json){
-			
-		});
-	});
 	
 	/* List shows */
 	socket.on('shows.unmatched', function(){
@@ -481,14 +458,6 @@ io.sockets.on('connection', function(socket) {
 	socket.on('show.episode.download', function(data){
 		var show = plugin('showdata');
 		show.download(data.id);
-	});
-	
-	// Search
-	socket.on('show.search', function(data){
-		var shows = plugin('showdata');
-		shows.search(data, function(results){
-			socket.emit('show.search', {shows: results});
-		});
 	});
 	
 });

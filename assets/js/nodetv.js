@@ -45,10 +45,10 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 		
 		$scope.detail	= {};
 		$scope.shows	= [];
-		$scope.available	= [];
 		
 		$scope.query	= null;
-		$scope.result	= {};
+		$scope.results	= [];
+		$scope.selected = false;
 		
 		socket.emit('shows.enabled');
 		
@@ -59,11 +59,26 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 			}, 500);
 		});
 		
+		// Search
+		socket.on('show.search', function(data){
+			$scope.results = data;
+		});
+		
+		socket.on('show.added', function(){
+			socket.emit('shows.enabled');
+		});
+		
+		$scope.showAdd = function(){
+			socket.emit('show.add', $scope.selected);
+			$scope.selected = false;
+			
+			$('#add-modal').modal('close');
+		};
+		
 		$scope.modalAdd = function(){
-			socket.emit('shows.available');
-			socket.on('shows.available', function(data){
-				$scope.available = data;
-			});
+			$scope.query = null;
+			$scope.results = [];
+			$scope.selected = false;
 			
 			if (!$('.modal-open').length) {
 				$('#add-modal').modal();
@@ -81,13 +96,9 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 		};
 		
 		
-		$scope.search = function(test){
-			console.log($scope.query);
-			
+		$scope.search = function(){
+			socket.emit('show.search', $scope.query);
 		};	
-		
-		
-		
 		$scope.rescan = function(id){
 			// trigger show-specific rescan
 		};
@@ -173,6 +184,10 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 			controller: 'downloadCtrl'
 			
 		}).when('/shows', {
+			templateUrl: 'views/partials/shows.html',
+			controller: 'showCtrl'
+
+		}).when('/shows/:id', {
 			templateUrl: 'views/partials/shows.html',
 			controller: 'showCtrl'
 			
