@@ -311,6 +311,22 @@ io.sockets.on('connection', function(socket) {
 	})
 	
 	
+	
+	
+	
+	socket.on('shows.available', function(){
+		var shows = plugin('showdata');
+		shows.available(function(results){
+			socket.emit('shows.available', results);
+		});
+	});
+	
+	
+	
+	
+	
+	
+	
 	// Downloads
 	
 	socket.on('download.list', function(data){

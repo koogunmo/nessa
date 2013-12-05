@@ -193,6 +193,17 @@ var ShowData = {
 		});
 	},
 	
+	available: function(callback){
+		db.all("SELECT * FROM show WHERE directory IS NULL ORDER BY name ASC", function(error, rows){
+			if (error) {
+				logger.error(error);
+				return;
+			}
+			if (rows === undefined) return;
+			if (typeof(callback) == 'function') callback(rows);
+		});
+	},
+	
 	enabled: function(callback){
 		db.all("SELECT * FROM show WHERE directory IS NOT NULL ORDER BY name ASC", function(error, rows){
 			if (error) {

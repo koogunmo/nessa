@@ -42,6 +42,13 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 	});
 	
 	nessa.controller('showCtrl', function($scope, $routeParams, socket){
+		
+		$scope.detail	= {};
+		$scope.shows	= [];
+		$scope.available= [];
+		
+		$scope.test = null;
+		
 		socket.emit('shows.enabled');
 		socket.on('shows.enabled', function(data){
 			$scope.shows = data;
@@ -50,13 +57,18 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 			}, 500);
 		});
 		
-		$scope.detail = {};
-		
-		$scope.addShow = function(){
-			// open modal to add shows
+		$scope.modalAdd = function(){
+			socket.emit('shows.available');
+			socket.on('shows.available', function(data){
+				$scope.available = data;
+			});
+			
+			if (!$('.modal-open').length) {
+				$('#add-modal').modal();
+			}
 		};
 		
-		$scope.modalShow = function(id){
+		$scope.modalDetail = function(id){
 			socket.emit('show.overview', id);
 			socket.on('show.overview', function(json){
 				$scope.detail = json;
