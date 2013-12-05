@@ -90,9 +90,12 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 			socket.emit('download.list');
 		}, 2500);
 		socket.on('download.list', function(data){
+			data.sort(function(a,b){
+				if (a.name < b.name) return -1;
+				if (a.name > b.name) return 1;
+				return 0;
+			});
 			$scope.downloads = data;
-			
-			console.log(data)
 		});
 		
 		$scope.pause = function(id){
