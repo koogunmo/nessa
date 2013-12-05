@@ -149,6 +149,28 @@ var torrent = {
 		} catch(e) {
 			logger.error(e.message);
 		}
+	},
+	
+	list: function(callback){
+		this.rpc.get(function(error, args){
+			if (typeof(callback) == 'function') callback(error, args);
+		});
+	},
+	
+	pause: function(data){
+		
+	},
+	
+	remove: function(data, callback){
+		if (!data.id) return;
+		if (data.purge) data.purge = false;
+		this.rpc.remove(data.id, data.purge, function(error){
+			if (typeof(callback) == 'function') callback(error);
+		});
+	},
+	
+	resume: function(data){
+		
 	}
 };
 

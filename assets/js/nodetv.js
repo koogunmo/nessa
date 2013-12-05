@@ -31,7 +31,6 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 		};
 	});
 	
-	
 	nessa.controller('homeCtrl', function($scope, socket){
 		socket.emit('main.dashboard');
 		socket.on('main.dashboard.latest', function(data){
@@ -53,6 +52,10 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 		
 		$scope.detail = {};
 		
+		$scope.addShow = function(){
+			// open modal to add shows
+		};
+		
 		$scope.modalShow = function(id){
 			socket.emit('show.overview', id);
 			socket.on('show.overview', function(json){
@@ -62,14 +65,46 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 				}
 			});
 		};
+		
+		
+		$scope.rescan = function(id){
+			// trigger show-specific rescan
+		};
+		
+		$scope.save = function(){
+			socket.emit('show.settings', $scope.detail.general);
+		};
+		
 		$scope.update = function(id){
 			socket.emit('show.update', {id: id}, function(){
 				socket.emit('show.overview', id);
 			});
-		}
+		};
+	});
+	
+	nessa.controller('downloadCtrl', function($scope, socket){
+		$scope.downloads = [];
 		
-		$scope.save = function(){
-			socket.emit('show.settings', $scope.detail.general);
+		socket.emit('download.list');
+		setInterval(function(){
+//			socket.emit('download.list');
+		}, 2500);
+		socket.on('download.list', function(data){
+			$scope.downloads = data;
+			
+			console.log(data)
+		});
+		
+		$scope.pause = function(id){
+			socket.emit('download.pause', {id: id});
+		};
+		$scope.resume = function(id){
+			socket.emit('download.resume', {id: id});
+		};
+		$scope.remove = function(id){
+			if (confirm('Are you sure you want to delete this torrent?')) {
+				socket.emit('download.remove', {id: id, purge: false});
+			}
 		};
 	});
 	
@@ -84,6 +119,7 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 			socket.emit('system.settings', $scope.settings)
 		};
 		$scope.rescan = function(){
+			// Full media rescan - not advisable
 			socket.emit('system.rescan');
 		};
 		$scope.reboot = function(){
@@ -100,6 +136,10 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 		$routeProvider.when('/dashboard', {
 			templateUrl: 'views/partials/dashboard.html',
 			controller: 'homeCtrl'
+			
+		}).when('/downloads', {
+			templateUrl: 'views/partials/downloads.html',
+			controller: 'downloadCtrl'
 			
 		}).when('/shows', {
 			templateUrl: 'views/partials/shows.html',

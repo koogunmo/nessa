@@ -313,6 +313,27 @@ io.sockets.on('connection', function(socket) {
 	})
 	
 	
+	// Downloads
+	
+	socket.on('download.list', function(data){
+		torrent.list(function(error, data){
+			if (error) {
+				logger.error(error);
+				return;
+			}
+			socket.emit('download.list', data.torrents);
+		});
+		
+	}).on('download.remove', function(data){
+		torrent.remove(data, function(error){
+			if (!error) {
+				socket.emit('system.alert', {
+					type: 'success',
+					message: 'Torrent successfully deleted'
+				});
+			}
+		});
+	});
 	
 	
 	
