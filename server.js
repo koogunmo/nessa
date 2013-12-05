@@ -240,10 +240,10 @@ io.sockets.on('connection', function(socket) {
 			type: 'info',
 			message: 'Rescanning media directory'
 		});
-		/*
+		
 		var scanner = plugin('scanner');
 		scanner.shows();
-		*/
+		
 	}).on('system.restart', function(){
 		socket.emit('system.alert', {
 			type: 'info',
@@ -257,12 +257,11 @@ io.sockets.on('connection', function(socket) {
 			type: 'info',
 			message: 'Update in progress'
 		});
-		/*
+		
 		var system = plugin('system');
 		system.update(function(){
 			socket.emit('system.loaded');
 		});
-		*/
 	});
 	
 	// Dashboard
@@ -341,49 +340,10 @@ io.sockets.on('connection', function(socket) {
 	// Old methods
 	
 	
-	/* System handlers */
-	socket.on('system.update', function(data){
-		// Force an update from github (if one is available)
-		socket.emit('system.loading', {message: 'Updating...'});
-		var system = plugin('system');
-		system.update(function(){
-			socket.emit('system.loaded');
-		});
-		
-	}).on('system.rescan', function(){
-		var scanner = plugin('scanner');
-		scanner.shows();
-		
-	});
-	
 	
 	
 	/* Page handlers */
-	socket.on('main.dashboard', function(){
-		// Latest downloads
-		db.all("SELECT S.name, E.season, E.episode, E.title, E.synopsis, E.airdate FROM show AS S INNER JOIN show_episode AS E ON S.id = E.show_id ORDER BY downloaded DESC, episode DESC LIMIT 10", function(error, rows){
-			if (error) {
-				logger.error(error);
-				return;
-			}
-			
-			socket.emit('main.dashboard', rows);
-			
-			socket.emit('page.template', {
-				template: 'views/main/dashboard.html',
-				data: {
-					latest: rows
-				}
-			});
-		});
-		
-	}).on('main.settings', function(){
-		socket.emit('page.template', {
-			template: 'views/main/settings.html',
-			data: nconf.get()
-		});
-		
-	}).on('shows.enabled', function(){
+	socket.on('shows.enabled', function(){
 		// List of enabled/subscribed shows
 		var shows = plugin('showdata');
 		shows.enabled(function(json){
