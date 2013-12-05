@@ -84,17 +84,23 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 	
 	nessa.controller('downloadCtrl', function($scope, socket){
 		$scope.downloads = [];
+		$scope.sort = 'alpha';
 		
 		socket.emit('download.list');
 		setInterval(function(){
 			socket.emit('download.list');
 		}, 2500);
+		
 		socket.on('download.list', function(data){
-			data.sort(function(a,b){
-				if (a.name < b.name) return -1;
-				if (a.name > b.name) return 1;
-				return 0;
-			});
+			if ($scope.sort == 'alpha') {
+				data.sort(function(a,b){
+					if (a.name < b.name) return -1;
+					if (a.name > b.name) return 1;
+					return 0;
+				});
+			} else if ($scope.sort == 'age'){
+				
+			}
 			$scope.downloads = data;
 		});
 		

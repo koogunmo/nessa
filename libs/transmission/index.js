@@ -163,7 +163,7 @@ var torrent = {
 	
 	remove: function(data, callback){
 		if (!data.id) return;
-		if (data.purge) data.purge = false;
+		if (!data.purge) data.purge = false;
 		this.rpc.remove(data.id, data.purge, function(error){
 			if (typeof(callback) == 'function') callback(error);
 		});
