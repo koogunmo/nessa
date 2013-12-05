@@ -1,6 +1,6 @@
 "use strict";
 
-require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
+require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 	
 	nessa.controller('navCtrl', function($scope, $location){
 		$scope.isActive = function(viewLocation){
@@ -41,15 +41,17 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 		});
 	});
 	
-	nessa.controller('showCtrl', function($scope, $routeParams, socket){
+	nessa.controller('showCtrl', function($scope, $routeParams, $filter, socket){
 		
 		$scope.detail	= {};
 		$scope.shows	= [];
-		$scope.available= [];
+		$scope.available	= [];
 		
-		$scope.test = null;
+		$scope.query	= null;
+		$scope.result	= {};
 		
 		socket.emit('shows.enabled');
+		
 		socket.on('shows.enabled', function(data){
 			$scope.shows = data;
 			setTimeout(function(){
@@ -79,14 +81,19 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 		};
 		
 		
+		$scope.search = function(test){
+			console.log($scope.query);
+			
+		};	
+		
+		
+		
 		$scope.rescan = function(id){
 			// trigger show-specific rescan
 		};
-		
 		$scope.save = function(){
 			socket.emit('show.settings', $scope.detail.general);
 		};
-		
 		$scope.update = function(id){
 			socket.emit('show.update', {id: id}, function(){
 				socket.emit('show.overview', id);

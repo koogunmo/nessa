@@ -310,6 +310,12 @@ io.sockets.on('connection', function(socket) {
 		});
 	})
 	
+	socket.on('show.search', function(data){
+		var shows = plugin('showdata');
+		shows.search(data, function(results){
+			socket.emit('show.search', results);
+		});
+	});
 	
 	
 	
