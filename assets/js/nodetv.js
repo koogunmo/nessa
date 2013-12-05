@@ -103,7 +103,7 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 		};
 		$scope.remove = function(id){
 			if (confirm('Are you sure you want to delete this torrent?')) {
-				socket.emit('download.remove', {id: id, purge: false});
+				socket.emit('download.remove', {id: id, purge: true});
 			}
 		};
 	});
