@@ -44,27 +44,13 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 		$scope.downloads = [];
 		$scope.predicate = 'name';
 		$scope.reverse = false;
-		$scope.sort = 'Sort by';
 		
 		socket.emit('download.list');
 		setInterval(function(){
-			socket.emit('download.list');
+	//		socket.emit('download.list');
 		}, 2500);
 		
 		socket.on('download.list', function(data){
-			/*
-			if ($scope.sort == 'alpha') {
-				data.sort(function(a,b){
-					var an = a.name.replace(' ', '.');
-					var bn = b.name.replace(' ', '.');
-					if (an < bn) return -1;
-					if (an > bn) return 1;
-					return 0;
-				});
-			} else if ($scope.sort == 'age'){
-				
-			}
-			*/
 			$scope.downloads = data;
 		});
 		

@@ -5,7 +5,7 @@ requirejs.config({
 		'app': './app',
 		'bootstrap': 'https://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min',
 		'jquery': 'https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min',
-		'angular': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.2.3/angular.min',
+		'angular': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.2.4/angular.min',
 		'ngCookies': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.2.3/angular-cookies.min',
 		'ngResource': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.2.3/angular-resource.min',
 		'ngRoute': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.2.3/angular-route.min',
@@ -31,6 +31,6 @@ requirejs.config({
 			exports: 'io'
 		}
 	},
-	priority: ['angular'],
+	priority: ['jquery','angular'],
 	deps: ['./nodetv']
 });

@@ -59,6 +59,12 @@ body {
 #downloads .download {
 	border-bottom: 1px solid #EEEEEE;
 }
+#downloads .download h4 {
+	margin-right: 60px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
 
 /* Settings */
 
