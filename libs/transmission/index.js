@@ -153,6 +153,14 @@ var torrent = {
 	
 	list: function(callback){
 		this.rpc.get(function(error, args){
+			db.serialize(function(){
+				for (var i in args.torrents){
+					var hash = args.torrents[i].hashString
+					db.get("SELECT S.name, E.* FROM show_episode AS E INNER JOIN show AS S ON E.show_id = S.id WHERE E.hash = ?", hash, function(error, row){
+						if (row) args.torrents[i].show = row;
+					});
+				}
+			});
 			if (typeof(callback) == 'function') callback(error, args);
 		});
 	},

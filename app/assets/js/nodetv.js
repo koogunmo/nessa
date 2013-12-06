@@ -2,12 +2,6 @@
 
 require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 	
-	nessa.controller('navCtrl', function($scope, $location){
-		$scope.isActive = function(viewLocation){
-			return viewLocation === $location.path();
-		};
-	});
-	
 	nessa.controller('alertsCtrl', function($scope, socket){
 		$scope.alerts = [];
 		socket.on('system.alert', function(alert){
@@ -38,6 +32,54 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 		};
 	});
 	
+	nessa.controller('navCtrl', function($scope, $location){
+		$scope.isActive = function(viewLocation){
+			return viewLocation === $location.path();
+		};
+	});
+	
+	// Section-specific controllers
+
+	nessa.controller('downloadCtrl', function($scope, socket){
+		$scope.downloads = [];
+		$scope.sort = 'alpha';
+		
+		socket.emit('download.list');
+		setInterval(function(){
+			socket.emit('download.list');
+		}, 2500);
+		
+		socket.on('download.list', function(data){
+			if ($scope.sort == 'alpha') {
+				data.sort(function(a,b){
+					var an = a.name.replace(' ', '.');
+					var bn = b.name.replace(' ', '.');
+					if (an < bn) return -1;
+					if (an > bn) return 1;
+					return 0;
+				});
+			} else if ($scope.sort == 'age'){
+				
+			}
+			
+			console.log(data);
+			
+			$scope.downloads = data;
+		});
+		
+		$scope.pause = function(id){
+			socket.emit('download.pause', {id: id});
+		};
+		$scope.resume = function(id){
+			socket.emit('download.resume', {id: id});
+		};
+		$scope.remove = function(id){
+			if (confirm('Are you sure you want to delete this torrent?')) {
+				socket.emit('download.remove', {id: id, purge: true});
+			}
+		};
+	});
+	
 	nessa.controller('homeCtrl', function($scope, socket){
 		socket.emit('main.dashboard');
 		socket.on('main.dashboard.latest', function(data){
@@ -48,11 +90,41 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 		});
 	});
 	
-	nessa.controller('showCtrl', function($scope, $routeParams, $filter, socket){
+	nessa.controller('matchCtrl', function($scope, socket){
+		$scope.unmatched = [];
 		
+		socket.emit('shows.unmatched');
+		socket.on('shows.unmatched', function(data){
+			$scope.unmatched = data;
+		});
+		
+	});
+
+	nessa.controller('settingsCtrl', function($scope, socket){
+		$scope.settings = {};
+		socket.emit('system.settings');
+		socket.on('system.settings', function(data){
+			$scope.settings = data;
+		});
+		
+		$scope.save = function(form){
+			socket.emit('system.settings', $scope.settings)
+		};
+		$scope.rescan = function(){
+			// Full media rescan - not advisable
+			socket.emit('system.rescan');
+		};
+		$scope.reboot = function(){
+			socket.emit('system.restart');
+		};
+		$scope.update = function(){
+			socket.emit('system.update');
+		};
+	});
+	
+	nessa.controller('showCtrl', function($scope, $routeParams, $filter, socket){
 		$scope.detail	= {};
 		$scope.shows	= [];
-		
 		$scope.query	= null;
 		$scope.results	= [];
 		$scope.selected = false;
@@ -119,65 +191,6 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 		};
 	});
 	
-	nessa.controller('downloadCtrl', function($scope, socket){
-		$scope.downloads = [];
-		$scope.sort = 'alpha';
-		
-		socket.emit('download.list');
-		setInterval(function(){
-			socket.emit('download.list');
-		}, 2500);
-		
-		socket.on('download.list', function(data){
-			if ($scope.sort == 'alpha') {
-				data.sort(function(a,b){
-					var an = a.name.replace(' ', '.');
-					var bn = b.name.replace(' ', '.');
-					if (an < bn) return -1;
-					if (an > bn) return 1;
-					return 0;
-				});
-			} else if ($scope.sort == 'age'){
-				
-			}
-			
-			$scope.downloads = data;
-		});
-		
-		$scope.pause = function(id){
-			socket.emit('download.pause', {id: id});
-		};
-		$scope.resume = function(id){
-			socket.emit('download.resume', {id: id});
-		};
-		$scope.remove = function(id){
-			if (confirm('Are you sure you want to delete this torrent?')) {
-				socket.emit('download.remove', {id: id, purge: true});
-			}
-		};
-	});
-	
-	nessa.controller('settingsCtrl', function($scope, socket){
-		$scope.settings = {};
-		socket.emit('system.settings');
-		socket.on('system.settings', function(data){
-			$scope.settings = data;
-		});
-		
-		$scope.save = function(form){
-			socket.emit('system.settings', $scope.settings)
-		};
-		$scope.rescan = function(){
-			// Full media rescan - not advisable
-			socket.emit('system.rescan');
-		};
-		$scope.reboot = function(){
-			socket.emit('system.restart');
-		};
-		$scope.update = function(){
-			socket.emit('system.update');
-		};
-	});
 	
 	
 	// Bootstrap to document
