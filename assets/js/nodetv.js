@@ -184,8 +184,8 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 	angular.bootstrap(document, ['nessa'])
 	
 	
-	// jQuery below
 	
+	// jQuery below
 	$(document).on('lazyload', function(){
 		$('div.image:visible img[data-src]').each(function(){
 				if ($(this).attr('src')) return;
@@ -199,6 +199,5 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 		$('.synopsis', this).slideToggle();
 		
 	});
-	
 	
 });

@@ -153,7 +153,7 @@ It was also heavily skewed towards using newsgroups, which I don't use.
 - Better UI & navigation
 - Integration Overrides
 	- Trakt
-- Simple torrent management?
+- ~~Simple torrent management~~
 - Setup wizard
 	- Clean install test
 

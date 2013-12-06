@@ -31,10 +31,10 @@
 			</div>
 			<nav class="collapse navbar-collapse">
 				<ul class="nav navbar-nav">
-					<li ng-class="{ active: isActive('/dashboard')}"><a href="#/dashboard">Dashboard</a></li>
-					<li ng-class="{ active: isActive('/shows')}"><a href="#/shows">Shows</a></li>
-					<li ng-class="{ active: isActive('/downloads')}"><a href="#/downloads">Downloads</a></li>
-					<li ng-class="{ active: isActive('/settings')}"><a href="#/settings">Settings</a></li>
+					<li data-toggle="collapse" data-target=".navbar-collapse" ng-class="{ active: isActive('/dashboard')}"><a href="#/dashboard">Dashboard</a></li>
+					<li data-toggle="collapse" data-target=".navbar-collapse" ng-class="{ active: isActive('/shows')}"><a href="#/shows">Shows</a></li>
+					<li data-toggle="collapse" data-target=".navbar-collapse" ng-class="{ active: isActive('/downloads')}"><a href="#/downloads">Downloads</a></li>
+					<li data-toggle="collapse" data-target=".navbar-collapse" ng-class="{ active: isActive('/settings')}"><a href="#/settings">Settings</a></li>
 				</ul>
 			</nav>
 		</div>
