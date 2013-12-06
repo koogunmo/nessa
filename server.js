@@ -465,13 +465,15 @@ io.sockets.on('connection', function(socket) {
 /***********************************************************************/
 // Routing
 
-app.get('/', ensureAuthenticated, function(req, res) {	
+app.get('/', function(req, res) {	
 	res.sendfile(__dirname + '/views/index-ng.html');
 });
 
-app.get('/beta', ensureAuthenticated, function(req, res) {	
+app.get('/beta', function(req, res) {	
 	res.sendfile(__dirname + '/views/index-ng.html');
 });
+
+
 
 
 
@@ -481,7 +483,6 @@ passport.use(new LocalStrategy(
 	function(username, password, done) {
 		var sha1 = require('crypto').createHash('sha1');
 		var pass = sha1.update(password).digest('hex');
-		
 		db.get("SELECT * FROM user WHERE username = ? AND password = ?", username, pass, function(error, user){
 			if (error) return done(error);
 			if (!user) return done(null, false, {message: 'Incorrect'});
@@ -489,25 +490,19 @@ passport.use(new LocalStrategy(
 		});
 	}
 ));
-
 passport.serializeUser(function(user, done) {
-	return done(null, user.id);
+	return done(null, user);
+});
+passport.deserializeUser(function(user, done) {
+	return done(null, user);
 });
 
-passport.deserializeUser(function(id, done) {
-	db.get("SELECT * FROM user WHERE id = ?", id, function(error, user){
-		if (error) return done(error);
-		return done(null, user);
-	});
-});
-
-function ensureAuthenticated(req, res, next) {
-	var allowed	= false;
-	if (!nconf.get('installed')) {
-		// First run? Redirect to installer
-		res.redirect('/install');
-		return;
-	}
+app.get('/loggedin', function(req, res){
+	
+	var response = {
+		authenticated: false,
+		user: {}
+	};
 	if (nconf.get('security:whitelist')) {
 		// Is there a list of allowed IPs?
 		var blocks = nconf.get('security:whitelist').split(',');
@@ -515,31 +510,39 @@ function ensureAuthenticated(req, res, next) {
 		blocks.forEach(function(mask){
 			var block = new netmask(mask);
 			if (block.contains(req.connection.remoteAddress)) {
-				allowed = true;
+				response.authenticated = true;
 			}
 		});
+		if (response.authenticated) return res.send(response);
 	}
 	
 	db.get("SELECT COUNT(id) AS count FROM user", function(error, result){
-		if (!result.count) {
-			allowed = true;
+		if (error || !result.count) {
+			// no users in db - allow access
+			response.authenticated = true;
 		} else {
-			if (req.isAuthenticated()) allowed = true;
+			if (req.isAuthenticated()) {
+				response.authenticated = true;
+				response.user = req.user;
+			}
 		}
-		if (allowed) {
-			next();
-		} else {
-			res.redirect('/login');
-		}
+		res.send(response);
 	});
-}
+});
 
-app.get('/login',  function(req, res){
-	res.sendfile(__dirname + '/views/login.html');
-}).post('/login', passport.authenticate('local', {
-	successRedirect: '/',
-	failureRedirect: '/login'
-}));
+
+
+app.post('/login', passport.authenticate('local'), function(req, res){
+	
+	res.send(req.user);
+});
+
+app.post('/logout', function(req,res){
+	req.logOut();
+	res.send(200);
+});
+
+
 
 
 /* Installer */
@@ -568,7 +571,7 @@ app.get('/install', function(req, res){
 		// Start building the database
 		var shows = plugin('showdata');
 		shows.list();
-		res.redirect('/#main/settings');
+	//	res.redirect('/#main/settings');
 	});
 });
 

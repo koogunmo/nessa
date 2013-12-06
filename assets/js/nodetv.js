@@ -22,12 +22,19 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 		};
 	});
 	
-	nessa.controller('loginCtrl', function($scope){
-		$scope.username = null;
-		$scope.password = null;
+	nessa.controller('loginCtrl', function($scope, $rootScope, $http, $location, $window){
+		$scope.user = {};
 		
 		$scope.login = function(){
-			
+			$http.post('/login', {
+				username: $scope.user.username,
+				password: $scope.user.password,
+			}).success(function(user){
+				$window.history.back();
+			}).error(function(){
+				// alert
+				$location.url('/login');
+			});
 		};
 	});
 	
@@ -173,34 +180,7 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 	});
 	
 	
-	// Routing 
-	nessa.config(['$routeProvider', function($routeProvider){
-		$routeProvider.when('/dashboard', {
-			templateUrl: 'views/partials/dashboard.html',
-			controller: 'homeCtrl'
-			
-		}).when('/downloads', {
-			templateUrl: 'views/partials/downloads.html',
-			controller: 'downloadCtrl'
-			
-		}).when('/shows', {
-			templateUrl: 'views/partials/shows.html',
-			controller: 'showCtrl'
-
-		}).when('/shows/:id', {
-			templateUrl: 'views/partials/shows.html',
-			controller: 'showCtrl'
-			
-		}).when('/settings', {
-			templateUrl: 'views/partials/settings.html',
-			controller: 'settingsCtrl'
-			
-		}).otherwise({
-			redirectTo: '/dashboard'
-		})
-	}]);
-	
-	// Bootstrap
+	// Bootstrap to document
 	angular.bootstrap(document, ['nessa'])
 	
 	
