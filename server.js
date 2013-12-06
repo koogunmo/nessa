@@ -42,7 +42,7 @@ if (process.getuid) {
 		if (nconf.get('run:user')) process.setuid(nconf.get('run:user'));
 		process.env['HOME'] = process.cwd();
 	} catch(e) {
-		logger.warn(e.message);
+		console.warn(e.message);
 	}
 }
 
