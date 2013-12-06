@@ -42,7 +42,7 @@ if (process.getuid) {
 		if (nconf.get('run:user')) process.setuid(nconf.get('run:user'));
 		process.env['HOME'] = process.cwd();
 	} catch(e) {
-		console.error(e.message);
+		logger.warn(e.message);
 	}
 }
 
@@ -52,7 +52,8 @@ if (process.title) process.title = 'nessa.js';
 /***********************************************************************/
 /* Load dependencies */
 
-var extend	= require('xtend'),
+var connect	= require('connect'),
+	extend	= require('xtend'),
 	express	= require('express'),
 	fs		= require('fs'),
 	http	= require('http'),
@@ -90,13 +91,8 @@ var app		= express(),
 	io		= require('socket.io').listen(server);
 
 app.configure(function(){
-	app.use('/assets', express.static(__dirname + '/assets'));
-	if (nconf.get('shows:base')) app.use('/media', express.static(nconf.get('shows:base')));
-	app.use('/views', express.static(__dirname + '/views'));
-	
+	app.use(connect.compress());
 	app.use(express.cookieParser());
-//	app.use(express.bodyParser());
-	
 	app.use(express.urlencoded());
 	app.use(express.json());
 	
@@ -104,6 +100,13 @@ app.configure(function(){
 	app.use(passport.initialize());
 	app.use(passport.session());
 	app.use(app.router);
+	
+	app.use('/assets', express.static(__dirname + '/app/assets'));
+	app.use('/views', express.static(__dirname + '/app/views'));
+	
+	if (nconf.get('shows:base')) {
+		app.use('/media', express.static(nconf.get('shows:base')));
+	}
 });
 
 logger.info('nessa.js: Listening on port ' + nconf.get('port'));
@@ -222,10 +225,14 @@ io.sockets.on('connection', function(socket) {
 					logger.error(error);
 					return;
 				}
+				
 				socket.emit('system.alert', {
 					type: 'success',
 					message: 'Settings saved'
 				});
+				
+				// Update media path
+				app.use('/media', express.static(nconf.get('shows:base')));
 				
 				if (typeof(callback) == 'function') {
 					// alerts, etc
@@ -466,14 +473,8 @@ io.sockets.on('connection', function(socket) {
 // Routing
 
 app.get('/', function(req, res) {	
-	res.sendfile(__dirname + '/views/index-ng.html');
+	res.sendfile(__dirname + '/app/views/index-ng.html');
 });
-
-app.get('/beta', function(req, res) {	
-	res.sendfile(__dirname + '/views/index-ng.html');
-});
-
-
 
 
 
