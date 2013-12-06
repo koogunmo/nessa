@@ -153,6 +153,7 @@ var torrent = {
 	
 	list: function(callback){
 		this.rpc.get(function(error, args){
+			/*
 			db.serialize(function(){
 				for (var i in args.torrents){
 					var hash = args.torrents[i].hashString
@@ -161,6 +162,7 @@ var torrent = {
 					});
 				}
 			});
+			*/
 			if (typeof(callback) == 'function') callback(error, args);
 		});
 	},

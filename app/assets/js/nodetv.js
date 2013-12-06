@@ -61,9 +61,6 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 			} else if ($scope.sort == 'age'){
 				
 			}
-			
-			console.log(data);
-			
 			$scope.downloads = data;
 		});
 		
