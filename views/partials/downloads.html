@@ -1,7 +1,7 @@
 <div id="downloads">
 	<div class="download" ng-repeat="download in downloads">
 		<button class="btn btn-xs btn-danger pull-right" ng-click="remove(download.id);">Remove</button>
-		<h4>{{download.name}}</h4>
+		<h4>{{download.name | downloadName}}</h4>
 		<div class="progress progress-striped">
 			<div class="progress-bar" role="progressbar" style="width: {{download.percentDone*100}}%;" ng-class="{'progress-bar-success': download.percentDone==1}">
 				{{download.percentDone*100}}% Complete

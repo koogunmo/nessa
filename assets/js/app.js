@@ -31,6 +31,12 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute'], functi
 		};
 	});
 	
+	app.filter('downloadName', function(){
+		return function(string){
+			return string.replace(/\./g, ' ');
+		}
+	});
+	
 	app.config(function($routeProvider, $locationProvider, $httpProvider){
 	
 		var checkLoggedin = function($q, $timeout, $http, $location, $rootScope){
