@@ -42,7 +42,9 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 
 	nessa.controller('downloadCtrl', function($scope, socket){
 		$scope.downloads = [];
-		$scope.sort = 'alpha';
+		$scope.predicate = 'name';
+		$scope.reverse = false;
+		$scope.sort = 'Sort by';
 		
 		socket.emit('download.list');
 		setInterval(function(){
@@ -50,6 +52,7 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 		}, 2500);
 		
 		socket.on('download.list', function(data){
+			/*
 			if ($scope.sort == 'alpha') {
 				data.sort(function(a,b){
 					var an = a.name.replace(' ', '.');
@@ -61,6 +64,7 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 			} else if ($scope.sort == 'age'){
 				
 			}
+			*/
 			$scope.downloads = data;
 		});
 		

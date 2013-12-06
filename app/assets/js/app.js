@@ -37,6 +37,17 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute'], functi
 		}
 	});
 	
+	app.filter('bytes', function() {
+		return function(bytes, precision) {
+			if (isNaN(parseFloat(bytes)) || !isFinite(bytes)) return '0';
+			if (typeof precision === 'undefined') precision = 1;
+			var	units = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB'],
+				number = Math.floor(Math.log(bytes) / Math.log(1024));
+			
+			return (bytes / Math.pow(1024, Math.floor(number))).toFixed(precision) +  ' ' + units[number];
+		}
+	});
+	
 	app.config(function($routeProvider, $locationProvider, $httpProvider){
 	
 		var checkLoggedin = function($q, $timeout, $http, $location, $rootScope){
