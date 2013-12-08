@@ -62,7 +62,7 @@ var ShowData = {
 		// -1-1 = season, episode
 		
 		// Create artwork directory
-		if (!fs.existsSync(process.cwd() + '/assets/artwork/')) mkdir(process.cwd() + '/assets/artwork', 0775);
+		if (!fs.existsSync(process.cwd() + '/app/assets/artwork/')) mkdir(process.cwd() + '/app/assets/artwork', 0775);
 		
 		db.each(sql, function(error, show){
 			if (error) {
@@ -82,7 +82,7 @@ var ShowData = {
 							return;
 						}
 						var data = json.Data.Series[0];
-						if (data.banner && !fs.existsSync(process.cwd() + '/assets/artwork/'+show.tvdb+'.jpg')) {
+						if (data.banner && !fs.existsSync(process.cwd() + '/app/assets/artwork/'+show.tvdb+'.jpg')) {
 							// Banner Artwork
 							http.get('http://www.thetvdb.com/banners/'+data.banner[0], function(res){
 								var imagedata = '';
@@ -91,7 +91,7 @@ var ShowData = {
 									imagedata += chunk
 								});
 								res.on('end', function(){
-									var file = process.cwd() + '/assets/artwork/'+show.tvdb+'.jpg';
+									var file = process.cwd() + '/app/assets/artwork/'+show.tvdb+'.jpg';
 									fs.writeFile(file, imagedata, 'binary', function(error){
 										if (error) {
 											logger.error(error);

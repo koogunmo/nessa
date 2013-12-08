@@ -68,11 +68,11 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 	});
 	
 	nessa.controller('homeCtrl', function($scope, socket){
-		socket.emit('main.dashboard');
-		socket.on('main.dashboard.latest', function(data){
+		socket.emit('dashboard');
+		socket.on('dashboard.latest', function(data){
 			$scope.latest = data;
 		});
-		socket.on('main.dashboard.stats', function(data){
+		socket.on('dashboard.stats', function(data){
 			$scope.stats = data;
 		});
 	});
@@ -112,13 +112,17 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 	nessa.controller('showCtrl', function($scope, $routeParams, $filter, socket){
 		$scope.detail	= {};
 		$scope.shows	= [];
+		
+		$scope.predicate = 'name';
+		$scope.reverse	= false;
+		
 		$scope.query	= null;
 		$scope.results	= [];
 		$scope.selected = false;
 		
-		socket.emit('shows.enabled');
+		socket.emit('shows.list');
 		
-		socket.on('shows.enabled', function(data){
+		socket.on('shows.list', function(data){
 			$scope.shows = data;
 			setTimeout(function(){
 				$(document).trigger('lazyload');
@@ -126,7 +130,7 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 		});
 		
 		// Search
-		socket.on('show.search', function(data){
+		socket.on('shows.search', function(data){
 			$scope.results = data;
 		});
 		
@@ -152,8 +156,8 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 		};
 		
 		$scope.modalDetail = function(id){
-			socket.emit('show.overview', id);
-			socket.on('show.overview', function(json){
+			socket.emit('show.info', id);
+			socket.on('show.info', function(json){
 				$scope.detail = json;
 				if (!$('.modal-open').length) {
 					$('#show-modal').modal();
@@ -163,7 +167,7 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 		
 		
 		$scope.search = function(){
-			socket.emit('show.search', $scope.query);
+			socket.emit('shows.search', $scope.query);
 		};	
 		$scope.rescan = function(id){
 			// trigger show-specific rescan

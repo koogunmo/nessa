@@ -1,6 +1,8 @@
 /***********************************************************************/
 /* Global Methods */
 
+var pkg = require('./package.json');
+
 global.plugin = function(name){
 	try {
 		return require(__dirname + '/libs/' + name);
@@ -132,6 +134,7 @@ global.db = new sqlite.Database(__dirname + '/db/nessa.sqlite', function(error){
 /***********************************************************************/
 /* Handle events */
 
+/*
 events.on('shows.list', function(error, response){
 	if (response) {
 		var scanner = plugin('scanner');
@@ -155,6 +158,7 @@ events.on('shows.list', function(error, response){
 		scanner.episodes(id);
 	}
 });
+*/
 
 /***********************************************************************/
 /* Load tasks */
@@ -206,9 +210,7 @@ io.sockets.on('connection', function(socket) {
 		}
 	});
 	
-	
-	/*************** New methods for angular interface ***************/
-	
+	/*************** New Socket methods ***************/
 	
 	// System
 	socket.on('system.settings', function(json, callback){
@@ -225,19 +227,13 @@ io.sockets.on('connection', function(socket) {
 					logger.error(error);
 					return;
 				}
-				
 				socket.emit('system.alert', {
 					type: 'success',
 					message: 'Settings saved'
 				});
-				
 				// Update media path
 				app.use('/media', express.static(nconf.get('shows:base')));
-				
-				if (typeof(callback) == 'function') {
-					// alerts, etc
-					callback();
-				}
+				if (typeof(callback) == 'function') callback();
 			});
 		}
 		socket.emit('system.settings', nconf.get());
@@ -271,81 +267,25 @@ io.sockets.on('connection', function(socket) {
 		});
 	});
 	
-	// Dashboard
-	socket.on('main.dashboard', function(){
+	
+	
+	/** Dashboard **/
+	socket.on('dashboard', function(){
 		// Latest downloads
 		db.all("SELECT S.name, E.season, E.episode, E.title, E.synopsis, E.airdate FROM show AS S INNER JOIN show_episode AS E ON S.id = E.show_id ORDER BY downloaded DESC, episode DESC LIMIT 10", function(error, rows){
 			if (error) {
 				logger.error(error);
 				return;
 			}
-			socket.emit('main.dashboard.latest', rows);
+			socket.emit('dashboard.latest', rows);
 		});
-		
 		// Generate some stats for the homepage
-		
-		
-		// socket.emit('main.dashboard.stats', stats);
-	});
-	
-	
-	// Shows
-	
-	socket.on('show.settings', function(data){
-		var show = plugin('showdata');
-		show.settings(data, function(error){
-			if (error) {
-				socket.emit('system.alert', {
-					type: 'danger',
-					message: 'Show settings not updated'
-				});			
-			} else {
-				socket.emit('system.alert', {
-					type: 'success',
-					message: 'Show settings updated'
-				});
-			}
-		});
-		
-	}).on('show.rescan', function(data){
-		var scanner = plugin('scanner');
-		scanner.episodes(data.id);
-		
-		socket.emit('system.alert', {
-			type: 'info',
-			message: 'Show rescan in progress'
-		});
-	})
-	
-	// Search methods
-	
-	socket.on('show.search', function(data){
-		var shows = plugin('showdata');
-		shows.search(data, function(results){
-			
-			socket.emit('show.search', results);
-		});
-		
-	}).on('show.add', function(id){
-		// Add a show
-		var shows = plugin('showdata');
-		shows.add(id, function(){
-			socket.emit('system.alert', {
-				type: 'success',
-				message: 'Show added'
-			});
-			socket.emit('show.added', {id: id});
+		socket.emit('dashboard.stats', {
+			version: pkg.version
 		});
 	});
-	
-	
-	
-	
-	
-	
-	
-	// Downloads
-	
+
+	/** Downloads **/
 	socket.on('download.list', function(data){
 		torrent.list(function(error, data){
 			if (error) {
@@ -366,34 +306,72 @@ io.sockets.on('connection', function(socket) {
 		});
 	});
 	
-	
-	/*************** Old methods to be deprecated ***************/
-	
-	
-	// Old methods
-	
-	
-	
-	
-	/* Page handlers */
-	socket.on('shows.enabled', function(){
-		// List of enabled/subscribed shows
+	/** Shows **/
+	socket.on('shows.list', function(){
 		var shows = plugin('showdata');
 		shows.enabled(function(json){
-			
-			socket.emit('shows.enabled', json);
-			
-			socket.emit('page.template', {
-				template: 'views/show/list.html',
-				data: {
-					shows: json
-				}
+			socket.emit('shows.list', json);
+		});
+		
+	}).on('shows.search', function(data){
+		var shows = plugin('showdata');
+		shows.search(data, function(results){
+			socket.emit('shows.search', results);
+		});
+		
+	}).on('show.info', function(id){
+		var show = plugin('showdata');
+		show.overview(id, function(json){
+			socket.emit('show.info', json);
+		});
+		
+	});
+	// Set
+	socket.on('show.settings', function(data){
+		var show = plugin('showdata');
+		show.settings(data, function(error){
+			if (error) {
+				socket.emit('system.alert', {
+					type: 'danger',
+					message: 'Show settings not updated'
+				});			
+			} else {
+				socket.emit('system.alert', {
+					type: 'success',
+					message: 'Show settings updated'
+				});
+			}
+		});
+	}).on('show.add', function(id){
+		// Add a show
+		var shows = plugin('showdata');
+		shows.add(id, function(){
+			socket.emit('system.alert', {
+				type: 'success',
+				message: 'Show added'
 			});
+			socket.emit('show.added', {id: id});
 		});
 	});
 	
+	// Utility
+	socket.on('show.rescan', function(data){
+		var scanner = plugin('scanner');
+		scanner.episodes(data.id);
+		
+		socket.emit('system.alert', {
+			type: 'info',
+			message: 'Show rescan in progress'
+		});
+		
+	}).on('show.update', function(id){
+		var show = plugin('showdata');
+		show.info(data.id);
+		if (callback) callback();
+	});
 	
-	/* Trakt integration */
+	
+	// Trakt integration
 	socket.on('show.watched', function(data){
 		db.get("SELECT id, tvdb FROM show WHERE id = ?", data.id, function(error, show){
 			trakt.show.seen(show.tvdb, function(json){
@@ -415,8 +393,11 @@ io.sockets.on('connection', function(socket) {
 		});
 	});
 	
-	/***************************************************/
-	/* "API" calls */
+	
+	
+	
+	
+	/*************** Old methods to be converted ***************/
 	
 	
 	
@@ -426,6 +407,7 @@ io.sockets.on('connection', function(socket) {
 		shows.unmatched(function(json){
 			socket.emit('shows.unmatched', json);
 		});
+		
 	}).on('shows.match', function(data){
 		var qs = require('querystring');
 		var match = qs.parse(data);
@@ -437,28 +419,6 @@ io.sockets.on('connection', function(socket) {
 		} catch(e) {
 			logger.error(e.message);
 		}
-	});
-	
-	/* Individual show data */
-	socket.on('show.overview', function(id){
-		// Fetch individual show details
-		var show = plugin('showdata');
-		show.overview(id, function(json){
-			
-			socket.emit('modal.template', {
-				template: 'views/show/info.html',
-				data: json
-			});
-			
-			socket.emit('show.overview', json);
-			
-		});
-		
-	}).on('show.update', function(data, callback){
-		var show = plugin('showdata');
-		show.info(data.id);
-		
-		if (callback) callback();
 	});
 	
 	
@@ -473,10 +433,8 @@ io.sockets.on('connection', function(socket) {
 // Routing
 
 app.get('/', function(req, res) {	
-	res.sendfile(__dirname + '/app/views/index-ng.html');
+	res.sendfile(__dirname + '/app/views/index.html');
 });
-
-
 
 /* User Authentication */
 
@@ -499,7 +457,6 @@ passport.deserializeUser(function(user, done) {
 });
 
 app.get('/loggedin', function(req, res){
-	
 	var response = {
 		authenticated: false,
 		user: {}
@@ -516,7 +473,6 @@ app.get('/loggedin', function(req, res){
 		});
 		if (response.authenticated) return res.send(response);
 	}
-	
 	db.get("SELECT COUNT(id) AS count FROM user", function(error, result){
 		if (error || !result.count) {
 			// no users in db - allow access
@@ -530,14 +486,9 @@ app.get('/loggedin', function(req, res){
 		res.send(response);
 	});
 });
-
-
-
 app.post('/login', passport.authenticate('local'), function(req, res){
-	
 	res.send(req.user);
 });
-
 app.post('/logout', function(req,res){
 	req.logOut();
 	res.send(200);
@@ -547,6 +498,7 @@ app.post('/logout', function(req,res){
 
 
 /* Installer */
+/*
 app.get('/install', function(req, res){
 	if (nconf.get('installed')) {
 //		res.redirect('/');
@@ -575,29 +527,16 @@ app.get('/install', function(req, res){
 	//	res.redirect('/#main/settings');
 	});
 });
-
+*/
+/*
 app.get('/artwork', function(req, res){
 	var show = plugin('showdata');
 	db.each("SELECT id FROM show WHERE status = 1", function(error, row){
 		show.artwork(row.id);
 	});
 });
-
-
-// Below is a chaotic mess of ideas and prototyping
-
-/*
-app.get('/info/:show', function(req, res){
-	var shows = plugin('showdata');
-	shows.info(req.params.show);
-	
-});
-app.get('/episodes/:show', function(req, res){
-	var shows = plugin('showdata');
-	shows.episodes(req.params.show);
-	
-});
 */
+
 
 /*
 // Magnet parser test

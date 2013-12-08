@@ -116,5 +116,6 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute'], functi
 		});
 		
 	});
+		
 	return app;
 });

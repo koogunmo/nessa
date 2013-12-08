@@ -1,10 +1,15 @@
 <div id="shows">
+	<form class="form-group">
+		<label></label>
+		<input type="text" class="form-control" autofocus="true" placeholder="Search" ng-model="filter.name" />
+	</form>
+	
 	<div class="row">
 		<div class="show col-sm-3" ng-click="modalAdd()">
 			<div class="image"></div>
 			<div>Add Show</div>
 		</div>
-		<div class="show col-sm-3" ng-repeat="show in shows" ng-click="modalDetail(show.id)">
+		<div class="show col-sm-3" ng-repeat="show in shows | orderBy:predicate | filter:filter" ng-click="modalDetail(show.id)">
 			<div class="image">
 				<img data-src="/media/{{show.directory}}/cover.jpg" alt="" class="img-responsive" />
 			</div>
@@ -18,7 +23,7 @@
 		<div class="modal-content">
 			<form ng-submit="showAdd()">
 				<div class="modal-header">
-					<input type="text" list="shows-available" class="form-control" autofocus="autofocus" placeholder="Type to search" ng-model="query" ng-change="search()" />
+					<input type="text" list="shows-available" class="form-control" autofocus="true" placeholder="Type to search" ng-model="query" ng-change="search()" />
 				</div>
 				<div class="modal-body" ng-show="results">
 					<div class="results" >
@@ -111,7 +116,7 @@
 						</div>
 					</div>
 				</div>
-			
+				
 				<div class="modal-footer">
 					<button type="submit" class="btn btn-success">Save</button>
 					<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
