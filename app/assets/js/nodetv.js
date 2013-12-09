@@ -171,8 +171,8 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 		};
 		
 		$scope.modalDetail = function(id){
-			socket.emit('show.info', id);
-			socket.on('show.info', function(json){
+			socket.emit('show.summary', id);
+			socket.on('show.summary', function(json){
 				$scope.detail = json;
 				if (!$('.modal-open').length) {
 					$('#show-modal').modal();
@@ -188,7 +188,7 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 			// trigger show-specific rescan
 		};
 		$scope.save = function(){
-			socket.emit('show.settings', $scope.detail.general);
+			socket.emit('show.settings', $scope.detail.summary);
 		};
 		$scope.update = function(id){
 			socket.emit('show.update', {id: id}, function(){

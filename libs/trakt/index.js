@@ -80,7 +80,7 @@ var Trakt = {
 	calendar: {
 		shows: function(callback){
 			Trakt.get('calendar/shows.json', null, function(error, json){
-				if (typeof(callback) == 'function') callback(json);
+				if (typeof(callback) == 'function') callback(error, json);
 			});
 		}
 	},
@@ -93,7 +93,7 @@ var Trakt = {
 				imdb_id: imdb
 			};
 			Trakt.post('movie/library', payload, function(error, json){
-				if (typeof(callback) == 'function') callback(json);
+				if (typeof(callback) == 'function') callback(error, json);
 			});
 		},
 		seen: function(imdb, callback){
@@ -101,7 +101,7 @@ var Trakt = {
 				imdb_id: imdb
 			};
 			Trakt.post('movie/seen', payload, function(error, json){
-				if (typeof(callback) == 'function') callback(json);
+				if (typeof(callback) == 'function') callback(error, json);
 			});
 		},
 		summary: function(imdb, callback){
@@ -109,7 +109,7 @@ var Trakt = {
 				imdb_id: imdb
 			};
 			Trakt.get('movie/summary.json', payload, function(error, json){
-				if (typeof(callback) == 'function') callback(json);
+				if (typeof(callback) == 'function') callback(error, json);
 			});
 		},
 		unlibrary: function(imdb, callback){
@@ -117,7 +117,7 @@ var Trakt = {
 				imdb_id: imdb
 			};
 			Trakt.post('movie/unlibrary', payload, function(error, json){
-				if (typeof(callback) == 'function') callback(json);
+				if (typeof(callback) == 'function') callback(error, json);
 			});
 		},
 		unseen: function(imdb, callback){
@@ -125,7 +125,7 @@ var Trakt = {
 				imdb_id: imdb
 			};
 			Trakt.post('movie/unseen', payload, function(error, json){
-				if (typeof(callback) == 'function') callback(json);
+				if (typeof(callback) == 'function') callback(error, json);
 			});
 		}
 	},
@@ -138,7 +138,7 @@ var Trakt = {
 				episode: null
 			}
 			Trakt.post('show/checkin', payload, function(error, json){
-				if (typeof(callback) == 'function') callback(json);
+				if (typeof(callback) == 'function') callback(error, json);
 			});
 		},
 		
@@ -151,7 +151,7 @@ var Trakt = {
 					episodes: list
 				};
 				Trakt.post('show/episode/library', payload, function(error, json){
-					if (typeof(callback) == 'function') callback(json);
+					if (typeof(callback) == 'function') callback(error, json);
 				});
 			},
 			seen: function(tvdb, season, episode, callback){
@@ -164,7 +164,7 @@ var Trakt = {
 					}]
 				};
 				Trakt.post('show/episode/seen', payload, function(error, json){
-					if (typeof(callback) == 'function') callback(json);
+					if (typeof(callback) == 'function') callback(error, json);
 				});
 			},
 			summary: function(tvdb, season, episode, callback){
@@ -174,7 +174,7 @@ var Trakt = {
 					episode: episode
 				};
 				Trakt.get('show/episode/summary.json', payload, function(error, json){
-					if (typeof(callback) == 'function') callback(json);
+					if (typeof(callback) == 'function') callback(error, json);
 				});
 			},
 			unseen: function(tvdb, season, episode, callback){
@@ -187,7 +187,7 @@ var Trakt = {
 					}]
 				};
 				Trakt.post('show/episode/unseen', payload, function(error, json){
-					if (typeof(callback) == 'function') callback(json);
+					if (typeof(callback) == 'function') callback(error, json);
 				});
 			}
 
@@ -198,7 +198,7 @@ var Trakt = {
 				tvdb_id: tvdb
 			};
 			Trakt.post('show/library', payload, function(error, json){
-				if (typeof(callback) == 'function') callback(json);
+				if (typeof(callback) == 'function') callback(error, json);
 			});
 		},
 		
@@ -206,7 +206,7 @@ var Trakt = {
 			info: function(tvdb, season, callback){
 				var payload = [tvdb, season];
 				Trakt.get('show/season.json', payload, function(error, json){
-					if (typeof(callback) == 'function') callback(json);
+					if (typeof(callback) == 'function') callback(error, json);
 				});
 			},
 			library: function(tvdb, season, callback){
@@ -215,7 +215,7 @@ var Trakt = {
 					season: season
 				};
 				Trakt.post('show/season/library', payload, function(error, json){
-					if (typeof(callback) == 'function') callback(json);
+					if (typeof(callback) == 'function') callback(error, json);
 				});
 			},
 			seen: function(tvdb, season, callback){
@@ -224,7 +224,7 @@ var Trakt = {
 					season: season
 				};
 				Trakt.post('show/season/seen', payload, function(error, json){
-					if (typeof(callback) == 'function') callback(json);
+					if (typeof(callback) == 'function') callback(error, json);
 				});
 			}
 		},
@@ -233,7 +233,7 @@ var Trakt = {
 				tvdb_id: tvdb
 			};
 			Trakt.get('show/seasons.json', payload, function(error, json){
-				if (typeof(callback) == 'function') callback(json);
+				if (typeof(callback) == 'function') callback(error, json);
 			});
 		},
 		seen: function(tvdb, callback){
@@ -241,7 +241,7 @@ var Trakt = {
 				tvdb_id: tvdb
 			};
 			Trakt.post('show/seen', payload, function(error, json){
-				if (typeof(callback) == 'function') callback(json);
+				if (typeof(callback) == 'function') callback(error, json);
 			});
 		},
 		summary: function(tvdb, callback){
@@ -249,7 +249,7 @@ var Trakt = {
 				tvdb_id: tvdb
 			};
 			Trakt.get('show/summary.json', payload, function(error, json){
-				if (typeof(callback) == 'function') callback(json);
+				if (typeof(callback) == 'function') callback(error, json);
 			});
 		},
 		unlibrary: function(tvdb, callback){
@@ -257,7 +257,7 @@ var Trakt = {
 				tvdb_id: tvdb
 			};
 			Trakt.post('show/unlibrary', payload, function(error, json){
-				if (typeof(callback) == 'function') callback(json);
+				if (typeof(callback) == 'function') callback(error, json);
 			})
 		
 		},
@@ -275,7 +275,7 @@ var Trakt = {
 				payload.shows.push(shows)
 			}
 			Trakt.post('show/watchlist', payload, function(error, json){
-				if (typeof(callback) == 'function') callback(json);
+				if (typeof(callback) == 'function') callback(error, json);
 			})
 		}
 	}

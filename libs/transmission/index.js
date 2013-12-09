@@ -15,7 +15,8 @@ var torrent = {
 		});
 		return this;
 	},
-	add: function(obj) {
+	
+	add: function(obj, callback) {
 		try {
 			if (!this.rpc) {
 				console.log('Unable to connect to Transmission');

@@ -134,6 +134,8 @@ global.db = new sqlite.Database(__dirname + '/db/nessa.sqlite', function(error){
 /***********************************************************************/
 /* Handle events */
 
+
+
 /*
 events.on('shows.list', function(error, response){
 	if (response) {
@@ -163,7 +165,7 @@ events.on('shows.list', function(error, response){
 /***********************************************************************/
 /* Load tasks */
 if (nconf.get('installed')) {
-	fs.readdir(__dirname + '/core/tasks', function(error, files){
+	fs.readdir(__dirname + '/server/tasks', function(error, files){
 		if (error) {
 			logger.error(error);
 			return;
@@ -172,7 +174,7 @@ if (nconf.get('installed')) {
 		files.filter(function(file){
 			return (file.substr(-3) == '.js');
 		}).forEach(function(file){
-			require(__dirname + '/core/tasks/' + file);
+			require(__dirname + '/server/tasks/' + file);
 		});
 	});
 }
@@ -210,6 +212,13 @@ io.sockets.on('connection', function(socket) {
 		}
 	});
 	
+	events.on('system.alert', function(data){
+		socket.emit('system.alert', {
+			type: data.type,
+			message: data.message
+		});
+	});
+	
 	/*************** New Socket methods ***************/
 	
 	// System
@@ -224,7 +233,6 @@ io.sockets.on('connection', function(socket) {
 						type: 'danger',
 						message: 'Settings were not saved'
 					});
-					logger.error(error);
 					return;
 				}
 				socket.emit('system.alert', {
@@ -267,8 +275,6 @@ io.sockets.on('connection', function(socket) {
 		});
 	});
 	
-	
-	
 	/** Dashboard **/
 	socket.on('dashboard', function(){
 		// Latest downloads
@@ -309,20 +315,23 @@ io.sockets.on('connection', function(socket) {
 	/** Shows **/
 	socket.on('shows.list', function(){
 		var shows = plugin('showdata');
-		shows.enabled(function(json){
-			socket.emit('shows.list', json);
+		shows.list(function(error, results){
+			socket.emit('shows.list', results);
 		});
 		
 	}).on('shows.search', function(data){
 		var shows = plugin('showdata');
-		shows.search(data, function(results){
+		shows.search(data, function(error, results){
 			socket.emit('shows.search', results);
 		});
 		
-	}).on('show.info', function(id){
+	}).on('show.summary', function(id){
 		var show = plugin('showdata');
-		show.overview(id, function(json){
-			socket.emit('show.info', json);
+		show.summary(id, function(error, json){
+			
+			console.log(json);
+			
+			socket.emit('show.summary', json);
 		});
 		
 	});
@@ -374,20 +383,20 @@ io.sockets.on('connection', function(socket) {
 	// Trakt integration
 	socket.on('show.watched', function(data){
 		db.get("SELECT id, tvdb FROM show WHERE id = ?", data.id, function(error, show){
-			trakt.show.seen(show.tvdb, function(json){
+			trakt.show.seen(show.tvdb, function(error, json){
 				db.run("UPDATE show_episode SET watched = 1 WHERE show_id = ?", show.id);
 			});
 		});
 	}).on('show.season.watched', function(data){
 		db.get("SELECT id, tvdb FROM show WHERE id = ?", data.id, function(error, show){
-			trakt.show.season.seen(show.tvdb, data.season, function(json){
+			trakt.show.season.seen(show.tvdb, data.season, function(error, json){
 				db.run("UPDATE show_episode SET watched = 1 WHERE show_id = ? AND season = ?", show.id, data.season);
 			});
 		});
 	}).on('show.episode.watched', function(data){
 		db.get("SELECT E.id, S.tvdb, E.season, E.episode FROM show AS S INNER JOIN show_episode AS E ON S.id = E.show_id WHERE E.id = ?", data.episode, function(error, row){
 			if (error || !row) return;
-			trakt.show.episode.seen(row.tvdb, row.season, row.episode, function(json){
+			trakt.show.episode.seen(row.tvdb, row.season, row.episode, function(error, json){
 				db.run("UPDATE show_episode SET watched = 1 WHERE id = ?", row.id);
 			});
 		});
