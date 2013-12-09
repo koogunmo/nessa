@@ -33,6 +33,21 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 	});
 	
 	nessa.controller('navCtrl', function($scope, $location){
+		
+		$scope.menu = [{
+			path: 'dashboard',
+			name: 'Dashboard'
+		},{
+			path: 'shows',
+			name: 'Shows'
+		},{
+			path: 'downloads',
+			name: 'Downloads'
+		},{
+			path: 'settings',
+			name: 'Settings'
+		}];
+		
 		$scope.isActive = function(viewLocation){
 			return viewLocation === $location.path();
 		};
@@ -186,9 +201,6 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 	
 	// Bootstrap to document
 	angular.bootstrap(document, ['nessa'])
-	
-	
-	
 	// jQuery below
 	$(document).on('lazyload', function(){
 		$('div.image:visible img[data-src]').each(function(){
@@ -199,6 +211,7 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 				src: $(this).data('src')
 			});
 		});
+		
 	}).on('click', '#dashboard .latest', function(){
 		$('.synopsis', this).slideToggle();
 		
