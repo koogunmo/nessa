@@ -1,190 +1,87 @@
 # NodeTV
 Automated TV Torrenting acquisition
 
-Now with 100% more [Angular](http://angularjs.org) and [Bootstrap](http://getbootstrap.com)!
+## Project Goal
 
-## Angular/Bootstrap Todos
+"Build a system that functions in a similar manner to SickBeard, but using torrents only."
 
-- Show settings (save)
-- Add show
+I tried to use SickBeard, but it wouldn't easily let me arrange my files in a way I liked. It was also heavily skewed towards using newsgroups, which I don't use, thus NodeTV was born.
 
-## System Requirements
 
-- Compatible operating system
+
+## Requirements
+
+- Compatible operating systems
 	- Linux: Tested on Ubuntu
-	- OS X *should* work too
-	- Windows users: You're on your own for now.
-- Node.js 0.10.x
-- Transmission with RPC Enabled
+	- OS X: 10.6 or later
+	- Windows users: You're on your own for now
+		- Please see the note at the bottom of this document
+- [Node.js](http://nodejs.org) 0.10.x
+- [Transmission](http://transmissionbt.com) with RPC Enabled
+- A free [Trakt](http://trakt.tv) account
 - Plenty of storage space
 
-## "Optional" Third-party software
-NodeTV doesn't handle uPNP/AV (yet), so you'll need a MediaServer if you want to stream your content. I've used the following, with various degrees of success
+
+
+## Optional Third-party software
+NodeTV doesn't handle uPNP/DLNA (yet), so if you want to stream your content, you'll need a MediaServer. I've used the following, with various degrees of success
 
 - [ReadyMedia](minidlna.sourceforge.net) (Open-source)
 - [Twonky 7](http://twonky.com/downloads) (Commercial)
 
 These work reasonably well with VLC and my XBOX 360. Your mileage may vary.
 
+
+
 ## Browser Support
 
 NodeTV works in all current browsers. IE 8.0 and earlier are *NOT* supported.
 
+
+
 ## Installing
 
-Once you've cloned the repository, you'll need to install the dependencies
+Clone the repository
+> git clone https://github.com/greebowarrior/nessa.git /opt/nodetv
+
+Next, you'll need to install the dependencies
 > npm install
+
+
 
 ## Running NodeTV
 
+On the command line, run the following
 > /usr/bin/node /path/to/nodetv/server.js
 
 You'll probably want to daemonize the process, I use [forever](https://github.com/nodejitsu/forever).
 
 You can then access the interface at [http://localhost:6377](http://localhost:6377)  
-Alternatively, you could use a reverse proxy like nginx on port 80:
 
-	server {
-		listen 80;
-		root /opt/nessa;
-		index index.html index.htm;
-		server_name _;
-		location / {
-		        proxy_pass http://localhost:6377;
-		        proxy_http_version 1.1;
-		        proxy_set_header Upgrade $http_upgrade;
-		        proxy_set_header Connection "upgrade";
-		        proxy_set_header Host $host;
-		}
-	}
+### Ubuntu
+An upstart job can be found at scripts/upstart.conf
+> sudo cp scripts/upstart.conf /etc/init/nodetv.conf  
+> sudo initctl reload-configuration
 
-
-## Project Goal
-
-"Build a system that functions in a similar manner to SickBeard, but using torrents only."
-
-I tried to use SickBeard, but it wouldn't easily let me arrange my files in a way I liked.  
-It was also heavily skewed towards using newsgroups, which I don't use.
-
-## Roadmap
-
-### Phase 1 - **COMPLETE**
-- Populate a database of known shows
-	- We're piggybacking TVShowsApp's XML feeds for now
-- Retrieve TVDB data
-	- TVDB: Full title, Synopsis, IMDB ID
-- Update show list weekly
-- Scan local filesystem for directories
-	- Match show with database entry, flag as enabled
-	- Retrieve episode listings from TVDB
-- Scan show directories for episodes
-	- Update database and rename episode files if necessary
-- Automatically grab new torrents by schedule.
-	- Again, we're using TVShowsApp's feeds for this
-	- Parse and reformat the magnet link to add a few extra trackers
-	- Add to Transmission
-	- Copy and rename when download completes
-	- Delete from Transmission directory when seeding is complete
-
-**NodeTV is now capable of running 24/7, but limited to downloading new episodes of existing shows only.**
-
----
-
-### Phase 2 - COMPLETE
-- ~~Automatic update by schedule~~
-	- ~~Pull latest version from Github then send SIGUSR2~~
-- *Build responsive HTML5 interface (Ongoing)*
-	- ~~Use Socket.IO~~
-	- ~~Handlebars for templating~~
-	- ~~Responsive layout (Mobile-first)~~
-- ~~Browse show list~~
-- ~~Get show artwork from TVDB~~
-- ~~Display show information~~
-	- ~~Modal window~~
-	- ~~Use artwork banner or poster~~
-	- ~~list episodes~~
-- ~~Add Show~~
-	- ~~Use existing shows database~~
-	- ~~Autocomplete style search~~
-	- ~~Create folder using show name~~
-- ~~Support for unmatched shows~~
-	- ~~Find shows without TVShows data, retrieve TVDB data~~
-	- ~~Interface for matching with TVDB~~
-	- ~~Trigger filesystem scan for episodes~~
-
-**NodeTV now has a usable, if basic, interface**
-
----
-
-### Phase 3 - *CURRENT*
-
-- ~~Improve show modal~~
-	- ~~Trigger rescan/info update~~
-	- ~~Settings tab/section~~
-	- ~~Episode list needs to scroll~~
-- Authentication
-	- ~~User/Pass~~
-		- Need interface to manage users
-	- ~~IP Whitelisting~~
-- Dashboard
-	- ~~Show recently downloaded~~
-	- Show upcoming episodes (next 7 days)
-- ~~trakt integration~~
-- Add custom show
-	- Enter name
-	- Search TVDB
-	- Add custom RSS url
-- REPACK support?
-- Scan Transmission for *manually* added shows?
-	- Move to right place, rename, etc
-- Improve Matching UI
-	- Use modal window
-- Twilio for SMS download notifications?
-- Per-show settings (HD, enabled, etc)
-	- ~~SD/HD~~
-	- SMS Notifications on/off
-- Notification system
-	- info bubbles?
-- Handle series "specials"
-	- e.g. Doctor Who christmas episodes
-
-### Phase 4
-- Ants. Ants EVERYWHERE!
-- Better UI & navigation
-- Integration Overrides
-	- Trakt
-- ~~Simple torrent management~~
-- Setup wizard
-	- Clean install test
-
-### Phase 5
-- Remove dependency on TVShows
-	- Feeds seem to be unreliable at times
-	- Migrate to ShowRSS
-
-### Phase 6
-- Custom templates and/or themes
-	- I'm sure some people won't like my idea of design
-- Implement uPNP/DLNA MediaServer?
-	- Removes dependency on Twonky/miniDLNA
-		- Need to find/write a good uPnP/AV module?
 
 
 ## File formatting
 
 We use a human-readable format for directories and filenames.
-	
-	[Show Name]/Season ##/Episode ## - [Show Title].ext
+>[Show Name]/Season ##/Episode ## - [Show Title].ext
+
 Season and Episode numbers always have leading zeroes.
 
 In the case of multipart episodes, the format is expanded
-	
-	[Show Name]/Season ##/Episode ##-## - [Part 1 Title; Part 2 Title].ext
+> [Show Name]/Season ##/Episode ##-## - [Part 1 Title; Part 2 Title].ext
+
 For example:
 
-	Falling Skies/Season 01/Episode 01-02 - Live and Learn; The Armory.avi
+> Falling Skies/Season 01/Episode 01-02 - Live and Learn; The Armory.avi
 
 We chose this format due to it's tidy structure, ease of navigation, and legibility. We may, in future, add the ability to customise this on a global and per-show basis.
+
+
 
 ## RegExp
 
@@ -235,19 +132,33 @@ At the time of writing, daily shows have not been tested at all.
 
 ### Specials / Miniseries
 
-We need to create expressions for miniseries.						
+We need to create expressions for miniseries.
+
+
+			
 ## Acknowledgments
 
 NodeTV utilises the following third-party data sources:
 
-- [TVShowsApp](http://tvshowsapp.com): If you like *our* software, please donate to *them* so they can keep up their fantastic work (and providing us with data)
-- [The TVDB](http://thetvdb.com): Show information, Episodes, and artwork
+- [TVShowsApp](http://tvshowsapp.com): Show list and RSS feeds
+- [Trakt.tv](http://trakt.tv): Show information, artwork and social functions
+
+
 
 ## Licence
 
 This software is distributed under a Modified BSD License. Please see LICENCE.txt for full details
 
+
+
 ## Disclaimer
 
 The authors of this software not condone, or approve of the illegal downloading and/or sharing of copyrighted material. You, the end user, are solely responsible for any legal actions against you that may occur as a result of using this software.
 
+
+
+## Windows Users
+
+There's no specific reason why NodeTV won't work on your system, but we just don't have the means to test it.
+
+You'll need to install [Transmission-QT](http://sourceforge.net/projects/trqtw/)

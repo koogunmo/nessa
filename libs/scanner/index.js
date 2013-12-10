@@ -27,40 +27,29 @@ function listDirectory(path, callback) {
 	});
 }
 
-module.exports = exports = {
-	shows: function(){
-		logger.info('Scanning shows...');
+var Scanner = {
+	shows: function(callback){
+		// Scan media directory for folders - calback is called for each item found
+		var self = this;
 		if (base = nconf.get('shows:base')) {
 			fs.readdir(base, function(error, dirs){
-				if (error) {
-					logger.log(error);
-					return;
-				}
+				if (error) return;
 				dirs.forEach(function(dir){
 					fs.stat(base + '/' + dir, function(error, stat){
-						if (error) {
-							logger.error(error);
-							return;	
-						}
+						if (error) return;
 						if (stat && stat.isDirectory()){
 							db.get("SELECT * FROM show WHERE name = ?", dir, function(error, row){
-								if (error) {
-									logger.error(error);
-									return;
-								}
+								if (error) return;
 								if (row === undefined) {
 									// Not in database, queue to find later
 									db.run('INSERT INTO show_unmatched (directory) VALUES (?)', dir, function(error){
-										if (error) {
-											logger.error(error);
-											return;
-										}
+										if (error) return;
 									});
 									return;
 								}
 								if (!row.directory) {
 									db.run("UPDATE show SET status = 1, directory = ? WHERE id = ?", dir, row.id);
-									events.emit('scanner.shows', null, row.id);
+									if (typeof(callback) == 'function') callback(null, row.id);
 								}
 								if (row.tvdb) trakt.show.library(row.tvdb);
 							});
@@ -68,24 +57,15 @@ module.exports = exports = {
 					});
 				});
 			});
-		//	events.emit('scanner.shows', null, null);
 		}
 	},
 	
-	episodes: function(showid, season, episode){
+	episodes: function(id, callback){
+		var self = this;
 		if (base = nconf.get('shows:base')) {
-			if (showid === undefined) {
-				return;
-			}
-			db.get("SELECT id, name, directory FROM show WHERE directory IS NOT NULL AND id = ?", showid, function(error, show){
+			db.get("SELECT id, name, directory FROM show WHERE directory IS NOT NULL AND id = ?", id, function(error, show){
 				try {
-					if (error) {
-						logger.error(error);
-						return;
-					}
-					if (!show.directory) return;
-					
-					logger.info(show.name + ': Scanning episodes...');
+					if (error || !show.directory) return;
 					var showdir = base + '/' + show.directory;
 					
 					listDirectory(showdir, function(filepath){
@@ -101,10 +81,7 @@ module.exports = exports = {
 						}
 						// Title formatting
 						db.all("SELECT E.*, S.tvdb FROM show_episode AS E INNER JOIN show AS S ON S.id = E.show_id WHERE E.show_id = ? AND E.season = ?", show.id, data.season, function(error, rows){
-							if (error) {
-								logger.error(error);
-								return;
-							}
+							if (error) return;
 							var library = [];
 							var title = [];
 							var tvdb = null;
@@ -114,6 +91,9 @@ module.exports = exports = {
 									title.push(row.title);
 								}
 							});
+							
+							// TODO: use helper.formatName here instead
+							
 							var newName = 'Season '+helper.zeroPadding(data.season)+'/Episode '+ep+' - '+title.join('; ')+path.extname(file);
 							if (file != newName) {
 								helper.moveFile(showdir + '/' + file, showdir + '/' + newName);
@@ -130,7 +110,7 @@ module.exports = exports = {
 							});
 							trakt.show.episode.library(tvdb, library);
 						});
-						events.emit('scanner.episodes', null, show.id);
+					//	events.emit('scanner.episodes', null, show.id);
 					});
 				} catch(e) {
 					logger.error(e.message);
@@ -139,3 +119,5 @@ module.exports = exports = {
 		}
 	}
 };
+
+module.exports = exports = Scanner;

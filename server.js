@@ -199,7 +199,7 @@ io.sockets.on('connection', function(socket) {
 	
 	socket.on('reconnected', function(data) {
 		try {
-			console.log(data);
+			logger.log(data);
 		} catch(e) {
 			logger.error('reconnected: ' + e.message);
 		}
@@ -253,7 +253,13 @@ io.sockets.on('connection', function(socket) {
 		});
 		
 		var scanner = plugin('scanner');
-		scanner.shows();
+		var shows = plugin('showdata');
+		
+		scanner.shows(function(error, id){
+			shows.getFullListings(id, function(error, id){
+				scanner.episodes(id);
+			});
+		});
 		
 	}).on('system.restart', function(){
 		socket.emit('system.alert', {
@@ -328,9 +334,6 @@ io.sockets.on('connection', function(socket) {
 	}).on('show.summary', function(id){
 		var show = plugin('showdata');
 		show.summary(id, function(error, json){
-			
-			console.log(json);
-			
 			socket.emit('show.summary', json);
 		});
 		
@@ -367,16 +370,23 @@ io.sockets.on('connection', function(socket) {
 	socket.on('show.rescan', function(data){
 		var scanner = plugin('scanner');
 		scanner.episodes(data.id);
-		
 		socket.emit('system.alert', {
 			type: 'info',
 			message: 'Show rescan in progress'
 		});
 		
-	}).on('show.update', function(id){
+	}).on('show.update', function(data){
 		var show = plugin('showdata');
-		show.info(data.id);
-		if (callback) callback();
+		show.getArtwork(data.id, function(error, json){
+			show.list(function(error, results){
+				socket.emit('shows.list', results);
+			});
+		});
+		show.getFullListings(data.id, function(error, json){
+			show.summary(data.id, function(error, json){
+				socket.emit('show.summary', json);
+			});
+		});
 	});
 	
 	

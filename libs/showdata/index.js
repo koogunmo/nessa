@@ -137,7 +137,7 @@ var ShowData = {
 					summary: show,
 					listing: episodes
 				};
-				response.summary.directory = nconf.get('shows:base')+'/'+show.directory;
+				response.summary.path = nconf.get('shows:base')+'/'+show.directory;
 				
 				if (typeof(callback) == 'function') callback(null, response);
 			});
@@ -147,6 +147,37 @@ var ShowData = {
 	
 	/******************************************************/
 	
+	getArtwork: function(id, callback){
+		var self = this;
+		var http = require('http');
+		
+		db.get("SELECT * FROM show WHERE id = ?", id, function(error, show){
+			// get poster and banner art from trakt
+			trakt.show.summary(show.tvdb, function(error, json){
+				if (json.images.banner){
+					var banner = fs.createWriteStream(nconf.get('shows:base') + '/' + show.directory + '/banner.jpg');
+					banner.on('error', function(e){
+						console.error(e);
+					});
+					var request = http.get(json.images.banner, function(response){
+						response.pipe(banner);
+					});
+				}
+				if (json.images.poster) {
+					var src = json.images.poster.replace('.jpg', '-138.jpg');
+					var poster = fs.createWriteStream(nconf.get('shows:base') + '/' + show.directory + '/poster.jpg');
+					poster.on('error', function(e){
+						console.error(e);
+					});
+					var request = http.get(src, function(response){
+						response.pipe(poster);
+					});
+				}
+				if (typeof(callback) == 'function') callback(null, show.id);
+			});
+		});
+	},
+	
 	getEpisode: function(id, season, episode, callback){
 		var self = this;
 		db.get("SELECT * FROM show WHERE id = ?", id, function(error, show){
@@ -154,6 +185,25 @@ var ShowData = {
 				episode.show_id = show.id;
 				self.setEpisode(episode, function(error, response){
 					if (typeof(callback) == 'function') callback(null, true);
+				});
+			});
+		});
+	},
+	
+	getFullListings: function(id, callback){
+		var self = this;
+		// Fetch episode listings
+		db.get("SELECT * FROM show WHERE id = ?", id, function(error, show){
+			trakt.show.seasons(show.tvdb, function(error, seasons){
+				seasons.forEach(function(season){
+					// TODO: Handle season artwork
+					trakt.show.season.info(show.tvdb, season.season, function(error, episodes){
+						episodes.forEach(function(episode){
+							episode.show_id = show.id;
+							self.setEpisode(episode);
+						});
+						if (typeof(callback) == 'function') callback(null, show.id);
+					});
 				});
 			});
 		});
@@ -236,25 +286,6 @@ var ShowData = {
 				} catch(e) {
 					logger.error(e.message);
 				}
-			});
-		});
-	},
-	
-	getFullListings: function(id, callback){
-		var self = this;
-		// Fetch episode listings
-		db.get("SELECT * FROM show WHERE id = ?", id, function(error, show){
-			trakt.show.seasons(show.tvdb, function(error, seasons){
-				seasons.forEach(function(season){
-					// TODO: Handle season artwork
-					trakt.show.season.info(show.tvdb, season.season, function(error, episodes){
-						episodes.forEach(function(episode){
-							episode.show_id = show.id;
-							self.setEpisode(episode);
-						});
-					});
-				});
-				if (typeof(callback) == 'function') callback(null, true);
 			});
 		});
 	},

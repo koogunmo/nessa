@@ -180,9 +180,16 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 			});
 		};
 		
-		
+		var delaySearch = null;
 		$scope.search = function(){
-			socket.emit('shows.search', $scope.query);
+			clearTimeout(delaySearch);
+			
+			$scope.results = [];
+			if ($scope.query.length >= 3) {
+				delaySearch = setTimeout(function(){
+					socket.emit('shows.search', $scope.query);
+				}, 500);
+			}
 		};	
 		$scope.rescan = function(id){
 			// trigger show-specific rescan

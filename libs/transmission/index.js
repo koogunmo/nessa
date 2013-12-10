@@ -22,7 +22,8 @@ var torrent = {
 				console.log('Unable to connect to Transmission');
 				return;
 			}
-			// TO DO: reformat magnet to add extra trackers
+			
+			obj.magnet = helper.formatMagnet(obj.magnet);
 			this.rpc.add(obj.magnet, function(error, args){
 				if (error) {
 					logger.error('bt:add', error, obj);

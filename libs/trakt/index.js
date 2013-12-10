@@ -25,6 +25,12 @@ var Trakt = {
 	
 	get: function(url, data, callback) {
 	//	if (!Trakt.settings.enabled) return;
+		
+		if (typeof(data) == 'object') {
+			var array = [];
+			for (var i in data) array.push(data[i]);
+			data = array;
+		}
 		var path = (data) ? '/' + data.join('/') : '';
 		request({
 			uri: 'http://api.trakt.tv/'+url+'/'+Trakt.settings.apikey + path,
@@ -37,7 +43,7 @@ var Trakt = {
 			try {
 				if (typeof(response) != 'object') response = JSON.parse(response);
 			//	var error = (response.status == 'success') ? false : true;
-				callback(false, response);
+				if (typeof(callback) == 'function') callback(null, response);
 			} catch(e) {
 				logger.error(url+': '+e.message);
 			}
@@ -59,7 +65,7 @@ var Trakt = {
 				if (typeof(response) != 'object') response = JSON.parse(response);
 				var error = null;
 				if (response.status == 'failed') error = response.message;
-				callback(error, response);
+				if (typeof(callback) == 'function') callback(null, response);
 			} catch(e) {
 				logger.error(url+': '+e.message);
 			}
@@ -69,10 +75,10 @@ var Trakt = {
 	/*********************************/
 	
 	account: {
-		test: function(){
+		test: function(callback){
 			var payload = {};
 			Trakt.post('account/test', payload, function(error, json){
-				console.log(json);
+				if (typeof(callback) == 'function') callback(error, json);
 			});
 		}
 	},
@@ -125,6 +131,25 @@ var Trakt = {
 				imdb_id: imdb
 			};
 			Trakt.post('movie/unseen', payload, function(error, json){
+				if (typeof(callback) == 'function') callback(error, json);
+			});
+		}
+	},
+	
+	search: {
+		movies: function(query){
+			var payload = {
+				query: query
+			};
+			Trakt.get('search/movies.json', payload, function(error, json){
+				if (typeof(callback) == 'function') callback(error, json);
+			});
+		},
+		shows: function(query){
+			var payload = {
+				query: query
+			};
+			Trakt.get('search/show.json', payload, function(error, json){
 				if (typeof(callback) == 'function') callback(error, json);
 			});
 		}

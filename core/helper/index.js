@@ -1,25 +1,16 @@
 var fs		= require('fs'),
 	mkdirp	= require('mkdirp'),
 	path	= require('path'),
-	url		= require('url')
-	qs		= require('querystring');
+	qs		= require('querystring'),
+	url		= require('url'),
+	extend	= require('xtend');
 
 // Common helper functions
 
 exports = module.exports = {
 	
-	isRepack: function(name) {
-		return (name.match(/repack|proper/i)) ? true : false;
-	},
-	
-	// Zero-pad a integer to the required length
-	zeroPadding: function(num, length) {
-		var pad = '000000';
-		if (typeof(length) == 'undefined') length = 2;
-		return (pad + num).slice(-length);
-	},
-	
-	copyFile: function(from, to, callback) {
+	// FS methods
+	fileCopy: function(from, to, callback) {
 		try {
 			if (!fs.existsSync(path.dirname(to))) {
 				mkdirp.sync(path.dirname(to, 0775));
@@ -41,7 +32,30 @@ exports = module.exports = {
 		}
 	},
 	
-	// Parse the various formats for TV Shows
+	fileMove: function(from, to, callback) {
+		// Move a file to the correct location
+		try {
+			if (!fs.existsSync(path.dirname(to))) {
+				mkdirp.sync(path.dirname(to, 0775));
+			}
+			fs.rename(from, to, callback);
+		} catch(e) {
+			logger.error(e.message);
+		}
+	},
+	
+	copyFile: function(from, to, callback) {
+		console.warn('helper.copyFile is deprecated');
+		return this.fileCopy(from, to, callback);
+	},
+	
+	moveFile: function(from, to, callback) {
+		console.warn('helper.moveFile is deprecated');
+		return this.fileMove(from, to, callback);
+	},
+	
+	
+	// RegExp methods
 	getEpisodeNumbers: function(file) {
 		
 		var file = file.toString();
@@ -80,77 +94,64 @@ exports = module.exports = {
 		return (response !== undefined) ? response : false;
 	},
 	
-	moveFile: function(from, to, callback) {
-		// Move a file to the correct location
-		try {
-			if (!fs.existsSync(path.dirname(to))) {
-				mkdirp.sync(path.dirname(to, 0775));
-			}
-			fs.rename(from, to, callback);
-		} catch(e) {
-			logger.error(e.message);
+	// Formatting methods
+	zeroPadding: function(num, length) {
+		var pad = '000000';
+		if (typeof(length) == 'undefined') length = 2;
+		return (pad + num).slice(-length);
+	},
+	formatName: function(data){
+		var defaults = {
+			format: nconf.get('shows:format'),
+			season: null,
+			episodes: [],
+			ext: null
+		};
+		var values = extend(defaults, data);
+		var token = {
+			'E': null,
+			'S': null,
+			'T': null,
+			'X': null,
+		};
+		if (values.episodes.length > 1) {
+			values.episodes.sort();
+			token.E = helper.zeroPadding(values.episodes[0].episode)+'-'+helper.zeroPadding(values.episodes[values.episodes.length-1].episode);
+			var titles = [];
+			values.episodes.forEach(function(episode){
+				titles.push(episode.title);
+			});
+			token.T = titles.join('; ');
+		} else {
+			token.E = helper.zeroPadding(values.episodes[0].episode);
+			token.T = values.episodes[0].title;
 		}
+		token.S = helper.zeroPadding(values.season);
+		token.X = values.ext.replace(/^\./, '');
+		
+		return values.format.replace(/%(\w)/g, function(match, key){			
+			return token[key];
+		});
 	},
 	
-	niceName: function(data){
-		// Is this used?
-		var data = {
-			episode: [],
-			ext: '',
-			format: 'Season %S/Episode %E - %T.%X',
-			name: '',
-			season: '',
-			title: []
-		};
-		
-		var output = '';
-		if (season) {
-			output += 'Season '+helper.zeroPadding(data.season)+'/';
-		} else {
-			output += 'Specials/';
-		}
-		if (episode.length > 1) {
-			var ep = helper.zeroPadding(data.episodes[0])+'-'+helper.zeroPadding(data.episodes[data.episodes.length-1]);
-		} else {
-			var ep = helper.zeroPadding(data.episodes[0]);
-		}
-		
-		output += 'Episode '+ep;
-		if (title) {
-			output += ' - '+title.join('; ');
-		}
-		output += ext;
-		
-		return output;
-		
-		
-		/*
-		if (format = nconf.get('shows:format')) {
-			var replace = {
-				'E': ep
-			//	'N': data.name,
-				'S': helper.zeroPadding(data.season, 2),
-				'T': title.join('; '),
-				'X': ext.replace(/^\./, '')
-			};
-			var name = format.replace(/%(\w)/g, function(match, key){			
-				return replace[key];
-			});
-			name = nconf.get('shows:base') + '/' + row.directory + '/' + name;
-		}
-		*/
+	// Torrent methods
+	
+	isRepack: function(name) {
+		return (name.match(/repack|proper/i)) ? true : false;
 	},
 	
 	formatMagnet: function(magnet, name){
+		// Add extra trackers to the torrent before adding
 		try {
 			var data = url.parse(magnet, true);
 			if (name !== undefined) data.query.dn = name;
 			var trackers = [
-				'udp://tracker.openbittorent.com:80',
 				'udp://open.demonii.com:1337',
+				'udp://tracker.openbittorent.com:80',
 				'udp://tracker.publicbt.com:80',
 				'udp://tracker.istole.it:80',
 				'udp://tracker.ccc.de:80',
+				'udp://tracker.coppersurfer.tk:6969'
 			];
 			data.query.tr.forEach(function(tracker){
 				if (trackers.indexOf(tracker) == -1) {

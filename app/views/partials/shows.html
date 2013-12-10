@@ -11,7 +11,7 @@
 		</div>
 		<div class="show col-sm-3" ng-repeat="show in shows | orderBy:predicate | filter:filter" ng-click="modalDetail(show.id)">
 			<div class="image">
-				<img data-src="/media/{{show.directory}}/cover.jpg" alt="" class="img-responsive" />
+				<img data-src="/media/{{show.directory}}/poster.jpg" alt="" class="img-responsive" />
 			</div>
 			<div>{{show.name}}</div>
 		</div>
@@ -50,7 +50,7 @@
 					<button type="button" class="close close-corner" data-dismiss="modal" aria-hidden="true">
 						<img src="assets/gfx/overlay-close.png" />
 					</button>
-					<img src="assets/artwork/{{detail.summary.tvdb}}.jpg" alt="{{detail.summary.name}}" class="img-responsive" />
+					<img src="media/{{detail.summary.directory}}/banner.jpg" alt="{{detail.summary.name}}" class="img-responsive" />
 				</div>
 				
 				<ul class="nav nav-tabs">
@@ -99,7 +99,7 @@
 						<div class="tab-pane" id="settings">
 							<div class="form-group">
 								<label for="ipt_setting_directory">Media Directory</label>
-								<input type="text" ng-model="detail.summary.directory" readonly="readonly" class="form-control" />
+								<input type="text" ng-model="detail.summary.path" readonly="readonly" class="form-control" />
 							</div>
 							<div class="form-group">
 								<input type="checkbox" name="status" ng-model="detail.summary.status" ng-checked="detail.summary.status==1" ng-true-value="1" ng-false-value="0" />

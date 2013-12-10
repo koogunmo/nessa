@@ -5,6 +5,7 @@ var shows		= plugin('showdata');
 function updateListings(){
 	// Update show listings
 	shows.getShowlist();
+	
 	// Update show information (synopsis, etc)
 	db.each("SELECT * FROM show WHERE directory IS NOT NULL", function(error, show){
 		if (error || !show) return;
