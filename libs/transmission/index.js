@@ -127,6 +127,14 @@ var torrent = {
 								if (error) logger.error(error);
 							});
 							trakt.show.episode.library(tvdb, library);
+							
+							/*
+							events.emit('download.complete', {
+								season: data.season,
+								episode: ep,
+								title: title.join('; ')
+							})
+							*/
 						});
 					});
 					

@@ -22,9 +22,13 @@ body {
 
 /* Modals */
 .modal .modal-body {
+	/* fix this based on screen sizes */
 	max-height: 320px;
 	overflow-y: auto;
+	-webkit-overflow-scrolling: touch;
 }
+
+
 .modal-header > img {
 	border-radius: 6px 6px 0px 0px;
 }
@@ -95,7 +99,6 @@ body {
 	right: -10px;
 	top: -10px;
 }
-
 
 @media screen and (min-width: 768px) {
 	#shows .show {

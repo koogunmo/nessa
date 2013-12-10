@@ -218,6 +218,14 @@ io.sockets.on('connection', function(socket) {
 			message: data.message
 		});
 	});
+	/*	
+	events.on('download.complete', function(data){
+		socket.emit('system.alert', {
+			type: 'info',
+			message: data.show + ' S' + data.season + 'E'+ data.episode + ' downloaded'
+		});
+	});
+	*/
 	
 	/*************** New Socket methods ***************/
 	
