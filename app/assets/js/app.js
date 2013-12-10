@@ -97,6 +97,10 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute'], functi
 			resolve: {
 				loggedin: checkLoggedin
 			}
+		}).when('/match', {
+			templateUrl: 'views/partials/match.html',
+			controller: 'matchCtrl'
+			
 		}).when('/shows', {
 			templateUrl: 'views/partials/shows.html',
 			controller: 'showCtrl'

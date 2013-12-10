@@ -72,6 +72,25 @@ var Trakt = {
 		}).auth(Trakt.settings.username, Trakt.password());
 	},
 	
+	search: function(type, query, callback){
+		request({
+			uri: 'http://api.trakt.tv/search/'+type+'.json/'+Trakt.settings.apikey + '?limit=10&query=' + query,
+			method: 'GET'
+		}, function(error, req, response){
+			if (error) {
+				logger.error(error);
+				return;
+			}
+			try {
+				if (typeof(response) != 'object') response = JSON.parse(response);
+			//	var error = (response.status == 'success') ? false : true;
+				if (typeof(callback) == 'function') callback(null, response);
+			} catch(e) {
+				logger.error('search/'+type+': '+e.message);
+			}
+		}).auth(Trakt.settings.username, Trakt.password());
+	},
+	
 	/*********************************/
 	
 	account: {
@@ -136,20 +155,12 @@ var Trakt = {
 		}
 	},
 	
-	search: {
-		movies: function(query){
+	network: {
+		follow: function(user, callback){
 			var payload = {
-				query: query
+				user: user
 			};
-			Trakt.get('search/movies.json', payload, function(error, json){
-				if (typeof(callback) == 'function') callback(error, json);
-			});
-		},
-		shows: function(query){
-			var payload = {
-				query: query
-			};
-			Trakt.get('search/show.json', payload, function(error, json){
+			Trakt.post('network/follow', payload, function(error, json){
 				if (typeof(callback) == 'function') callback(error, json);
 			});
 		}

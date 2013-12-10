@@ -1,7 +1,7 @@
 <div id="shows">
 	<form class="form-group">
 		<label></label>
-		<input type="text" class="form-control" autofocus="true" placeholder="Search" ng-model="filter.name" />
+		<input type="text" class="form-control" autofocus="true" placeholder="Search available shows..." ng-model="filter.name" />
 	</form>
 	
 	<div class="row">
@@ -113,16 +113,18 @@
 								<input type="checkbox" name="hd" ng-model="detail.summary.hd" ng-checked="detail.summary.hd==1" ng-true-value="1" ng-false-value="0" />
 								<label for="ipt_setting_hd">Prefer HD video</label>
 							</div>
+							<div class="form-group">
+								<button type="button" class="btn btn-info" ng-click="update(detail.summary.id)">Update listings</button>
+								<button type="button" class="btn btn-warning" ng-click="rescan(detail.summary.id)">Rescan Files</button>
+								<button type="button" class="btn btn-danger" ng-click="remove(detail.summary.id)">Remove Show</button>
+							</div>
 						</div>
 					</div>
 				</div>
 				
 				<div class="modal-footer">
 					<button type="submit" class="btn btn-success">Save</button>
-					<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-					
-					<button type="button" class="btn btn-info" ng-click="update(detail.summary.id)">Update listings</button>
-					<button type="button" class="btn btn-warning" ng-click="rescan(detail.summary.id)">Rescan Files</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 				</div>
 			</form>
 		</div>

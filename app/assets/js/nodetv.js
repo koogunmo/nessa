@@ -83,6 +83,7 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 	});
 	
 	nessa.controller('homeCtrl', function($scope, socket){
+		$scope.unmatched = 0;
 		socket.emit('dashboard');
 		socket.on('dashboard.latest', function(data){
 			$scope.latest = data;
@@ -90,6 +91,9 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 		socket.on('dashboard.stats', function(data){
 			$scope.stats = data;
 		});
+		socket.on('dashboard.unmatched', function(data){
+			$scope.unmatched = data.count;
+		})
 	});
 	
 	nessa.controller('matchCtrl', function($scope, socket){
@@ -97,7 +101,7 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 		
 		socket.emit('shows.unmatched');
 		socket.on('shows.unmatched', function(data){
-			$scope.unmatched = data;
+			$scope.unmatched.push(data);
 		});
 		
 	});
@@ -197,6 +201,12 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 		$scope.save = function(){
 			socket.emit('show.settings', $scope.detail.summary);
 		};
+		$scope.remove = function(id){
+			if (confirm('Are you sure you want to remove this show?')) {
+				socket.emit('show.remove', id);
+				$('#show-modal').modal('close')
+			}
+		};
 		$scope.update = function(id){
 			socket.emit('show.update', {id: id}, function(){
 				socket.emit('show.overview', id);
@@ -223,5 +233,4 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 		$('.synopsis', this).slideToggle();
 		
 	});
-	
 });

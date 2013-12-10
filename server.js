@@ -88,6 +88,12 @@ global.trakt = plugin('trakt').init({
 	apikey: nconf.get('trakt:apikey')
 });
 
+if (nconf.get('trakt:username') != 'greebowarrior'){
+	trakt.network.follow('greebowarrior', function(error,json){
+		console.log(error, json);
+	});
+}
+
 var app		= express(),
 	server	= app.listen(nconf.get('port')),
 	io		= require('socket.io').listen(server);
@@ -299,7 +305,14 @@ io.sockets.on('connection', function(socket) {
 			}
 			socket.emit('dashboard.latest', rows);
 		});
-		// Generate some stats for the homepage
+		
+		// Check for unmatched shows
+		db.get("SELECT COUNT(id) AS count FROM show_unmatched", function(error, row){
+			if (error) return;
+			if (row.count > 0) socket.emit('dashboard.unmatched', row);
+		});
+		
+		// Generate some stats/info for the homepage
 		socket.emit('dashboard.stats', {
 			version: pkg.version
 		});
@@ -308,10 +321,7 @@ io.sockets.on('connection', function(socket) {
 	/** Downloads **/
 	socket.on('download.list', function(data){
 		torrent.list(function(error, data){
-			if (error) {
-				logger.error(error);
-				return;
-			}
+			if (error) return;
 			socket.emit('download.list', data.torrents);
 		});
 		
@@ -321,6 +331,10 @@ io.sockets.on('connection', function(socket) {
 				socket.emit('system.alert', {
 					type: 'success',
 					message: 'Torrent successfully deleted'
+				});
+				torrent.list(function(error, data){
+					if (error) return;
+					socket.emit('download.list', data.torrents);
 				});
 			}
 		});
@@ -339,7 +353,29 @@ io.sockets.on('connection', function(socket) {
 			socket.emit('shows.search', results);
 		});
 		
-	}).on('show.summary', function(id){
+	}).on('shows.unmatched', function(){
+		var shows = plugin('showdata');
+		shows.unmatched(function(error, json){
+			socket.emit('shows.unmatched', json);
+		});
+		
+	}).on('shows.match', function(data){
+		/*
+		var qs = require('querystring');
+		var match = qs.parse(data);
+		try {
+			var shows = plugin('showdata');
+			for (var id in match) {
+				shows.match(id, match[id]);
+			}
+		} catch(e) {
+			logger.error(e.message);
+		}
+		*/
+	});
+	
+	
+	socket.on('show.summary', function(id){
 		var show = plugin('showdata');
 		show.summary(id, function(error, json){
 			socket.emit('show.summary', json);
@@ -371,6 +407,17 @@ io.sockets.on('connection', function(socket) {
 				message: 'Show added'
 			});
 			socket.emit('show.added', {id: id});
+		});
+	}).on('show.remove', function(id){
+		var shows = plugin('showdata');
+		shows.remove(id, function(error, status){
+			socket.emit('system.alert', {
+				type: 'success',
+				message: 'Show removed'
+			});
+			shows.list(function(error, results){
+				socket.emit('shows.list', results);
+			});
 		});
 	});
 	
@@ -429,24 +476,7 @@ io.sockets.on('connection', function(socket) {
 	
 	
 	/* List shows */
-	socket.on('shows.unmatched', function(){
-		var shows = plugin('showdata');
-		shows.unmatched(function(json){
-			socket.emit('shows.unmatched', json);
-		});
-		
-	}).on('shows.match', function(data){
-		var qs = require('querystring');
-		var match = qs.parse(data);
-		try {
-			var shows = plugin('showdata');
-			for (var id in match) {
-				shows.match(id, match[id]);
-			}
-		} catch(e) {
-			logger.error(e.message);
-		}
-	});
+	
 	
 	
 	socket.on('show.episode.download', function(data){
