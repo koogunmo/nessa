@@ -359,19 +359,20 @@ io.sockets.on('connection', function(socket) {
 			socket.emit('shows.unmatched', json);
 		});
 		
-	}).on('shows.match', function(data){
-		/*
-		var qs = require('querystring');
-		var match = qs.parse(data);
-		try {
-			var shows = plugin('showdata');
-			for (var id in match) {
-				shows.match(id, match[id]);
-			}
-		} catch(e) {
-			logger.error(e.message);
+	}).on('shows.matched', function(data){
+		var shows = plugin('showdata');
+		for (var i in data) {
+			shows.match(data[i].id, data[i].tvdb, function(error, json){
+				
+			});
 		}
-		*/
+		
+		socket.emit('system.alert', {
+			type: 'success',
+			message: 'Shows successfully matched'
+		});
+		
+
 	});
 	
 	

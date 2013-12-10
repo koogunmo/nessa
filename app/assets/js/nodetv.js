@@ -97,12 +97,24 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 	});
 	
 	nessa.controller('matchCtrl', function($scope, socket){
-		$scope.unmatched = [];
+		$scope.unmatched	= [];
+		$scope.matched		= [];
 		
 		socket.emit('shows.unmatched');
 		socket.on('shows.unmatched', function(data){
 			$scope.unmatched.push(data);
 		});
+		
+		$scope.save = function(){
+			$('input[type=radio]:checked').each(function(){
+				var record = {
+					id: $(this).data('id'),
+					tvdb: $(this).val()
+				}
+				$scope.matched.push(record);
+			});
+			socket.emit('shows.matched', $scope.matched);
+		};
 		
 	});
 

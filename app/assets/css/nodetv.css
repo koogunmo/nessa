@@ -72,10 +72,11 @@ body {
 
 /* Settings */
 
-#settings {
+#match, #settings {
 	padding-bottom: 50px;
 }
 
+#match .toolbar,
 #settings .toolbar {
 	background-color: #EEEEEE;
 	border-top: 1px solid #CCCCCC;

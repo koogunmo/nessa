@@ -161,6 +161,8 @@ var ShowData = {
 		});
 	},
 	
+	
+	
 	match: function(id, tvdb, callback){
 		
 		
@@ -380,6 +382,10 @@ var ShowData = {
 				}
 			});
 		});
+	},
+	
+	getMatch: function(){
+		// match db rows to directories (used by full scan)
 	},
 	
 	getShowlist: function(callback){
