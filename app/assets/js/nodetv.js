@@ -130,7 +130,7 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 		};
 		$scope.listings = function(){
 			if (confirm('This will update all show listings and artwork. NodeTV may become VERY laggy. Continue anyway?')) {
-				socket.emit('system.rescan');
+				socket.emit('system.listings');
 			}
 		};
 		$scope.rescan = function(){
