@@ -8,9 +8,9 @@ var rule = new schedule.RecurrenceRule();
 	rule.minute		= [0,30];
 
 schedule.scheduleJob(rule, function(){
-//	tvshows.getLatest();
+	tvshows.getLatest();
 });
-//tvshows.getLatest();
+tvshows.getLatest();
 
 
 
