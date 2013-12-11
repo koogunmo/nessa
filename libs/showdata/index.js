@@ -160,16 +160,20 @@ var ShowData = {
 	
 	match: function(matches, callback){
 		var self = this;
+		
 		matches.forEach(function(match){
 			db.get("SELECT id, directory FROM show_unmatched WHERE id = ?", match.id, function(error, row){
 				if (error || !row) return;
 				db.get("SELECT * FROM show WHERE tvdb = ?", match.tvdb, function(error, show){
-					if (error || !show) return;
+					if (error) return;
 					if (show === undefined) {
 						trakt.show.summary(match.tvdb, function(error, json){
 							var record = [row.directory, match.tvdb, json.title];
 							db.run("INSERT INTO show (status,directory,tvdb,name) VALUES (1,?,?,?)", record, function(error){
-								if (error) return;
+								if (error) {
+									console.log(error);
+									return;
+								}
 								db.run("DELETE FROM show_unmatched WHERE id = ?", row.id, function(error){
 									if (error) return;
 								});
