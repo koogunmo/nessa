@@ -92,7 +92,7 @@ var Scanner = {
 								}
 							});
 							
-							// TODO: use helper.formatName here instead
+							// TODO: Use helper.formatName
 							
 							var newName = 'Season '+helper.zeroPadding(data.season)+'/Episode '+ep+' - '+title.join('; ')+path.extname(file);
 							if (file != newName) {

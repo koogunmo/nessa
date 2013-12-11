@@ -113,6 +113,9 @@ var torrent = {
 								episode: row.episode
 							})
 						});
+						
+						// TODO: Use helper.formatName
+						
 						var newName = 'Season '+helper.zeroPadding(data.season)+'/Episode '+ep+' - '+title.join('; ')+path.extname(file);
 						
 						var date = new Date();
