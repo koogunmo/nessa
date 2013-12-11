@@ -121,7 +121,7 @@ var torrent = {
 						var date = new Date();
 						var downloaded = date.getFullYear()+'-'+helper.zeroPadding(date.getMonth()+1)+'-'+helper.zeroPadding(date.getDate());
 						
-						helper.copyFile(file, showdir + '/' + newName, function(){
+						helper.fileCopy(file, showdir + '/' + newName, function(){
 							db.run("UPDATE show_episode SET file = ?, status = 2, downloaded = ? WHERE hash = ?", newName, downloaded, item.hashString, function(error){
 								if (error) logger.error(error);
 							});

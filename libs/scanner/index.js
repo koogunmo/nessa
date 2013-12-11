@@ -96,7 +96,7 @@ var Scanner = {
 							
 							var newName = 'Season '+helper.zeroPadding(data.season)+'/Episode '+ep+' - '+title.join('; ')+path.extname(file);
 							if (file != newName) {
-								helper.moveFile(showdir + '/' + file, showdir + '/' + newName);
+								helper.fileMove(showdir + '/' + file, showdir + '/' + newName);
 							}
 							// Update Database records
 							data.episodes.forEach(function(episode){
