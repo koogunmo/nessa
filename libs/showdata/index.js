@@ -161,81 +161,36 @@ var ShowData = {
 		});
 	},
 	
-	
-	
-	match: function(id, tvdb, callback){
-		
-		
-		
-		/*
-		if (id !== undefined) {
-			var sql = "SELECT * FROM show_unmatched WHERE id = "+id;
-		} else {
-			var sql = "SELECT * FROM show_unmatched";
-			tvdb	= null;
-		}
-		db.each(sql, function(error, row){
-			// Search TVDB (we already have a method to match shows WITH a TVDB id)
-			request.get('http://thetvdb.com/api/GetSeries.php?seriesname='+row.directory, function(error, req, xml){
-				parser.parseString(xml, function(error, json){
-					if (error) {
-						logger.error(error);
-						return;
-					}
-					if (!json.Data.Series) return;
-					var results = json.Data.Series;
-					
-					if (tvdb !== undefined) {
-						var found = [];
-						results.forEach(function(result){
-							if (result.id[0] == tvdb) found.push(result);
-						});
-						if (found.length) results = found;
-					}
-					
-					if (results.length == 1) {
-						var data = results[0];
-						var record = {
-							id: data.id[0],
-							name: data.SeriesName[0],
-							synopsis: data.Overview[0],
-							imdb: data.IMDB_ID[0]
-						};
-						// Update shows table
-						db.get("SELECT COUNT(id), id FROM show WHERE tvdb = ?", record.id, function(error, result){
-							if (error) {
-								logger.error(error);
-								return;
-							}
-							if (result.count == 1) {
-								var params = [record.name, row.directory, record.imdb, record.synopsis, result.id];
-								db.run("UPDATE show SET name = ?, status = 1, directory = ?, imdb = ?, synopsis = ? WHERE id = ?", params, function(error){
-									events.emit('scanner.shows', null, result.id, false);
+	match: function(matches, callback){
+		var self = this;
+		matches.forEach(function(match){
+			db.get("SELECT id, directory FROM show_unmatched WHERE id = ?", match.id, function(error, row){
+				if (error || !row) return;
+				db.get("SELECT * FROM show WHERE tvdb = ?", match.tvdb, function(error, show){
+					if (error || !show) return;
+					if (show === undefined) {
+						trakt.show.summary(match.tvdb, function(error, json){
+							var record = [row.directory, match.tvdb, json.title];
+							db.run("INSERT INTO show (status,directory,tvdb,name) VALUES (1,?,?,?)", record, function(error){
+								if (error) return;
+								db.run("DELETE FROM show_unmatched WHERE id = ?", row.id, function(error){
+									if (error) return;
 								});
-							} else {
-								var params = [record.id, record.imdb, record.name, row.directory, record.synopsis];
-								db.run("INSERT INTO show (tvdb,imdb,status,name,directory,synopsis) VALUES (?,?,1,?,?,?)", params, function(error, result){
-									if (error) {
-										logger.error(error);
-										return;
-									}
-									events.emit('scanner.shows', null, this.lastID, false);
-								});
-							}
-							db.run("DELETE FROM show_unmatched WHERE id = ?", row.id);
+								if (typeof(callback) == 'function') callback(null, this.lastID);
+							});
 						});
 					} else {
-						// multiple results. hmmm...
-						results.forEach(function(result){
-							if (result.SeriesName[0].indexOf(row.directory) == 0) {
-								console.log(result.SeriesName[0]);
-							}
+						db.run("UPDATE show SET directory = ?, status = 2 WHERE id = ?", row.directory, show.id, function(error){
+							if (error) return;
+							db.run("DELETE FROM show_unmatched WHERE id = ?", row.id, function(error){
+								if (error) return;
+							});
+							if (typeof(callback) == 'function') callback(null, show.id);
 						});
 					}
 				});
 			});
-		})
-		*/
+		});
 	},
 	
 	
@@ -288,15 +243,20 @@ var ShowData = {
 		var self = this;
 		// Fetch episode listings
 		db.get("SELECT * FROM show WHERE id = ?", id, function(error, show){
+			if (error) return;
 			trakt.show.seasons(show.tvdb, function(error, seasons){
+				var count = 0;
+				var total = seasons.length;
 				seasons.forEach(function(season){
-					// TODO: Handle season artwork
 					trakt.show.season.info(show.tvdb, season.season, function(error, episodes){
+						count++;
 						episodes.forEach(function(episode){
 							episode.show_id = show.id;
 							self.setEpisode(episode);
 						});
-						if (typeof(callback) == 'function') callback(null, show.id);
+						if (count == total) {
+							if (typeof(callback) == 'function') callback(null, show.id);
+						}
 					});
 				});
 			});
@@ -427,9 +387,10 @@ var ShowData = {
 		db.get("SELECT * FROM show WHERE id = ?", id, function(error, show){
 			trakt.show.summary(show.tvdb, function(error, json){
 				var ended = (json.status == 'Ended') ? true : false;
-				db.run("UPDATE show SET name = ?, synopsis = ?, imdb = ?, ended = ? WHERE tvdb = ?", json.name, json.overview, json.imdb_id, ended, show.tvdb, function(error){
-					if (typeof(callback) == 'function') callback(null, show.id);
+				db.run("UPDATE show SET name = ?, synopsis = ?, imdb = ?, ended = ? WHERE tvdb = ?", json.title, json.overview, json.imdb_id, ended, show.tvdb, function(error){
+					if (error) return;
 				});
+				if (typeof(callback) == 'function') callback(null, show.id);
 			});
 		});
 	},
@@ -438,6 +399,8 @@ var ShowData = {
 	
 	setEpisode: function(episode, callback) {
 		db.get("SELECT COUNT(id) AS count FROM show_episode WHERE show_id = ? AND season = ? AND episode = ?", episode.show_id, episode.season, episode.episode, function(error, row){
+			if (error) console.log(error);
+			
 			var record = [
 				episode.show_id, episode.season, episode.episode, episode.title, episode.overview, episode.first_aired, episode.watched
 			];

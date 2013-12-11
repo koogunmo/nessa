@@ -9,6 +9,7 @@
 			<div class="panel-body">
 				<div class="form-group" ng-repeat="match in show.matches">
 					<input type="radio" name="match[{{show.id}}]" id="ipt_match_{{match.tvdb_id}}" value="{{match.tvdb_id}}" data-id="{{show.id}}" /> 
+					
 					<label for="ipt_match_{{match.tvdb_id}}">{{match.title}} ({{match.year}})</label>
 				</div>
 			</div>

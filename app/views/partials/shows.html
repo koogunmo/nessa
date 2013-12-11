@@ -70,19 +70,17 @@
 					
 						<div class="tab-pane" id="episodes">
 							<div id="seasons" class="panel-group">
-								<div class="panel" ng-repeat="season in detail.listing">
-									<div class="panel-heading">
+								<div class="panel panel-default" ng-repeat="season in detail.listing">
+									<div class="panel-heading" data-toggle="collapse" data-parent="#seasons" href="#season-{{season.season}}">
 										<h4 class="panel-title">
-											<a data-toggle="collapse" data-parent="#seasons" href="#season-{{season.season}}">Season {{season.season}}</a>
+											<span ng-if="season.season==0">Specials</span>
+											<span ng-if="season.season>=1">Season {{season.season}}</span>
 										</h4>
 									</div>
 									<div id="season-{{season.season}}" class="panel-collapse collapse">
 										<div class="panel-body">
 											<div class="episodes" ng-repeat="episode in season.episodes">
-												<h5>
-													<span class="episode seen" data-episode="{{episode.id}}" title="Mark this episode as watched">{{episode.episode}}</span>
-													<span class="title">{{episode.title}}</span>
-												</h5>
+												<h5>{{episode.episode | zeroPad:2}}: {{episode.title}}</h5>
 												
 												<div class="extended">
 													<p class="synopsis">{{episode.synopsis}}</p>

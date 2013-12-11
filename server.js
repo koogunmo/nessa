@@ -138,37 +138,6 @@ global.db = new sqlite.Database(__dirname + '/db/nessa.sqlite', function(error){
 });
 
 /***********************************************************************/
-/* Handle events */
-
-
-
-/*
-events.on('shows.list', function(error, response){
-	if (response) {
-		var scanner = plugin('scanner');
-		scanner.shows();
-	}
-}).on('scanner.shows', function(error, id, match){
-	var shows = plugin('showdata');
-	shows.info(id);
-	
-	var match = (match !== undefined) ? !!match : true;
-	if (match) shows.match();
-	
-}).on('shows.info', function(error, id, rescan){
-	var shows = plugin('showdata');
-	shows.episodes(id, rescan);
-	shows.artwork(id);
-	
-}).on('shows.episodes', function(error, id, rescan){
-	if (rescan) {
-		var scanner = plugin('scanner');
-		scanner.episodes(id);
-	}
-});
-*/
-
-/***********************************************************************/
 /* Load tasks */
 if (nconf.get('installed')) {
 	fs.readdir(__dirname + '/server/tasks', function(error, files){
@@ -361,18 +330,17 @@ io.sockets.on('connection', function(socket) {
 		
 	}).on('shows.matched', function(data){
 		var shows = plugin('showdata');
-		for (var i in data) {
-			shows.match(data[i].id, data[i].tvdb, function(error, json){
-				
-			});
-		}
+		var scanner = plugin('scanner');
 		
-		socket.emit('system.alert', {
-			type: 'success',
-			message: 'Shows successfully matched'
+		shows.match(data, function(error, id){
+			shows.getSummary(id, function(error, id){
+				shows.getArtwork(id);
+				shows.getFullListings(id, function(error, id){
+					scanner.episodes(id);
+				});
+			});
 		});
 		
-
 	});
 	
 	
@@ -433,11 +401,7 @@ io.sockets.on('connection', function(socket) {
 		
 	}).on('show.update', function(data){
 		var show = plugin('showdata');
-		show.getArtwork(data.id, function(error, json){
-			show.list(function(error, results){
-				socket.emit('shows.list', results);
-			});
-		});
+		show.getArtwork(data.id);
 		show.getFullListings(data.id, function(error, json){
 			show.summary(data.id, function(error, json){
 				socket.emit('show.summary', json);

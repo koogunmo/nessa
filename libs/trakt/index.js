@@ -24,8 +24,6 @@ var Trakt = {
 	},
 	
 	get: function(url, data, callback) {
-	//	if (!Trakt.settings.enabled) return;
-		
 		if (typeof(data) == 'object') {
 			var array = [];
 			for (var i in data) array.push(data[i]);
@@ -42,7 +40,6 @@ var Trakt = {
 			}
 			try {
 				if (typeof(response) != 'object') response = JSON.parse(response);
-			//	var error = (response.status == 'success') ? false : true;
 				if (typeof(callback) == 'function') callback(null, response);
 			} catch(e) {
 				logger.error(url+': '+e.message);
@@ -51,7 +48,6 @@ var Trakt = {
 	},
 	
 	post: function(url, data, callback) {
-	//	if (!Trakt.settings.enabled) return;
 		request({
 			uri: 'http://api.trakt.tv/'+url+'/'+Trakt.settings.apikey,
 			json: data,
@@ -63,8 +59,6 @@ var Trakt = {
 			}
 			try {
 				if (typeof(response) != 'object') response = JSON.parse(response);
-				var error = null;
-				if (response.status == 'failed') error = response.message;
 				if (typeof(callback) == 'function') callback(null, response);
 			} catch(e) {
 				logger.error(url+': '+e.message);
@@ -264,7 +258,7 @@ var Trakt = {
 				});
 			}
 		},
-		seasons: function(tvdb){
+		seasons: function(tvdb, callback){
 			var payload = {
 				tvdb_id: tvdb
 			};

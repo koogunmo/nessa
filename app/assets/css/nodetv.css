@@ -58,6 +58,10 @@ body {
 	padding: 0px;
 }
 
+#seasons .panel-heading {
+	cursor: pointer;
+}
+
 /* Downloads */
 
 #downloads .download {

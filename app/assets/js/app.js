@@ -36,6 +36,19 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute'], functi
 			return string.replace(/\./g, ' ');
 		}
 	});
+	app.filter('zeroPad', function(){
+		return function(n, l){
+			if (!l) l = 2;
+			var num = parseInt(n, 10), len = parseInt(l, 10);
+			if (isNaN(num) || isNaN(len)) return n;
+			num = ''+num;
+			while (num.length < len) {
+				num = '0'+num;
+			}
+			return num;
+		}
+	});
+	
 	
 	app.filter('bytes', function() {
 		return function(bytes, precision) {
