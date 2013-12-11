@@ -14,14 +14,13 @@
 	},
 	"dependencies": {
 		"connect": "2.11.x",
-		"easyimage": "0.1.x",
 		"express": "3.x.x",
 		"feedparser": "0.16.x",
 		"gitty": "1.2.x",
 		"log4js": "0.6.x",
 		"mime": "1.2.9",
-		"nconf": "0.6.x",
 		"mkdirp": "0.3.x",
+		"nconf": "0.6.x",
 		"netmask": "0.0.2",
 		"node-schedule": "0.1.x",
 		"node-ssdp": "0.0.2",
@@ -33,7 +32,6 @@
 		"socket.io": "0.9.x",
 		"sqlite3": "2.1.x",
 		"transmission": "0.3.x",
-		"tvdb": "0.0.13",
 		"twilio": "1.4.x",
 		"xml2js": "0.4.x",
 		"xtend": "2.1.x"

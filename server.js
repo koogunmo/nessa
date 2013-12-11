@@ -55,22 +55,12 @@ if (process.title) process.title = 'nessa.js';
 /* Load dependencies */
 
 var connect	= require('connect'),
-	extend	= require('xtend'),
 	express	= require('express'),
 	fs		= require('fs'),
-	http	= require('http'),
 	logger	= require('log4js').getLogger(),
-	mime	= require('mime'),
 	path	= require('path'),
-	request	= require('request'),
 	sqlite	= require('sqlite3').verbose(),
-	sys		= require('sys'),
-	tvdb	= new (require('tvdb'))({apiKey: nconf.get('tvdb:apikey')}),
-	url		= require('url'),
-	util	= require('util'),
-	uuid	= require('node-uuid'),
-	
-	xml2js	= new (require('xml2js')).Parser();
+	uuid	= require('node-uuid');
 
 var passport		= require('passport'),
 	LocalStrategy	= require('passport-local').Strategy;
