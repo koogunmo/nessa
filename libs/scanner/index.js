@@ -38,7 +38,7 @@ var Scanner = {
 					fs.stat(base + '/' + dir, function(error, stat){
 						if (error) return;
 						if (stat && stat.isDirectory()){
-							db.get("SELECT * FROM show WHERE name = ?", dir, function(error, row){
+							db.get("SELECT * FROM show WHERE name = ? OR directory = ?", dir, dir, function(error, row){
 								if (error) return;
 								if (row === undefined) {
 									// Not in database, queue to find later

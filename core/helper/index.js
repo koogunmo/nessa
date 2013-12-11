@@ -119,12 +119,12 @@ exports = module.exports = {
 			token.E = helper.zeroPadding(values.episodes[0].episode)+'-'+helper.zeroPadding(values.episodes[values.episodes.length-1].episode);
 			var titles = [];
 			values.episodes.forEach(function(episode){
-				titles.push(episode.title);
+				titles.push(episode.title.replace('/', '-'));
 			});
 			token.T = titles.join('; ');
 		} else {
 			token.E = helper.zeroPadding(values.episodes[0].episode);
-			token.T = values.episodes[0].title;
+			token.T = values.episodes[0].title.replace('/', '-');
 		}
 		token.S = helper.zeroPadding(values.season);
 		token.X = values.ext.replace(/^\./, '');
