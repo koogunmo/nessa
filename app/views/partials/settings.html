@@ -1,8 +1,12 @@
 <div id="settings">
 	<form ng-submit="save(this)">
-		<div class="toolbar">
-			<input type="submit" value="Save settings" class="btn btn-success" />
-		</div>
+		<ul class="nav nav-tabs">
+			<li class="active"><a href="#">General</a></li>
+			<li><a href="#">Users</a></li>
+			<li><a href="#">Maintenance</a></li>
+		</ul>
+		
+		
 		
 		<h2>Global Settings</h2>
 		<fieldset>
@@ -84,6 +88,11 @@
 				</div>
 			</div>
 		</fieldset>
+		
+		
+		<div class="toolbar">
+			<input type="submit" value="Save settings" class="btn btn-success" />
+		</div>
 	</form>
 		
 	<h2>System</h2>

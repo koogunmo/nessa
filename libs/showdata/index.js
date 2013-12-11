@@ -201,7 +201,7 @@ var ShowData = {
 			db.run("UPDATE show_episode SET watched = 1 WHERE id = ?", row.id);
 			trakt.show.episode.seen(row.tvdb, [{season: row.season, episode: row.episode}]);
 		});
-	}
+	},
 	
 	/******************************************************/
 	
