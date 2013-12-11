@@ -99,11 +99,7 @@ var torrent = {
 					}
 					
 					db.all("SELECT S.name, S.directory, S.tvdb, E.* FROM show_episode AS E INNER JOIN show AS S ON S.id = E.show_id WHERE E.hash = ? AND E.file IS NULL", item.hashString, function(error, results){
-						if (error) {
-							logger.error(error);
-							return;
-						}
-						if (!results.length) return;
+						if (error || !results.length) return;
 						
 						var showdir = nconf.get('shows:base') + '/' + results[0].directory;
 						var title	= [];

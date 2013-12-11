@@ -35,9 +35,6 @@ var ShowData = {
 			db.run("UPDATE show SET status = ?, directory = ? WHERE id = ?", update.status, update.directory, row.id, function(error){
 				if (error) return;
 				trakt.show.library(row.tvdb);
-				
-//				self.getInfo(row.id);
-				
 				if (typeof(callback) == 'function') callback(null, row.id);
 			});
 		});
@@ -180,7 +177,7 @@ var ShowData = {
 							});
 						});
 					} else {
-						db.run("UPDATE show SET directory = ?, status = 2 WHERE id = ?", row.directory, show.id, function(error){
+						db.run("UPDATE show SET directory = ?, status = 1 WHERE id = ?", row.directory, show.id, function(error){
 							if (error) return;
 							db.run("DELETE FROM show_unmatched WHERE id = ?", row.id, function(error){
 								if (error) return;
@@ -193,6 +190,18 @@ var ShowData = {
 		});
 	},
 	
+	watched: function(id, season, episode){
+		// Mark an episode as watched
+		db.get("SELECT S.tvdb, E.id FROM show AS S INNER JOIN show_episode AS E ON S.id = E.show_id WHERE S.id = ? AND E.season = ? AND E.episode = ?", id, season, episode, function(error, row){
+			if (error) {
+				logger.error(error);
+				return;
+			}
+			if (row === undefined) return;
+			db.run("UPDATE show_episode SET watched = 1 WHERE id = ?", row.id);
+			trakt.show.episode.seen(row.tvdb, [{season: row.season, episode: row.episode}]);
+		});
+	}
 	
 	/******************************************************/
 	
@@ -312,10 +321,7 @@ var ShowData = {
 						results.forEach(function(result){
 							if (show.hd != result.hd) return;
 							db.all("SELECT * FROM show_episode WHERE show_id = ? AND season = ? AND episode IN ("+result.episode.join(',')+")", show.id, result.season, function(error, rows){
-								if (error) {
-									logger.error(error);
-									return;
-								}
+								if (error) return;
 								if (typeof(rows) == 'undefined') return;
 								
 								var ids = [];
@@ -328,11 +334,8 @@ var ShowData = {
 									torrent.add({
 										id: ids,
 										magnet: result.magnet
-									}, function(error, response){
-										
 									});
-									// Update the episode listings
-									events.emit('shows.info', null, show.id, false);
+									self.getFullListings(show.id);
 								}
 							});
 						});
@@ -344,10 +347,6 @@ var ShowData = {
 		});
 	},
 	
-	getMatch: function(){
-		// match db rows to directories (used by full scan)
-	},
-	
 	getShowlist: function(callback){
 		self = this;
 		// Get the latest showlist feed from TVShows and add new entries into the local database
@@ -355,10 +354,7 @@ var ShowData = {
 			if (error) return;
 			try {
 				parser.parseString(xml, function(error, json){
-					if (error) {
-						logger.error(error);
-						return;
-					}
+					if (error) return;
 					json.shows.show.forEach(function(show){
 						var record = {
 							name: show.name[0],
@@ -416,11 +412,11 @@ var ShowData = {
 			}
 			if (typeof(callback) == 'function') callback(null, true)
 		});
-	},
+	}
 	
 	/******************************************************/
 	
-	
+	/*
 	download: function(epid){
 		var sql = "SELECT E.id, S.name, S.feed, S.hd, E.season, E.episode, E.title FROM show AS S INNER JOIN show_episode AS E ON S.id = E.show_id WHERE E.id = ?";
 		db.get(sql, epid, function(error, row){
@@ -428,6 +424,7 @@ var ShowData = {
 				logger.error(error);
 				return;
 			}
+			
 			
 			if (row.feed.indexOf('tvshowsapp.com') >= 0) {
 				row.feed = row.feed.replace(/.xml/, '.full.xml')
@@ -463,186 +460,7 @@ var ShowData = {
 				}
 			});
 		});
-	},
-	
-	getEpisodes: function(id, rescan){
-		
-		var rescan = (rescan !== undefined) ? !!rescan : true;
-		
-		if (id !== undefined) {
-			var sql = "SELECT * FROM show WHERE id = "+id+" AND status = 1 AND tvdb IS NOT NULL";
-		} else {
-			var sql = "SELECT * FROM show WHERE status = 1 AND tvdb IS NOT NULL";
-		}
-		db.each(sql, function(error, show){
-			if (error) {
-				logger.error(error);
-				return;
-			}
-			logger.info(show.name + ': Fetching episode data');
-			try {
-				// Get episode listings from TVDB
-				request.get('http://thetvdb.com/api/'+nconf.get('tvdb:apikey')+'/series/'+show.tvdb+'/all/en.xml', function(error, req, xml){
-					if (error) {
-						logger.error(error);
-						return;
-					}
-					parser.parseString(xml, function(error, json){
-						if (error) {
-							logger.error(error);
-							return;
-						}
-						if (!json.Data.Episode) return;
-						json.Data.Episode.forEach(function(ep){
-							var record = {
-								id: show.id,
-								season: ep.SeasonNumber[0],
-								episode: ep.EpisodeNumber[0],
-								title: ep.EpisodeName[0],
-								synopsis: ep.Overview[0],
-								airdate: ep.FirstAired[0]
-							};
-							// Ignore specials for now
-							if (record.season == 0) return;
-							var search = [record.id, record.season, record.episode];
-							db.get("SELECT COUNT(id) AS count, id FROM show_episode WHERE show_id = ? AND season = ? AND episode = ?", search, function(error, result){
-								if (error) {
-									logger.error(error);
-									return;
-								}
-								if (result.count == 1) {
-									var params = [record.title, record.synopsis, record.airdate, result.id];
-									db.run("UPDATE show_episode SET title = ?, synopsis = ?, airdate = ? WHERE id = ?", params, function(error){
-										if (error) logger.error(error);
-									});
-								} else {
-									var params = [record.id, record.season, record.episode, record.title, record.synopsis, record.airdate]
-									db.run("INSERT INTO show_episode (show_id,season,episode,title,synopsis,airdate) VALUES (?,?,?,?,?,?)", params, function(error){
-										if (error) logger.error(error);
-									});
-								}
-							});
-						});
-					});
-					events.emit('shows.episodes', null, show.id, rescan);
-				});
-			} catch(e) {
-				logger.error(e.message);
-			}
-		});
-	},
-		
-	getInfo: function(showid, rescan){
-		var rescan = (rescan !== undefined) ? !!rescan : true;
-		
-		if (showid) {
-			var sql = "SELECT * FROM show WHERE id = "+showid+" AND tvdb IS NOT NULL ORDER BY name ASC";
-		} else {
-			var sql = "SELECT * FROM show WHERE tvdb IS NOT NULL ORDER BY name ASC";
-		}
-		// Enhance each show record with additional TVDB data
-		db.each(sql, function(error, show){
-			if (error) {
-				console.error(error);
-				return;
-			}
-			if (!show) return;
-			logger.info(show.name + ': Fetching show data');
-			request.get('http://thetvdb.com/api/'+nconf.get('tvdb:apikey')+'/series/'+show.tvdb+'/en.xml', function(error, req, xml){
-				if (error) {
-					logger.error(error);
-					return;
-				}
-				try {
-					parser.parseString(xml, function(error, json){
-						if (error) {
-							logger.error(error);
-							return;
-						}
-						var data = json.Data.Series[0];
-						var record = {
-							id: show.tvdb,
-							name: data.SeriesName[0],
-							synopsis: data.Overview[0],
-							imdb: data.IMDB_ID[0],
-							ended: (data.Status[0] == 'Ended') ? 1 : 0
-						};
-						db.run("UPDATE show SET name = ?, synopsis = ?, imdb = ?, ended = ? WHERE tvdb = ?", record.name, record.synopsis, record.imdb, record.ended, record.id);
-						events.emit('shows.info', null, show.id, rescan);
-					});
-				} catch(e) {
-					logger.error('shows.info', e.message);
-				}
-			});
-			db.each("SELECT DISTINCT(E.season) FROM show AS S INNER JOIN show_episode AS E ON S.id = E.show_id WHERE S.tvdb = ?", show.tvdb, function(error, row){
-				trakt.show.season.info(show.tvdb, row.season, function(json){
-					json.forEach(function(episode){
-						var watched = (episode.watched) ? 1 : 0;
-						var record = [watched, show.id, episode.season, episode.episode];
-						db.run("UPDATE show_episode SET watched = ? WHERE show_id = ? AND season = ? AND episode = ?", record)
-					});
-				});
-			});
-		});
-	},
-	
-	
-	overview: function(id, callback){
-		db.get("SELECT * FROM show WHERE id = ?", id, function(error, show){
-			if (error) {
-				logger.error(error);
-				return;
-			}
-			if (!show) return;
-			
-			var response = {
-				general: show,
-				seasons: []
-			}
-			
-			response.general.directory = nconf.get('shows:base')+'/'+show.directory;
-			
-			db.all("SELECT * FROM show_episode WHERE show_id = ? ORDER BY season,episode ASC", show.id, function(error, rows){
-				if (error) {
-					logger.error(error);
-					return;
-				}
-				var seasons = [];
-				var episodes = [];
-				
-				rows.forEach(function(row){
-					if (seasons.indexOf(row.season) == -1) seasons.push(row.season);
-					if (!episodes[row.season]) episodes[row.season] = [];
-					episodes[row.season].push(row);
-				});
-				seasons.forEach(function(season){
-					var record = {
-						season: season,
-						episodes: episodes[season]
-					}
-					response.seasons.push(record);
-				});
-				if (typeof(callback) == 'function') callback(response);
-			});
-		});
-	},
-	
-	
-	
-	
-	
-	watched: function(id, season, episode){
-		// mark an episode as watched
-		db.get("SELECT S.tvdb, E.id FROM show AS S INNER JOIN show_episode AS E ON S.id = E.show_id WHERE S.id = ? AND E.season = ? AND E.episode = ?", id, season, episode, function(error, row){
-			if (error) {
-				logger.error(error);
-				return;
-			}
-			if (row === undefined) return;
-			db.run("UPDATE show_episode SET watched = 1 WHERE id = ?", row.id);
-			trakt.show.episode.seen(row.tvdb, [{season: row.season, episode: row.episode}]);
-		});
 	}
-	
+	*/
 };
 exports = module.exports = ShowData;

@@ -23,9 +23,6 @@ global.nconf.file({
 	run: {
 		user: 'media',
 		group: 'media'
-	},
-	tvdb: {
-		apikey: 'B77582079E378FF3'
 	}
 });
 
@@ -360,7 +357,11 @@ io.sockets.on('connection', function(socket) {
 	}).on('show.add', function(id){
 		// Add a show
 		var shows = plugin('showdata');
-		shows.add(id, function(){
+		shows.add(id, function(error, id){
+			shows.getArtwork(id);
+			shows.getSummary(id, function(error, id){
+				shows.getFullListings(id)
+			});
 			socket.emit('system.alert', {
 				type: 'success',
 				message: 'Show added'
