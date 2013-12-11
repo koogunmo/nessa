@@ -129,14 +129,19 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 			socket.emit('system.settings', $scope.settings)
 		};
 		$scope.rescan = function(){
-			// Full media rescan - not advisable
-			socket.emit('system.rescan');
+			if (confirm('WARNING: NodeTV will probably become VERY laggy during a full rescan. Continue anyway?')) {
+				socket.emit('system.rescan');
+			}
 		};
 		$scope.reboot = function(){
-			socket.emit('system.restart');
+			if (confirm('This will restart NodeTV. Are you sure?')) {
+				socket.emit('system.restart');
+			}
 		};
 		$scope.update = function(){
-			socket.emit('system.update');
+			if (confirm('This will force NodeTV to update to the latest version. Are you sure?')) {
+				socket.emit('system.update');
+			}
 		};
 	});
 	
