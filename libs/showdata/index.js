@@ -397,16 +397,18 @@ var ShowData = {
 		db.get("SELECT COUNT(id) AS count FROM show_episode WHERE show_id = ? AND season = ? AND episode = ?", episode.show_id, episode.season, episode.episode, function(error, row){
 			if (error) console.log(error);
 			
-			var record = [
-				episode.show_id, episode.season, episode.episode, episode.title, episode.overview, episode.first_aired, episode.watched
-			];
 			if (!row.count){
+				var record = [
+					episode.show_id, episode.season, episode.episode, episode.title, episode.overview, episode.first_aired, episode.watched
+				];
 				db.run("INSERT INTO show_episode (show_id,season,episode,title,synopsis,airdate,watched) VALUES (?,?,?,?,?,?,?)", record, function(error){
 					if (error) return;
 				});
 			} else {
-				for (var i = 0; i < 3; i++) record.shift();
-				db.run("UPDATE show_episode SET title = ?, synopsis = ?, airdate = ?, watched = ?", record, function(error){
+				var record = [
+					episode.title, episode.overview, episode.first_aired, episode.watched, episode.show_id, episode.season, episode.episode
+				];
+				db.run("UPDATE show_episode SET title = ?, synopsis = ?, airdate = ?, watched = ? WHERE show_id = ? AND season = ? AND episode = ?", record, function(error){
 					if (error) return;
 				});
 			}

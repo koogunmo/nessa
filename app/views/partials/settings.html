@@ -3,7 +3,7 @@
 		<br />
 		<ul class="nav nav-pills">
 			<li class="active"><a href="#general" data-toggle="tab">General</a></li>
-			<li><a href="#users" data-toggle="tab">Users</a></li>
+			<li><a href="#security" data-toggle="tab">Security</a></li>
 			<li><a href="#system" data-toggle="tab">System</a></li>
 		</ul>
 		<br />
@@ -12,20 +12,16 @@
 				
 				<div class="panel panel-info">
 					<div class="panel-heading">
-						<h4 class="panel-title">General Settings</h4>
+						<h4 class="panel-title">Media</h4>
 					</div>
 					<div class="panel-body">
 						<div class="form-group">
-							<label for="ipt_shows_base">Media Directory</label>
+							<label for="ipt_shows_base">Base Media Directory</label>
 							<input type="text" id="ipt_shows_base" name="shows:base" ng-model="settings.shows.base" class="form-control" />
 						</div>
 						<div class="form-group">
 							<input type="checkbox" id="ipt_shows_hd" name="shows:hd" ng-model="settings.shows.hd" />
 							<label for="ipt_shows_hd">Prefer HD Video</label>
-						</div>
-						<div class="form-group">
-							<label for="ipt_security_whitelist">IP Whitelist</label>
-							<input type="text" id="ipt_security_whitelist" name="security:whitelist" ng-model="settings.security.whitelist" class="form-control" />
 						</div>
 					</div>
 				</div>
@@ -111,10 +107,29 @@
 				</div>
 			</div>
 			
-			<div class="tab-pane" id="users">
-				UI for user admin coming soon
-				
-				
+			<div class="tab-pane" id="security">
+				<div class="panel panel-info">
+					<div class="panel-heading">
+						<h4 class="panel-title">Users</h4>
+					</div>
+					<div class="panel-body">
+						TODO: User management
+					</div>
+				</div>
+				<div class="panel panel-info">
+					<div class="panel-heading">
+						<h4 class="panel-title">Network Security</h4>
+					</div>
+					<div class="panel-body">
+						<div class="form-group">
+							<label for="ipt_security_whitelist">IP Whitelist</label>
+							<input type="text" id="ipt_security_whitelist" name="security:whitelist" ng-model="settings.security.whitelist" class="form-control" />
+						</div>
+						<div class="well">
+							Users from the allowed IP ranges will not be required to log in.
+						</div>
+					</div>
+				</div>
 			</div>
 			
 			<div class="tab-pane" id="system">
