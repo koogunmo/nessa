@@ -230,7 +230,13 @@ io.sockets.on('connection', function(socket) {
 				scanner.episodes(id);
 			});
 		});
-		
+	}).on('system.listings', function(){
+		// Update ALL listing information and artwork
+		var shows = plugin('showdata');
+		db.each("SELECT * FROM show WHERE status != -1 AND directory IS NOT NULL", function(error, show){
+			shows.getArtwork(show.id);
+			shows.getFullListings(show.id);
+		});
 	}).on('system.restart', function(){
 		socket.emit('system.alert', {
 			type: 'info',
@@ -250,6 +256,7 @@ io.sockets.on('connection', function(socket) {
 			socket.emit('system.loaded');
 		});
 	});
+	
 	
 	/** Dashboard **/
 	socket.on('dashboard', function(){

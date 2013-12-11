@@ -133,11 +133,25 @@
 			</div>
 			
 			<div class="tab-pane" id="system">
-				<div class="panel panel-danger">
-					<div class="panel-heading">System Maintenance</div>
+				<div class="panel panel-warning">
+					<div class="panel-heading">
+						<h4 class="panel-title">Library Maintenance</h4>
+					</div>
 					<div class="panel-body">
 						<div>
+							<button class="btn btn-primary confirm" ng-click="listings()">Update ALL listings</button>
 							<button class="btn btn-info confirm" ng-click="rescan()">Rescan Media</button>
+						</div>
+						<br />
+						<div class="well well-sm">NodeTV automatically updates show listings at 1am every Sundays</div>
+					</div>
+				</div>
+				<div class="panel panel-danger">
+					<div class="panel-heading">
+						<h4 class="panel-title">System Maintenance</h4>
+					</div>
+					<div class="panel-body">
+						<div>
 							<button class="btn btn-warning confirm" ng-click="update()">Update NodeTV</button>
 							<button class="btn btn-danger confirm" ng-click="reboot()">Restart NodeTV</button>
 						</div>

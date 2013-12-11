@@ -128,6 +128,11 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 		$scope.save = function(form){
 			socket.emit('system.settings', $scope.settings)
 		};
+		$scope.listings = function(){
+			if (confirm('This will update all show listings and artwork. NodeTV may become VERY laggy. Continue anyway?')) {
+				socket.emit('system.rescan');
+			}
+		};
 		$scope.rescan = function(){
 			if (confirm('WARNING: NodeTV will probably become VERY laggy during a full rescan. Continue anyway?')) {
 				socket.emit('system.rescan');
