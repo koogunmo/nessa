@@ -98,7 +98,10 @@ var Trakt = {
 	
 	calendar: {
 		shows: function(callback){
-			Trakt.get('calendar/shows.json', null, function(error, json){
+			var payload = {
+				username: Trakt.settings.username
+			};
+			Trakt.get('user/calendar/shows.json', payload, function(error, json){
 				if (typeof(callback) == 'function') callback(error, json);
 			});
 		}
@@ -148,6 +151,8 @@ var Trakt = {
 			});
 		}
 	},
+
+	/*********************************/
 	
 	network: {
 		follow: function(user, callback){
@@ -159,6 +164,8 @@ var Trakt = {
 			});
 		}
 	},
+	
+	/*********************************/
 	
 	show: {
 		checkin: function(){
@@ -309,6 +316,7 @@ var Trakt = {
 			})
 		}
 	}
+
 };
 
 module.exports = exports = Trakt;

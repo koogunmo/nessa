@@ -1,19 +1,50 @@
 <div id="dashboard">
-	
 	<div class="alert alert-warning" ng-if="unmatched!=0">
 		There are <a href="#/match" class="alert-link">unmatched shows</a> that need updating
 	</div>
 	
-	<div>
-		<h2>Latest Shows</h2>
-		<div class="latest" ng-repeat="item in latest">
-			<h4>{{item.name}} : {{item.title}}</h3>
-			<h5>{{item.airdate*1000 | date:'dd MMMM yyyy'}} : Season {{item.season}}, Episode {{item.episode}}</h4>
-			<p class="synopsis">{{item.synopsis}}</p>
+	<div ng-if="latest.length>=1">
+		<h3>Latest Shows</h3>
+		<hr />
+		<div class="panel panel-default" ng-repeat="item in latest">
+			<div class="panel-heading">
+				<h4 class="panel-title">{{item.name}} <span class="small"> - {{item.title}}</span></h4>
+			</div>
+			<div class="panel-body">
+				<div><strong>Season {{item.season}}, Episode {{item.episode}}</strong> <span class="small">: {{item.airdate*1000 | date:'dd MMMM yyyy'}}</span></div>
+				{{item.synopsis}}
+			</div>
+			<!--
+			<div class="panel-footer">
+				Watched, etc
+			</div>
+			-->
 		</div>
 	</div>
 	
-	<div class="stats">
-		Version: {{stats.version}}
+	<div ng-if="upcoming.length>=1">
+		<h3>This Week</h3>
+		<hr />
+		<div ng-repeat="day in upcoming">
+			<div class="panel panel-default" ng-repeat="item in day.episodes">
+				<div class="panel-heading">
+					<h4 class="panel-title">{{item.show.title}} <span class="small"> - {{item.episode.title}}</span></h4>
+				</div>
+				<div class="panel-body">
+					<div><strong>Season {{item.episode.season}}, Episode {{item.episode.number}}</strong> <span class="small">: {{item.episode.first_aired*1000 | date:'dd MMMM yyyy'}}</span></div>
+					{{item.episode.overview}}
+				</div>
+			</div>
+		</div>
 	</div>
+	
+	<div class="panel panel-info">
+		<div class="panel-heading">
+			<h4 class="panel-title">System details</h4>
+		</div>
+		<div class="panel-body">
+			Version: {{stats.version}}
+		</div>
+	</div>
+	
 </div>

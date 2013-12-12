@@ -110,10 +110,6 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute'], functi
 			resolve: {
 				loggedin: checkLoggedin
 			}
-		}).when('/match', {
-			templateUrl: 'views/partials/match.html',
-			controller: 'matchCtrl'
-			
 		}).when('/shows', {
 			templateUrl: 'views/partials/shows.html',
 			controller: 'showCtrl'
@@ -121,6 +117,13 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute'], functi
 		}).when('/shows/:id', {
 			templateUrl: 'views/partials/shows.html',
 			controller: 'showCtrl'
+			
+		}).when('/shows/match', {
+			templateUrl: 'views/partials/match.html',
+			controller: 'matchCtrl',
+			resolve: {
+				loggedin: checkLoggedin
+			}
 			
 		}).when('/settings', {
 			templateUrl: 'views/partials/settings.html',
@@ -131,7 +134,6 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute'], functi
 		}).otherwise({
 			redirectTo: '/dashboard'
 		});
-		
 	});
 		
 	return app;

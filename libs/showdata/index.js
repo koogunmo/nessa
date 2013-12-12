@@ -73,6 +73,15 @@ var ShowData = {
 		});
 	},
 	
+	latest: function(callback){
+		var self = this;
+		var lastweek = Math.round(new Date()/1000) - (7*24*60*60);
+		db.all("SELECT S.id, S.tvdb, S.name, E.season, E.episode, E.title, E.synopsis, E.airdate, E.watched FROM show AS S INNER JOIN show_episode AS E ON S.id = E.show_id WHERE file IS NOT NULL AND airdate >= ? ORDER BY airdate DESC, episode DESC LIMIT 10", lastweek, function(error, rows){
+			if (error) return;
+			if (typeof(callback) == 'function') callback(null, rows);
+		});
+	},
+	
 	list: function(callback){
 		var self = this;
 		// Get a list of all enabled shows
@@ -392,6 +401,13 @@ var ShowData = {
 				});
 				if (typeof(callback) == 'function') callback(null, show.id);
 			});
+		});
+	},
+	
+	getUnmatched: function(callback){
+		db.get("SELECT COUNT(id) AS count FROM show_unmatched", function(error, row){
+			if (error) return;
+			if (typeof(callback) == 'function') callback(null, row);
 		});
 	},
 	

@@ -19,7 +19,7 @@ CREATE TABLE "show_episode" (
 	"episode" INTEGER,
 	"title" TEXT,
 	"synopsis" TEXT,
-	"airdate" TEXT,
+	"airdate" INTEGER,
 	"file" TEXT,
 	"hash" TEXT,
 	"downloaded" TEXT,
@@ -28,8 +28,7 @@ CREATE TABLE "show_episode" (
 
 CREATE TABLE "show_unmatched" (
 	"id" INTEGER PRIMARY KEY AUTOINCREMENT,
-	"directory" TEXT UNIQUE,
-	"tvdb" INTEGER
+	"directory" TEXT UNIQUE
 );
 
 CREATE TABLE "user" (

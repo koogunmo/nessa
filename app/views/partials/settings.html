@@ -16,11 +16,19 @@
 					<div class="panel-body">
 						<div class="form-group">
 							<label for="ipt_shows_base">Base Media Directory</label>
-							<input type="text" id="ipt_shows_base" name="shows:base" ng-model="settings.shows.base" class="form-control" />
+							
+							<div class="input-group">
+								<input type="text" id="ipt_shows_base" name="shows:base" ng-model="settings.shows.base" class="form-control" />
+								<span class="input-group-addon">
+									<span class="glyphicon glyphicon-folder-open"></span>
+								</span>
+							</div>
 						</div>
 						<div class="form-group">
-							<input type="checkbox" id="ipt_shows_hd" name="shows:hd" ng-model="settings.shows.hd" />
-							<label for="ipt_shows_hd">Prefer HD Video</label>
+							<label class="checkbox-inline">
+								<input type="checkbox" id="ipt_shows_hd" name="shows:hd" ng-model="settings.shows.hd" />
+								<strong>Prefer HD Video</strong>
+							</label>
 						</div>
 					</div>
 				</div>
@@ -55,10 +63,11 @@
 					</div>
 					<div class="panel-body">
 						<div class="form-group">
-							<input type="checkbox" id="ipt_trakt_enable" name="trakt:enabled" ng-model="settings.trakt.enabled" />
-							<label for="ipt_trakt_enable">Enable Integration</label>
+							<label class="checkbox-inline">
+								<input type="checkbox" id="ipt_trakt_enable" name="trakt:enabled" ng-model="settings.trakt.enabled" />
+								<strong>Enable Integration</strong>
+							</label>
 						</div>
-						
 						<div ng-switch on="settings.trakt.enabled">
 							<div class="alert alert-danger" ng-switch-when="false"><strong>Note</strong>: Trakt integration is <strong>required</strong></div>
 							<div class="form-group" ng-switch-when="true">
@@ -83,10 +92,11 @@
 					</div>
 					<div class="panel-body">
 						<div class="form-group">
-							<input type="checkbox" id="ipt_twilio_enabled" name="twilio:enabled" ng-model="settings.twilio.enabled" />
-							<label for="ipt_twilio_enabled">Enable SMS Notifications</label>
+							<label class="checkbox-inline">
+								<input type="checkbox" id="ipt_twilio_enabled" name="twilio:enabled" ng-model="settings.twilio.enabled" />
+								<strong>Enable SMS Notifications</strong>
+							</label>
 						</div>
-						
 						<div ng-switch on="settings.twilio.enabled">
 							<div class="alert alert-warning" ng-switch-when="false"><strong>Note</strong>: SMS integration is not yet functional</div>
 							<div class="form-group" ng-switch-when="true">

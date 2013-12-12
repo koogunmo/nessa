@@ -254,24 +254,27 @@ io.sockets.on('connection', function(socket) {
 	
 	/** Dashboard **/
 	socket.on('dashboard', function(){
-		// Latest downloads
-		db.all("SELECT S.name, E.season, E.episode, E.title, E.synopsis, E.airdate FROM show AS S INNER JOIN show_episode AS E ON S.id = E.show_id ORDER BY downloaded DESC, episode DESC LIMIT 10", function(error, rows){
-			if (error) {
-				logger.error(error);
-				return;
-			}
-			socket.emit('dashboard.latest', rows);
+		var shows = plugin('showdata');
+		
+		// List latest downloads
+		shows.latest(function(error, json){
+			socket.emit('dashboard.latest', json);
 		});
 		
 		// Check for unmatched shows
-		db.get("SELECT COUNT(id) AS count FROM show_unmatched", function(error, row){
-			if (error) return;
-			if (row.count > 0) socket.emit('dashboard.unmatched', row);
+		shows.getUnmatched(function(error, json){
+			if (json.count) socket.emit('dashboard.unmatched', json.count);
+		});
+		
+		// Get upcoming shows
+		trakt.calendar.shows(function(error, json){
+			socket.emit('dashboard.upcoming', json);
 		});
 		
 		// Generate some stats/info for the homepage
 		socket.emit('dashboard.stats', {
-			version: pkg.version
+			version: pkg.version,
+			uptime: process.uptime()
 		});
 	});
 
@@ -395,9 +398,9 @@ io.sockets.on('connection', function(socket) {
 		var show = plugin('showdata');
 		show.getArtwork(data.id);
 		show.getFullListings(data.id, function(error, json){
-			show.summary(data.id, function(error, json){
-				socket.emit('show.summary', json);
-			});
+		//	show.summary(data.id, function(error, json){
+		//		socket.emit('show.summary', json);
+		//	});
 		});
 	});
 	

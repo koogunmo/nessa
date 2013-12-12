@@ -84,6 +84,8 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 	
 	nessa.controller('homeCtrl', function($scope, socket){
 		$scope.unmatched = 0;
+		$scope.upcoming = [];
+		
 		socket.emit('dashboard');
 		socket.on('dashboard.latest', function(data){
 			$scope.latest = data;
@@ -93,7 +95,11 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 		});
 		socket.on('dashboard.unmatched', function(data){
 			$scope.unmatched = data.count;
-		})
+		});
+		socket.on('dashboard.upcoming', function(data){
+			$scope.upcoming = data;
+		});
+		
 	});
 	
 	nessa.controller('matchCtrl', function($scope, socket){
