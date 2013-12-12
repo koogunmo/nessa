@@ -8,7 +8,7 @@
 		<h2>Latest Shows</h2>
 		<div class="latest" ng-repeat="item in latest">
 			<h4>{{item.name}} : {{item.title}}</h3>
-			<h5>{{item.airdate}} : Season {{item.season}}, Episode {{item.episode}}</h4>
+			<h5>{{item.airdate*1000 | date:'dd MMMM yyyy'}} : Season {{item.season}}, Episode {{item.episode}}</h4>
 			<p class="synopsis">{{item.synopsis}}</p>
 		</div>
 	</div>
