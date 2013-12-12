@@ -125,16 +125,28 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 	});
 
 	nessa.controller('settingsCtrl', function($scope, socket){
-		$scope.settings = {};
+		$scope.settings = {}
 		$scope.branches = [{name: 'master'},{name: 'nightly'}];
-		
+		$scope.users = [];
+			
 		socket.emit('system.settings');
 		socket.on('system.settings', function(data){
 			$scope.settings = data;
 		});
 		
+		socket.emit('system.users');
+		socket.on('system.users', function(data){
+			$scope.users = data;
+		});
+		
 		$scope.save = function(form){
 			socket.emit('system.settings', $scope.settings)
+		};
+		
+		$scope.latest = function(){
+		//	if (confirm('This will update all show listings and artwork. NodeTV may become VERY laggy. Continue anyway?')) {
+				socket.emit('system.latest');
+		//	}
 		};
 		$scope.listings = function(){
 			if (confirm('This will update all show listings and artwork. NodeTV may become VERY laggy. Continue anyway?')) {

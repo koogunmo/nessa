@@ -219,6 +219,28 @@ io.sockets.on('connection', function(socket) {
 		}
 		socket.emit('system.settings', nconf.get());
 		
+	}).on('system.users', function(){
+		db.all("SELECT * FROM user ORDER BY username ASC", function(error, rows){
+			if (error) return;
+		//	socket.emit('system.users', rows);
+		});
+	}).on('system.latest', function(){
+		var shows = plugin('showdata');
+		shows.getLatest();
+		
+		socket.emit('system.alert', {
+			type: 'info',
+			message: 'Checking for new downloads'
+		});
+		
+	}).on('system.listings', function(){
+		// Update ALL listing information and artwork
+		var shows = plugin('showdata');
+		db.each("SELECT * FROM show WHERE status != -1 AND directory IS NOT NULL", function(error, show){
+			shows.getArtwork(show.id);
+			shows.getFullListings(show.id);
+		});
+		
 	}).on('system.rescan', function(){
 		socket.emit('system.alert', {
 			type: 'info',
@@ -233,13 +255,7 @@ io.sockets.on('connection', function(socket) {
 				scanner.episodes(id);
 			});
 		});
-	}).on('system.listings', function(){
-		// Update ALL listing information and artwork
-		var shows = plugin('showdata');
-		db.each("SELECT * FROM show WHERE status != -1 AND directory IS NOT NULL", function(error, show){
-			shows.getArtwork(show.id);
-			shows.getFullListings(show.id);
-		});
+		
 	}).on('system.restart', function(){
 		var system = plugin('system');
 		system.restart()
