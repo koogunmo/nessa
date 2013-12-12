@@ -238,19 +238,10 @@ io.sockets.on('connection', function(socket) {
 			shows.getFullListings(show.id);
 		});
 	}).on('system.restart', function(){
-		socket.emit('system.alert', {
-			type: 'info',
-			message: 'NodeTV is restarting'
-		});
 		var system = plugin('system');
 		system.restart()
 		
 	}).on('system.update', function(){
-		socket.emit('system.alert', {
-			type: 'info',
-			message: 'Update in progress'
-		});
-		
 		var system = plugin('system');
 		system.update(function(){
 			socket.emit('system.loaded');

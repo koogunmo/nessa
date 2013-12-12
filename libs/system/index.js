@@ -10,11 +10,16 @@ var system = {
 					logger.error(error);
 					return;
 				}
+				events.emit('system.alert', {
+					type: 'warning',
+					message: 'Update in progress'
+				});
 				var restart = (success.indexOf('already up-to-date') == 0) ? false : true;
 				
 				var interval = setInterval(function(){
 					if (restart) {
-						logger.info('Updates installed. Restarting...');
+						clearInterval(interval);
+						logger.info('Updates installed.');
 						system.restart();
 					}
 				}, 5000);
@@ -46,6 +51,11 @@ var system = {
 	},
 	restart: function(){
 		try {
+			logger.info('Restarting.');
+			events.emit('system.alert', {
+				type: 'danger',
+				message: 'NodeTV is restarting'
+			});
 			// Assuming we're using forever
 			process.kill(process.pid, 'SIGUSR2');
 		} catch(e) {
