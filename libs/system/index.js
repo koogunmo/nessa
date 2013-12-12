@@ -5,7 +5,7 @@ var system = {
 	update: function(callback){
 		try {
 			var repo = git(process.cwd());
-			repo.pull('origin', 'master', function(error, success){
+			repo.pull('origin', nconf.get('system:branch'), function(error, success){
 				if (error) {
 					logger.error(error);
 					return;
