@@ -138,8 +138,8 @@
 						<h4 class="panel-title">Library Maintenance</h4>
 					</div>
 					<div class="panel-body">
-						<div>
-							<button type="button" class="btn btn-primary confirm" ng-click="listings()">Update ALL listings</button>
+						<div class="form-group">
+							<button type="button" class="btn btn-primary confirm" ng-click="listings()">Update listings</button>
 							<button type="button" class="btn btn-info confirm" ng-click="rescan()">Rescan Media</button>
 						</div>
 						<br />
@@ -151,7 +151,12 @@
 						<h4 class="panel-title">System Maintenance</h4>
 					</div>
 					<div class="panel-body">
-						<div>
+						<div class="form-group">
+							<label for="ipt_system_branch">Update channel</label>
+							{{settings.system.derp}}
+							<select name="system:branch" id="ipt_system_branch" ng-model="settings.system.branch" ng-options="branch.name as branch.name for branch in branches" class="form-control"></select>
+						</div>
+						<div class="form-group">
 							<button type="button" class="btn btn-warning confirm" ng-click="update()">Update NodeTV</button>
 							<button type="button" class="btn btn-danger confirm" ng-click="reboot()">Restart NodeTV</button>
 						</div>

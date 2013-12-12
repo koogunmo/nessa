@@ -23,6 +23,9 @@ global.nconf.file({
 	run: {
 		user: 'media',
 		group: 'media'
+	},
+	system: {
+		branch: 'master'
 	}
 });
 

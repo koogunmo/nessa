@@ -120,6 +120,8 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 
 	nessa.controller('settingsCtrl', function($scope, socket){
 		$scope.settings = {};
+		$scope.branches = [{name: 'master'},{name: 'nightly'}];
+		
 		socket.emit('system.settings');
 		socket.on('system.settings', function(data){
 			$scope.settings = data;
