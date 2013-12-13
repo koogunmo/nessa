@@ -1,6 +1,6 @@
 {
 	"name": "nessa.js",
-	"version": "0.4.0",
+	"version": "0.4.1",
 	"author": "Martin Purcell <martin.purcell@gmail.com>",
 	"description": "NodeTV - TV Torrent Manager",
 	"private": true,
