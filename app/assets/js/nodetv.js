@@ -275,4 +275,11 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 		$('.synopsis', this).slideToggle();
 		
 	});
+	
+	$(document).on('click', 'watched', function(){
+		// mark episodes as watched/unwatched
+		
+	});
+	
+	
 });

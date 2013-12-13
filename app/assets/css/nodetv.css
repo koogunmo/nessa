@@ -66,6 +66,11 @@ body {
 	cursor: pointer;
 }
 
+#seasons .episode {
+	border-bottom: 1px solid #EEEEEE;
+}
+
+
 /* Downloads */
 
 #downloads .download {

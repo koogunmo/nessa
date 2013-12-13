@@ -73,44 +73,41 @@ var Scanner = {
 						var data = helper.getEpisodeNumbers(file);
 						if (!data || !data.episodes) return;
 						
-						// Episode number range
-						if (data.episodes.length > 1) {
-							var ep = helper.zeroPadding(data.episodes[0])+'-'+helper.zeroPadding(data.episodes[data.episodes.length-1]);
-						} else {
-							var ep = helper.zeroPadding(data.episodes[0]);
-						}
 						// Title formatting
 						db.all("SELECT E.*, S.tvdb FROM show_episode AS E INNER JOIN show AS S ON S.id = E.show_id WHERE E.show_id = ? AND E.season = ?", show.id, data.season, function(error, rows){
 							if (error) return;
+							
+							var episodes = [];
 							var library = [];
-							var title = [];
 							var tvdb = null;
 							rows.forEach(function(row){
-								tvdb = row.tvdb;
-								if (data.episodes.indexOf(row.episode) >= 0) {
-									title.push(row.title);
-								}
+								if (!tvdb) tvdb = row.tvdb;
+								episodes.push({
+									episode: row.episode,
+									title: row.title
+								});
 							});
 							
-							// TODO: Use helper.formatName
+							var target = helper.formatName({
+								season:	data.season,
+								episodes: episodes,
+								ext: path.extname(file)
+							})
 							
-							var newName = 'Season '+helper.zeroPadding(data.season)+'/Episode '+ep+' - '+title.join('; ')+path.extname(file);
-							if (file != newName) {
-								helper.fileMove(showdir + '/' + file, showdir + '/' + newName);
-							}
+							if (file != target) helper.fileMove(showdir + '/' + file, showdir + '/' + newName);
+							
 							// Update Database records
 							data.episodes.forEach(function(episode){
-								db.run("UPDATE show_episode SET status = 2, file = ? WHERE show_id = ? AND season = ? AND episode = ?", newName, show.id, data.season, episode, function(error){
-									if (error) logger.error(error);
+								db.run("UPDATE show_episode SET status = 2, file = ? WHERE show_id = ? AND season = ? AND episode = ?", target, show.id, data.season, episode, function(error){
+									if (error) return;
 								});
 								library.push({
 									season: data.season,
 									episode: episode
-								})
+								});
 							});
 							trakt.show.episode.library(tvdb, library);
 						});
-					//	events.emit('scanner.episodes', null, show.id);
 					});
 				} catch(e) {
 					logger.error(e.message);

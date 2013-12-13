@@ -59,10 +59,7 @@ var torrent = {
 	complete: function() {
 		var self = this;
 		try {
-			if (!this.rpc) {
-				console.log('Unable to connect to Transmission');
-				return;
-			}
+			if (!this.rpc) return;
 			// Get a list of all completed torrents
 			this.rpc.get(function(error, data){
 				if (error) {
@@ -91,41 +88,38 @@ var torrent = {
 					var data = helper.getEpisodeNumbers(file);
 					if (!data || !data.episodes) return;
 					
-					/* Episode number range */
-					if (data.episodes.length > 1) {
-						var ep = helper.zeroPadding(data.episodes[0])+'-'+helper.zeroPadding(data.episodes[data.episodes.length-1]);
-					} else {
-						var ep = helper.zeroPadding(data.episodes[0]);
-					}
-					
 					db.all("SELECT S.name, S.directory, S.tvdb, E.* FROM show_episode AS E INNER JOIN show AS S ON S.id = E.show_id WHERE E.hash = ? AND E.file IS NULL", item.hashString, function(error, results){
 						if (error || !results.length) return;
 						
 						var showdir = nconf.get('shows:base') + '/' + results[0].directory;
-						var title	= [];
+						var episodes = [];
+						
 						var library	= [];
 						var tvdb	= null;
+						
 						results.forEach(function(row){
 							if (!tvdb) tvdb = row.tvdb;
-							title.push(row.title);
+							episodes.push({
+								episode: row.episode,
+								title: row.title
+							});
 							library.push({
 								season: row.season,
 								episode: row.episode
-							})
+							});
+						});
+						var target = helper.formatName({
+							season: data.season,
+							episodes: episodes,
+							ext: path.extname(file)
 						});
 						
-						// TODO: Use helper.formatName
-						
-						var newName = 'Season '+helper.zeroPadding(data.season)+'/Episode '+ep+' - '+title.join('; ')+path.extname(file);
-						
 						var downloaded = Math.round(new Date()/1000);
-						
-						helper.fileCopy(file, showdir + '/' + newName, function(){
-							db.run("UPDATE show_episode SET file = ?, status = 2, downloaded = ? WHERE hash = ?", newName, downloaded, item.hashString, function(error){
+						helper.fileCopy(file, showdir + '/' + target, function(){
+							db.run("UPDATE show_episode SET file = ?, status = 2, downloaded = ? WHERE hash = ?", target, downloaded, item.hashString, function(error){
 								if (error) logger.error(error);
 							});
 							trakt.show.episode.library(tvdb, library);
-							
 							/*
 							events.emit('download.complete', {
 								season: data.season,

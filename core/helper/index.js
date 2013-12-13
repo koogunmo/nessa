@@ -59,7 +59,7 @@ exports = module.exports = {
 	getEpisodeNumbers: function(file) {
 		
 		var file = file.toString();
-		var regexp	= /(?:S|Season)?\s?(\d{1,2})(?:\:[\w\s]+)?[\/\s]?(?:E|Episode|x)\s?([\d]{2,})(?:(?:E|-)\s?([\d]{2,})){0,}/i;
+		var regexp	= /(?:S|Season|\w+)?\s?(\d{1,2})(?:\:[\w\s]+)?[\/\s]?(?:E|Episode|x|\w+)\s?([\d]{2,})(?:(?:E|-)\s?([\d]{2,})){0,}/i;
 		var abdexp	= /(\d{4})\D?(\d{2})\D?(\d{2})/i;
 		
 		if (match = file.match(regexp)) {
@@ -83,7 +83,7 @@ exports = module.exports = {
 			}
 			
 		} else if (match = file.match(abdexp)) {
-			// Air By Date (e.g. Colbert Report, Daily Show, Craig Ferguson, etc)
+			// Air By Date (e.g. Colbert Report, Daily Show, Neighbours, etc)
 			var reponse = {
 				type: 'ABD',
 				year: match[0],
@@ -100,6 +100,7 @@ exports = module.exports = {
 		if (typeof(length) == 'undefined') length = 2;
 		return (pad + num).slice(-length);
 	},
+	
 	formatName: function(data){
 		var defaults = {
 			format: nconf.get('shows:format'),

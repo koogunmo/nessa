@@ -4,10 +4,15 @@
 	</div>
 	
 	<div ng-if="latest.length>=1">
-		<h3>Latest Shows</h3>
-		<hr />
+		<div class="page-header">
+			<h3>Latest Shows</h3>
+		</div>
 		<div class="panel panel-default" ng-repeat="item in latest">
 			<div class="panel-heading">
+				
+				<span class="glyphicon glyphicon-eye-open pull-right" title="Episode has been watched" ng-if="item.watched==1"></span>
+				<span class="glyphicon glyphicon-eye-close pull-right" title="Episode has not been watched" ng-if="item.watched==0"></span>
+				
 				<h4 class="panel-title">{{item.name}} <span class="small"> - {{item.title}}</span></h4>
 			</div>
 			<div class="panel-body">
@@ -23,8 +28,9 @@
 	</div>
 	
 	<div ng-if="upcoming.length>=1">
-		<h3>This Week</h3>
-		<hr />
+		<div class="page-header">
+			<h3>This Week</h3>
+		</div>
 		<div ng-repeat="day in upcoming">
 			<div class="panel panel-default" ng-repeat="item in day.episodes">
 				<div class="panel-heading">

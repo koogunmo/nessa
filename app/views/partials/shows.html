@@ -1,15 +1,14 @@
 <div id="shows">
 	<form class="form-group">
 		<label></label>
-		<input type="text" class="form-control" autofocus="true" placeholder="Search available shows..." ng-model="filter.name" />
+		<input type="text" class="form-control" autofocus="true" placeholder="Search show library..." ng-model="filter.name" />
 	</form>
-	
 	<div class="row">
-		<div class="show col-sm-3" ng-click="modalAdd()">
+		<div class="show col-sm-2" ng-click="modalAdd()">
 			<div class="image"></div>
 			<div>Add Show</div>
 		</div>
-		<div class="show col-sm-3" ng-repeat="show in shows | orderBy:predicate | filter:filter" ng-click="modalDetail(show.id)">
+		<div class="show col-sm-2" ng-repeat="show in shows | orderBy:predicate | filter:filter" ng-click="modalDetail(show.id)">
 			<div class="image">
 				<img data-src="/media/{{show.directory}}/poster.jpg" alt="" class="img-responsive" />
 			</div>
@@ -79,14 +78,14 @@
 									</div>
 									<div id="season-{{season.season}}" class="panel-collapse collapse">
 										<div class="panel-body">
-											<div class="episodes" ng-repeat="episode in season.episodes">
-												<h5>{{episode.episode | zeroPad:2}}: {{episode.title}}</h5>
+											<div class="episode" ng-repeat="episode in season.episodes">
+												<h5><span class="small">{{episode.episode | zeroPad:2}}</span> {{episode.title}}</h5>
 												
 												<div class="extended">
 													<p class="synopsis">{{episode.synopsis}}</p>
 													<!-- <div class="airdate">{{item.airdate*1000 | date:'dd MMMM yyyy'}}</div> -->
 												</div>
-												<hr />
+												
 												
 											</div>
 										</div>
