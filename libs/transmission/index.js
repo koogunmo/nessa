@@ -17,14 +17,15 @@ var torrent = {
 	},
 	
 	add: function(obj, callback) {
+		var self = this;
 		try {
 			if (!this.rpc) {
 				console.log('Unable to connect to Transmission');
 				return;
 			}
-			
+
 			obj.magnet = helper.formatMagnet(obj.magnet);
-			this.rpc.add(obj.magnet, function(error, args){
+			self.rpc.add(obj.magnet, function(error, args){
 				if (error) {
 					logger.error('bt:add', error, obj);
 					return;
@@ -37,6 +38,45 @@ var torrent = {
 					});
 				}
 			});
+			
+			/*
+			// Attempt at friendly names in transfer list
+			// Didn't work, as the dn gets replaced when the transfer begins :(
+			
+			db.all("SELECT S.name, E.season, E.episode FROM show_episode AS E INNER JOIN show AS S ON E.show_id = S.id WHERE E.id IN ("+obj.id.join(',')+") ORDER BY E.episode ASC", function(error, rows){
+				var info = {
+					show: null,
+					season: null,
+					episode: []
+				};
+				rows.forEach(function(row){
+					info.show	= row.name;
+					info.season	= helper.zeroPadding(row.season, 2);
+					info.episode.push(helper.zeroPadding(row.episode, 2));
+				});
+				var episodes = [];
+				info.episode.sort();
+				episodes.push(info.episode[0]);
+				if (info.episode.length > 1) {
+					episodes.push(info.episode[info.episode.length-1]);
+				}
+				var display = encodeURIComponent(info.show+' - S' + info.season + 'E' + episodes.join('-'));
+				obj.magnet = helper.formatMagnet(obj.magnet);
+				self.rpc.add(obj.magnet, function(error, args){
+					if (error) {
+						logger.error('bt:add', error, obj);
+						return;
+					}
+					if (args) {
+						obj.id.forEach(function(id){
+					//		db.run("UPDATE show_episode SET hash = ?, status = 1 WHERE id = ?", args.hashString, id, function(error, args){
+					//			if (error) logger.error(error);
+					//		});
+						});
+					}
+				});
+			});
+			*/
 		} catch(e) {
 			logger.error(e.message);
 		}

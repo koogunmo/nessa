@@ -160,7 +160,7 @@ exports = module.exports = {
 				}
 			});
 			data.query.tr = trackers;
-			data.query.dn = data.query.dn.replace(/\s/g, '.');
+		//	data.query.dn = data.query.dn.replace(/\s/g, '.');
 			return 'magnet:?'+qs.unescape(qs.stringify(data.query));
 		} catch(e) {
 			logger.error(e.message);

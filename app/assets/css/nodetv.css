@@ -32,7 +32,6 @@ body {
 	-webkit-overflow-scrolling: touch;
 }
 
-
 .modal-header > img {
 	border-radius: 6px 6px 0px 0px;
 }
@@ -44,6 +43,10 @@ body {
 }
 #dashboard .latest .synopsis {
 	display: none;
+}
+
+#dashboard .small {
+	white-space: nowrap;
 }
 
 /* Shows */
@@ -106,12 +109,22 @@ body {
 .modal-header {
     position: relative;
 }
+
 .close.close-corner {
+	display: none;
 	margin: 0;
 	opacity: 1;
 	position: absolute;
 	right: -10px;
 	top: -10px;
+}
+
+@media screen and (max-width: 767px) {
+	#dashboard .small {
+		display: block;
+		padding-top: 5px;
+	}
+	
 }
 
 @media screen and (min-width: 768px) {
@@ -141,6 +154,5 @@ body {
 	#shows .show div.image > img {
 		display: none;
 	}
-
 }
 

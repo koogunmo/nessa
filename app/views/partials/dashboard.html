@@ -13,17 +13,12 @@
 				<span class="glyphicon glyphicon-eye-open pull-right" title="Episode has been watched" ng-if="item.watched==1"></span>
 				<span class="glyphicon glyphicon-eye-close pull-right" title="Episode has not been watched" ng-if="item.watched==0"></span>
 				
-				<h4 class="panel-title">{{item.name}} <span class="small"> - {{item.title}}</span></h4>
+				<h4 class="panel-title">{{item.name}} <span class="small">{{item.title}}</span></h4>
 			</div>
 			<div class="panel-body">
-				<div><strong>Season {{item.season}}, Episode {{item.episode}}</strong> <span class="small">: {{item.airdate*1000 | date:'dd MMMM yyyy'}}</span></div>
+				<div><strong>Season {{item.season}}, Episode {{item.episode}}</strong> <span class="small">{{item.airdate*1000 | date:'dd MMMM yyyy'}}</span></div>
 				{{item.synopsis}}
 			</div>
-			<!--
-			<div class="panel-footer">
-				Watched, etc
-			</div>
-			-->
 		</div>
 	</div>
 	
@@ -34,10 +29,10 @@
 		<div ng-repeat="day in upcoming">
 			<div class="panel panel-default" ng-repeat="item in day.episodes">
 				<div class="panel-heading">
-					<h4 class="panel-title">{{item.show.title}} <span class="small"> - {{item.episode.title}}</span></h4>
+					<h4 class="panel-title">{{item.show.title}} <span class="small">{{item.episode.title}}</span></h4>
 				</div>
 				<div class="panel-body">
-					<div><strong>Season {{item.episode.season}}, Episode {{item.episode.number}}</strong> <span class="small">: {{item.episode.first_aired*1000 | date:'dd MMMM yyyy'}}</span></div>
+					<div><strong>Season {{item.episode.season}}, Episode {{item.episode.number}}</strong> <span class="small">{{item.episode.first_aired*1000 | date:'dd MMMM yyyy'}}</span></div>
 					{{item.episode.overview}}
 				</div>
 			</div>

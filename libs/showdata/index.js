@@ -333,7 +333,7 @@ var ShowData = {
 						
 						results.forEach(function(result){
 							if (show.hd != result.hd) return;
-							db.all("SELECT * FROM show_episode WHERE show_id = ? AND season = ? AND episode IN ("+result.episode.join(',')+")", show.id, result.season, function(error, rows){
+							db.all("SELECT S.name, E.* FROM show_episode AS E INNER JOIN show AS S ON E.show_id = S.id WHERE E.show_id = ? AND E.season = ? AND E.episode IN ("+result.episode.join(',')+")", show.id, result.season, function(error, rows){
 								if (error) return;
 								if (typeof(rows) == 'undefined') return;
 								
