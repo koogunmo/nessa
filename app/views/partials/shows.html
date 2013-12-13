@@ -51,19 +51,17 @@
 					</button>
 					<img src="media/{{detail.summary.directory}}/banner.jpg" alt="{{detail.summary.name}}" class="img-responsive" />
 				</div>
-				
-				<ul class="nav nav-tabs">
-					<li class="active"><a href="#synopsis" data-toggle="tab">Synopsis</a></li>
-					<li><a href="#episodes" data-toggle="tab">Episodes</a></li>
-					<li><a href="#settings" data-toggle="tab">Settings</a></li>
-				</ul>
-			
 				<div class="modal-body">
+					<ul class="nav nav-pills nav-sm">
+						<li class="active"><a href="#synopsis" data-toggle="tab">Synopsis</a></li>
+						<li><a href="#episodes" data-toggle="tab">Episodes</a></li>
+						<li><a href="#options" data-toggle="tab">Settings</a></li>
+					</ul>
+					<br />
 					<div class="tab-content">
 						<div class="tab-pane active" id="synopsis">
-							<div class="synopsis">
-								<h3>Synopsis</h3>
-								<p>{{detail.summary.synopsis}}</p>
+							<div class="synopsis well">
+								{{detail.summary.synopsis}}
 							</div>
 						</div>
 					
@@ -79,16 +77,23 @@
 									<div id="season-{{season.season}}" class="season panel-collapse collapse">
 										<div class="panel-body">
 											<div class="episode" ng-repeat="episode in season.episodes">
-												<h5 class="title"><span class="small">{{episode.episode | zeroPad:2}}</span> {{episode.title}}</h5>
+												
+												<h5 class="title"><span class="small">{{episode.episode | zeroPad:2}}</span>{{episode.title}}</h5>
 												
 												<div class="extended">
-													<p class="synopsis">{{episode.synopsis}}</p>
+													<p class="synopsis" ng-if="episode.synopsis">{{episode.synopsis}}</p>
 													
-													<!-- <div class="airdate">{{item.airdate*1000 | date:'dd MMMM yyyy'}}</div> -->
 													<div class="tools">
+														<span class="glyphicon glyphicon-eye-open action" title="Mark episode as watched" ng-if="episode.file&&episode.watched==0" ng-click="episode.watched=1"></span>
+														
+														<span class="glyphicon glyphicon-hdd" title="This episode has been downloaded" ng-if="episode.file"></span>
+														
+														
+														
 														<!-- <span class="glyphicon glyphicon-cloud-download" title="Download this episode" ng-if="!episode.file"></span> -->
-														<span class="glyphicon glyphicon-eye-open" title="Mark episode as watched" ng-if="episode.file&&episode.watched==0"></span>
 													</div>
+													
+													<!-- <p class="airdate"><strong>First aired:</strong> {{episode.airdate*1000 | date:'yyyy-MM-dd'}}</p> -->
 												</div>
 											</div>
 										</div>
@@ -96,7 +101,7 @@
 								</div>	
 							</div>
 						</div>
-						<div class="tab-pane" id="settings">
+						<div class="tab-pane" id="options">
 							<div class="form-group">
 								<label for="ipt_setting_directory">Media Directory</label>
 								<input type="text" ng-model="detail.summary.path" readonly="readonly" class="form-control" />

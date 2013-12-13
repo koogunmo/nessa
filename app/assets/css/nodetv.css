@@ -27,7 +27,7 @@ body {
 /* Modals */
 .modal .modal-body {
 	/* fix this based on screen sizes */
-	max-height: 320px;
+	max-height: 380px;
 	overflow-y: auto;
 	-webkit-overflow-scrolling: touch;
 }
@@ -76,19 +76,27 @@ body {
 #seasons .season .episode:last-child {
 	border-bottom: none;
 }
-#seasons .season  .episode .title {
+#seasons .season .episode .title {
 	cursor: pointer;
+	margin-left: 20px;
 }
-#seasons .season  .episode .title > .small {
-	padding-right: 10px;
+#seasons .season .episode .title > .small {
+	padding-right: 8px;
+	margin-left: -20px;
 }
-#seasons .season  .episode .synopsis {
+#seasons .season .episode .extended {
 	display: none;
+	padding-bottom: 10px;
 }
-#seasons .season .episode .tools {
-	font-size: 18px;
+#seasons .season .episode .extended .tools {
+	text-align: right;
 }
-#seasons .season .episode .tools > span {
+#seasons .season .episode .extended .tools > span {
+	display: inline-block;
+	font-size: 12px;
+	margin-left: 10px;
+}
+#seasons .season .episode .extended .tools > span.action {
 	cursor: pointer;
 }
 
@@ -143,7 +151,9 @@ body {
 		display: block;
 		padding-top: 5px;
 	}
-	
+	#seasons .season .episode .extended .synopsis {
+		font-size: 12px;
+	}
 }
 
 @media screen and (min-width: 768px) {
@@ -172,6 +182,10 @@ body {
 	}
 	#shows .show div.image > img {
 		display: none;
+	}
+	
+	#seasons .season .episode .extended .synopsis {
+		margin-left: 20px;
 	}
 }
 

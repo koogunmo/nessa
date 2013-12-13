@@ -256,10 +256,9 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 		};
 	});
 	
-	
-	
 	// Bootstrap to document
 	angular.bootstrap(document, ['nessa'])
+	
 	// jQuery below
 	$(document).on('lazyload', function(){
 		$('div.image:visible img[data-src]').each(function(){
@@ -275,6 +274,14 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 		$('.synopsis', this).slideToggle();
 		
 	});
+	
+	
+	$(document).on('click', '.episode .title', function(){
+		var parent = $(this).parent();
+		$('.episode.open').not(parent).toggleClass('open').children('.extended').slideToggle();
+		$(parent).toggleClass('open').children('.extended').slideToggle();
+	});
+	
 	
 	$(document).on('click', 'watched', function(){
 		// mark episodes as watched/unwatched
