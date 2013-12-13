@@ -76,17 +76,20 @@
 											<span ng-if="season.season>=1">Season {{season.season}}</span>
 										</h4>
 									</div>
-									<div id="season-{{season.season}}" class="panel-collapse collapse">
+									<div id="season-{{season.season}}" class="season panel-collapse collapse">
 										<div class="panel-body">
 											<div class="episode" ng-repeat="episode in season.episodes">
-												<h5><span class="small">{{episode.episode | zeroPad:2}}</span> {{episode.title}}</h5>
+												<h5 class="title"><span class="small">{{episode.episode | zeroPad:2}}</span> {{episode.title}}</h5>
 												
 												<div class="extended">
 													<p class="synopsis">{{episode.synopsis}}</p>
+													
 													<!-- <div class="airdate">{{item.airdate*1000 | date:'dd MMMM yyyy'}}</div> -->
+													<div class="tools">
+														<!-- <span class="glyphicon glyphicon-cloud-download" title="Download this episode" ng-if="!episode.file"></span> -->
+														<span class="glyphicon glyphicon-eye-open" title="Mark episode as watched" ng-if="episode.file&&episode.watched==0"></span>
+													</div>
 												</div>
-												
-												
 											</div>
 										</div>
 									</div>

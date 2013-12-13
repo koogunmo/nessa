@@ -69,8 +69,27 @@ body {
 	cursor: pointer;
 }
 
-#seasons .episode {
+
+#seasons .season .episode {
 	border-bottom: 1px solid #EEEEEE;
+}
+#seasons .season .episode:last-child {
+	border-bottom: none;
+}
+#seasons .season  .episode .title {
+	cursor: pointer;
+}
+#seasons .season  .episode .title > .small {
+	padding-right: 10px;
+}
+#seasons .season  .episode .synopsis {
+	display: none;
+}
+#seasons .season .episode .tools {
+	font-size: 18px;
+}
+#seasons .season .episode .tools > span {
+	cursor: pointer;
 }
 
 
