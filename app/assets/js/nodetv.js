@@ -187,7 +187,7 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 			$scope.shows = data;
 			setTimeout(function(){
 				$(document).trigger('lazyload');
-			}, 500);
+			}, 250);
 		});
 		
 		// Search
@@ -269,7 +269,6 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 				src: $(this).data('src')
 			});
 		});
-		
 	}).on('click', '#dashboard .latest', function(){
 		$('.synopsis', this).slideToggle();
 		

@@ -49,6 +49,7 @@ body {
 	white-space: nowrap;
 }
 
+
 /* Shows */
 
 #shows div.image {
@@ -151,12 +152,23 @@ body {
 		display: block;
 		padding-top: 5px;
 	}
+	#dashboard .thumbnail {
+		display: block;
+		width: 100%;
+		max-width: 400px;
+	}
 	#seasons .season .episode .extended .synopsis {
 		font-size: 12px;
 	}
 }
 
 @media screen and (min-width: 768px) {
+	#dashboard .thumbnail {
+		float: left; 
+		margin-right: 10px;
+		width: 120px;
+	}
+	
 	#shows .show {
 		border: none;
 		height: 160px;

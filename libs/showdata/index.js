@@ -87,8 +87,6 @@ var ShowData = {
 		// Get a list of all enabled shows
 		db.all("SELECT * FROM show WHERE status != -1 AND directory IS NOT NULL ORDER BY name ASC", function(error, rows){
 			if (error) return;
-			
-		//	if (rows === undefined) error = 'No shows found';
 			if (typeof(callback) == 'function') callback(null, rows);
 		});
 	},
