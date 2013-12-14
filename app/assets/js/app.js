@@ -131,6 +131,10 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute'], functi
 			resolve: {
 				loggedin: checkLoggedin
 			}
+		}).when('/install', {
+			templateUrl: 'views/partials/install.html',
+			controller: 'installCtrl',
+			
 		}).otherwise({
 			redirectTo: '/dashboard'
 		});
