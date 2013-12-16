@@ -89,6 +89,12 @@ var ShowData = {
 			if (error) return;
 			if (typeof(callback) == 'function') callback(null, rows);
 		});
+		/*
+		var collection = db2.collection('show');
+		collection.find({status: {$ge: 0}, directory: {$exists: true, $ne: null}}).toArray(function(error, results){
+			if (typeof(callback) == 'function') callback(null, rows);
+		});
+		*/
 	},
 	
 	remove: function(id, callback){
@@ -364,14 +370,18 @@ var ShowData = {
 		request.get('http://tvshowsapp.com/showlist/showlist.xml', function(error, req, xml){
 			if (error) return;
 			try {
+				var collection = db2.collection('show');
 				parser.parseString(xml, function(error, json){
 					if (error) return;
 					json.shows.show.forEach(function(show){
 						var record = {
 							name: show.name[0],
+							status: -1,
+							ended: 0,
 							tvdb: show.tvdbid[0],
 							feed: show.mirrors[0].mirror[0]
 						};
+						/*
 						db.get("SELECT COUNT(id), id AS count FROM show WHERE tvdb = ?", record.tvdb, function(error, row){
 							if (error) return;
 							if (row.count == 0) {
@@ -381,6 +391,15 @@ var ShowData = {
 								});
 							}
 						});
+						*/
+						collection.findOne({tvdb: record.tvdb}, function(error, obj){
+							if (!obj){
+								collection.insert(record, function(error, res){
+									console.log('Inserted', error, res);
+								});
+							}	
+						});
+
 					});
 				});
 			} catch(e) {

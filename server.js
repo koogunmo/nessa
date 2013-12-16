@@ -49,7 +49,7 @@ if (process.getuid) {
 }
 
 /* Set a friendly process name */
-if (process.title) process.title = 'nessa.js';
+if (process.title) process.title = pkg.name;
 
 /***********************************************************************/
 /* Load dependencies */
@@ -58,6 +58,7 @@ var connect	= require('connect'),
 	express	= require('express'),
 	fs		= require('fs'),
 	logger	= require('log4js').getLogger(),
+	mongo	= require('mongodb').MongoClient,
 	path	= require('path'),
 	sqlite	= require('sqlite3').verbose(),
 	uuid	= require('node-uuid');
@@ -107,7 +108,10 @@ app.configure(function(){
 	}
 });
 
-logger.info('nessa.js: Listening on port ' + nconf.get('port'));
+
+
+logger.info(process.title + ' v'+pkg.version);
+logger.info('Listening on port ' + nconf.get('port'));
 
 /* Database */
 if (!fs.existsSync(__dirname + '/db/nessa.sqlite')) {
@@ -126,6 +130,17 @@ if (!fs.existsSync(__dirname + '/db/nessa.sqlite')) {
 global.db = new sqlite.Database(__dirname + '/db/nessa.sqlite', function(error){
 	if (error) logger.error('DB: ', error);
 });
+
+
+// Moving to Mongo
+try {
+	mongo.connect('mongodb://'+nconf.get('mongo:host')+':'+nconf.get('mongo:port')+'/'+nconf.get('mongo:name'), function(error, db){
+		logger.info('Connected to MongoDB');
+		global.db2 = db;
+	});
+} catch(e){
+	logger.error(e.message);
+}
 
 /***********************************************************************/
 /* Load tasks */

@@ -19,15 +19,11 @@ var torrent = {
 	add: function(obj, callback) {
 		var self = this;
 		try {
-			if (!this.rpc) {
-				console.log('Unable to connect to Transmission');
-				return;
-			}
-
+			if (!this.rpc) return;
 			obj.magnet = helper.formatMagnet(obj.magnet);
 			self.rpc.add(obj.magnet, function(error, args){
 				if (error) {
-					logger.error('bt:add', error, obj);
+				//	logger.error('bt:add', error, obj);
 					return;
 				}
 				if (args) {
@@ -103,7 +99,7 @@ var torrent = {
 			// Get a list of all completed torrents
 			this.rpc.get(function(error, data){
 				if (error) {
-					logger.error(error);
+				//	logger.error(error);
 					return;
 				}
 				var response = [];
