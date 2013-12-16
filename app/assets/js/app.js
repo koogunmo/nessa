@@ -63,6 +63,23 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute'], functi
 	
 	app.config(function($routeProvider, $locationProvider, $httpProvider){
 	
+		var checkInstalled = function($q, $timeout, $http, $location, $rootScope){
+			// Initialize a new promise
+			var deferred = $q.defer();
+			// Make an AJAX call to check if installer has been run
+			$http.get('/installed').success(function(response){
+				if (response.installed) {
+					$timeout(deferred.resolve, 0);
+				} else {
+					$timeout(function(){
+						deferred.reject();
+					}, 0);
+					$location.url('/install');
+				}
+			});
+			return deferred.promise;
+		};
+
 		var checkLoggedin = function($q, $timeout, $http, $location, $rootScope){
 			// Initialize a new promise
 			var deferred = $q.defer();
@@ -110,6 +127,7 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute'], functi
 			resolve: {
 				loggedin: checkLoggedin
 			}
+			
 		}).when('/shows', {
 			templateUrl: 'views/partials/shows.html',
 			controller: 'showCtrl'
@@ -131,11 +149,15 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute'], functi
 			resolve: {
 				loggedin: checkLoggedin
 			}
+			
 		}).when('/install', {
 			templateUrl: 'views/partials/install.html',
 			controller: 'installCtrl',
 			
 		}).otherwise({
+			resolve: {
+				installed: checkInstalled
+			},
 			redirectTo: '/dashboard'
 		});
 	});

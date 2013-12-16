@@ -489,6 +489,13 @@ passport.deserializeUser(function(user, done) {
 	return done(null, user);
 });
 
+app.get('/installed', function(req, res){
+	var response = {
+		installed: nconf.get('installed')
+	};
+	res.send(response);
+});
+
 app.get('/loggedin', function(req, res){
 	var response = {
 		authenticated: false,

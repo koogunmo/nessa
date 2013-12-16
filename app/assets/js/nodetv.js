@@ -220,9 +220,11 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 			socket.emit('show.summary', id);
 			socket.on('show.summary', function(json){
 				$scope.detail = json;
-				if (!$('.modal-open').length) {
-					$('#show-modal').modal();
-				}
+				setTimeout(function(){
+					if (!$('.modal-open').length) {
+						$('#show-modal').modal();
+					}
+				}, 100);
 			});
 		};
 		
