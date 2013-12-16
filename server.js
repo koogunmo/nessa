@@ -49,7 +49,7 @@ if (process.getuid) {
 }
 
 /* Set a friendly process name */
-if (process.title) process.title = pkg.name;
+if (process.title) process.title = 'NodeTV';
 
 /***********************************************************************/
 /* Load dependencies */
@@ -135,12 +135,15 @@ global.db = new sqlite.Database(__dirname + '/db/nessa.sqlite', function(error){
 // Moving to Mongo
 try {
 	mongo.connect('mongodb://'+nconf.get('mongo:host')+':'+nconf.get('mongo:port')+'/'+nconf.get('mongo:name'), function(error, db){
-		logger.info('Connected to MongoDB');
-		global.db2 = db;
+		logger.info('MongoDB: Connected to '+nconf.get('mongo:host'));
+		global.dbm = db;
 	});
 } catch(e){
 	logger.error(e.message);
 }
+
+var showdata = plugin('showdata');
+//showdata.getShowlist();
 
 /***********************************************************************/
 /* Load tasks */
@@ -251,9 +254,13 @@ io.sockets.on('connection', function(socket) {
 	}).on('system.listings', function(){
 		// Update ALL listing information and artwork
 		var shows = plugin('showdata');
-		db.each("SELECT * FROM show WHERE status != -1 AND directory IS NOT NULL", function(error, show){
-			shows.getArtwork(show.id);
-			shows.getFullListings(show.id);
+		
+		var collection = dbm.collection('show');
+		collection.find({}).toArray(function(error, results){
+			results.forEach(function(result){
+				shows.getArtwork(show.tvdb);
+				shows.getFullListings(show.tvdb);
+			});
 		});
 		
 	}).on('system.rescan', function(){
@@ -265,9 +272,9 @@ io.sockets.on('connection', function(socket) {
 		var scanner = plugin('scanner');
 		var shows = plugin('showdata');
 		
-		scanner.shows(function(error, id){
-			shows.getFullListings(id, function(error, id){
-				scanner.episodes(id);
+		scanner.shows(function(error, tvdb){
+			shows.getFullListings(tvdb, function(error, tvdb){
+				scanner.episodes(tvdb);
 			});
 		});
 		
@@ -294,7 +301,7 @@ io.sockets.on('connection', function(socket) {
 		
 		// Check for unmatched shows
 		shows.getUnmatched(function(error, json){
-			if (json.count) socket.emit('dashboard.unmatched', json.count);
+			if (json.length) socket.emit('dashboard.unmatched', json.length);
 		});
 		
 		// Get upcoming shows

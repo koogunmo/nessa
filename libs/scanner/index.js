@@ -29,6 +29,9 @@ function listDirectory(path, callback) {
 
 var Scanner = {
 	shows: function(callback){
+		var collection = dbm.collection('show');
+		var unmatched = dbm.collection('unmatched');
+		
 		// Scan media directory for folders - calback is called for each item found
 		var self = this;
 		if (base = nconf.get('shows:base')) {
@@ -38,20 +41,23 @@ var Scanner = {
 					fs.stat(base + '/' + dir, function(error, stat){
 						if (error) return;
 						if (stat && stat.isDirectory()){
-							db.get("SELECT * FROM show WHERE name = ? OR directory = ?", dir, dir, function(error, row){
+							collection.find({$or: [{name: dir},{directory: dir}]}).toArray(function(error, results){
 								if (error) return;
-								if (row === undefined) {
-									// Not in database, queue to find later
-									db.run('INSERT INTO show_unmatched (directory) VALUES (?)', dir, function(error){
-										if (error) return;
+								var record = {
+									status: 1,
+									directory: dir
+								};
+								if (results.length == 1) {
+									var result = results[0];
+									collection.update({tvdb: result.tvdb}, {$set: record}, {upsert: true}, function(error, affected){
+										if (typeof(callback) == 'function') callback(null, result.tvdb);
 									});
-									return;
+									trakt.show.library(result.tvdb);
+								} else {
+									unmatched.update({directory: dir}, {$set: record}, {upsert: true}, function(error, result){
+										console.log('Unmatched: '+dir);
+									});
 								}
-								if (!row.directory) {
-									db.run("UPDATE show SET status = 1, directory = ? WHERE id = ?", dir, row.id);
-									if (typeof(callback) == 'function') callback(null, row.id);
-								}
-								if (row.tvdb) trakt.show.library(row.tvdb);
 							});
 						}
 					});
@@ -60,12 +66,15 @@ var Scanner = {
 		}
 	},
 	
-	episodes: function(id, callback){
+	episodes: function(tvdb, callback){
 		var self = this;
 		if (base = nconf.get('shows:base')) {
-			db.get("SELECT id, name, directory FROM show WHERE directory IS NOT NULL AND id = ?", id, function(error, show){
+			var showCollection = dbm.collection('show');
+			var episodeCollection = dbm.collection('episode');
+			
+			showCollection.findOne({tvdb: tvdb, status: {$exists: true}}, function(error, show){
+				if (error || !show) return;
 				try {
-					if (error || !show.directory) return;
 					var showdir = base + '/' + show.directory;
 					
 					listDirectory(showdir, function(filepath){
@@ -74,14 +83,11 @@ var Scanner = {
 						if (!data || !data.episodes) return;
 						
 						// Title formatting
-						db.all("SELECT E.*, S.tvdb FROM show_episode AS E INNER JOIN show AS S ON S.id = E.show_id WHERE E.show_id = ? AND E.season = ?", show.id, data.season, function(error, rows){
+						episodeCollection.find({tvdb: tvdb, season: data.season}).toArray(function(error, rows){
 							if (error) return;
-							
 							var episodes = [];
 							var library = [];
-							var tvdb = null;
 							rows.forEach(function(row){
-								if (!tvdb) tvdb = row.tvdb;
 								episodes.push({
 									episode: row.episode,
 									title: row.title
@@ -98,9 +104,14 @@ var Scanner = {
 							
 							// Update Database records
 							data.episodes.forEach(function(episode){
-								db.run("UPDATE show_episode SET status = 2, file = ? WHERE show_id = ? AND season = ? AND episode = ?", target, show.id, data.season, episode, function(error){
-									if (error) return;
+								var record = {
+									status: 2,
+									file: target
+								};
+								episodeCollection.update({tvdb: tvdb, season: data.season, episode: episode}, {$set: record}, function(error, affected){
+									console.log(error, affected);
 								});
+								
 								library.push({
 									season: data.season,
 									episode: episode

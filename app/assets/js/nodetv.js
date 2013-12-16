@@ -104,7 +104,6 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 	
 	nessa.controller('matchCtrl', function($scope, socket){
 		$scope.unmatched	= [];
-		
 		socket.emit('shows.unmatched');
 		socket.on('shows.unmatched', function(data){
 			$scope.unmatched.push(data);

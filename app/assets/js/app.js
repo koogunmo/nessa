@@ -136,7 +136,7 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute'], functi
 			templateUrl: 'views/partials/shows.html',
 			controller: 'showCtrl'
 			
-		}).when('/shows/match', {
+		}).when('/match', {
 			templateUrl: 'views/partials/match.html',
 			controller: 'matchCtrl',
 			resolve: {
