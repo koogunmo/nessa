@@ -250,9 +250,9 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 				$('#show-modal').modal('close')
 			}
 		};
-		$scope.update = function(id){
-			socket.emit('show.update', {id: id}, function(){
-				socket.emit('show.overview', id);
+		$scope.update = function(tvdb){
+			socket.emit('show.update', {tvdb: tvdb}, function(){
+				socket.emit('show.overview', tvdb);
 			});
 		};
 	});

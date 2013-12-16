@@ -1,4 +1,5 @@
 var exec	= require('child_process').exec,
+	extend	= require('xtend'),
 	feed	= require('feedparser'),
 	fs		= require('fs'),
 	http	= require('http'),
@@ -39,7 +40,9 @@ var ShowData = {
 	
 	episodes: function(tvdb, callback){
 		var collection = dbm.collection('episode');
-		dbm.find({tvdb: tvdb}).toArray(function(error, results){
+		collection.find({tvdb: tvdb}).toArray(function(error, results){
+			var seasons = [], episodes = [], response = [];
+			
 			results.forEach(function(result){
 				if (seasons.indexOf(result.season) == -1) seasons.push(result.season);
 				if (!episodes[result.season]) episodes[result.season] = [];
@@ -66,20 +69,35 @@ var ShowData = {
 		});
 		*/
 		
-		var collection = dbm.collection('episode');
-		collection.find({
-			file: {$exists: true, $ne: null},
-			airdate: {$ge: lastweek}
+		var episodeCollection = dbm.collection('episode');
+		var showCollection = dbm.collection('show');
+		
+		var list = [];
+		
+		episodeCollection.find({
+			file: {$exists: true},
+			airdate: {$gt: lastweek-1, $lt: Math.round(new Date()/1000)}
 		}).toArray(function(error, results){
-			
-			
+			var count = 0;
+			results.forEach(function(result){
+				showCollection.findOne({tvdb: result.tvdb}, function(error, show){
+					result = extend(result, show);
+					list.push(result);
+					count++;
+				});
+			});
+			setTimeout(function(){
+				if (count == results.length) {
+					console.log(list);
+					if (typeof(callback) == 'function') callback(null, list);
+				}
+			}, 100);
 		});
 	},
 	
 	list: function(callback){
-		var self = this;
 		var collection = dbm.collection('show');
-		collection.find({status: {$exists: true, $ge: 0}}).toArray(callback);
+		collection.find({status: {$exists: true}}).toArray(callback);
 	},
 	
 	remove: function(tvdb, callback){
@@ -146,13 +164,15 @@ var ShowData = {
 	match: function(matches, callback){
 		var self = this;
 		
-		var showsCollection = dbm.collection('show');
+		var showCollection = dbm.collection('show');
 		var unmatchedCollection = dbm.collection('unmatched');
 		
 		var ObjectID = require('mongodb').ObjectID;
 		
 		matches.forEach(function(match){
 			unmatchedCollection.findOne({_id: ObjectID(match.id)}, function(error, row){
+				
+				
 				
 				console.log(error, row);
 				
@@ -253,7 +273,7 @@ var ShowData = {
 	
 	getEpisode: function(tvdb, season, episode, callback){
 		trakt.show.episode.summary(tvdb, season, episode, function(error, episode){
-			episode.tvdb = episode.tvdb_id;
+			episode.tvdb = tvdb;
 			self.setEpisode(episode, function(error, response){
 				if (typeof(callback) == 'function') callback(null, true);
 			});
@@ -264,22 +284,20 @@ var ShowData = {
 		var self = this;
 		// Fetch episode listings
 		var collection = dbm.collection('show');
-		collection.findOne({tvdb: tvdb}, function(error, show){
-			if (error || !show) return;
-			trakt.show.seasons(show.tvdb, function(error, seasons){
-				var count = 0;
-				var total = seasons.length;
-				seasons.forEach(function(season){
-					trakt.show.season.info(show.tvdb, season.season, function(error, episodes){
-						count++;
-						episodes.forEach(function(episode){
-							episode.tvdb = show.tvdb_id;
-							self.setEpisode(episode);
-						});
-						if (count == total) {
-							if (typeof(callback) == 'function') callback(null, show.tvdb);
-						}
+		
+		trakt.show.seasons(tvdb, function(error, seasons){
+			var count = 0;
+			var total = seasons.length;
+			seasons.forEach(function(season){
+				trakt.show.season.info(tvdb, season.season, function(error, episodes){
+					count++;
+					episodes.forEach(function(episode){
+						episode.tvdb = tvdb;
+						self.setEpisode(episode);
 					});
+					if (count == total) {
+						if (typeof(callback) == 'function') callback(null, tvdb);
+					}
 				});
 			});
 		});
@@ -288,9 +306,10 @@ var ShowData = {
 	getLatest: function(){
 		var self = this;
 		// Check each of the feeds for new episodes
-		var collection = dbm.collection('show');
+		var showCollection = dbm.collection('show');
+		var episodeCollection = dbm.collection('episode');
 		
-		collection.find({
+		showCollection.find({
 			status: 1,
 			ended: {$exists: false},
 			feed: {$exists: true, $ne: null}
@@ -340,25 +359,23 @@ var ShowData = {
 							
 							results.forEach(function(result){
 								if (show.hd != result.hd) return;
-								/*
-								db.all("SELECT S.name, E.* FROM show_episode AS E INNER JOIN show AS S ON E.show_id = S.id WHERE E.show_id = ? AND E.season = ? AND E.episode IN ("+result.episode.join(',')+")", show.id, result.season, function(error, rows){
-									if (error) return;
-									if (typeof(rows) == 'undefined') return;
-									
-									var ids = [];
+								episodeCollection.find({
+									tvdb: show.tvdb,
+									season: result.season,
+									episode: {$in: result.episode}
+								}).toArray(function(error, rows){
+									var list = [];
 									rows.forEach(function(row){
-										if (row.hash || row.file) return;
-										ids.push(row.id);
+										list.push(row._id);
 									});
-									if (ids.length) {
+									if (list.length){
 										torrent.add({
-											id: ids,
+											id: list,
 											magnet: result.magnet
 										});
-										self.getFullListings(show.id);
+										self.getFullListings(show.tvdb);
 									}
 								});
-								*/
 							});
 						});
 					} catch(e) {
@@ -419,7 +436,7 @@ var ShowData = {
 	
 	setEpisode: function(episode, callback) {
 		var record = {
-			tvdb: episode.tvdb_id,
+			tvdb: episode.tvdb,
 			season: episode.season,
 			episode: episode.episode,
 			title: episode.title,

@@ -3,4 +3,7 @@
 setInterval(function(){
 	torrent.complete();
 }, 300000);
-torrent.complete();
+
+setTimeout(function(){
+	torrent.complete();
+}, 5000);

@@ -67,7 +67,7 @@
 					
 						<div class="tab-pane" id="episodes">
 							<div id="seasons" class="panel-group">
-								<div class="panel panel-default" ng-repeat="season in detail.listing">
+								<div class="panel panel-default" ng-repeat="season in detail.listing | orderBy:'season':true">
 									<div class="panel-heading" data-toggle="collapse" data-parent="#seasons" href="#season-{{season.season}}">
 										<h4 class="panel-title">
 											<span ng-if="season.season==0">Specials</span>
@@ -76,7 +76,7 @@
 									</div>
 									<div id="season-{{season.season}}" class="season panel-collapse collapse">
 										<div class="panel-body">
-											<div class="episode" ng-repeat="episode in season.episodes">
+											<div class="episode" ng-repeat="episode in season.episodes | orderBy:'episode'">
 												
 												<h5 class="title"><span class="small">{{episode.episode | zeroPad:2}}</span>{{episode.title}}</h5>
 												

@@ -18,18 +18,22 @@ var torrent = {
 	
 	add: function(obj, callback) {
 		var self = this;
+		var ObjectID = require('mongodb').ObjectID;
+		var collection = dbm.collection('episode');
+		
 		try {
 			if (!this.rpc) return;
 			obj.magnet = helper.formatMagnet(obj.magnet);
 			self.rpc.add(obj.magnet, function(error, args){
-				if (error) {
-				//	logger.error('bt:add', error, obj);
-					return;
-				}
+				if (error) return;
 				if (args) {
 					obj.id.forEach(function(id){
-						db.run("UPDATE show_episode SET hash = ?, status = 1 WHERE id = ?", args.hashString, id, function(error, args){
-							if (error) logger.error(error);
+						var record = {
+							hash: args.hashString,
+							status: 1
+						};
+						collection.update({_id: ObjectID(id)}, {$set: record}, function(error, affected){
+					//		if (typeof(callback) == 'function') callback(null, true);
 						});
 					});
 				}
@@ -94,14 +98,13 @@ var torrent = {
 	
 	complete: function() {
 		var self = this;
+		var episodeCollection = dbm.collection('episode');
+		
 		try {
 			if (!this.rpc) return;
 			// Get a list of all completed torrents
 			this.rpc.get(function(error, data){
-				if (error) {
-				//	logger.error(error);
-					return;
-				}
+				if (error) return;
 				var response = [];
 				data.torrents.forEach(function(item){
 					// Has it finished downloading?
@@ -124,6 +127,49 @@ var torrent = {
 					var data = helper.getEpisodeNumbers(file);
 					if (!data || !data.episodes) return;
 					
+					db.find({hash: item.hashString}).toArray(function(error, results){
+						if (error || !results.length) return;
+						var showdir = nconf.get('shows:base') + '/' + results[0].directory;
+						
+						var tvdb = null;
+						var episodes = [];
+						var library	= [];
+						
+						results.forEach(function(row){
+							if (!tvdb) tvdb = row.tvdb;
+							episodes.push({
+								episode: row.episode,
+								title: row.title
+							});
+							library.push({
+								season: row.season,
+								episode: row.episode
+							});
+						});
+						var target = helper.formatName({
+							season: data.season,
+							episodes: episodes,
+							ext: path.extname(file)
+						});
+						var record = {
+							status: 2,
+							file: target
+						};
+						helper.fileCopy(file, showdir + '/' + target, function(){
+							episodeCollection.update({hash: item.hashString}, {$set: record}, function(error, affected){
+								
+							});
+							trakt.show.episode.library(tvdb, library);
+							
+						//	events.emit('download.complete', {
+						//		season: data.season,
+						//		episode: ep,
+						//		title: title.join('; ')
+						//	})
+						});
+					});
+					
+					/*
 					db.all("SELECT S.name, S.directory, S.tvdb, E.* FROM show_episode AS E INNER JOIN show AS S ON S.id = E.show_id WHERE E.hash = ? AND E.file IS NULL", item.hashString, function(error, results){
 						if (error || !results.length) return;
 						
@@ -156,26 +202,21 @@ var torrent = {
 								if (error) logger.error(error);
 							});
 							trakt.show.episode.library(tvdb, library);
-							/*
-							events.emit('download.complete', {
-								season: data.season,
-								episode: ep,
-								title: title.join('; ')
-							})
-							*/
+							
+						//	events.emit('download.complete', {
+						//		season: data.season,
+						//		episode: ep,
+						//		title: title.join('; ')
+						//	})
 						});
 					});
+					*/
 					
 					/* Remove if seeding is completed */
 					if (item.isFinished) {
-						db.get("SELECT COUNT(id) AS count FROM show_episode WHERE hash = ? GROUP BY hash", item.hashString, function(error, row){
-							if (error) {
-								logger.error(error);
-								return;
-							}
-							if (row === undefined) return;
-							if (row.count >= 1) {
-								logger.info('Removing: ' + item.name);
+						episodeCollection.count({hash: item.hashString}, function(error, count){
+							if (error) return;
+							if (count >= 1){
 								self.rpc.remove(item.id, true, function(error){
 									if (error) logger.error(error);
 								});
@@ -191,16 +232,7 @@ var torrent = {
 	
 	list: function(callback){
 		this.rpc.get(function(error, args){
-			/*
-			db.serialize(function(){
-				for (var i in args.torrents){
-					var hash = args.torrents[i].hashString
-					db.get("SELECT S.name, E.* FROM show_episode AS E INNER JOIN show AS S ON E.show_id = S.id WHERE E.hash = ?", hash, function(error, row){
-						if (row) args.torrents[i].show = row;
-					});
-				}
-			});
-			*/
+			if (error) return;
 			if (typeof(callback) == 'function') callback(error, args);
 		});
 	},

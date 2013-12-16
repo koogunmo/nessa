@@ -113,7 +113,7 @@ app.configure(function(){
 logger.info(process.title + ' v'+pkg.version);
 logger.info('Listening on port ' + nconf.get('port'));
 
-/* Database */
+/* Database
 if (!fs.existsSync(__dirname + '/db/nessa.sqlite')) {
 	nconf.set('installed', false);
 	global.db = new sqlite.Database(__dirname + '/db/nessa.sqlite', function(error){
@@ -130,9 +130,9 @@ if (!fs.existsSync(__dirname + '/db/nessa.sqlite')) {
 global.db = new sqlite.Database(__dirname + '/db/nessa.sqlite', function(error){
 	if (error) logger.error('DB: ', error);
 });
+*/
 
-
-// Moving to Mongo
+/* MongoDB */
 try {
 	mongo.connect('mongodb://'+nconf.get('mongo:host')+':'+nconf.get('mongo:port')+'/'+nconf.get('mongo:name'), function(error, db){
 		logger.info('MongoDB: Connected to '+nconf.get('mongo:host'));
@@ -238,10 +238,11 @@ io.sockets.on('connection', function(socket) {
 		socket.emit('system.settings', nconf.get());
 		
 	}).on('system.users', function(){
-		db.all("SELECT * FROM user ORDER BY username ASC", function(error, rows){
+		var collection = dbm.collection('user');
+		collection.find().toArray(function(error, results){
 			if (error) return;
 		//	socket.emit('system.users', rows);
-		});
+		})
 	}).on('system.latest', function(){
 		var shows = plugin('showdata');
 		shows.getLatest();
@@ -301,7 +302,7 @@ io.sockets.on('connection', function(socket) {
 		
 		// Check for unmatched shows
 		shows.getUnmatched(function(error, json){
-			if (json.length) socket.emit('dashboard.unmatched', json.length);
+			if (json && json.length) socket.emit('dashboard.unmatched', json.length);
 		});
 		
 		// Get upcoming shows
@@ -434,8 +435,8 @@ io.sockets.on('connection', function(socket) {
 		
 	}).on('show.update', function(data){
 		var show = plugin('showdata');
-		show.getArtwork(data.id);
-		show.getFullListings(data.id, function(error, json){
+		show.getArtwork(data.tvdb);
+		show.getFullListings(data.tvdb, function(error, json){
 		//	show.summary(data.id, function(error, json){
 		//		socket.emit('show.summary', json);
 		//	});
@@ -443,11 +444,13 @@ io.sockets.on('connection', function(socket) {
 	});
 	
 	
-	// Trakt integration
+	// Trakt watched functionality
+	/*
 	socket.on('show.watched', function(data){
 		db.get("SELECT id, tvdb FROM show WHERE id = ?", data.id, function(error, show){
-			trakt.show.seen(show.tvdb, function(error, json){
+			trakt.show.seen(data.tvdb, function(error, json){
 				db.run("UPDATE show_episode SET watched = 1 WHERE show_id = ?", show.id);
+				
 			});
 		});
 	}).on('show.season.watched', function(data){
@@ -464,10 +467,7 @@ io.sockets.on('connection', function(socket) {
 			});
 		});
 	});
-	
-	
-	
-	
+	*/
 	
 	/*************** Old methods to be converted ***************/
 	
@@ -497,7 +497,9 @@ passport.use(new LocalStrategy(
 	function(username, password, done) {
 		var sha1 = require('crypto').createHash('sha1');
 		var pass = sha1.update(password).digest('hex');
-		db.get("SELECT * FROM user WHERE username = ? AND password = ?", username, pass, function(error, user){
+		
+		var collection = dbm.collection('user');
+		collection.findOne({username: username, password: password}, function(error, user){
 			if (error) return done(error);
 			if (!user) return done(null, false, {message: 'Incorrect'});
 			return done(null, user);
@@ -535,9 +537,9 @@ app.get('/loggedin', function(req, res){
 		});
 		if (response.authenticated) return res.send(response);
 	}
-	db.get("SELECT COUNT(id) AS count FROM user", function(error, result){
-		if (error || !result.count) {
-			// no users in db - allow access
+	var collection = dbm.collection('user');
+	collection.count(function(error, count){
+		if (!count) {
 			response.authenticated = true;
 		} else {
 			if (req.isAuthenticated()) {
