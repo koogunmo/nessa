@@ -101,6 +101,7 @@ var ShowData = {
 	},
 	
 	search: function(query, callback){
+	//	trakt.search('shows', query, callback);
 		var query = new RegExp(query, 'i');
 		var collection = db.collection('show');
 		collection.find({name: query, status: {$exists: false}}).toArray(callback);

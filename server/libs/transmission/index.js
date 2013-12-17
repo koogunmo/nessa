@@ -32,9 +32,10 @@ var torrent = {
 					};
 					obj.id.forEach(function(id){
 						collection.update({_id: ObjectID(id)}, {$set: record}, function(error, affected){
-					//		if (typeof(callback) == 'function') callback(null, true);
+							if (error) return;
 						});
 					});
+					if (typeof(callback) == 'function') callback(null, true);
 				}
 			});
 		} catch(e) {

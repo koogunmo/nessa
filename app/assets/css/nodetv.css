@@ -52,6 +52,15 @@ body {
 
 /* Shows */
 
+/*
+#add-modal .result {
+	height: 100px;
+}
+#add-modal .result img {
+	height: 100px;
+}
+*/
+
 #shows div.image {
 	display: none;
 }
