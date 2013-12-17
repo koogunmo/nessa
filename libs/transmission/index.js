@@ -127,7 +127,7 @@ var torrent = {
 					var data = helper.getEpisodeNumbers(file);
 					if (!data || !data.episodes) return;
 					
-					db.find({hash: item.hashString}).toArray(function(error, results){
+					episodeCollection.find({hash: item.hashString}).toArray(function(error, results){
 						if (error || !results.length) return;
 						var showdir = nconf.get('shows:base') + '/' + results[0].directory;
 						
