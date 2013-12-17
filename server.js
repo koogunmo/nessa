@@ -392,11 +392,15 @@ io.sockets.on('connection', function(socket) {
 		});
 	}).on('show.remove', function(tvdb){
 		var shows = plugin('showdata');
-		shows.remove(tvdb, function(error, status){
+		shows.remove(tvdb, function(error, response){
+			
+			console.log(tvdb, error, response);
+			
 			socket.emit('system.alert', {
 				type: 'success',
 				message: 'Show removed'
 			});
+			
 			shows.list(function(error, results){
 				socket.emit('shows.list', results);
 			});

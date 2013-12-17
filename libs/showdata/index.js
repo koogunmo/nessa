@@ -97,7 +97,7 @@ var ShowData = {
 	
 	remove: function(tvdb, callback){
 		var collection = db.collection('show');
-		collection.update({tvdb: data.tvdb}, {$unset: {status: true}}, {upsert: true}, callback);
+		collection.update({tvdb: tvdb}, {$unset: {status: true}}, {upsert: true}, callback);
 	},
 	
 	search: function(query, callback){
@@ -124,7 +124,7 @@ var ShowData = {
 					summary: show,
 					listing: episodes
 				};
-				response.summary.path = nconf.get('shows:base')+'/'+show.directory;
+				response.displaypath = nconf.get('shows:base')+'/'+show.directory;
 				
 				if (typeof(callback) == 'function') callback(null, response);
 			});
