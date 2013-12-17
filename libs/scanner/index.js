@@ -87,7 +87,9 @@ var Scanner = {
 							if (error) return;
 							var episodes = [];
 							var library = [];
+							
 							rows.forEach(function(row){
+								if (data.episodes.indexOf(row.episode) == -1) return;
 								episodes.push({
 									episode: row.episode,
 									title: row.title
@@ -100,10 +102,7 @@ var Scanner = {
 								ext: path.extname(file)
 							});
 							
-							console.log(target);
-							return;
-							
-						//	if (file != target) helper.fileMove(showdir + '/' + file, showdir + '/' + target);
+							if (file != target) helper.fileMove(showdir + '/' + file, showdir + '/' + target);
 							
 							// Update Database records
 							data.episodes.forEach(function(episode){
@@ -112,9 +111,8 @@ var Scanner = {
 									file: target
 								};
 								episodeCollection.update({tvdb: tvdb, season: data.season, episode: episode}, {$set: record}, function(error, affected){
-									console.log(error, affected);
+								//	console.log(error, affected);
 								});
-								
 								library.push({
 									season: data.season,
 									episode: episode

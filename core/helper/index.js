@@ -115,8 +115,13 @@ exports = module.exports = {
 			'T': null,
 			'X': null,
 		};
+		
 		if (values.episodes.length > 1) {
-			values.episodes.sort();
+			values.episodes.sort(function(a,b){
+				if (a.episode < b.episode) return -1;
+				if (a.episode > b.episode) return 1;
+				return 0;
+			});
 			token.E = helper.zeroPadding(values.episodes[0].episode)+'-'+helper.zeroPadding(values.episodes[values.episodes.length-1].episode);
 			var titles = [];
 			values.episodes.forEach(function(episode){

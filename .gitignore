@@ -18,6 +18,7 @@ npm-debug.log
 settings.json
 
 
-test_data
+text_data/
+test_data/*
 test.*
 upnp.js
