@@ -58,7 +58,6 @@ var connect	= require('connect'),
 	express	= require('express'),
 	fs		= require('fs'),
 	logger	= require('log4js').getLogger(),
-	mongo	= require('mongodb').MongoClient,
 	path	= require('path'),
 	uuid	= require('node-uuid');
 
@@ -113,7 +112,15 @@ logger.info('Listening on port ' + nconf.get('port'));
 /* MongoDB */
 try {
 	if (nconf.get('mongo')) {
-		mongo.connect('mongodb://'+nconf.get('mongo:host')+':'+nconf.get('mongo:port')+'/'+nconf.get('mongo:name'), function(error, db){
+		var MongoDb		= require('mongodb').Db,
+			MongoClient	= require('mongodb').MongoClient,
+			MongoServer	= require('mongodb').Server;
+		
+		var mongo = new MongoDb(nconf.get('mongo:name'), new MongoServer(nconf.get('mongo:host'), nconf.get('mongo:port')), {w: 1});
+		mongo.open(function(error, db){
+			if (nconf.get('mongo:auth')){
+				db.authenticate(nconf.get('mongo:username'), nconf.get('mongo:password'));
+			}
 			logger.info('MongoDB: Connected to '+nconf.get('mongo:host'));
 			global.db = db;
 		});

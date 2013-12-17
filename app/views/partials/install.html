@@ -4,29 +4,71 @@
 	</div>
 	
 	<form>
-		
-		<h2>Files</h2>
-		
-		<div class="form-group">
-			<label for="">Media Directory</label>
-			<div class="input-group">
-				<input type="text" class="form-control" />
-				<span class="input-group-addon">@</span>
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h4 class="panel-title">Database</h4>
+			</div>
+			<div class="panel-body">
+				<div class="form-group">
+					<label for="">Host</label><input type="text" class="form-control" ng-model="settings.mongo.host" />
+				</div>
+				<div class="form-group">
+					<label for="">Port</label><input type="text" class="form-control" ng-model="settings.mongo.port" />
+				</div>
+				
+				<div class="form-group">
+					<label><input type="checkbox" ng-model="settings.mongo.auth" /> My database requires a username and password</label>
+				</div>
+				
+				<div class="form-group" ng-if="settings.mongo.auth">
+					<label for="">Username</label><input type="text" class="form-control" ng-model="settings.mongo.username" />
+				</div>
+				<div class="form-group" ng-if="settings.mongo.auth">
+					<label for="">Password</label><input type="password" class="form-control" ng-model="settings.mongo.password" />
+				</div>
 			</div>
 		</div>
 		
-		<h2>Trakt.tv</h2>
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h4 class="panel-title">Files</h4>
+			</div>
+			<div class="panel-body">
+				<div class="form-group">
+					<label for="">Media Directory</label><input type="text" class="form-control" ng-model="settings.shows.base" />
+				</div>
+			</div>
+		</div>
 		
-		<div class="form-group"><label for="">Username</label><input type="text" class="form-control" /></div>
-		<div class="form-group"><label for="">Password</label><input type="password" class="form-control" /></div>
-		<div class="form-group"><label for="">API Key</label><input type="text" class="form-control" /></div>
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h4 class="panel-title">Trakt.tv</h4>
+			</div>
+			<div class="panel-body">
+				<div class="form-group"><label for="">Username</label><input type="text" class="form-control" ng-model="settings.trakt.username" /></div>
+				<div class="form-group"><label for="">Password</label><input type="password" class="form-control" ng-model="settings.trakt.password" /></div>
+				<div class="form-group"><label for="">API Key</label><input type="text" class="form-control" ng-model="settings.trakt.apikey" /></div>
+			</div>
+		</div>
 		
-		<h2>Transmission</h2>
-		
-		<div class="form-group"><label for="">Username</label><input type="text" class="form-control" /></div>
-		<div class="form-group"><label for="">Password</label><input type="password" class="form-control" /></div>
-		<div class="form-group"><label for="">Host</label><input type="text" class="form-control" /></div>
-		<div class="form-group"><label for="">Port</label><input type="text" class="form-control" /></div>
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h4 class="panel-title">Transmission</h4>
+			</div>
+			<div class="panel-body">
+				<div class="form-group"><label for="">Host</label><input type="text" class="form-control" ng-model="settings.transmission.host" /></div>
+				<div class="form-group"><label for="">Port</label><input type="text" class="form-control" ng-model="settings.transmission.port" /></div>
+				<div class="form-group">
+					<label><input type="checkbox" ng-model="settings.transmission.auth" /> Transmission requires a username and password</label>
+				</div>
+				<div class="form-group" ng-if="settings.transmission.auth"><label for="">Username</label><input type="text" class="form-control" ng-model="settings.transmission.username" /></div>
+				<div class="form-group" ng-if="settings.transmission.auth"><label for="">Password</label><input type="password" class="form-control" ng-model="settings.transmission.password" /></div>
+			</div>
+		</div>
 		
 	</form>
+	<ul class="pager">
+		<li class="previous disabled"><a href="#">&larr; Previous</a></li>
+		<li class="next disabled"><a href="#">Next &rarr;</a></li>
+	</ul>
 </div>

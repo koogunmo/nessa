@@ -308,6 +308,7 @@ var ShowData = {
 									season: res.season,
 									episode: res.episodes,
 									hd: (item.title[0].match(/720p|1080p/i)) ? true : false,
+									repack: helper.isRepack(item.title[0]),
 									magnet: magnet,
 									aired: airdate
 								};
@@ -360,8 +361,11 @@ var ShowData = {
 							tvdb: show.tvdbid[0],
 							feed: show.mirrors[0].mirror[0]
 						};
-						collection.update({tvdb: record.tvdb}, {$set: record}, {upsert: true}, function(error, affected){
-							self.getSummary(record.tvdb);
+						collection.count({tvdb: record.tvdb}, function(error, count){
+							if (error || count == 1) return;
+							collection.insert(record, {upsert: true}, function(error, affected){
+								self.getSummary(record.tvdb);
+							});
 						});
 					});
 				});

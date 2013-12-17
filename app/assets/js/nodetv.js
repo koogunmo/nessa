@@ -54,7 +54,15 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 	});
 	
 	// Section-specific controllers
-
+	
+	nessa.controller('installCtrl', function($scope, socket){
+		$scope.settings = {};
+		socket.on('system.settings', function(data){
+			$scope.settings = data;
+		});
+		socket.emit('system.settings');
+	});
+	
 	nessa.controller('downloadCtrl', function($scope, socket){
 		$scope.downloads = [];
 		$scope.predicate = 'name';
