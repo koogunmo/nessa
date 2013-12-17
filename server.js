@@ -232,7 +232,6 @@ io.sockets.on('connection', function(socket) {
 	}).on('system.latest', function(){
 		var shows = plugin('showdata');
 		shows.getLatest();
-		
 		socket.emit('system.alert', {
 			type: 'info',
 			message: 'Checking for new downloads'

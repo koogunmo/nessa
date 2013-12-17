@@ -151,9 +151,9 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 		};
 		
 		$scope.latest = function(){
-		//	if (confirm('This will update all show listings and artwork. NodeTV may become VERY laggy. Continue anyway?')) {
+			if (confirm('This will update all show listings and artwork. NodeTV may become VERY laggy. Continue anyway?')) {
 				socket.emit('system.latest');
-		//	}
+			}
 		};
 		$scope.listings = function(){
 			if (confirm('This will update all show listings and artwork. NodeTV may become VERY laggy. Continue anyway?')) {

@@ -269,7 +269,7 @@ var ShowData = {
 		var episodeCollection = db.collection('episode');
 		
 		showCollection.find({
-			status: 1,
+			status: true,
 			ended: {$exists: false},
 			feed: {$exists: true, $ne: null}
 		}).toArray(function(error, shows){
@@ -280,6 +280,7 @@ var ShowData = {
 					try {
 						parser.parseString(xml, function(error, json){
 							if (error) return;
+							
 							var results = [];
 							if (!json.rss.channel[0].item) return;
 							var now = new Date().getTime();
@@ -307,9 +308,9 @@ var ShowData = {
 								var record = {
 									season: res.season,
 									episode: res.episodes,
-									hd: (item.title[0].match(/720p|1080p/i)) ? true : false,
+									hd: helper.isHD(item.title[0]),
 									repack: helper.isRepack(item.title[0]),
-									magnet: magnet,
+									magnet: helper.formatMagnet(magnet),
 									aired: airdate
 								};
 								if (magnet) results.push(record);
@@ -318,15 +319,22 @@ var ShowData = {
 							if (!results) return;
 							
 							results.forEach(function(result){
-								if (show.hd != result.hd) return;
+								if (!!show.hd != result.hd) return;
+								
 								episodeCollection.find({
 									tvdb: show.tvdb,
 									season: result.season,
 									episode: {$in: result.episode}
-								}).toArray(function(error, rows){
+								}).toArray(function(error, episodes){
+									// Prevent duplicate transfers
 									var list = [];
-									rows.forEach(function(row){
-										list.push(row._id);
+									
+									episodes.forEach(function(episode){
+										var add = true;
+										if (episode.status || episode.hash) add = false;
+										// Allow repacks
+										if (result.repack) add = true;
+										if (add) list.push(episode._id);
 									});
 									if (list.length){
 										torrent.add({
@@ -387,7 +395,7 @@ var ShowData = {
 				record.status = false;
 			}
 			var collection = db.collection('show');
-			collection.update({tvdb: tvdb}, {$set: record}, {upsert: true}, function(error, affected){
+			collection.update({tvdb: tvdb}, {$set: record}, function(error, affected){
 				if (typeof(callback) == 'function') callback(error, tvdb);
 			});
 		});
@@ -412,7 +420,7 @@ var ShowData = {
 		};
 		var collection = db.collection('episode');
 		collection.update({tvdb: record.tvdb, season: record.season, episode: record.episode}, {$set: record}, {upsert: true}, function(error, affected){
-			if (typeof(callback) == 'function') callback(null, true)
+			if (typeof(callback) == 'function') callback(error, !!affected)
 		});
 	}
 	

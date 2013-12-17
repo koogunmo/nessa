@@ -23,14 +23,13 @@ var torrent = {
 		
 		try {
 			if (!this.rpc) return;
-			obj.magnet = helper.formatMagnet(obj.magnet);
 			self.rpc.add(obj.magnet, function(error, args){
 				if (error) return;
 				if (args) {
 					obj.id.forEach(function(id){
 						var record = {
 							hash: args.hashString,
-							status: 1
+							status: false
 						};
 						collection.update({_id: ObjectID(id)}, {$set: record}, function(error, affected){
 					//		if (typeof(callback) == 'function') callback(null, true);
@@ -38,45 +37,6 @@ var torrent = {
 					});
 				}
 			});
-			
-			/*
-			// Attempt at friendly names in transfer list
-			// Didn't work, as the dn gets replaced when the transfer begins :(
-			
-			db.all("SELECT S.name, E.season, E.episode FROM show_episode AS E INNER JOIN show AS S ON E.show_id = S.id WHERE E.id IN ("+obj.id.join(',')+") ORDER BY E.episode ASC", function(error, rows){
-				var info = {
-					show: null,
-					season: null,
-					episode: []
-				};
-				rows.forEach(function(row){
-					info.show	= row.name;
-					info.season	= helper.zeroPadding(row.season, 2);
-					info.episode.push(helper.zeroPadding(row.episode, 2));
-				});
-				var episodes = [];
-				info.episode.sort();
-				episodes.push(info.episode[0]);
-				if (info.episode.length > 1) {
-					episodes.push(info.episode[info.episode.length-1]);
-				}
-				var display = encodeURIComponent(info.show+' - S' + info.season + 'E' + episodes.join('-'));
-				obj.magnet = helper.formatMagnet(obj.magnet);
-				self.rpc.add(obj.magnet, function(error, args){
-					if (error) {
-						logger.error('bt:add', error, obj);
-						return;
-					}
-					if (args) {
-						obj.id.forEach(function(id){
-					//		db.run("UPDATE show_episode SET hash = ?, status = 1 WHERE id = ?", args.hashString, id, function(error, args){
-					//			if (error) logger.error(error);
-					//		});
-						});
-					}
-				});
-			});
-			*/
 		} catch(e) {
 			logger.error(e.message);
 		}
@@ -152,7 +112,7 @@ var torrent = {
 							ext: path.extname(file)
 						});
 						var record = {
-							status: 2,
+							status: true,
 							file: target
 						};
 						helper.fileCopy(file, showdir + '/' + target, function(){
@@ -168,50 +128,6 @@ var torrent = {
 						//	})
 						});
 					});
-					
-					/*
-					db.all("SELECT S.name, S.directory, S.tvdb, E.* FROM show_episode AS E INNER JOIN show AS S ON S.id = E.show_id WHERE E.hash = ? AND E.file IS NULL", item.hashString, function(error, results){
-						if (error || !results.length) return;
-						
-						var showdir = nconf.get('shows:base') + '/' + results[0].directory;
-						var episodes = [];
-						
-						var library	= [];
-						var tvdb	= null;
-						
-						results.forEach(function(row){
-							if (!tvdb) tvdb = row.tvdb;
-							episodes.push({
-								episode: row.episode,
-								title: row.title
-							});
-							library.push({
-								season: row.season,
-								episode: row.episode
-							});
-						});
-						var target = helper.formatName({
-							season: data.season,
-							episodes: episodes,
-							ext: path.extname(file)
-						});
-						
-						var downloaded = Math.round(new Date()/1000);
-						helper.fileCopy(file, showdir + '/' + target, function(){
-							db.run("UPDATE show_episode SET file = ?, status = 2, downloaded = ? WHERE hash = ?", target, downloaded, item.hashString, function(error){
-								if (error) logger.error(error);
-							});
-							trakt.show.episode.library(tvdb, library);
-							
-						//	events.emit('download.complete', {
-						//		season: data.season,
-						//		episode: ep,
-						//		title: title.join('; ')
-						//	})
-						});
-					});
-					*/
-					
 					/* Remove if seeding is completed */
 					if (item.isFinished) {
 						episodeCollection.count({hash: item.hashString}, function(error, count){

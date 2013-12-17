@@ -142,15 +142,17 @@ exports = module.exports = {
 	
 	// Torrent methods
 	
+	isHD: function(name){
+		return (name.match(/720p|1080p/i)) ? true : false;
+	},
 	isRepack: function(name) {
 		return (name.match(/repack|proper/i)) ? true : false;
 	},
 	
-	formatMagnet: function(magnet, name){
+	formatMagnet: function(magnet){
 		// Add extra trackers to the torrent before adding
 		try {
 			var data = url.parse(magnet, true);
-			if (name !== undefined) data.query.dn = name;
 			var trackers = [
 				'udp://open.demonii.com:1337',
 				'udp://tracker.openbittorent.com:80',
@@ -165,11 +167,16 @@ exports = module.exports = {
 				}
 			});
 			data.query.tr = trackers;
-		//	data.query.dn = data.query.dn.replace(/\s/g, '.');
 			return 'magnet:?'+qs.unescape(qs.stringify(data.query));
 		} catch(e) {
 			logger.error(e.message);
 			return null;
 		}
-	}	
+	},
+	
+	parseMagnet: function(magnet){
+		var parser = require('magnet-uri');
+		return parser(magnet);
+	}
+	
 };
