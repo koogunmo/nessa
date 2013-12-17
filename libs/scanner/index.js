@@ -98,9 +98,12 @@ var Scanner = {
 								season:	data.season,
 								episodes: episodes,
 								ext: path.extname(file)
-							})
+							});
 							
-							if (file != target) helper.fileMove(showdir + '/' + file, showdir + '/' + newName);
+							console.log(target);
+							return;
+							
+						//	if (file != target) helper.fileMove(showdir + '/' + file, showdir + '/' + target);
 							
 							// Update Database records
 							data.episodes.forEach(function(episode){
