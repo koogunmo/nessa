@@ -44,7 +44,7 @@ var Scanner = {
 							collection.find({$or: [{name: dir},{directory: dir}]}).toArray(function(error, results){
 								if (error) return;
 								var record = {
-									status: 1,
+									status: true,
 									directory: dir
 								};
 								if (results.length == 1) {

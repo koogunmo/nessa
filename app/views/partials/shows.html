@@ -44,7 +44,7 @@
 <div id="show-modal" class="modal" role="dialog" ng-cloak>
 	<div class="modal-dialog">
 		<div class="modal-content">
-			<form ng-submit="save()" ng-switch="detail.summary.status">
+			<form ng-submit="save()">
 				<div class="modal-header">
 					<button type="button" class="close close-corner" data-dismiss="modal" aria-hidden="true">
 						<img src="assets/gfx/overlay-close.png" />
@@ -101,21 +101,21 @@
 								</div>	
 							</div>
 						</div>
-						<div class="tab-pane" id="options">
+						<div class="tab-pane" id="options" ng-switch="detail.summary.status">
 							<div class="form-group">
 								<label for="ipt_setting_directory">Media Directory</label>
 								<input type="text" ng-model="detail.summary.path" readonly="readonly" class="form-control" />
 							</div>
 							<div class="form-group">
-								<input type="checkbox" name="status" ng-model="detail.summary.status" ng-checked="detail.summary.status==1" ng-true-value="1" ng-false-value="0" />
+								<input type="checkbox" name="status" ng-model="detail.summary.status" ng-checked="detail.summary.status" />
 								<label for="ipt_setting_status">Download new episodes when available</label>
 							</div>
-							<div class="form-group" ng-switch-when="1">
+							<div class="form-group" ng-switch-when="true">
 								<label for="ipt_setting_feed">RSS Feed</label>
 								<input type="text" name="feed" ng-model="detail.summary.feed" class="form-control" />
 							</div>
-							<div class="form-group" ng-switch-when="1">
-								<input type="checkbox" name="hd" ng-model="detail.summary.hd" ng-checked="detail.summary.hd==1" ng-true-value="1" ng-false-value="0" />
+							<div class="form-group" ng-switch-when="true">
+								<input type="checkbox" name="hd" ng-model="detail.summary.hd" ng-checked="detail.summary.hd" />
 								<label for="ipt_setting_hd">Prefer HD video</label>
 							</div>
 							<div class="form-group">

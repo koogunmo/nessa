@@ -16,7 +16,7 @@ var ShowData = {
 		var collection = db.collection('show');
 		collection.findOne({tvdb: tvdb}, function(error, result){
 			var record = {
-				status: 1
+				status: true
 			};
 			if (!result.directory) {
 				try {
@@ -75,8 +75,10 @@ var ShowData = {
 			var count = 0;
 			results.forEach(function(result){
 				showCollection.findOne({tvdb: result.tvdb}, function(error, show){
-					result = extend(result, show);
-					list.push(result);
+					list.push({
+						show: show,
+						episode: result
+					});
 					count++;
 				});
 			});
@@ -106,6 +108,7 @@ var ShowData = {
 	
 	settings: function(data, callback){
 		var collection = db.collection('show');
+		delete data._id;
 		collection.update({tvdb: data.tvdb}, {$set: data}, {upsert: true}, function(error, affected){
 			if (typeof(callback) == 'function') callback(error, !!affected);
 		});
@@ -154,42 +157,21 @@ var ShowData = {
 		
 		matches.forEach(function(match){
 			unmatchedCollection.findOne({_id: ObjectID(match.id)}, function(error, row){
-				
-				console.log(error, row);
-				
-			});
-			
-			
-			
-			
-			/*
-			db.get("SELECT id, directory FROM show_unmatched WHERE id = ?", match.id, function(error, row){
-				if (error || !row) return;
-				db.get("SELECT * FROM show WHERE tvdb = ?", match.tvdb, function(error, show){
-					if (error) return;
-					if (show === undefined) {
-						trakt.show.summary(match.tvdb, function(error, json){
-							var record = [row.directory, match.tvdb, json.title];
-							db.run("INSERT INTO show (status,directory,tvdb,name) VALUES (1,?,?,?)", record, function(error){
-								if (error) return;
-								db.run("DELETE FROM show_unmatched WHERE id = ?", row.id, function(error){
-									if (error) return;
-								});
-								if (typeof(callback) == 'function') callback(null, this.lastID);
-							});
+				trakt.show.summary(match.tvdb, function(error, json){
+					var record = {
+						directory: row.directory,
+						status: !!row.status,
+						name: json.title,
+						tvdb: match.tvdb
+					};
+					showCollection.update({tvdb: match.tvdb}, {$set: record}, {upsert: true}, function(error, affected){
+						unmatchedCollection.remove({_id: ObjectID(match.id)}, function(error, affected){
+							// Removed from unmatched list
 						});
-					} else {
-						db.run("UPDATE show SET directory = ?, status = 1 WHERE id = ?", row.directory, show.id, function(error){
-							if (error) return;
-							db.run("DELETE FROM show_unmatched WHERE id = ?", row.id, function(error){
-								if (error) return;
-							});
-							if (typeof(callback) == 'function') callback(null, show.id);
-						});
-					}
+						if (typeof(callback) == 'function') callback(error, match.tvdb);
+					});
 				});
 			});
-			*/
 		});
 	},
 	
@@ -396,7 +378,10 @@ var ShowData = {
 				imdb: json.imdb_id,
 				synopsis: json.overview
 			};
-			if (json.status == 'Ended') record.ended = true;
+			if (json.status == 'Ended') {
+				record.ended = true;
+				record.status = false;
+			}
 			var collection = db.collection('show');
 			collection.update({tvdb: tvdb}, {$set: record}, {upsert: true}, function(error, affected){
 				if (typeof(callback) == 'function') callback(error, tvdb);

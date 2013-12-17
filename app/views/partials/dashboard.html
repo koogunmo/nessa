@@ -7,17 +7,17 @@
 		<div class="page-header">
 			<h3>Latest Shows</h3>
 		</div>
-		<div class="panel panel-default" ng-repeat="item in latest | orderBy:'airdate':true">
+		<div class="panel panel-default" ng-repeat="item in latest | orderBy:'episode.airdate':true">
 			<div class="panel-heading">
 				
-				<span class="glyphicon glyphicon-eye-open pull-right" title="Episode has been watched" ng-if="item.watched==1"></span>
-				<span class="glyphicon glyphicon-eye-close pull-right" title="Episode has not been watched" ng-if="item.watched==0"></span>
+				<span class="glyphicon glyphicon-eye-open pull-right" title="Episode has been watched" ng-if="item.episode.watched==1"></span>
+				<span class="glyphicon glyphicon-eye-close pull-right" title="Episode has not been watched" ng-if="item.episode.watched==0"></span>
 				
-				<h4 class="panel-title">{{item.name}} <span class="small">{{item.title}}</span></h4>
+				<h4 class="panel-title">{{item.show.name}} <span class="small">{{item.episode.title}}</span></h4>
 			</div>
 			<div class="panel-body">
-				<div><strong>Season {{item.season}}, Episode {{item.episode}}</strong> <span class="small">{{item.airdate*1000 | date:'dd MMMM yyyy'}}</span></div>
-				{{item.synopsis}}
+				<div><strong>Season {{item.episode.season}}, Episode {{item.episode.episode}}</strong> <span class="small">{{item.episode.airdate*1000 | date:'dd MMMM yyyy'}}</span></div>
+				{{item.episode.synopsis}}
 			</div>
 		</div>
 	</div>
