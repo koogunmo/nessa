@@ -353,9 +353,9 @@ io.sockets.on('connection', function(socket) {
 	});
 	
 	
-	socket.on('show.summary', function(id){
+	socket.on('show.summary', function(tvdb){
 		var show = plugin('showdata');
-		show.summary(id, function(error, json){
+		show.summary(tvdb, function(error, json){
 			socket.emit('show.summary', json);
 		});
 		
@@ -379,20 +379,20 @@ io.sockets.on('connection', function(socket) {
 	}).on('show.add', function(id){
 		// Add a show
 		var shows = plugin('showdata');
-		shows.add(id, function(error, id){
-			shows.getArtwork(id);
-			shows.getSummary(id, function(error, id){
-				shows.getFullListings(id)
+		shows.add(tvdb, function(error, tvdb){
+			shows.getArtwork(tvdb);
+			shows.getSummary(tvdb, function(error, tvdb){
+				shows.getFullListings(tvdb)
 			});
 			socket.emit('system.alert', {
 				type: 'success',
 				message: 'Show added'
 			});
-			socket.emit('show.added', {id: id});
+			socket.emit('show.added', {tvdb: tvdb});
 		});
-	}).on('show.remove', function(id){
+	}).on('show.remove', function(tvdb){
 		var shows = plugin('showdata');
-		shows.remove(id, function(error, status){
+		shows.remove(tvdb, function(error, status){
 			socket.emit('system.alert', {
 				type: 'success',
 				message: 'Show removed'
@@ -404,18 +404,18 @@ io.sockets.on('connection', function(socket) {
 	});
 	
 	// Utility
-	socket.on('show.rescan', function(data){
+	socket.on('show.rescan', function(tvdb){
 		var scanner = plugin('scanner');
-		scanner.episodes(data.id);
+		scanner.episodes(tvdb);
 		socket.emit('system.alert', {
 			type: 'info',
 			message: 'Show rescan in progress'
 		});
 		
-	}).on('show.update', function(data){
+	}).on('show.update', function(tvdb){
 		var show = plugin('showdata');
-		show.getArtwork(data.tvdb);
-		show.getFullListings(data.tvdb, function(error, json){
+		show.getArtwork(tvdb);
+		show.getFullListings(tvdb, function(error, json){
 		//	show.summary(data.id, function(error, json){
 		//		socket.emit('show.summary', json);
 		//	});

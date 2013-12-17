@@ -215,8 +215,8 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 			}
 		};
 		
-		$scope.modalDetail = function(id){
-			socket.emit('show.summary', id);
+		$scope.modalDetail = function(tvdb){
+			socket.emit('show.summary', tvdb);
 			socket.on('show.summary', function(json){
 				$scope.detail = json;
 				setTimeout(function(){
@@ -238,20 +238,20 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 				}, 500);
 			}
 		};	
-		$scope.rescan = function(id){
-			// trigger show-specific rescan
+		$scope.rescan = function(tvdb){
+			socket.emit('show.rescan', tvdb);
 		};
 		$scope.save = function(){
 			socket.emit('show.settings', $scope.detail.summary);
 		};
-		$scope.remove = function(id){
+		$scope.remove = function(tvdb){
 			if (confirm('Are you sure you want to remove this show?')) {
-				socket.emit('show.remove', id);
+				socket.emit('show.remove', tvdb);
 				$('#show-modal').modal('close')
 			}
 		};
 		$scope.update = function(tvdb){
-			socket.emit('show.update', {tvdb: tvdb}, function(){
+			socket.emit('show.update', tvdb, function(){
 				socket.emit('show.overview', tvdb);
 			});
 		};
