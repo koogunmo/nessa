@@ -49,6 +49,7 @@ var Scanner = {
 								};
 								if (results.length == 1) {
 									var result = results[0];
+									collection.ensureIndex('tvdb');
 									collection.update({tvdb: result.tvdb}, {$set: record}, {upsert: true}, function(error, affected){
 										if (typeof(callback) == 'function') callback(null, result.tvdb);
 									});
@@ -83,6 +84,7 @@ var Scanner = {
 						if (!data || !data.episodes) return;
 						
 						// Title formatting
+						episodeCollection.ensureIndex({tvdb: 1, season: 1});
 						episodeCollection.find({tvdb: tvdb, season: data.season}).toArray(function(error, rows){
 							if (error) return;
 							var episodes = [];
@@ -111,6 +113,7 @@ var Scanner = {
 									status: true,
 									file: target
 								};
+								episodeCollection.ensureIndex({tvdb: 1, season: 1, episode: 1});
 								episodeCollection.update({tvdb: tvdb, season: data.season, episode: episode}, {$set: record}, function(error, affected){
 								//	console.log(error, affected);
 								});

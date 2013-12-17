@@ -149,6 +149,15 @@ exports = module.exports = {
 		return (name.match(/repack|proper/i)) ? true : false;
 	},
 	
+	getHash: function(magnet){
+		try {
+			var info = require('magnet-uri')(magnet);
+			return info.xt.split(':')[2];
+		} catch(e) {
+			logger.error(e.message);
+		}
+	},
+	
 	formatMagnet: function(magnet){
 		// Add extra trackers to the torrent before adding
 		try {

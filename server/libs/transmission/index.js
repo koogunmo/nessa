@@ -1,6 +1,6 @@
-var transmission = require('transmission');
-var path = require('path');
-var uuid = require('node-uuid');
+var transmission = require('transmission'),
+	path = require('path'),
+	uuid = require('node-uuid');
 
 var torrent = {
 	rpc: null,
@@ -26,11 +26,11 @@ var torrent = {
 			self.rpc.add(obj.magnet, function(error, args){
 				if (error) return;
 				if (args) {
+					var record = {
+						hash: args.hashString,
+						status: false
+					};
 					obj.id.forEach(function(id){
-						var record = {
-							hash: args.hashString,
-							status: false
-						};
 						collection.update({_id: ObjectID(id)}, {$set: record}, function(error, affected){
 					//		if (typeof(callback) == 'function') callback(null, true);
 						});
@@ -44,16 +44,20 @@ var torrent = {
 	
 	blocklist: function(callback){
 		// In theory, this should trigger a blocklist update
-		this.rpc.callServer({
-			method : this.rpc.methods.other.blockList,
-			tag : uuid.v4()
-		}, function(err, result) {
-			if (err) {
-				return callback(err)
-			}
-			var torrent = result['torrent-added']
-			callback(err, torrent)
-		})
+		try {
+			this.rpc.callServer({
+				method : this.rpc.methods.other.blockList,
+				tag : uuid.v4()
+			}, function(err, result) {
+				if (err) {
+					return callback(err)
+				}
+				var torrent = result['torrent-added']
+				callback(err, torrent)
+			});
+		} catch(e) {
+			logger.error(e.message);
+		}
 	},
 	
 	complete: function() {
@@ -147,10 +151,14 @@ var torrent = {
 	},
 	
 	list: function(callback){
-		this.rpc.get(function(error, args){
-			if (error) return;
-			if (typeof(callback) == 'function') callback(error, args);
-		});
+		try {
+			this.rpc.get(function(error, args){
+				if (error) return;
+				if (typeof(callback) == 'function') callback(error, args);
+			});
+		} catch(e){
+			logger.error(e.message);
+		}
 	},
 	
 	pause: function(data){
@@ -158,11 +166,29 @@ var torrent = {
 	},
 	
 	remove: function(data, callback){
+		// TODO: make this better
 		if (!data.id) return;
 		if (!data.purge) data.purge = false;
+		
 		this.rpc.remove(data.id, data.purge, function(error){
 			if (typeof(callback) == 'function') callback(error);
 		});
+	},
+	
+	repacked: function(hash) {
+		var self = this;
+		try {
+			// A torrent has been repacked - Trash the previous transfer
+			self.list(function(error, transfers){
+				transfers.torrents.forEach(function(transfer){
+					if (transfer.hashString == hash) {
+						self.remove({id: transfer.id, purge: true});
+					}
+				});
+			});
+		} catch(e){
+			logger.error(e.message);
+		}
 	},
 	
 	resume: function(data){

@@ -288,6 +288,7 @@ var ShowData = {
 							
 							json.rss.channel[0].item.forEach(function(item){
 								var airdate = new Date(item.pubDate[0]).getTime();
+								// TODO: better limiting?
 								if (airdate < now-limit) return;
 								
 								var res = helper.getEpisodeNumbers(item.title[0]);
@@ -326,14 +327,18 @@ var ShowData = {
 									season: result.season,
 									episode: {$in: result.episode}
 								}).toArray(function(error, episodes){
-									// Prevent duplicate transfers
 									var list = [];
-									
 									episodes.forEach(function(episode){
 										var add = true;
 										if (episode.status || episode.hash) add = false;
-										// Allow repacks
-										if (result.repack) add = true;
+										if (result.repack) {
+											var hash = helper.getHash(result.magnet);
+											// Have we already added this repack?
+											if (hash != episode.hash) {
+												add = true;
+												torrent.repacked(episode.hash);
+											}
+										}
 										if (add) list.push(episode._id);
 									});
 									if (list.length){
