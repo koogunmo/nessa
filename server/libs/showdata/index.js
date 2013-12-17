@@ -363,7 +363,7 @@ var ShowData = {
 						};
 						collection.count({tvdb: record.tvdb}, function(error, count){
 							if (error || count == 1) return;
-							collection.insert(record, {upsert: true}, function(error, affected){
+							collection.insert(record, function(error, affected){
 								self.getSummary(record.tvdb);
 							});
 						});
