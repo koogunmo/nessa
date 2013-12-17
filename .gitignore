@@ -9,16 +9,11 @@ lib-cov
 .DS_Store
 
 node_modules
-logs
-docs
 
-cache/*.*
-db/*.sqlite
+docs/*.txt
+docs/*.md
 npm-debug.log
 settings.json
 
-
-text_data/
 test_data/*
 test.*
-upnp.js

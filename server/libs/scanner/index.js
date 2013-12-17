@@ -108,7 +108,7 @@ var Scanner = {
 							// Update Database records
 							data.episodes.forEach(function(episode){
 								var record = {
-									status: 2,
+									status: true,
 									file: target
 								};
 								episodeCollection.update({tvdb: tvdb, season: data.season, episode: episode}, {$set: record}, function(error, affected){

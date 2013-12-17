@@ -5,7 +5,7 @@ var pkg = require('./package.json');
 
 global.plugin = function(name){
 	try {
-		return require(__dirname + '/libs/' + name);
+		return require(__dirname + '/server/libs/' + name);
 	} catch(e) {
 		logger.error(e.message);
 	}
@@ -69,7 +69,7 @@ var passport		= require('passport'),
 global.events = new (require('events')).EventEmitter;
 global.logger = logger;
 
-global.helper	= require('./core/helper');
+global.helper	= require('./server/core/helper');
 global.torrent	= plugin('transmission');
 
 global.trakt = plugin('trakt').init({
