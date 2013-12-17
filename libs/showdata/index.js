@@ -82,7 +82,6 @@ var ShowData = {
 			});
 			setTimeout(function(){
 				if (count == results.length) {
-					console.log(list);
 					if (typeof(callback) == 'function') callback(null, list);
 				}
 			}, 100);
@@ -156,10 +155,7 @@ var ShowData = {
 		matches.forEach(function(match){
 			unmatchedCollection.findOne({_id: ObjectID(match.id)}, function(error, row){
 				
-				
-				
 				console.log(error, row);
-				
 				
 			});
 			
@@ -175,10 +171,7 @@ var ShowData = {
 						trakt.show.summary(match.tvdb, function(error, json){
 							var record = [row.directory, match.tvdb, json.title];
 							db.run("INSERT INTO show (status,directory,tvdb,name) VALUES (1,?,?,?)", record, function(error){
-								if (error) {
-									console.log(error);
-									return;
-								}
+								if (error) return;
 								db.run("DELETE FROM show_unmatched WHERE id = ?", row.id, function(error){
 									if (error) return;
 								});

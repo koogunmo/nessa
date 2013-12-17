@@ -60,7 +60,6 @@ var connect	= require('connect'),
 	logger	= require('log4js').getLogger(),
 	mongo	= require('mongodb').MongoClient,
 	path	= require('path'),
-	sqlite	= require('sqlite3').verbose(),
 	uuid	= require('node-uuid');
 
 var passport		= require('passport'),
@@ -108,42 +107,22 @@ app.configure(function(){
 	}
 });
 
-
-
 logger.info(process.title + ' v'+pkg.version);
 logger.info('Listening on port ' + nconf.get('port'));
 
-/* Database
-if (!fs.existsSync(__dirname + '/db/nessa.sqlite')) {
-	nconf.set('installed', false);
-	global.db = new sqlite.Database(__dirname + '/db/nessa.sqlite', function(error){
-		if (error) logger.error('DB: ', error);
-	});
-	fs.readFile(__dirname + '/db/create.sql', 'utf8', function(error, sql){
-		if (error) throw(error);
-		db.exec(sql, function(error){
-			if (error) throw(error);
-		});
-		db.close();
-	});
-}
-global.db = new sqlite.Database(__dirname + '/db/nessa.sqlite', function(error){
-	if (error) logger.error('DB: ', error);
-});
-*/
-
 /* MongoDB */
 try {
-	mongo.connect('mongodb://'+nconf.get('mongo:host')+':'+nconf.get('mongo:port')+'/'+nconf.get('mongo:name'), function(error, db){
-		logger.info('MongoDB: Connected to '+nconf.get('mongo:host'));
-		global.db = db;
-	});
+	if (nconf.get('mongo')) {
+		mongo.connect('mongodb://'+nconf.get('mongo:host')+':'+nconf.get('mongo:port')+'/'+nconf.get('mongo:name'), function(error, db){
+			logger.info('MongoDB: Connected to '+nconf.get('mongo:host'));
+			global.db = db;
+		});
+	} else {
+		nconf.set('installed', false);
+	}
 } catch(e){
 	logger.error(e.message);
 }
-
-var showdata = plugin('showdata');
-//showdata.getShowlist();
 
 /***********************************************************************/
 /* Load tasks */

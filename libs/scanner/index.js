@@ -95,6 +95,7 @@ var Scanner = {
 									title: row.title
 								});
 							});
+							if (!episodes.length) return;
 							
 							var target = helper.formatName({
 								season:	data.season,

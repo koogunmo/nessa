@@ -1,7 +1,7 @@
 <div id="match">
 	<h3>Unmatched Shows</h3>
 	<form ng-submit="save()">
-		<div class="panel panel-info" ng-repeat="show in unmatched">
+		<div class="panel panel-info" ng-repeat="show in unmatched | orderBy:'name'">
 			<div class="panel-heading">
 				<h3 class="panel-title">{{show.name}} </h3>
 			</div>
