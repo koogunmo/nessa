@@ -26,16 +26,10 @@
 				</div>
 				<div class="modal-body" ng-show="results">
 					<div class="results">
-						<div class="result" ng-repeat="result in results">
-							<!--
-							<img src="{{result.images.poster | traktPoster}}" class="pull-right" />
-							<h4>{{result.title}}</h4>
-							<h5>{{result.year}}</h5>
-							
-							<button type="button" class="btn btn-default">Select</button>
-							-->
-							<input type="radio" id="ipt_show_{{$index}}" name="selected" value="{{result.tvdb}}" ng-model="$parent.selected" />
-							<label for="ipt_show_{{$index}}">{{result.name}}</label>
+						<div class="result" ng-repeat="result in results" ng-class="{selected: $parent.selected==result.tvdb_id}" ng-click="$parent.selected=result.tvdb_id">
+							<img src="{{result.images.poster | traktPoster}}" />
+							<strong>{{result.title}}</strong>
+							<p class="synopsis">{{result.overview}}</p>
 						</div>
 					</div>
 				</div>

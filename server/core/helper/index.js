@@ -139,6 +139,10 @@ exports = module.exports = {
 			return token[key];
 		});
 	},
+	formatDirectory: function(name){
+		// Sanitize the directory names
+		return name.replace(/\//g, '-');
+	},
 	
 	// Torrent methods
 	

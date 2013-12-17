@@ -39,7 +39,7 @@ body {
 /* Dashboard */
 
 #dashboard .latest {
-	border-bottom: 1px solid #999999;
+	border-bottom: 1px solid #EEEEEE;
 }
 #dashboard .latest .synopsis {
 	display: none;
@@ -49,17 +49,33 @@ body {
 	white-space: nowrap;
 }
 
-
 /* Shows */
 
-/*
 #add-modal .result {
+	border-bottom: 1px solid #EEEEEE;
+	box-sizing: border-box;
+	cursor: pointer;
 	height: 100px;
+	overflow: hidden;
+	padding: 5px;
+	position: relative;
 }
+#add-modal .result.selected {
+	background-color: #DFF0D8;
+}
+
 #add-modal .result img {
-	height: 100px;
+	float: left;
+	height: 90px;
+	margin-right: 5px;
 }
-*/
+
+#add-modal .result .synopsis {
+	font-size: 12px;
+	max-height: 69px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
 
 #shows div.image {
 	display: none;

@@ -12,23 +12,40 @@ var ShowData = {
 	
 	add: function(tvdb, callback){
 		var self = this;
-		// 'Add' a show to the database (actually just flags it as enabled, and creates the media directory)
 		var collection = db.collection('show');
 		collection.findOne({tvdb: tvdb}, function(error, result){
-			var record = {
-				status: true
-			};
-			if (!result.directory) {
-				try {
-					mkdir(nconf.get('shows:base') + '/' + row.name, 0775);
-					update.directory = row.name;
-				} catch(e) {
-					logger.error(e.message);
-				}
+			if (error) return;
+			
+			if (!result) {
+				trakt.show.summary(tvdb, function(error, json){
+					if (error) return;
+					var record = {
+						tvdb: json.tvdb_id,
+						imdb: json.imdb_id,
+						name: json.title,
+						synopsis: json.overview,
+						directory: helper.formatDirectory(json.title),
+						status: true,
+						feed: null
+					};
+					try {
+						mkdir(nconf.get('shows:base') + '/' + record.directory, 0775);
+					} catch(e){
+						logger.error(e.message);
+					}
+					collection.insert(record, function(error, affected){
+						if (typeof(callback) == 'function') callback(error, tvdb);
+					});
+				});
+			} else {
+				var record = {
+					directory: helper.formatDirectory(result.name),
+					status: true
+				};
+				collection.update({tvdb: tvdb}, {$set: record}, function(error, affected){
+					if (typeof(callback) == 'function') callback(error, tvdb);
+				});
 			}
-			collection.update({tvdb: tvdb}, {$set: record}, {upsert: true}, function(error, affected){
-				if (typeof(callback) == 'function') callback(null, tvdb);
-			});
 		});
 	},
 	
@@ -101,10 +118,24 @@ var ShowData = {
 	},
 	
 	search: function(query, callback){
-	//	trakt.search('shows', query, callback);
-		var query = new RegExp(query, 'i');
 		var collection = db.collection('show');
-		collection.find({name: query, status: {$exists: false}}).toArray(callback);
+		collection.find({name: new RegExp(query, 'i'), status: {$exists: false}}).toArray(function(error, results){
+			if (error) return;
+			if (results.length){
+				var response = [];
+				results.forEach(function(result){
+					var count = 0;
+					trakt.show.summary(result.tvdb, function(error, json){
+						json.feed = result.feed;
+						response.push(json)
+						count++;
+						if (count == results.length) callback(null, response);
+					});
+				});
+			} else {
+				trakt.search('shows', query, callback);
+			}
+		});
 	},
 	
 	settings: function(data, callback){

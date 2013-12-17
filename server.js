@@ -382,7 +382,7 @@ io.sockets.on('connection', function(socket) {
 				});
 			}
 		});
-	}).on('show.add', function(id){
+	}).on('show.add', function(tvdb){
 		// Add a show
 		var shows = plugin('showdata');
 		shows.add(tvdb, function(error, tvdb){
