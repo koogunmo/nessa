@@ -136,7 +136,7 @@ global.db = new sqlite.Database(__dirname + '/db/nessa.sqlite', function(error){
 try {
 	mongo.connect('mongodb://'+nconf.get('mongo:host')+':'+nconf.get('mongo:port')+'/'+nconf.get('mongo:name'), function(error, db){
 		logger.info('MongoDB: Connected to '+nconf.get('mongo:host'));
-		global.dbm = db;
+		global.db = db;
 	});
 } catch(e){
 	logger.error(e.message);
@@ -238,7 +238,7 @@ io.sockets.on('connection', function(socket) {
 		socket.emit('system.settings', nconf.get());
 		
 	}).on('system.users', function(){
-		var collection = dbm.collection('user');
+		var collection = db.collection('user');
 		collection.find().toArray(function(error, results){
 			if (error) return;
 		//	socket.emit('system.users', rows);
@@ -256,7 +256,7 @@ io.sockets.on('connection', function(socket) {
 		// Update ALL listing information and artwork
 		var shows = plugin('showdata');
 		
-		var collection = dbm.collection('show');
+		var collection = db.collection('show');
 		collection.find({}).toArray(function(error, results){
 			results.forEach(function(result){
 				shows.getArtwork(show.tvdb);
@@ -472,14 +472,9 @@ io.sockets.on('connection', function(socket) {
 	/*************** Old methods to be converted ***************/
 	
 	
-	
-	/* List shows */
-	
-	
-	
 	socket.on('show.episode.download', function(data){
 		var show = plugin('showdata');
-		show.download(data.id);
+	//	show.download(data.id);
 	});
 	
 });
@@ -498,7 +493,7 @@ passport.use(new LocalStrategy(
 		var sha1 = require('crypto').createHash('sha1');
 		var pass = sha1.update(password).digest('hex');
 		
-		var collection = dbm.collection('user');
+		var collection = db.collection('user');
 		collection.findOne({username: username, password: password}, function(error, user){
 			if (error) return done(error);
 			if (!user) return done(null, false, {message: 'Incorrect'});
@@ -537,7 +532,7 @@ app.get('/loggedin', function(req, res){
 		});
 		if (response.authenticated) return res.send(response);
 	}
-	var collection = dbm.collection('user');
+	var collection = db.collection('user');
 	collection.count(function(error, count){
 		if (!count) {
 			response.authenticated = true;
@@ -557,50 +552,6 @@ app.post('/logout', function(req,res){
 	req.logOut();
 	res.send(200);
 });
-
-
-
-
-/* Installer */
-/*
-app.get('/install', function(req, res){
-	if (nconf.get('installed')) {
-//		res.redirect('/');
-//		return;
-	}
-	// Display the install form
-	res.sendfile(__dirname + '/views/install.html');
-	
-}).post('/install', function(req, res){
-	// Save settings, redirect to settings page
-	var qs = require('querystring');
-	var json = qs.parse(req.body);
-	for (var i in json) {
-		nconf.set(i, json[i]);
-	}
-	nconf.set('installed', true);
-	nconf.save(function(error){
-		if (error) {
-			logger.error(error);
-			return;
-		}
-		app.use('/media', express.static(nconf.get('shows:base')));
-		// Start building the database
-		var shows = plugin('showdata');
-		shows.list();
-	//	res.redirect('/#main/settings');
-	});
-});
-*/
-/*
-app.get('/artwork', function(req, res){
-	var show = plugin('showdata');
-	db.each("SELECT id FROM show WHERE status = 1", function(error, row){
-		show.artwork(row.id);
-	});
-});
-*/
-
 
 /*
 // Magnet parser test

@@ -5,8 +5,7 @@ Automated TV Torrenting acquisition
 
 "Build a system that functions in a similar manner to SickBeard, but using torrents only."
 
-I tried to use SickBeard, but it wouldn't easily let me arrange my files in a way I liked. It was also heavily skewed towards using newsgroups, which I don't use, thus NodeTV was born.
-
+I tried [SickBeard](http://sickbeard.com/), but it wouldn't easily let me arrange/name my files in a way I liked. It was also heavily skewed towards using newsgroups, which I don't use, thus NodeTV was born.
 
 
 ## Requirements
@@ -17,10 +16,9 @@ I tried to use SickBeard, but it wouldn't easily let me arrange my files in a wa
 	- Windows users: You're on your own for now
 		- Please see the note at the bottom of this document
 - [Node.js](http://nodejs.org) 0.10.x
+- [MongoDB](http://mongodb.org) 2.4.x
 - [Transmission](http://transmissionbt.com) with RPC Enabled
 - A free [Trakt](http://trakt.tv) account
-- Plenty of storage space
-
 
 
 ## Optional Third-party software
@@ -32,11 +30,9 @@ NodeTV doesn't handle uPNP/DLNA (yet), so if you want to stream your content, yo
 These work reasonably well with VLC and my XBOX 360. Your mileage may vary.
 
 
-
 ## Browser Support
 
-NodeTV works in all current browsers. IE 8.0 and earlier are *NOT* supported.
-
+NodeTV works in all current browsers. IE 8.0 and earlier are not supported.
 
 
 ## Installing
@@ -46,7 +42,6 @@ Clone the repository
 
 Next, you'll need to install the dependencies
 > npm install
-
 
 
 ## Running NodeTV
@@ -64,7 +59,6 @@ An upstart job can be found at scripts/upstart.conf
 > sudo initctl reload-configuration
 
 
-
 ## File formatting
 
 We use a human-readable format for directories and filenames.
@@ -72,7 +66,7 @@ We use a human-readable format for directories and filenames.
 
 Season and Episode numbers always have leading zeroes.
 
-In the case of multipart episodes, the format is expanded
+In the case of multipart episodes, the format is expanded:
 > [Show Name]/Season ##/Episode ##-## - [Part 1 Title; Part 2 Title].ext
 
 For example:
@@ -80,7 +74,6 @@ For example:
 > Falling Skies/Season 01/Episode 01-02 - Live and Learn; The Armory.avi
 
 We chose this format due to it's tidy structure, ease of navigation, and legibility. We may, in future, add the ability to customise this on a global and per-show basis.
-
 
 
 ## RegExp
@@ -107,8 +100,8 @@ It also supports episode spans of any size. For example, it would handle a file 
 
 Optionally, the Season name may have subtitle:
 	
-	Season 01: Subtitle/Episode 02
-	Season 01 - Subtitle/Episode 02
+	American Horror Story/Season 02: Asylum/Episode 01 - Welcome to Briarcliff.mp4
+	American Horror Story/Season 02 - Asylum/Episode 01 - Welcome to Briarcliff.mp4
 
 Any episodes which are similar to:	
 

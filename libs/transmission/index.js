@@ -19,7 +19,7 @@ var torrent = {
 	add: function(obj, callback) {
 		var self = this;
 		var ObjectID = require('mongodb').ObjectID;
-		var collection = dbm.collection('episode');
+		var collection = db.collection('episode');
 		
 		try {
 			if (!this.rpc) return;
@@ -98,7 +98,7 @@ var torrent = {
 	
 	complete: function() {
 		var self = this;
-		var episodeCollection = dbm.collection('episode');
+		var episodeCollection = db.collection('episode');
 		
 		try {
 			if (!this.rpc) return;

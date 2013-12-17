@@ -7,11 +7,14 @@ function updateListings(){
 	shows.getShowlist();
 	
 	// Update show information (synopsis, etc)
-	db.each("SELECT * FROM show WHERE status != -1 AND directory IS NOT NULL", function(error, show){
-		if (error || !show) return;
-		shows.getArtwork(show.id);
-		shows.getSummary(show.id, function(error, id){
-			shows.getFullListing(id);
+	var collection = db.collection('show');
+	collection.find({status: {$exists: true}}).toArray(function(error, results){
+		if (error || !results) return;
+		results.forEach(function(show){
+			shows.getArtwork(show.tvdb);
+			shows.getSummary(show.tvdb, function(error, tvdb){
+				shows.getFullListing(tvdb);
+			});
 		});
 	});
 }

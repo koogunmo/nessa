@@ -29,8 +29,8 @@ function listDirectory(path, callback) {
 
 var Scanner = {
 	shows: function(callback){
-		var collection = dbm.collection('show');
-		var unmatched = dbm.collection('unmatched');
+		var collection = db.collection('show');
+		var unmatched = db.collection('unmatched');
 		
 		// Scan media directory for folders - calback is called for each item found
 		var self = this;
@@ -69,8 +69,8 @@ var Scanner = {
 	episodes: function(tvdb, callback){
 		var self = this;
 		if (base = nconf.get('shows:base')) {
-			var showCollection = dbm.collection('show');
-			var episodeCollection = dbm.collection('episode');
+			var showCollection = db.collection('show');
+			var episodeCollection = db.collection('episode');
 			
 			showCollection.findOne({tvdb: tvdb, status: {$exists: true}}, function(error, show){
 				if (error || !show) return;

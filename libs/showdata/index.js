@@ -13,7 +13,7 @@ var ShowData = {
 	add: function(tvdb, callback){
 		var self = this;
 		// 'Add' a show to the database (actually just flags it as enabled, and creates the media directory)
-		var collection = dbm.collection('show');
+		var collection = db.collection('show');
 		collection.findOne({tvdb: tvdb}, function(error, result){
 			var record = {
 				status: 1
@@ -39,7 +39,7 @@ var ShowData = {
 	},
 	
 	episodes: function(tvdb, callback){
-		var collection = dbm.collection('episode');
+		var collection = db.collection('episode');
 		collection.find({tvdb: tvdb}).toArray(function(error, results){
 			var seasons = [], episodes = [], response = [];
 			
@@ -62,15 +62,9 @@ var ShowData = {
 	latest: function(callback){
 		var self = this;
 		var lastweek = Math.round(new Date()/1000) - (7*24*60*60);
-		/*
-		db.all("SELECT S.id, S.tvdb, S.name, E.season, E.episode, E.title, E.synopsis, E.airdate, E.watched FROM show AS S INNER JOIN show_episode AS E ON S.id = E.show_id WHERE file IS NOT NULL AND airdate >= ? ORDER BY airdate DESC, episode DESC LIMIT 10", lastweek, function(error, rows){
-			if (error) return;
-			if (typeof(callback) == 'function') callback(null, rows);
-		});
-		*/
 		
-		var episodeCollection = dbm.collection('episode');
-		var showCollection = dbm.collection('show');
+		var episodeCollection = db.collection('episode');
+		var showCollection = db.collection('show');
 		
 		var list = [];
 		
@@ -96,34 +90,24 @@ var ShowData = {
 	},
 	
 	list: function(callback){
-		var collection = dbm.collection('show');
+		var collection = db.collection('show');
 		collection.find({status: {$exists: true}}).toArray(callback);
 	},
 	
 	remove: function(tvdb, callback){
-		var collection = dbm.collection('show');
+		var collection = db.collection('show');
 		collection.update({tvdb: data.tvdb}, {$unset: {status: true}}, {upsert: true}, callback);
 	},
 	
 	search: function(query, callback){
-		var self = this;
-		// Search database for any shows matching 'query' that aren't already enabled
-		var query = '/.*'+query+'%';
-	//	db.all("SELECT * FROM show WHERE name LIKE ? AND status <= 0 ORDER BY name ASC", query, function(error, rows){
-	//		if (error) return;
-	//		if (typeof(callback) == 'function') callback(null, rows);
-	//	});
-		
-		
-	//	var collection = dbm.collection('show');
-	//	collection.find({name: /.*.*/}).toArray(callback);
-		
+		var query = new RegExp(query, 'i');
+		var collection = db.collection('show');
+		collection.find({name: query, status: {$exists: false}}).toArray(callback);
 	},
 	
 	settings: function(data, callback){
-		var collection = dbm.collection('show');
+		var collection = db.collection('show');
 		collection.update({tvdb: data.tvdb}, {$set: data}, {upsert: true}, function(error, affected){
-			
 			if (typeof(callback) == 'function') callback(error, !!affected);
 		});
 	},
@@ -131,7 +115,7 @@ var ShowData = {
 	summary: function(tvdb, callback){
 		var self = this;
 		
-		var collection = dbm.collection('show');
+		var collection = db.collection('show');
 		collection.findOne({tvdb: tvdb}, function(error, show){
 			self.episodes(show.tvdb, function(error, episodes){
 				var response = {
@@ -146,7 +130,7 @@ var ShowData = {
 	},
 	
 	unmatched: function(callback){
-		var collection = dbm.collection('unmatched');
+		var collection = db.collection('unmatched');
 		collection.find({}).toArray(function(error, shows){
 			shows.forEach(function(show){
 				trakt.search('shows', show.directory, function(error, json){
@@ -164,8 +148,8 @@ var ShowData = {
 	match: function(matches, callback){
 		var self = this;
 		
-		var showCollection = dbm.collection('show');
-		var unmatchedCollection = dbm.collection('unmatched');
+		var showCollection = db.collection('show');
+		var unmatchedCollection = db.collection('unmatched');
 		
 		var ObjectID = require('mongodb').ObjectID;
 		
@@ -229,7 +213,7 @@ var ShowData = {
 			trakt.show.episode.seen(row.tvdb, [{season: row.season, episode: row.episode}]);
 		});
 		*/
-		var collection = dbm.collection('episode');
+		var collection = db.collection('episode');
 		var record = {
 			watched: true
 		};
@@ -244,7 +228,7 @@ var ShowData = {
 		var self = this;
 		var http = require('http');
 		
-		var collection = dbm.collection('show');
+		var collection = db.collection('show');
 		collection.findOne({tvdb: tvdb}, function(error, show){
 			trakt.show.summary(show.tvdb, function(error, json){
 				if (json.images.banner){
@@ -283,7 +267,7 @@ var ShowData = {
 	getFullListings: function(tvdb, callback){
 		var self = this;
 		// Fetch episode listings
-		var collection = dbm.collection('show');
+		var collection = db.collection('show');
 		
 		trakt.show.seasons(tvdb, function(error, seasons){
 			var count = 0;
@@ -306,8 +290,8 @@ var ShowData = {
 	getLatest: function(){
 		var self = this;
 		// Check each of the feeds for new episodes
-		var showCollection = dbm.collection('show');
-		var episodeCollection = dbm.collection('episode');
+		var showCollection = db.collection('show');
+		var episodeCollection = db.collection('episode');
 		
 		showCollection.find({
 			status: 1,
@@ -392,7 +376,7 @@ var ShowData = {
 		request.get('http://tvshowsapp.com/showlist/showlist.xml', function(error, req, xml){
 			if (error) return;
 			try {
-				var collection = dbm.collection('show');
+				var collection = db.collection('show');
 				parser.parseString(xml, function(error, json){
 					if (error) return;
 					json.shows.show.forEach(function(show){
@@ -420,7 +404,7 @@ var ShowData = {
 				synopsis: json.overview
 			};
 			if (json.status == 'Ended') record.ended = true;
-			var collection = dbm.collection('show');
+			var collection = db.collection('show');
 			collection.update({tvdb: tvdb}, {$set: record}, {upsert: true}, function(error, affected){
 				if (typeof(callback) == 'function') callback(error, tvdb);
 			});
@@ -428,7 +412,7 @@ var ShowData = {
 	},
 	
 	getUnmatched: function(callback){
-		var collection = dbm.collection('unmatched');
+		var collection = db.collection('unmatched');
 		collection.find().toArray(callback);
 	},
 	
@@ -444,7 +428,7 @@ var ShowData = {
 			airdate: episode.first_aired,
 			watched: episode.watched
 		};
-		var collection = dbm.collection('episode');
+		var collection = db.collection('episode');
 		collection.update({tvdb: record.tvdb, season: record.season, episode: record.episode}, {$set: record}, {upsert: true}, function(error, affected){
 			if (typeof(callback) == 'function') callback(null, true)
 		});
