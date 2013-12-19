@@ -285,17 +285,15 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 	
 	var resizeModal = function(){
 		$('.modal').each(function(){
-			var headers = 90 + $('.modal-header', this).height() + $('.modal-footer', this).height();
+			var headers = 80 + $('.modal-header', this).height() + $('.modal-footer', this).height();
 			$('.modal-body').css({
-				'height': $(window).height() - headers
+				'max-height': $(window).height() - headers
 			})
 		})
 	};
-	$(document).on('shown.bs.modal', '.modal', function(){
-		resizeModal();
-	});
-	$(window).on('resize orientationchange', resizeModal);
 	
+	$(document).on('shown.bs.modal', '.modal', resizeModal)
+	$(window).on('resize orientationchange', resizeModal);
 	
 	
 	$(document).on('click', '.episode .title', function(){

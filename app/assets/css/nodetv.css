@@ -25,9 +25,20 @@ body {
 }
 
 /* Modals */
-.modal .modal-body {
-	/* fix this based on screen sizes */
-	min-height: 250px;
+
+.modal-dialog {
+	bottom: 10px;
+	height: auto;
+	left: 10px;
+	margin: 0px auto;
+	max-width: 600px;
+	pointer-events: all;
+	position: absolute;
+	right: 10px;
+	top: 10px;
+	width: auto;
+}
+.modal-body {
 	overflow-y: auto;
 	-webkit-overflow-scrolling: touch;
 }
