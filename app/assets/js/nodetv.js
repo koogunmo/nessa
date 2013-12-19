@@ -1,6 +1,6 @@
 "use strict";
 
-require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
+require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 	
 	nessa.controller('alertsCtrl', function($scope, socket){
 		$scope.alerts = [];
@@ -282,6 +282,20 @@ require(['app','jquery','socket.io','bootstrap'], function(nessa,$,io){
 		$('.synopsis', this).slideToggle();
 		
 	});
+	
+	var resizeModal = function(){
+		$('.modal').each(function(){
+			var headers = 90 + $('.modal-header', this).height() + $('.modal-footer', this).height();
+			$('.modal-body').css({
+				'height': $(window).height() - headers
+			})
+		})
+	};
+	$(document).on('shown.bs.modal', '.modal', function(){
+		resizeModal();
+	});
+	$(window).on('resize orientationchange', resizeModal);
+	
 	
 	
 	$(document).on('click', '.episode .title', function(){

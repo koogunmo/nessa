@@ -27,7 +27,7 @@ body {
 /* Modals */
 .modal .modal-body {
 	/* fix this based on screen sizes */
-	max-height: 380px;
+	min-height: 250px;
 	overflow-y: auto;
 	-webkit-overflow-scrolling: touch;
 }
