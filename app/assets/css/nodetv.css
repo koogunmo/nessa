@@ -74,11 +74,8 @@ body {
 
 /* Dashboard */
 
-#dashboard .latest {
-	border-bottom: 1px solid #EEEEEE;
-}
-#dashboard .latest .synopsis {
-	display: none;
+#dashboard .panel-heading > span {
+	cursor: pointer;
 }
 
 #dashboard .small {

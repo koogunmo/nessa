@@ -92,10 +92,10 @@ var ShowData = {
 			var count = 0;
 			results.forEach(function(result){
 				showCollection.findOne({tvdb: result.tvdb}, function(error, show){
-					list.push({
-						show: show,
-						episode: result
-					});
+					var episode = result;
+					episode.show_name = show.name;
+					episode.tvdb = show.tvdb;
+					list.push(episode);
 					count++;
 				});
 			});

@@ -440,6 +440,7 @@ io.sockets.on('connection', function(socket) {
 				});
 			}
 		});
+		
 	}).on('show.season.watched', function(data){
 		trakt.show.season.seen(data.tvdb, data.season, data.episode, function(error, json){
 			if (error) return;
@@ -450,16 +451,29 @@ io.sockets.on('connection', function(socket) {
 				});
 			}
 		});
+		
 	}).on('show.episode.watched', function(data){
-		trakt.show.episode.seen(data.tvdb, data.season, data.episode, function(error, json){
-			if (error) return;
-			if (json.status == 'success') {
-				var collection = db.collection('episode');
-				collection.update({tvdb: data.tvdb, season: data.season, episode: data.episode}, {$set: {watched: true}}, function(error, affected){
-					if (error) return;
-				});
-			}
-		});
+		if (data.watched) {
+			trakt.show.episode.seen(data.tvdb, data.season, data.episode, function(error, json){
+				if (error) return;
+				if (json.status == 'success') {
+					var collection = db.collection('episode');
+					collection.update({tvdb: data.tvdb, season: data.season, episode: data.episode}, {$set: {watched: true}}, function(error, affected){
+						if (error) return;
+					});
+				}
+			});
+		} else {
+			trakt.show.episode.unseen(data.tvdb, data.season, data.episode, function(error, json){
+				if (error) return;
+				if (json.status == 'success') {
+					var collection = db.collection('episode');
+					collection.update({tvdb: data.tvdb, season: data.season, episode: data.episode}, {$set: {watched: false}}, function(error, affected){
+						if (error) return;
+					});
+				}
+			});
+		}
 	});
 	
 	/*************** Old methods to be converted ***************/

@@ -50,9 +50,6 @@
 		<div class="modal-content">
 			<form ng-submit="save()">
 				<div class="modal-header">
-					<button type="button" class="close close-corner" data-dismiss="modal" aria-hidden="true">
-						<img src="assets/gfx/overlay-close.png" />
-					</button>
 					<img src="media/{{detail.summary.directory}}/banner.jpg" alt="{{detail.summary.name}}" class="img-responsive" />
 				</div>
 				<div class="modal-body">
@@ -92,8 +89,8 @@
 													
 													<div class="tools">
 														
-														<span class="glyphicon glyphicon-eye-open action" title="Mark episode as watched" ng-if="episode.file && !episode.watched" ng-click="watched()"></span>
-														<span class="glyphicon glyphicon-hdd" title="This episode has been downloaded" ng-if="episode.file"></span>
+														<span class="glyphicon glyphicon-eye-closed action" title="Mark episode as watched" ng-if="episode.file && !episode.watched" ng-click="watched()"></span>
+														<span class="glyphicon glyphicon-hdd" title="This episode has been downloaded" ng-if="episode.file && episode.watched" ng-click="watched()"></span>
 														
 														<!-- <span class="glyphicon glyphicon-cloud-download" title="Download this episode" ng-if="!episode.file" ng-click="download()"></span> -->
 													</div>
