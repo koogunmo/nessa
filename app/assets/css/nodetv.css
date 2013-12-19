@@ -24,6 +24,31 @@ body {
 	z-index: 1030;
 }
 
+/* Login form */
+
+.form-signin {
+	background-color: #FFFFFF;
+	border: 1px solid #EEEEEE;
+	border-radius: 10px;
+	margin: 20px auto 0px;
+	max-width: 290px;
+	padding: 10px;
+}
+.form-signin h2 {
+	margin: 0px 0px 10px;
+	text-align: center;
+}
+.form-signin input[type="text"] {
+	margin-bottom: -1px;
+	border-bottom-left-radius: 0;
+	border-bottom-right-radius: 0;
+}
+.form-signin input[type="password"] {
+	margin-bottom: 10px;
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
+}
+
 /* Modals */
 
 .modal-dialog {
@@ -86,6 +111,10 @@ body {
 	max-height: 69px;
 	overflow: hidden;
 	text-overflow: ellipsis;
+}
+
+#shows .input-group-addon {
+	cursor: pointer;
 }
 
 #shows div.image {

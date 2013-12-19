@@ -177,7 +177,7 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 		};
 	});
 	
-	nessa.controller('showCtrl', function($scope, $routeParams, $filter, socket){
+	nessa.controller('showsCtrl', function($scope, $routeParams, $filter, socket){
 		$scope.detail	= {};
 		$scope.shows	= [];
 		
@@ -262,6 +262,28 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 			socket.emit('show.update', tvdb, function(){
 				socket.emit('show.overview', tvdb);
 			});
+		};
+	});
+	
+	nessa.controller('seasonCtrl', function($scope, socket){
+		$scope.watched = function(){
+			var data = {
+		//		tvdb: $scope.$parent.episode.tvdb,
+		//		season: $scope.$parent.episode.season
+			};
+		//	socket.emit('show.season.watched', data);
+		};
+	});
+	
+	nessa.controller('episodeCtrl', function($scope, socket){
+		$scope.watched = function(){
+			$scope.$parent.episode.watched = true;
+			var data = {
+				tvdb: $scope.$parent.episode.tvdb,
+				season: $scope.$parent.episode.season,
+				episode: $scope.$parent.episode.episode
+			};
+			socket.emit('show.episode.watched', data);
 		};
 	});
 	

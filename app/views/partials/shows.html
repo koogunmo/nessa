@@ -1,7 +1,10 @@
 <div id="shows">
 	<form class="form-group">
 		<label></label>
-		<input type="text" class="form-control" autofocus="true" placeholder="Search show library..." ng-model="filter.name" />
+		<div class="input-group">
+			<input type="text" class="form-control" autofocus="true" placeholder="Search show library..." ng-model="filter.name" />
+			<span class="input-group-addon" ng-click="filter.name=''">&times;</span>
+		</div>
 	</form>
 	<div class="row">
 		<div class="show col-sm-2" ng-click="modalAdd()">
@@ -29,7 +32,7 @@
 						<div class="result" ng-repeat="result in results" ng-class="{selected: $parent.selected==result.tvdb_id}" ng-click="$parent.selected=result.tvdb_id">
 							<img src="{{result.images.poster | traktPoster}}" />
 							<strong>{{result.title}}</strong>
-							<p class="synopsis">{{result.overview}}</p>
+							<p class="synopsis">{{result.overview || 'No synopsis available'}}</p>
 						</div>
 					</div>
 				</div>
@@ -62,13 +65,13 @@
 					<div class="tab-content">
 						<div class="tab-pane active" id="synopsis">
 							<div class="synopsis well">
-								{{detail.summary.synopsis}}
+								{{detail.summary.synopsis || 'No synopsis available'}}
 							</div>
 						</div>
 					
 						<div class="tab-pane" id="episodes">
 							<div id="seasons" class="panel-group">
-								<div class="panel panel-default" ng-repeat="season in detail.listing | orderBy:'season':true">
+								<div class="panel panel-default" ng-repeat="season in detail.listing | orderBy:'season':true" ng-controller="seasonCtrl">
 									<div class="panel-heading" data-toggle="collapse" data-parent="#seasons" href="#season-{{season.season}}">
 										<h4 class="panel-title">
 											<span ng-if="season.season==0">Specials</span>
@@ -77,24 +80,23 @@
 									</div>
 									<div id="season-{{season.season}}" class="season panel-collapse collapse">
 										<div class="panel-body">
-											<div class="episode" ng-repeat="episode in season.episodes | orderBy:'episode'">
+											<div>
+											<!-- Mark season as watched -->
+											</div>
+											<div class="episode" ng-repeat="episode in season.episodes | orderBy:'episode'" ng-controller="episodeCtrl">
 												
-												<h5 class="title"><span class="small">{{episode.episode | zeroPad:2}}</span>{{episode.title}}</h5>
+												<h5 class="title"><span class="small">{{episode.episode | zeroPad:2}}</span>{{episode.title || 'TBA'}}</h5>
 												
 												<div class="extended">
-													<p class="synopsis" ng-if="episode.synopsis">{{episode.synopsis}}</p>
+													<p class="synopsis" ng-if="episode.synopsis">{{episode.synopsis || 'No synopsis available'}}</p>
 													
 													<div class="tools">
-														<span class="glyphicon glyphicon-eye-open action" title="Mark episode as watched" ng-if="episode.file&&episode.watched==0" ng-click="episode.watched=1"></span>
 														
+														<span class="glyphicon glyphicon-eye-open action" title="Mark episode as watched" ng-if="episode.file && !episode.watched" ng-click="watched()"></span>
 														<span class="glyphicon glyphicon-hdd" title="This episode has been downloaded" ng-if="episode.file"></span>
 														
-														
-														
-														<!-- <span class="glyphicon glyphicon-cloud-download" title="Download this episode" ng-if="!episode.file"></span> -->
+														<!-- <span class="glyphicon glyphicon-cloud-download" title="Download this episode" ng-if="!episode.file" ng-click="download()"></span> -->
 													</div>
-													
-													<!-- <p class="airdate"><strong>First aired:</strong> {{episode.airdate*1000 | date:'yyyy-MM-dd'}}</p> -->
 												</div>
 											</div>
 										</div>

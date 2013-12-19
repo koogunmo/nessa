@@ -135,7 +135,7 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute'], functi
 			
 		}).when('/shows', {
 			templateUrl: 'views/partials/shows.html',
-			controller: 'showCtrl'
+			controller: 'showsCtrl'
 
 		}).when('/shows/:id', {
 			templateUrl: 'views/partials/shows.html',

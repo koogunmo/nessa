@@ -399,14 +399,10 @@ io.sockets.on('connection', function(socket) {
 	}).on('show.remove', function(tvdb){
 		var shows = plugin('showdata');
 		shows.remove(tvdb, function(error, response){
-			
-			console.log(tvdb, error, response);
-			
 			socket.emit('system.alert', {
 				type: 'success',
 				message: 'Show removed'
 			});
-			
 			shows.list(function(error, results){
 				socket.emit('shows.list', results);
 			});
@@ -432,31 +428,39 @@ io.sockets.on('connection', function(socket) {
 		});
 	});
 	
+	// Trakt 'watched' functionality
 	
-	// Trakt watched functionality
-	/*
 	socket.on('show.watched', function(data){
-		db.get("SELECT id, tvdb FROM show WHERE id = ?", data.id, function(error, show){
-			trakt.show.seen(data.tvdb, function(error, json){
-				db.run("UPDATE show_episode SET watched = 1 WHERE show_id = ?", show.id);
-				
-			});
+		trakt.show.seen(data.tvdb, function(error, json){
+			if (error) return;
+			if (json.status == 'success') {
+				var collection = db.collection('episode');
+				collection.update({tvdb: data.tvdb}, {$set: {watched: true}}, function(error, affected){
+					if (error) return;
+				});
+			}
 		});
 	}).on('show.season.watched', function(data){
-		db.get("SELECT id, tvdb FROM show WHERE id = ?", data.id, function(error, show){
-			trakt.show.season.seen(show.tvdb, data.season, function(error, json){
-				db.run("UPDATE show_episode SET watched = 1 WHERE show_id = ? AND season = ?", show.id, data.season);
-			});
+		trakt.show.season.seen(data.tvdb, data.season, data.episode, function(error, json){
+			if (error) return;
+			if (json.status == 'success') {
+				var collection = db.collection('episode');
+				collection.update({tvdb: data.tvdb, season: data.season}, {$set: {watched: true}}, function(error, affected){
+					if (error) return;
+				});
+			}
 		});
 	}).on('show.episode.watched', function(data){
-		db.get("SELECT E.id, S.tvdb, E.season, E.episode FROM show AS S INNER JOIN show_episode AS E ON S.id = E.show_id WHERE E.id = ?", data.episode, function(error, row){
-			if (error || !row) return;
-			trakt.show.episode.seen(row.tvdb, row.season, row.episode, function(error, json){
-				db.run("UPDATE show_episode SET watched = 1 WHERE id = ?", row.id);
-			});
+		trakt.show.episode.seen(data.tvdb, data.season, data.episode, function(error, json){
+			if (error) return;
+			if (json.status == 'success') {
+				var collection = db.collection('episode');
+				collection.update({tvdb: data.tvdb, season: data.season, episode: data.episode}, {$set: {watched: true}}, function(error, affected){
+					if (error) return;
+				});
+			}
 		});
 	});
-	*/
 	
 	/*************** Old methods to be converted ***************/
 	
