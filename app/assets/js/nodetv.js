@@ -245,18 +245,18 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 					socket.emit('shows.search', $scope.query);
 				}, 500);
 			}
-		};	
+		};
 		$scope.rescan = function(tvdb){
 			socket.emit('show.rescan', tvdb);
-		};
-		$scope.save = function(){
-			socket.emit('show.settings', $scope.detail.summary);
 		};
 		$scope.remove = function(tvdb){
 			if (confirm('Are you sure you want to remove this show?')) {
 				socket.emit('show.remove', tvdb);
 				$('#show-modal').modal('close')
 			}
+		};
+		$scope.save = function(){
+	//		socket.emit('show.settings', $scope.summary);
 		};
 		$scope.update = function(tvdb){
 			socket.emit('show.update', tvdb, function(){
@@ -265,30 +265,57 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 		};
 	});
 	
+	nessa.controller('showCtrl', function($scope, socket){
+		
+		$scope.watched = function(tvdb){
+		//	socket.emit('show.watched', {tvdb: tvdb});
+		};
+	});
+	
 	nessa.controller('seasonCtrl', function($scope, socket){
+		$scope.seen = true;
+		angular.forEach($scope.$parent.season.episodes, function(v,k){
+			if (!v.watched) $scope.seen = false;
+		});
+		
 		$scope.watched = function(){
-			
-			console.log($scope.parent);
-			return;
-			
+			$scope.seen = true;
 			var data = {
-		//		tvdb: $scope.$parent.episode.tvdb,
-		//		season: $scope.$parent.episode.season 
+				tvdb: $scope.$parent.season.episodes[0].tvdb,
+				season: $scope.$parent.season.season 
 			};
-		//	socket.emit('show.season.watched', data);
+			socket.emit('show.season.watched', data);
 		};
 	});
 	
 	nessa.controller('episodeCtrl', function($scope, socket){
+		$scope.episode = $scope.$parent.episode;
+		
 		$scope.watched = function(){
-			$scope.$parent.episode.watched = !$scope.$parent.episode.watched;
+			$scope.episode.watched = !$scope.episode.watched;
 			var data = {
-				tvdb: $scope.$parent.episode.tvdb,
-				season: $scope.$parent.episode.season,
-				episode: $scope.$parent.episode.episode,
-				watched: $scope.$parent.episode.watched
+				tvdb: $scope.episode.tvdb,
+				season: $scope.episode.season,
+				episode: $scope.episode.episode,
+				watched: $scope.episode.watched
 			};
 			socket.emit('show.episode.watched', data);
+		};
+		
+		$scope.download = function(){
+			var payload = {
+				tvdb: $scope.episode.tvdb,
+				season: $scope.episode.season,
+				episode: $scope.episode.episode
+			};
+			socket.emit('show.episode.download', payload);
+		};
+		
+		$scope.canDownload = function(){
+			if ($scope.episode.hash && $scope.episode.status === undefined) {
+				return true;
+			}
+			return false;
 		};
 	});
 	
@@ -328,12 +355,5 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 		$('.episode.open').not(parent).toggleClass('open').children('.extended').slideToggle();
 		$(parent).toggleClass('open').children('.extended').slideToggle();
 	});
-	
-	
-	$(document).on('click', 'watched', function(){
-		// mark episodes as watched/unwatched
-		
-	});
-	
 	
 });

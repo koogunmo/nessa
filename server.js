@@ -245,7 +245,9 @@ io.sockets.on('connection', function(socket) {
 		collection.find({}).toArray(function(error, results){
 			results.forEach(function(result){
 				shows.getArtwork(show.tvdb);
-				shows.getFullListings(show.tvdb);
+				shows.getFullListings(show.tvdb, function(error, tvdb){
+					shows.getHashes(tvdb);
+				});
 			});
 		});
 		
@@ -260,6 +262,7 @@ io.sockets.on('connection', function(socket) {
 		
 		scanner.shows(function(error, tvdb){
 			shows.getFullListings(tvdb, function(error, tvdb){
+				shows.getHashes(tvdb);
 				scanner.episodes(tvdb);
 			});
 		});
@@ -347,11 +350,12 @@ io.sockets.on('connection', function(socket) {
 		var shows = plugin('showdata');
 		var scanner = plugin('scanner');
 		
-		shows.match(data, function(error, id){
-			shows.getSummary(id, function(error, id){
-				shows.getArtwork(id);
-				shows.getFullListings(id, function(error, id){
-					scanner.episodes(id);
+		shows.match(data, function(error, tvdb){
+			shows.getSummary(tvdb, function(error, tvdb){
+				shows.getArtwork(tvdb);
+				shows.getFullListings(tvdb, function(error, tvdb){
+					shows.getHashes(tvdb)
+					scanner.episodes(tvdb);
 				});
 			});
 		});
@@ -388,7 +392,9 @@ io.sockets.on('connection', function(socket) {
 		shows.add(tvdb, function(error, tvdb){
 			shows.getArtwork(tvdb);
 			shows.getSummary(tvdb, function(error, tvdb){
-				shows.getFullListings(tvdb)
+				shows.getFullListings(tvdb, function(error, tvdb){
+					shows.getHashes(tvdb);
+				})
 			});
 			socket.emit('system.alert', {
 				type: 'success',
@@ -419,9 +425,10 @@ io.sockets.on('connection', function(socket) {
 		});
 		
 	}).on('show.update', function(tvdb){
-		var show = plugin('showdata');
-		show.getArtwork(tvdb);
-		show.getFullListings(tvdb, function(error, json){
+		var shows = plugin('showdata');
+		shows.getArtwork(tvdb);
+		shows.getFullListings(tvdb, function(error, tvdb){
+			shows.getHashes(tvdb);
 		//	show.summary(data.id, function(error, json){
 		//		socket.emit('show.summary', json);
 		//	});
@@ -431,6 +438,9 @@ io.sockets.on('connection', function(socket) {
 	// Trakt 'watched' functionality
 	
 	socket.on('show.watched', function(data){
+		
+		return;
+		
 		trakt.show.seen(data.tvdb, function(error, json){
 			if (error) return;
 			if (json.status == 'success') {
@@ -442,7 +452,10 @@ io.sockets.on('connection', function(socket) {
 		});
 		
 	}).on('show.season.watched', function(data){
-		trakt.show.season.seen(data.tvdb, data.season, data.episode, function(error, json){
+		
+		return;
+		
+		trakt.show.season.seen(data.tvdb, data.season, function(error, json){
 			if (error) return;
 			if (json.status == 'success') {
 				var collection = db.collection('episode');
@@ -480,8 +493,8 @@ io.sockets.on('connection', function(socket) {
 	
 	
 	socket.on('show.episode.download', function(data){
-		var show = plugin('showdata');
-	//	show.download(data.id);
+		var shows = plugin('showdata');
+		shows.download(data.tvdb, data.season, data.episode);
 	});
 	
 });
@@ -560,8 +573,10 @@ app.post('/logout', function(req,res){
 	res.send(200);
 });
 
-/*
-// Magnet parser test
-var magnet = 'magnet:?xt=urn:btih:60800347c8346ebb16b192290194d64dbe560b0a&dn=Continuum+S02E12+720p+HDTV+x264-KILLERS+%5Beztv%5D&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&tr=udp%3A%2F%2Ftracker.publicbt.com%3A80&tr=udp%3A%2F%2Ftracker.istole.it%3A6969&tr=udp%3A%2F%2Ftracker.ccc.de%3A80&tr=udp%3A%2F%2Fopen.demonii.com%3A1337';
-console.log(helper.formatMagnet(magnet));
-*/
+
+setTimeout(function(){
+	var showdata = plugin('showdata');
+//	showdata.getLatest();
+	showdata.getHashes(263724);
+}, 500);
+

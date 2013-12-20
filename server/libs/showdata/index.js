@@ -1,6 +1,5 @@
 var exec	= require('child_process').exec,
 	extend	= require('xtend'),
-	feed	= require('feedparser'),
 	fs		= require('fs'),
 	http	= require('http'),
 	mkdir	= require('mkdirp'),
@@ -49,10 +48,20 @@ var ShowData = {
 		});
 	},
 	
-	download: function(id, callback){
-		var self = this;
-		// Download a specific episode from the RSS feed
-		if (typeof(callback) == 'function') callback(null, true);
+	download: function(tvdb, season, episode, callback){
+		var showCollection = db.collection('show');
+		var episodeCollection = db.collection('episode');
+		
+		episodeCollection.findOne({tvdb: tvdb, season: season, episode: episode}, function(error, result){
+			if (error || !result.hash) return;
+			var magnet = helper.createMagnet(result.hash);
+			if (magnet) {
+				torrent.add(magnet, function(error, args){
+					if (error) return;
+				//	if (typeof(callback) == 'function') callback(error, args);
+				});
+			}
+		});
 	},
 	
 	episodes: function(tvdb, callback){
@@ -294,6 +303,36 @@ var ShowData = {
 		});
 	},
 	
+	getHashes: function(tvdb, callback){
+		// Get all the hashes we can find, and add them to the database
+		var showCollection = db.collection('show');
+		var episodeCollection = db.collection('episode');
+		showCollection.findOne({tvdb: tvdb}, function(error, show){
+			if (show.feed.indexOf('tvshowsapp.com') > 0 && show.feed.indexOf('.full.xml') == -1) {
+				// If it's a TVShowsApp feed, get the .full.xml instead
+				show.feed.replace(/\.xml$/, '.full.xml');
+			}
+			helper.parseFeed(show.feed, null, function(error, item){
+				if (error || !item.hash) return;
+				if (!!show.hd != item.hd) return;
+				
+				var update	= {hash: item.hash};
+				var where	= {
+					tvdb: tvdb,
+					season: item.season,
+					episode: {
+						$in: item.episodes
+					}
+				};
+				if (!item.repack) where.hash = {$exists: false};
+				episodeCollection.update(where, {$set: update}, function(error, affected){
+					if (error) console.error(error);
+				});
+				if (typeof(callback) == 'function') callback(null, tvdb);
+			});
+		});
+	},
+	
 	getLatest: function(){
 		var self = this;
 		// Check each of the feeds for new episodes
@@ -307,85 +346,47 @@ var ShowData = {
 		}).toArray(function(error, shows){
 			if (error || !shows) return;
 			shows.forEach(function(show){
-				request.get(show.feed, function(error, req, xml){
-					if (error) return;
-					try {
-						parser.parseString(xml, function(error, json){
-							if (error) return;
-							
-							var results = [];
-							if (!json.rss.channel[0].item) return;
-							var now = new Date().getTime();
-							var limit = 60*60*24*8*1000;
-							
-							json.rss.channel[0].item.forEach(function(item){
-								var airdate = new Date(item.pubDate[0]).getTime();
-								// TODO: better limiting?
-								if (airdate < now-limit) return;
-								
-								var res = helper.getEpisodeNumbers(item.title[0]);
-								
-								var sources = [];
-								if (item.enclosure) sources.push(item.enclosure[0]['$'].url);
-								if (item.link) sources.push(item.link[0]);
-								if (item.guid) sources.push(item.guid[0]['_']);
-								
-								var magnet = null;
-								for (var i in sources) {
-									var source = sources[i];
-									if (source.indexOf('magnet:?') == 0) {
-										magnet = source;
-										break;
-									}
-								}
-								var record = {
-									season: res.season,
-									episode: res.episodes,
-									hd: helper.isHD(item.title[0]),
-									repack: helper.isRepack(item.title[0]),
-									magnet: helper.formatMagnet(magnet),
-									aired: airdate
-								};
-								if (magnet) results.push(record);
-							});
-							
-							if (!results) return;
-							
-							results.forEach(function(result){
-								if (!!show.hd != result.hd) return;
-								
-								episodeCollection.find({
-									tvdb: show.tvdb,
-									season: result.season,
-									episode: {$in: result.episode}
-								}).toArray(function(error, episodes){
-									var list = [];
-									episodes.forEach(function(episode){
-										var add = true;
-										if (episode.status || episode.hash) add = false;
-										if (result.repack) {
-											var hash = helper.getHash(result.magnet);
-											// Have we already added this repack?
-											if (hash != episode.hash) {
-												add = true;
-												torrent.repacked(episode.hash);
-											}
-										}
-										if (add) list.push(episode._id);
-									});
-									if (list.length){
-										torrent.add({
-											id: list,
-											magnet: result.magnet
-										});
-										self.getFullListings(show.tvdb);
-									}
-								});
-							});
+				var limit = new Date() - (1000*7*24*60*60);
+				helper.parseFeed(show.feed, limit, function(error, json){
+					if (error || !json.hash) return;
+					if (!!show.hd != json.hd) return;
+					
+					episodeCollection.find({
+						tvdb: show.tvdb,
+						season: json.season,
+						episode: {$in: json.episodes}
+						
+					}).toArray(function(error, episodes){
+						if (error) return;
+						
+						var insert = false;
+						var obtain = false;
+						
+						episodes.forEach(function(episode){
+							if (!episode.status && !episode.file) obtain = true;
+							if (json.repack && json.hash != episode.hash) {
+								torrent.repack(episode.hash);
+								obtain = true;
+							}
+							if (!episode.hash) insert = true;
 						});
-					} catch(e) {
-						logger.error('shows.getlatest', e.message);
-					}
+						
+						if (insert) {
+							episodeCollection.update({
+								tvdb: show.tvdb,
+								season: json.season,
+								episode: {$in: json.episodes}
+							}, {$set: {hash: json.hash}}, function(error, affected){
+								if (error) return;
+							});
+						}
+						
+						if (obtain) {
+							var magnet = helper.createMagnet(json.hash);
+							torrent.add(magnet);
+							self.getFullListings(show.tvdb);
+						} 
+					});
 				});
 			});
 		});
@@ -415,7 +416,7 @@ var ShowData = {
 					});
 				});
 			} catch(e) {
-				console.error('shows.getShowlist', e.message);
+				console.error('showdata.getShowlist', e.message);
 			}
 		});
 	},
@@ -461,53 +462,5 @@ var ShowData = {
 		});
 	}
 	
-	/******************************************************/
-	
-	/*
-	download: function(epid){
-		var sql = "SELECT E.id, S.name, S.feed, S.hd, E.season, E.episode, E.title FROM show AS S INNER JOIN show_episode AS E ON S.id = E.show_id WHERE E.id = ?";
-		db.get(sql, epid, function(error, row){
-			if (error) {
-				logger.error(error);
-				return;
-			}
-			
-			
-			if (row.feed.indexOf('tvshowsapp.com') >= 0) {
-				row.feed = row.feed.replace(/.xml/, '.full.xml')
-			}
-			
-			request.get(row.feed, function(error, req, xml){
-				if (error) {
-					logger.error(error);
-					return;
-				}
-				try {
-					parser.parseString(xml, function(error, json){
-						if (error) {
-							logger.error(error);
-							return;
-						}
-						if (!json.rss.channel[0].item) return;
-						json.rss.channel[0].item.forEach(function(item){
-							var title = item.title.toString();
-							if (!row.hd && title.match(/720p|1080p/i)) return;
-							var data = helper.getEpisodeNumbers(title);
-							if (data.season == row.season && data.episodes.indexOf(row.episode) >= 0) {
-								var magnet = item.guid[0]['_'];
-								torrent.add({
-									id: [row.id],
-									magnet: magnet
-								});
-							}
-						});
-					});
-				} catch(e){
-					logger.error(e.message);
-				}
-			});
-		});
-	}
-	*/
 };
 exports = module.exports = ShowData;

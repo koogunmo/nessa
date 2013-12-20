@@ -3,7 +3,7 @@ var transmission = require('transmission'),
 	uuid = require('node-uuid');
 
 var torrent = {
-	rpc: null,
+	rpc: false,
 	connect: function() {
 		var self = this;
 		// Create connection
@@ -16,27 +16,10 @@ var torrent = {
 		return this;
 	},
 	
-	add: function(obj, callback) {
-		var self = this;
-		var ObjectID = require('mongodb').ObjectID;
-		var collection = db.collection('episode');
-		
+	add: function(magnet, callback) {
 		try {
-			if (!this.rpc) return;
-			self.rpc.add(obj.magnet, function(error, args){
-				if (error) return;
-				if (args) {
-					var record = {
-						hash: args.hashString,
-						status: false
-					};
-					obj.id.forEach(function(id){
-						collection.update({_id: ObjectID(id)}, {$set: record}, function(error, affected){
-							if (error) return;
-						});
-					});
-					if (typeof(callback) == 'function') callback(null, true);
-				}
+			this.rpc.add(magnet, function(error, args){
+				if (typeof(callback) == 'function') callback(error, args);
 			});
 		} catch(e) {
 			logger.error(e.message);
@@ -72,6 +55,8 @@ var torrent = {
 				if (error) return;
 				var response = [];
 				data.torrents.forEach(function(item){
+					var hash = item.hashString.toLowerCase();
+					
 					// Has it finished downloading?
 					if (item.percentDone < 1) return;
 					
@@ -92,7 +77,7 @@ var torrent = {
 					var data = helper.getEpisodeNumbers(file);
 					if (!data || !data.episodes) return;
 					
-					episodeCollection.find({hash: item.hashString}).toArray(function(error, results){
+					episodeCollection.find({hash: hash}).toArray(function(error, results){
 						if (error || !results.length) return;
 						var showdir = nconf.get('shows:base') + '/' + results[0].directory;
 						
@@ -121,7 +106,7 @@ var torrent = {
 							file: target
 						};
 						helper.fileCopy(file, showdir + '/' + target, function(){
-							episodeCollection.update({hash: item.hashString}, {$set: record}, function(error, affected){
+							episodeCollection.update({hash: hash}, {$set: record}, function(error, affected){
 								
 							});
 							trakt.show.episode.library(tvdb, library);
@@ -135,7 +120,7 @@ var torrent = {
 					});
 					/* Remove if seeding is completed */
 					if (item.isFinished) {
-						episodeCollection.count({hash: item.hashString}, function(error, count){
+						episodeCollection.count({hash: hash}, function(error, count){
 							if (error) return;
 							if (count >= 1){
 								self.rpc.remove(item.id, true, function(error){

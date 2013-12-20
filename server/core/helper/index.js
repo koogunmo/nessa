@@ -1,9 +1,11 @@
-var fs		= require('fs'),
+var extend	= require('xtend'),
+	fs		= require('fs'),
 	mkdirp	= require('mkdirp'),
+	parser	= new(require('xml2js')).Parser(),
 	path	= require('path'),
 	qs		= require('querystring'),
-	url		= require('url'),
-	extend	= require('xtend');
+	request	= require('request'),
+	url		= require('url');
 
 // Common helper functions
 
@@ -141,7 +143,50 @@ exports = module.exports = {
 	},
 	formatDirectory: function(name){
 		// Sanitize the directory names
-		return name.replace(/\//g, '-');
+		return name.replace(/\/\:/g, '-');
+	},
+	
+	parseFeed: function(url, since, callback){
+		var helper = this;
+		// parse a rss feed
+		request.get(url, function(error, req, xml){
+			if (error) return;
+			try {
+				parser.parseString(xml, function(error, json){
+					if (!json.rss.channel[0].item) return;
+					json.rss.channel[0].item.forEach(function(item){
+						if (since) {
+							var published = new Date(item.pubDate[0]).getTime();
+							if (published < since) return;
+						}
+						var sources = [];
+						if (item.enclosure) sources.push(item.enclosure[0]['$'].url);
+						if (item.link) sources.push(item.link[0]);
+						if (item.guid) sources.push(item.guid[0]['_']);
+						
+						var magnet = null;
+						sources.forEach(function(source){
+							if (magnet) return;
+							if (source.indexOf('magnet:?') == 0) {
+								magnet = source;
+								return;
+							}
+						});
+						var res = helper.getEpisodeNumbers(item.title[0]);
+						var response = {
+							season: res.season,
+							episodes: res.episodes,
+							hd: helper.isHD(item.title[0]),
+							repack: helper.isRepack(item.title[0]),
+							hash: helper.getHash(magnet)
+						};
+						if (typeof(callback) == 'function') callback(null, response);
+					});
+				});
+			} catch(e) {
+				logger.error('helper.parseFeed:', e.message);
+			}
+		});
 	},
 	
 	// Torrent methods
@@ -149,6 +194,7 @@ exports = module.exports = {
 	isHD: function(name){
 		return (name.match(/720p|1080p/i)) ? true : false;
 	},
+	
 	isRepack: function(name) {
 		return (name.match(/repack|proper/i)) ? true : false;
 	},
@@ -156,40 +202,27 @@ exports = module.exports = {
 	getHash: function(magnet){
 		try {
 			var info = require('magnet-uri')(magnet);
-			return info.xt.split(':')[2];
+			return info.xt.split(':')[2].toLowerCase();
 		} catch(e) {
-			logger.error(e.message);
+			logger.error('helper.getHash:', e.message);
 		}
 	},
 	
-	formatMagnet: function(magnet){
-		// Add extra trackers to the torrent before adding
-		try {
-			var data = url.parse(magnet, true);
-			var trackers = [
-				'udp://open.demonii.com:1337',
-				'udp://tracker.openbittorent.com:80',
-				'udp://tracker.publicbt.com:80',
-				'udp://tracker.istole.it:80',
-				'udp://tracker.ccc.de:80',
-				'udp://tracker.coppersurfer.tk:6969'
-			];
-			data.query.tr.forEach(function(tracker){
-				if (trackers.indexOf(tracker) == -1) {
-					trackers.push(tracker);
-				}
-			});
-			data.query.tr = trackers;
-			return 'magnet:?'+qs.unescape(qs.stringify(data.query));
-		} catch(e) {
-			logger.error(e.message);
-			return null;
-		}
-	},
-	
-	parseMagnet: function(magnet){
-		var parser = require('magnet-uri');
-		return parser(magnet);
+	createMagnet: function(hash, name){
+		if (!hash) return;
+		if (!name) name = hash;
+		var trackers = [
+			'udp://open.demonii.com:1337',
+			'udp://tracker.ccc.de:80',
+			'udp://tracker.coppersurfer.tk:6969',
+			'udp://tracker.istole.it:80',
+			'udp://tracker.openbittorent.com:80',
+			'udp://tracker.publicbt.com:80'
+		];
+		var tr = [];
+		trackers.forEach(function(tracker){
+			tr.push('tr='+tracker+'/announce');
+		});
+		return 'magnet:?xt=urn:btih:'+hash+'&dn='+name+'&'+tr.join('&');
 	}
-	
 };
