@@ -99,9 +99,6 @@ var torrent = {
 									episode: row.episode
 								});
 							});
-							
-							console.log(data);
-							
 							var target = helper.formatName({
 								season: data.season,
 								episodes: episodes,
@@ -111,10 +108,6 @@ var torrent = {
 								status: true,
 								file: target
 							};
-							
-							console.log(file, showdir +'/'+ target);
-							return;
-							
 							helper.fileCopy(file, showdir + '/' + target, function(){
 								episodeCollection.update({hash: hash}, {$set: record}, function(error, affected){
 									
