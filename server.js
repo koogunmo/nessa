@@ -573,10 +573,10 @@ app.post('/logout', function(req,res){
 	res.send(200);
 });
 
-
+/*
 setTimeout(function(){
 	var showdata = plugin('showdata');
 //	showdata.getLatest();
-	showdata.getHashes(263724);
+//	showdata.getHashes(263724);
 }, 500);
-
+*/

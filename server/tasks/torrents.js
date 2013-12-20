@@ -6,4 +6,4 @@ setInterval(function(){
 
 setTimeout(function(){
 	torrent.complete();
-}, 5000);
+}, 10000);

@@ -46,6 +46,7 @@ var torrent = {
 	
 	complete: function() {
 		var self = this;
+		var showsCollection = db.collection('show');
 		var episodeCollection = db.collection('episode');
 		
 		try {
@@ -79,43 +80,53 @@ var torrent = {
 					
 					episodeCollection.find({hash: hash}).toArray(function(error, results){
 						if (error || !results.length) return;
-						var showdir = nconf.get('shows:base') + '/' + results[0].directory;
-						
-						var tvdb = null;
-						var episodes = [];
-						var library	= [];
-						
-						results.forEach(function(row){
-							if (!tvdb) tvdb = row.tvdb;
-							episodes.push({
-								episode: row.episode,
-								title: row.title
-							});
-							library.push({
-								season: row.season,
-								episode: row.episode
-							});
-						});
-						var target = helper.formatName({
-							season: data.season,
-							episodes: episodes,
-							ext: path.extname(file)
-						});
-						var record = {
-							status: true,
-							file: target
-						};
-						helper.fileCopy(file, showdir + '/' + target, function(){
-							episodeCollection.update({hash: hash}, {$set: record}, function(error, affected){
-								
-							});
-							trakt.show.episode.library(tvdb, library);
+						showsCollection.findOne({tvdb: results[0].tvdb}, function(error, show){
+							if (error || !results.length) return;
+							var showdir = nconf.get('shows:base') + '/' + show.directory;
 							
-						//	events.emit('download.complete', {
-						//		season: data.season,
-						//		episode: ep,
-						//		title: title.join('; ')
-						//	})
+							var tvdb = null;
+							var episodes = [];
+							var library	= [];
+							
+							results.forEach(function(row){
+								if (!tvdb) tvdb = row.tvdb;
+								episodes.push({
+									episode: row.episode,
+									title: row.title
+								});
+								library.push({
+									season: row.season,
+									episode: row.episode
+								});
+							});
+							
+							console.log(data);
+							
+							var target = helper.formatName({
+								season: data.season,
+								episodes: episodes,
+								ext: path.extname(file)
+							});
+							var record = {
+								status: true,
+								file: target
+							};
+							
+							console.log(file, showdir +'/'+ target);
+							return;
+							
+							helper.fileCopy(file, showdir + '/' + target, function(){
+								episodeCollection.update({hash: hash}, {$set: record}, function(error, affected){
+									
+								});
+								trakt.show.episode.library(tvdb, library);
+								
+							//	events.emit('download.complete', {
+							//		season: data.season,
+							//		episode: ep,
+							//		title: title.join('; ')
+							//	})
+							});
 						});
 					});
 					/* Remove if seeding is completed */
