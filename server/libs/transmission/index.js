@@ -1,4 +1,5 @@
 var transmission = require('transmission'),
+	fs = require('fs'),
 	path = require('path'),
 	uuid = require('node-uuid');
 
@@ -108,17 +109,13 @@ var torrent = {
 								status: true,
 								file: target
 							};
+							
+							if (fs.existsSync(showdir + '/' + target)) return;
 							helper.fileCopy(file, showdir + '/' + target, function(){
 								episodeCollection.update({hash: hash}, {$set: record}, function(error, affected){
-									
+									if (error) return;
 								});
 								trakt.show.episode.library(tvdb, library);
-								
-							//	events.emit('download.complete', {
-							//		season: data.season,
-							//		episode: ep,
-							//		title: title.join('; ')
-							//	})
 							});
 						});
 					});

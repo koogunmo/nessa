@@ -317,6 +317,10 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 			}
 			return false;
 		};
+		
+		$scope.hasAired = function(){
+			return ($scope.episode.airdate*1000 < new Date().getTime());
+		};
 	});
 	
 	// Bootstrap to document
