@@ -256,7 +256,7 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 			}
 		};
 		$scope.save = function(){
-	//		socket.emit('show.settings', $scope.summary);
+			socket.emit('show.settings', $scope.detail.summary);
 		};
 		$scope.update = function(tvdb){
 			socket.emit('show.update', tvdb, function(){
@@ -265,10 +265,14 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 		};
 	});
 	
+	
 	nessa.controller('showCtrl', function($scope, socket){
 		
 		$scope.watched = function(tvdb){
 		//	socket.emit('show.watched', {tvdb: tvdb});
+		};
+		$scope.save = function(){
+			
 		};
 	});
 	

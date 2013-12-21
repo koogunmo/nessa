@@ -148,8 +148,8 @@ var ShowData = {
 	},
 	
 	settings: function(data, callback){
-		delete data._id;
 		var showCollection = db.collection('show');
+		if (data._id) delete data._id;
 		showCollection.update({tvdb: data.tvdb}, {$set: data}, {upsert: true}, function(error, affected){
 			if (typeof(callback) == 'function') callback(error, !!affected);
 		});
