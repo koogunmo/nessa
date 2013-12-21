@@ -79,10 +79,13 @@ var torrent = {
 					var data = helper.getEpisodeNumbers(file);
 					if (!data || !data.episodes) return;
 					
+						
 					episodeCollection.find({hash: hash}).toArray(function(error, results){
 						if (error || !results.length) return;
+						
 						showsCollection.findOne({tvdb: results[0].tvdb}, function(error, show){
-							if (error || !results.length) return;
+							if (error || !show) return;
+							
 							var showdir = nconf.get('shows:base') + '/' + show.directory;
 							
 							var tvdb = null;
@@ -109,7 +112,6 @@ var torrent = {
 								status: true,
 								file: target
 							};
-							
 							if (fs.existsSync(showdir + '/' + target)) return;
 							helper.fileCopy(file, showdir + '/' + target, function(){
 								episodeCollection.update({hash: hash}, {$set: record}, function(error, affected){
