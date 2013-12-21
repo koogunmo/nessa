@@ -51,13 +51,15 @@ var torrent = {
 		var episodeCollection = db.collection('episode');
 		
 		try {
+			
 			if (!this.rpc) return;
 			// Get a list of all completed torrents
 			this.rpc.get(function(error, data){
 				if (error) return;
+				
 				var response = [];
 				data.torrents.forEach(function(item){
-					var hash = item.hashString.toLowerCase();
+					var hash = item.hashString.toUpperCase();
 					
 					// Has it finished downloading?
 					if (item.percentDone < 1) return;
@@ -79,8 +81,7 @@ var torrent = {
 					var data = helper.getEpisodeNumbers(file);
 					if (!data || !data.episodes) return;
 					
-						
-					episodeCollection.find({hash: hash}).toArray(function(error, results){
+					episodeCollection.find({hash: hash, status: false}).toArray(function(error, results){
 						if (error || !results.length) return;
 						
 						showsCollection.findOne({tvdb: results[0].tvdb}, function(error, show){
@@ -112,7 +113,6 @@ var torrent = {
 								status: true,
 								file: target
 							};
-							if (fs.existsSync(showdir + '/' + target)) return;
 							helper.fileCopy(file, showdir + '/' + target, function(){
 								episodeCollection.update({hash: hash}, {$set: record}, function(error, affected){
 									if (error) return;

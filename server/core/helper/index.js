@@ -202,7 +202,7 @@ exports = module.exports = {
 	getHash: function(magnet){
 		try {
 			var info = require('magnet-uri')(magnet);
-			return info.xt.split(':')[2].toLowerCase();
+			return info.xt.split(':')[2].toUpperCase();
 		} catch(e) {
 			logger.error('helper.getHash:', e.message);
 		}

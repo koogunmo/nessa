@@ -59,6 +59,9 @@ var ShowData = {
 			if (magnet) {
 				torrent.add(magnet, function(error, args){
 					if (error) return;
+					episodeCollection.update({hash: result.hash}, {$set: {status: false}}, function(error, affected){
+						
+					});
 				//	if (typeof(callback) == 'function') callback(error, args);
 				});
 			}
@@ -358,7 +361,6 @@ var ShowData = {
 							if (json.repack && json.hash != episode.hash) {
 								torrent.repack(episode.hash);
 								self.deleteEpisode(show.tvdb, json.season, json.episodes);
-								
 								obtain = true;
 							}
 							if (!episode.hash) insert = true;
@@ -376,7 +378,12 @@ var ShowData = {
 						
 						if (obtain) {
 							var magnet = helper.createMagnet(json.hash);
-							torrent.add(magnet);
+							torrent.add(magnet, function(error, args){
+								if (error) return;
+								episodeCollection.update({hash: json.hash}, {$set: {status: false}}, function(error, affected){
+									if (error) return;
+								});
+							});
 							self.getFullListings(show.tvdb);
 						} 
 					});
