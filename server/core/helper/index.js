@@ -200,12 +200,10 @@ exports = module.exports = {
 	},
 	
 	getHash: function(magnet){
-		try {
-			var info = require('magnet-uri')(magnet);
-			return info.xt.split(':')[2].toUpperCase();
-		} catch(e) {
-			logger.error('helper.getHash:', e.message);
+		if (match = magnet.match(/btih\:([0-9A-F]{40})/i)){
+			return match[1].toUpperCase();
 		}
+		return false;
 	},
 	
 	createMagnet: function(hash, name){
