@@ -240,13 +240,12 @@ io.sockets.on('connection', function(socket) {
 	}).on('system.listings', function(){
 		// Update ALL listing information and artwork
 		var shows = plugin('showdata');
-		
-		var collection = db.collection('show');
-		collection.find({}).toArray(function(error, results){
-			results.forEach(function(result){
+		var showCollection = db.collection('show');
+		showCollection.find({status: {$exists: true}}).toArray(function(error, results){
+			results.forEach(function(show){
 				shows.getArtwork(show.tvdb);
 				shows.getFullListings(show.tvdb, function(error, tvdb){
-					shows.getHashes(tvdb);
+					shows.getHashes(show.tvdb);
 				});
 			});
 		});

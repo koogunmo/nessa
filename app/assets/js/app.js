@@ -29,6 +29,9 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute'], functi
 				});
 			}
 		};
+	}).run(function($rootScope, $location){
+		$rootScope.location = $location;
+		
 	});
 	
 	app.filter('downloadName', function(){
@@ -67,7 +70,6 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute'], functi
 	});
 	
 	app.config(function($routeProvider, $locationProvider, $httpProvider){
-	
 		var checkInstalled = function($q, $timeout, $http, $location, $rootScope){
 			// Initialize a new promise
 			var deferred = $q.defer();
@@ -133,13 +135,10 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute'], functi
 				loggedin: checkLoggedin
 			}
 			
-		}).when('/shows', {
+		}).when('/shows/:tvdb?', {
 			templateUrl: 'views/partials/shows.html',
-			controller: 'showsCtrl'
-
-		}).when('/shows/:id', {
-			templateUrl: 'views/partials/shows.html',
-			controller: 'showCtrl'
+			controller: 'showsCtrl',
+			reloadOnSearch: false
 			
 		}).when('/match', {
 			templateUrl: 'views/partials/match.html',

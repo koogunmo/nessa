@@ -32,7 +32,7 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 		};
 	});
 	
-	nessa.controller('navCtrl', function($scope, $location){
+	nessa.controller('navCtrl', function($scope, $rootScope, $location){
 		
 		$scope.menu = [{
 			path: 'dashboard',
@@ -51,6 +51,26 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 		$scope.isActive = function(viewLocation){
 			return viewLocation === $location.path();
 		};
+		
+		$scope.$on('$locationStartChange', function(a,b,c){
+			console.log(a,b,c);
+		});
+		/*
+		$rootScope.$on('$routeChangeStart', function(e, next, current){
+			
+			console.log(e, next, current);
+			
+		//	return false;
+			
+			e.preventDefault();
+			
+			
+			
+		//	
+			
+		//	$('.modal.in').modal('close');
+		});
+		*/
 	});
 	
 	// Section-specific controllers
@@ -177,19 +197,34 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 		};
 	});
 	
-	nessa.controller('showsCtrl', function($scope, $routeParams, $filter, socket){
-		$scope.detail	= {};
+	nessa.controller('showsCtrl', function($scope, $location, socket){
+		
+		$scope.$on('$routeChangeSuccess', function(){
+		//	console.log('$routeChangeSuccess');
+			if ($location.search().tvdb) {
+				$scope.details($location.search().tvdb);
+			} else {
+				// How can we close the modal?
+			}
+		});
+		
+		$scope.$on('$routeUpdate', function(){
+		//	console.log('$routeUpdate');
+			if ($location.search().tvdb) {
+				$scope.details($location.search().tvdb);
+			} else {
+				// How can we close the modal?
+			}
+		});
+		
+		$(document).on('hidden.bs.modal', function(){
+			$scope.$apply(function(){
+				$location.search('tvdb', null);
+			});
+		});
+		
 		$scope.shows	= [];
-		
-		$scope.predicate = 'name';
-		$scope.reverse	= false;
-		
-		$scope.query	= null;
-		$scope.results	= [];
-		$scope.selected = false;
-		
 		socket.emit('shows.list');
-		
 		socket.on('shows.list', function(data){
 			$scope.shows = data;
 			setTimeout(function(){
@@ -197,83 +232,96 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 			}, 250);
 		});
 		
-		// Search
-		socket.on('shows.search', function(data){
-			$scope.results = data;
-		});
 		
-		socket.on('show.added', function(){
-			socket.emit('shows.enabled');
-		});
-		
-		$scope.showAdd = function(){
-			socket.emit('show.add', $scope.selected);
-			$scope.selected = false;
-			
-			$('#add-modal').modal('close');
+		$scope.details = function(tvdb){
+			$location.search('tvdb', tvdb)
+			socket.emit('show.summary', tvdb);
 		};
 		
+		
 		$scope.modalAdd = function(){
-			$scope.query = null;
-			$scope.results = [];
-			$scope.selected = false;
-			
 			if (!$('.modal-open').length) {
 				$('#add-modal').modal();
 			}
 		};
+	});
+	
+	nessa.controller('searchCtrl', function($scope, socket){
+		$scope.query	= null;
+		$scope.results	= [];
+		$scope.selected = false;
 		
-		$scope.modalDetail = function(tvdb){
-			socket.emit('show.summary', tvdb);
-			socket.on('show.summary', function(json){
-				$scope.detail = json;
-				setTimeout(function(){
-					if (!$('.modal-open').length) {
-						$('#show-modal').modal();
-					}
-				}, 100);
-			});
+		socket.on('shows.search', function(data){
+			$scope.results = data;
+		});
+		socket.on('show.added', function(){
+			socket.emit('shows.enabled');
+		});
+		$scope.save = function(){
+			socket.emit('show.add', $scope.selected);
+			$scope.selected = false;
+			$('#add-modal').modal('close');
 		};
 		
 		var delaySearch = null;
 		$scope.search = function(){
 			clearTimeout(delaySearch);
-			
 			$scope.results = [];
-			if ($scope.query.length >= 3) {
+			if ($scope.query.length >= 4) {
 				delaySearch = setTimeout(function(){
 					socket.emit('shows.search', $scope.query);
 				}, 500);
 			}
 		};
-		$scope.rescan = function(tvdb){
-			socket.emit('show.rescan', tvdb);
+		
+		$scope.reset = function(){
+			$scope.query	= null;
+			$scope.results	= [];
+			$scope.selected = false;
 		};
-		$scope.remove = function(tvdb){
+		
+		$(document).on('hidden.bs.modal', '#add-modal', $scope.reset);
+	});
+	
+	nessa.controller('showCtrl', function($scope, socket){
+		$scope.detail = {}
+		
+		$scope.summary = {};
+		$scope.listing = {};
+		
+		socket.on('show.summary', function(json){
+			$scope.detail = json;
+			
+			$scope.summary = json.summary;
+			$scope.listing = json.listing;
+			
+			setTimeout(function(){
+				if (!$('.modal-open').length) $('#show-modal').modal();
+			}, 100);
+		});
+		
+		$scope.rescan = function(){
+			socket.emit('show.rescan', $scope.summary.tvdb);
+		};
+		$scope.remove = function(){
 			if (confirm('Are you sure you want to remove this show?')) {
-				socket.emit('show.remove', tvdb);
+				socket.emit('show.remove', $scope.summary.tvdb);
 				$('#show-modal').modal('close')
 			}
 		};
 		$scope.save = function(){
 			socket.emit('show.settings', $scope.detail.summary);
 		};
-		$scope.update = function(tvdb){
-			socket.emit('show.update', tvdb, function(){
-				socket.emit('show.overview', tvdb);
+		$scope.update = function(){
+			socket.emit('show.update', $scope.summary.tvdb, function(){
+		//		socket.emit('show.overview', $scope.summary.tvdb);
 			});
 		};
-	});
-	
-	
-	nessa.controller('showCtrl', function($scope, socket){
+		$scope.watched = function(){
+		//	socket.emit('show.watched', {tvdb: $scope.summary.tvdb});
+		};
 		
-		$scope.watched = function(tvdb){
-		//	socket.emit('show.watched', {tvdb: tvdb});
-		};
-		$scope.save = function(){
-			
-		};
+	//	$(document).on('hidden.bs.modal', '#show-modal', $scope.reset);
 	});
 	
 	nessa.controller('seasonCtrl', function($scope, socket){
@@ -354,7 +402,7 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 		})
 	};
 	
-	$(document).on('shown.bs.modal', '.modal', resizeModal)
+	$(document).on('shown.bs.modal', '.modal', resizeModal);
 	$(window).on('resize orientationchange', resizeModal);
 	
 	

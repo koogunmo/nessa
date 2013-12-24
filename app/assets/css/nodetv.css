@@ -88,6 +88,9 @@ input[type="search"], input.search {
 
 /* Shows */
 
+#add-modal .modal-header {
+	border-bottom: none;
+}
 #add-modal .result {
 	border-bottom: 1px solid #EEEEEE;
 	box-sizing: border-box;
@@ -97,6 +100,10 @@ input[type="search"], input.search {
 	padding: 5px;
 	position: relative;
 }
+#add-modal .result:last-child {
+	border-bottom: none;
+}
+
 #add-modal .result.selected {
 	background-color: #DFF0D8;
 }
@@ -105,6 +112,7 @@ input[type="search"], input.search {
 	float: left;
 	height: 90px;
 	margin-right: 5px;
+	width: 61px;
 }
 
 #add-modal .result .synopsis {

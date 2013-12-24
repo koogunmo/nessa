@@ -2,7 +2,7 @@
 	<form class="form-group">
 		<label></label>
 		<div class="input-group">
-			<input type="search" class="form-control search" autofocus="true" placeholder="Search show library..." ng-model="filter.name" />
+			<input type="text" class="form-control search" autofocus="true" placeholder="Search show library..." ng-model="filter.name" />
 			<span class="input-group-addon" ng-click="filter.name=''">&times;</span>
 		</div>
 	</form>
@@ -11,7 +11,7 @@
 			<div class="image"></div>
 			<div>Add Show</div>
 		</div>
-		<div class="show col-sm-2" ng-repeat="show in shows | orderBy:predicate | filter:filter" ng-click="modalDetail(show.tvdb)">
+		<div class="show col-sm-2" ng-repeat="show in shows | orderBy:'name' | filter:filter" ng-click="details(show.tvdb)">
 			<div class="image">
 				<img data-src="/media/{{show.directory}}/poster.jpg" alt="" class="img-responsive" />
 			</div>
@@ -20,12 +20,16 @@
 	</div>
 </div>
 
-<div id="add-modal" class="modal" role="dialog" ng-cloak>
+
+<div id="add-modal" class="modal" role="dialog" ng-controller="searchCtrl" ng-cloak>
 	<div class="modal-dialog">
 		<div class="modal-content">
-			<form ng-submit="showAdd()">
+			<form ng-submit="save()">
 				<div class="modal-header">
-					<input type="text" list="shows-available" class="form-control" autofocus="true" placeholder="Type to search" ng-model="query" ng-change="search()" />
+					<span class="input-group">
+						<input type="text" list="shows-available" class="form-control search" autofocus="true" placeholder="Type to search" ng-model="query" ng-change="search()" />
+						<span class="input-group-addon" ng-click="reset()">&times;</span>
+					</span>
 				</div>
 				<div class="modal-body" ng-show="results">
 					<div class="results">
@@ -37,15 +41,16 @@
 					</div>
 				</div>
 				<div class="modal-footer">
-					<button class="btn btn-success" ng-show="selected">Add Show</button>
-					<button class="btn btn-default" data-dismiss="modal">Close</button>
+					<button type="submit" class="btn btn-success" ng-show="selected">Add Show</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 				</div>
 			</form>
 		</div>
 	</div>
 </div>
 
-<div id="show-modal" class="modal" role="dialog" ng-cloak>
+
+<div id="show-modal" class="modal" role="dialog" ng-controller="showCtrl" ng-cloak>
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<form ng-submit="save()">
@@ -127,9 +132,9 @@
 								<label for="ipt_setting_hd">Prefer HD video</label>
 							</div>
 							<div class="form-group">
-								<button type="button" class="btn btn-info" ng-click="update(detail.summary.tvdb)">Update listings</button>
-								<button type="button" class="btn btn-warning" ng-click="rescan(detail.summary.tvdb)">Rescan Files</button>
-								<button type="button" class="btn btn-danger" ng-click="remove(detail.summary.tvdb)">Remove Show</button>
+								<button type="button" class="btn btn-info" ng-click="update()">Update listings</button>
+								<button type="button" class="btn btn-warning" ng-click="rescan()">Rescan Files</button>
+								<button type="button" class="btn btn-danger" ng-click="remove()">Remove Show</button>
 							</div>
 						</div>
 					</div>

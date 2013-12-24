@@ -302,11 +302,15 @@ var ShowData = {
 		// Get all the hashes we can find, and add them to the database
 		var showCollection = db.collection('show');
 		var episodeCollection = db.collection('episode');
+		
 		showCollection.findOne({tvdb: tvdb}, function(error, show){
+			if (error || !show || !show.feed) return;
+			
 			if (show.feed.indexOf('tvshowsapp.com') > 0 && show.feed.indexOf('.full.xml') == -1) {
 				// If it's a TVShowsApp feed, get the .full.xml instead
 				show.feed.replace(/\.xml$/, '.full.xml');
 			}
+			
 			helper.parseFeed(show.feed, null, function(error, item){
 				if (error || !item.hash) return;
 				if (!!show.hd != item.hd) return;
@@ -321,7 +325,7 @@ var ShowData = {
 				};
 				if (!item.repack) where.hash = {$exists: false};
 				episodeCollection.update(where, {$set: update}, function(error, affected){
-					if (error) console.error(error);
+					if (error) console.error('derp', error);
 				});
 				if (typeof(callback) == 'function') callback(null, tvdb);
 			});

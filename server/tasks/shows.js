@@ -12,7 +12,7 @@ schedule.scheduleJob(rule, function(){
 });
 setTimeout(function(){
 	tvshows.getLatest();
-}, 10000);
+}, 30000);
 
 
 

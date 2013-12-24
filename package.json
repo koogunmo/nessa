@@ -10,6 +10,7 @@
 	},
 	"dependencies": {
 		"connect": "2.11.x",
+		"connect-mongo": "0.4.x",
 		"express": "3.x.x",
 		"feedparser": "0.16.x",
 		"gitty": "1.2.x",
@@ -31,6 +32,12 @@
 		"twilio": "1.4.x",
 		"xml2js": "0.4.x",
 		"xtend": "2.1.x"
+	},
+	"devDependencies": {
+		"grunt": "0.4.2",
+		"grunt-contrib-requirejs": "0.4.1",
+		"grunt-contrib-sass": "0.6.0",
+		"grunt-contrib-uglify": "0.2.7"
 	},
 	"engines": {
 		"node": "0.10.x"
