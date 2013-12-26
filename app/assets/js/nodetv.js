@@ -200,16 +200,13 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 	nessa.controller('showsCtrl', function($scope, $location, socket){
 		
 		$scope.$on('$routeChangeSuccess', function(){
-		//	console.log('$routeChangeSuccess');
 			if ($location.search().tvdb) {
 				$scope.details($location.search().tvdb);
 			} else {
 				// How can we close the modal?
 			}
 		});
-		
 		$scope.$on('$routeUpdate', function(){
-		//	console.log('$routeUpdate');
 			if ($location.search().tvdb) {
 				$scope.details($location.search().tvdb);
 			} else {
@@ -232,14 +229,11 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 			}, 250);
 		});
 		
-		
 		$scope.details = function(tvdb){
 			$location.search('tvdb', tvdb)
 			socket.emit('show.summary', tvdb);
 		};
-		
-		
-		$scope.modalAdd = function(){
+		$scope.add = function(){
 			if (!$('.modal-open').length) {
 				$('#add-modal').modal();
 			}
