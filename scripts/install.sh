@@ -28,9 +28,10 @@ git clone https://github.com/greebowarrior/nessa.git /opt/nodetv
 
 ## Install minidlna
 
+sudo apt-get install libavcodec52 libavformat54 libavutil52 libc6 libexif12 libflac8 libid3tag0 libjpeg8 libogg0 libsqlite3-0 libvorbis0a
+
 # to do
-# dependencies?
-# build from source?
+
 
 ## Add Upstart script
 
