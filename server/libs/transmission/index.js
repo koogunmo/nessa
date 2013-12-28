@@ -126,7 +126,7 @@ var torrent = {
 						episodeCollection.count({hash: hash}, function(error, count){
 							if (error) return;
 							if (count >= 1){
-								self.rpc.remove(item.id, true, function(error){
+								self.rpc.remove({id: item.id, purge: true}, function(error){
 									if (error) logger.error(error);
 								});
 							}
