@@ -33,7 +33,7 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute'], functi
 		$rootScope.location = $location;
 		
 	});
-	
+		
 	app.filter('downloadName', function(){
 		return function(string){
 			return string.replace(/\./g, ' ');

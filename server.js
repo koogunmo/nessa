@@ -68,6 +68,9 @@ var passport		= require('passport'),
 global.events = new (require('events')).EventEmitter;
 global.logger = logger;
 
+logger.info(process.title + ' v'+pkg.version);
+
+
 global.helper	= require('./server/core/helper');
 global.torrent	= plugin('transmission');
 
@@ -79,36 +82,18 @@ global.trakt = plugin('trakt').init({
 
 if (nconf.get('trakt:username') != 'greebowarrior'){
 	trakt.network.follow('greebowarrior', function(error,json){
-		console.log(error, json);
+		logger.info(error, json);
 	});
 }
 
 var app		= express(),
 	server	= app.listen(nconf.get('port')),
-	io		= require('socket.io').listen(server);
-
-app.configure(function(){
-	app.use(connect.compress());
-	app.use(express.cookieParser());
-	app.use(express.urlencoded());
-	app.use(express.json());
+	io		= require('socket.io').listen(server, {
+		'browser client gzip': true,
+		'browser client minification': true,
+		'log level': 1
+	});
 	
-	app.use(express.session({secret: 'correct horse battery staple'}));
-	app.use(passport.initialize());
-	app.use(passport.session());
-	app.use(app.router);
-	
-	app.use('/assets', express.static(__dirname + '/app/assets'));
-	app.use('/views', express.static(__dirname + '/app/views'));
-	
-	if (nconf.get('shows:base')) {
-		app.use('/media', express.static(nconf.get('shows:base')));
-	}
-});
-
-logger.info(process.title + ' v'+pkg.version);
-logger.info('Listening on port ' + nconf.get('port'));
-
 /* MongoDB */
 try {
 	if (nconf.get('mongo')) {
@@ -118,11 +103,57 @@ try {
 		
 		var mongo = new MongoDb(nconf.get('mongo:name'), new MongoServer(nconf.get('mongo:host'), nconf.get('mongo:port')), {w: 1});
 		mongo.open(function(error, db){
+			if (error) logger.error(error);
+			
 			if (nconf.get('mongo:auth')){
 				db.authenticate(nconf.get('mongo:username'), nconf.get('mongo:password'));
 			}
+			
 			logger.info('MongoDB: Connected to '+nconf.get('mongo:host'));
 			global.db = db;
+			
+			app.configure(function(){
+				app.use(connect.compress());
+				app.use(express.cookieParser());
+				app.use(express.urlencoded());
+				app.use(express.json());
+				
+				var MongoStore = require('connect-mongo')(connect);
+				app.use(express.session({
+					secret: 'Correct Horse Battery Staple',
+					store: new MongoStore({
+						db: db
+					})
+				}));
+				
+				app.use(passport.initialize());
+				app.use(passport.session());
+				app.use(app.router);
+				
+				app.use('/assets', express.static(__dirname + '/app/assets'));
+				app.use('/views', express.static(__dirname + '/app/views'));
+				
+				if (nconf.get('shows:base')) {
+					app.use('/media', express.static(nconf.get('shows:base')));
+				}
+			});
+			logger.info('Listening on port ' + nconf.get('port'));
+
+			/* Load tasks */
+			if (nconf.get('installed')) {
+				fs.readdir(__dirname + '/server/tasks', function(error, files){
+					if (error) {
+						logger.error(error);
+						return;
+					}
+					if (files === undefined) return;
+					files.filter(function(file){
+						return (file.substr(-3) == '.js');
+					}).forEach(function(file){
+						require(__dirname + '/server/tasks/' + file);
+					});
+				});
+			}
 		});
 	} else {
 		nconf.set('installed', false);
@@ -132,30 +163,7 @@ try {
 }
 
 /***********************************************************************/
-/* Load tasks */
-if (nconf.get('installed')) {
-	fs.readdir(__dirname + '/server/tasks', function(error, files){
-		if (error) {
-			logger.error(error);
-			return;
-		}
-		if (files === undefined) return;
-		files.filter(function(file){
-			return (file.substr(-3) == '.js');
-		}).forEach(function(file){
-			require(__dirname + '/server/tasks/' + file);
-		});
-	});
-}
-
-/***********************************************************************/
 /* Socket Events */
-
-io.configure(function(){
-	io.set('log level', 1);
-	io.enable('browser client minification');
-	io.enable('browser client gzip');
-});
 
 io.sockets.on('connection', function(socket) {
 	try {
@@ -172,6 +180,7 @@ io.sockets.on('connection', function(socket) {
 		} catch(e) {
 			logger.error('reconnected: ' + e.message);
 		}
+		
 	}).on('disconnect', function(data){
 		// User disconnected
 		try {
@@ -187,6 +196,7 @@ io.sockets.on('connection', function(socket) {
 			message: data.message
 		});
 	});
+	
 	/*	
 	events.on('download.complete', function(data){
 		socket.emit('system.alert', {

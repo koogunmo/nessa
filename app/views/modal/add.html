@@ -1,0 +1,27 @@
+<div id="add-modal" class="modal" role="dialog" ng-controller="searchCtrl" ng-cloak>
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<form ng-submit="save()">
+				<div class="modal-header">
+					<span class="input-group">
+						<input type="text" list="shows-available" class="form-control search" autofocus="true" placeholder="Type to search" ng-model="query" ng-change="search()" />
+						<span class="input-group-addon" ng-click="reset()">&times;</span>
+					</span>
+				</div>
+				<div class="modal-body" ng-show="results">
+					<div class="results">
+						<div class="result" ng-repeat="result in results" ng-class="{selected: $parent.selected==result.tvdb_id}" ng-click="$parent.selected=result.tvdb_id">
+							<img ng-src="{{result.images.poster | traktPoster}}" />
+							<strong>{{result.title}}</strong>
+							<p class="synopsis">{{result.overview || 'No synopsis available'}}</p>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-success" ng-show="selected">Add Show</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>

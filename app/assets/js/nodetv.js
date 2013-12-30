@@ -233,7 +233,9 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 			$location.search('tvdb', tvdb)
 			socket.emit('show.summary', tvdb);
 		};
+		
 		$scope.add = function(){
+			
 			if (!$('.modal-open').length) {
 				$('#add-modal').modal();
 			}
@@ -278,20 +280,18 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 	});
 	
 	nessa.controller('showCtrl', function($scope, socket){
-		$scope.detail = {}
-		
-		$scope.summary = {};
-		$scope.listing = {};
-		
 		socket.on('show.summary', function(json){
+			
 			$scope.detail = json;
 			
 			$scope.summary = json.summary;
 			$scope.listing = json.listing;
 			
-			setTimeout(function(){
-				if (!$('.modal-open').length) $('#show-modal').modal();
-			}, 100);
+			if (!$('.modal-open').length) {
+				$('#show-modal').modal({
+				//	remote: 'views/modal/show.html'
+				});
+			}
 		});
 		
 		$scope.rescan = function(){
