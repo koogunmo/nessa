@@ -1,6 +1,8 @@
 /***********************************************************************/
 /* Global Methods */
 
+global.logger = logger = require('log4js').getLogger();
+
 var pkg = require('./package.json');
 
 global.plugin = function(name){
@@ -57,16 +59,16 @@ if (process.title) process.title = 'NodeTV';
 var connect	= require('connect'),
 	express	= require('express'),
 	fs		= require('fs'),
-	logger	= require('log4js').getLogger(),
 	path	= require('path'),
 	uuid	= require('node-uuid');
+
+
 
 var passport		= require('passport'),
 	LocalStrategy	= require('passport-local').Strategy;
 
 /* Global methods */
 global.events = new (require('events')).EventEmitter;
-global.logger = logger;
 
 logger.info(process.title + ' v'+pkg.version);
 

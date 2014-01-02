@@ -155,6 +155,9 @@ input[type="search"], input.search {
 	cursor: pointer;
 	margin-left: 20px;
 }
+#seasons .season .episode.unaired .title {
+	color: #CCCCCC;
+}
 #seasons .season .episode .title > .small {
 	padding-right: 8px;
 	margin-left: -20px;
@@ -166,8 +169,14 @@ input[type="search"], input.search {
 #seasons .season .episode .extended .tools {
 	font-size: 16px;
 	height: 22px;
+	margin-left: 10px;
 	text-align: left;
 }
+#seasons .season .episode.unaired .extended .tools {
+	font-size: 14px;
+	text-align: right;
+}
+
 #seasons .season .episode .extended .tools > span {
 	display: inline-block;
 	margin-left: 10px;
@@ -184,6 +193,7 @@ input[type="search"], input.search {
 	border-bottom: 1px solid #EEEEEE;
 }
 #downloads .download h4 {
+	height: 20px;
 	margin-right: 60px;
 	overflow: hidden;
 	text-overflow: ellipsis;

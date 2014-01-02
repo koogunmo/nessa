@@ -198,7 +198,6 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 	});
 	
 	nessa.controller('showsCtrl', function($scope, $location, socket){
-		
 		$scope.$on('$routeChangeSuccess', function(){
 			if ($location.search().tvdb) {
 				$scope.details($location.search().tvdb);
@@ -224,9 +223,7 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 		socket.emit('shows.list');
 		socket.on('shows.list', function(data){
 			$scope.shows = data;
-			setTimeout(function(){
-				$(document).trigger('lazyload');
-			}, 250);
+			$(document).trigger('lazyload');
 		});
 		
 		$scope.details = function(tvdb){
@@ -372,19 +369,36 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 	// Bootstrap to document
 	angular.bootstrap(document, ['nessa'])
 	
+	
 	// jQuery below
+	
+	$(window).on('orientationchange resize scroll', function(){
+		$(document).trigger('lazyload');
+	});
+	
+	$(document).on('keyup', '#shows input.search', function(){
+		console.log('cunt');
+		$(document).trigger('lazyload');
+	});
+	
 	$(document).on('lazyload', function(){
-		$('div.image:visible img[data-src]').each(function(){
-				if ($(this).attr('src')) return;
-			$(this).on('load', function(){
-				$(this).fadeIn();
-			}).attr({
-				src: $(this).data('src')
-			});
-		});
-	}).on('click', '#dashboard .latest', function(){
-		$('.synopsis', this).slideToggle();
+		if ($(window).width() < 750) return;
+		var height	= $(window).height();
+		var top		= $(window).scrollTop();
 		
+		setTimeout(function(){
+			$('div.image img[data-src]').one('load', function(){
+				$(this).fadeIn();
+			}).each(function(){
+				if ($(this).attr('src')) return;
+				var offset = $(this).parents('div.image').offset()
+				if (offset.top < height+top) {
+					$(this).attr({
+						src: $(this).data('src')
+					});
+				}
+			});
+		}, 100);
 	});
 	
 	var resizeModal = function(){

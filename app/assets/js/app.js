@@ -31,19 +31,20 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute'], functi
 		};
 	}).run(function($rootScope, $location){
 		$rootScope.location = $location;
-		
 	});
-		
+	
 	app.filter('downloadName', function(){
 		return function(string){
 			return string.replace(/\./g, ' ');
 		}
 	});
+	
 	app.filter('traktPoster', function(){
 		return function(string){
-			return string.replace('.jpg', '-138.jpg');
+			return string.replace(/\.jpg$/ig, '-138.jpg');
 		}
 	});
+	
 	app.filter('zeroPad', function(){
 		return function(n, l){
 			if (!l) l = 2;
