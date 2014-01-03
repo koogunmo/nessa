@@ -16,13 +16,10 @@
 		</ul>
 	</div>
 	-->
-	
-	<form class="" role="search">
-		<div class="form-group">
-			<label for=""></label>
-			<input type="text" class="form-control" placeholder="Search" ng-model="search.name">
-		</div>
-	</form>
+	<div class="form-group">
+		<label for=""></label>
+		<input type="text" class="form-control" placeholder="Filter downloads" ng-model="search.name">
+	</div>
 	
 	<div class="download" ng-repeat="download in downloads | orderBy:predicate:reverse | filter:search">
 		<button class="btn btn-xs btn-danger pull-right" ng-click="remove(download.id);">Remove</button>

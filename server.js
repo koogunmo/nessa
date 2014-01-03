@@ -231,7 +231,8 @@ io.sockets.on('connection', function(socket) {
 				}
 				socket.emit('system.alert', {
 					type: 'success',
-					message: 'Settings saved'
+					message: 'Settings saved',
+					autoClose: 2500
 				});
 				// Update media path
 				app.use('/media', express.static(nconf.get('shows:base')));
@@ -251,7 +252,8 @@ io.sockets.on('connection', function(socket) {
 		shows.getLatest();
 		socket.emit('system.alert', {
 			type: 'info',
-			message: 'Checking for new downloads'
+			message: 'Checking for new downloads',
+			autoClose: 2500
 		});
 		
 	}).on('system.listings', function(){
@@ -270,7 +272,8 @@ io.sockets.on('connection', function(socket) {
 	}).on('system.rescan', function(){
 		socket.emit('system.alert', {
 			type: 'info',
-			message: 'Rescanning media directory'
+			message: 'Rescanning media directory',
+			autoClose: 2500
 		});
 		
 		var scanner = plugin('scanner');
@@ -333,7 +336,8 @@ io.sockets.on('connection', function(socket) {
 			if (!error) {
 				socket.emit('system.alert', {
 					type: 'success',
-					message: 'Torrent successfully deleted'
+					message: 'Torrent successfully deleted',
+					autoClose: 2500
 				});
 				torrent.list(function(error, data){
 					if (error) return;
@@ -398,7 +402,8 @@ io.sockets.on('connection', function(socket) {
 			} else {
 				socket.emit('system.alert', {
 					type: 'success',
-					message: 'Show settings updated'
+					message: 'Show settings updated',
+					autoClose: 2500
 				});
 			}
 		});
@@ -414,7 +419,8 @@ io.sockets.on('connection', function(socket) {
 			});
 			socket.emit('system.alert', {
 				type: 'success',
-				message: 'Show added'
+				message: 'Show added',
+				autoClose: 2500
 			});
 			socket.emit('show.added', {tvdb: tvdb});
 		});
@@ -423,7 +429,8 @@ io.sockets.on('connection', function(socket) {
 		shows.remove(tvdb, function(error, response){
 			socket.emit('system.alert', {
 				type: 'success',
-				message: 'Show removed'
+				message: 'Show removed',
+				autoClose: 2500
 			});
 			shows.list(function(error, results){
 				socket.emit('shows.list', results);
@@ -437,7 +444,8 @@ io.sockets.on('connection', function(socket) {
 		scanner.episodes(tvdb);
 		socket.emit('system.alert', {
 			type: 'info',
-			message: 'Show rescan in progress'
+			message: 'Show rescan in progress',
+			autoClose: 2500
 		});
 		
 	}).on('show.update', function(tvdb){

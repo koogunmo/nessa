@@ -135,9 +135,11 @@ input[type="search"], input.search {
 	cursor: pointer;
 	padding: 10px;
 }
-
 .modal-show .modal-header {
 	padding: 0px;
+}
+.modal-show .modal-footer {
+	margin-top: 0px;
 }
 .modal-show .nav {
 	margin-bottom: 10px;

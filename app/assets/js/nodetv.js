@@ -5,10 +5,12 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 		$scope.alerts = [];
 		socket.on('system.alert', function(alert){
 			$scope.alerts.push(alert);
-			setTimeout(function(){
-				$scope.closeAlert(0);
-				$scope.$apply();
-			}, 3500);
+			if (alert.autoClose) {
+				setTimeout(function(){
+					$scope.closeAlert($scope.alerts.length-1);
+					$scope.$apply();
+				}, alert.autoClose);
+			}
 		});
 		$scope.closeAlert = function(index){
 			$scope.alerts.splice(index, 1);
@@ -25,14 +27,16 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 			}).success(function(user){
 				$window.history.back();
 			}).error(function(){
-				// alert
+				socket.emit('system.alert', {
+					type: 'danger',
+					message: 'Incorrect login details'
+				});
 				$location.url('/login');
 			});
 		};
 	});
 	
 	nessa.controller('navCtrl', function($scope, $rootScope, $location){
-		
 		$scope.menu = [{
 			path: 'dashboard',
 			name: 'Dashboard'
@@ -46,30 +50,9 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 			path: 'settings',
 			name: 'Settings'
 		}];
-		
 		$scope.isActive = function(viewLocation){
 			return viewLocation === $location.path();
 		};
-		
-		$scope.$on('$locationStartChange', function(a,b,c){
-			console.log(a,b,c);
-		});
-		/*
-		$rootScope.$on('$routeChangeStart', function(e, next, current){
-			
-			console.log(e, next, current);
-			
-		//	return false;
-			
-			e.preventDefault();
-			
-			
-			
-		//	
-			
-		//	$('.modal.in').modal('close');
-		});
-		*/
 	});
 	
 	// Section-specific controllers
@@ -96,6 +79,9 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 			$scope.downloads = data;
 		});
 		
+		$scope.progress = function(){
+			
+		};
 		$scope.pause = function(id){
 			socket.emit('download.pause', {id: id});
 		};
@@ -216,7 +202,6 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 		$scope.add = function(){
 			if (opened) return;
 			opened = true;
-			
 			modal = $modal.open({
 				templateUrl: '/views/modal/add.html',
 				controller: 'searchCtrl',
@@ -272,47 +257,34 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 	});
 	
 	nessa.controller('searchCtrl', function($scope, $modalInstance, socket){
-		/* fix this bastard */
-		$scope.query = null;
-		
-		socket.on('shows.search', function(data){
-			$scope.results = data;
+		$scope.search = {
+			query: ''
+		};
+		socket.on('shows.search', function(results){
+			$scope.results = results;
 		});
-		
 		socket.on('show.added', function(){
 			socket.emit('shows.enabled');
 		});
-		
 		$scope.close = function(){
 			$modalInstance.close();
 		};
-		
 		$scope.save = function(){
 			socket.emit('show.add', $scope.selected);
 			$modalInstance.close();
 		};
-		
-	//	var delaySearch = null;
-		$scope.$watch('query', function(){
-			
-			console.log('Search: ' + $scope.query);
-			return;
-			
-			/*
+		var delaySearch = null;
+		$scope.$watch('search.query', function(){
 			clearTimeout(delaySearch);
 			$scope.results = [];
-			if ($scope.query.length >= 4) {
+			if ($scope.search.query.length >= 4) {
 				delaySearch = setTimeout(function(){
-					socket.emit('shows.search', $scope.query);
+					socket.emit('shows.search', $scope.search.query);
 				}, 500);
 			}
-			*/
 		});
-		
 		$scope.reset = function(){
-			$scope.query	= null;
-			$scope.results	= [];
-			$scope.selected = false;
+			$scope.search.query = null;
 		};
 	});
 	
