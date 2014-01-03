@@ -1,7 +1,6 @@
 "use strict";
 
 require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
-	
 	nessa.controller('alertsCtrl', function($scope, socket){
 		$scope.alerts = [];
 		socket.on('system.alert', function(alert){
@@ -197,67 +196,109 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 		};
 	});
 	
-	nessa.controller('showsCtrl', function($scope, $location, socket){
-		$scope.$on('$routeChangeSuccess', function(){
-			if ($location.search().tvdb) {
-				$scope.details($location.search().tvdb);
-			} else {
-				// How can we close the modal?
-			}
-		});
-		$scope.$on('$routeUpdate', function(){
-			if ($location.search().tvdb) {
-				$scope.details($location.search().tvdb);
-			} else {
-				// How can we close the modal?
-			}
-		});
+	nessa.controller('showsCtrl', function($scope, $modal, $location, socket){
 		
-		$(document).on('hidden.bs.modal', function(){
-			$scope.$apply(function(){
-				$location.search('tvdb', null);
-			});
-		});
+		var modal	= false;
+		var opened	= false;
+		
+		var routeChange = function(){
+			if ($location.search().tvdb) {
+				$scope.view($location.search().tvdb);
+			} else {
+				if (opened) modal.close('navigation');
+			}
+		};
+		$scope.$on('$routeChangeSuccess', routeChange)
+		$scope.$on('$routeUpdate', routeChange);
 		
 		$scope.shows	= [];
-		socket.emit('shows.list');
-		socket.on('shows.list', function(data){
-			$scope.shows = data;
-			$(document).trigger('lazyload');
-		});
 		
-		$scope.details = function(tvdb){
-			$location.search('tvdb', tvdb)
+		$scope.add = function(){
+			if (opened) return;
+			opened = true;
+			
+			modal = $modal.open({
+				templateUrl: '/views/modal/add.html',
+				controller: 'searchCtrl',
+				windowClass: 'modal-add'
+			});
+			modal.opened.then(function(){
+				opened = true;
+			});
+			modal.result.then(function(){
+				opened = false;
+			});
+		};
+		
+		$scope.view = function(tvdb){
+			if (opened) return;
+			opened = true;
 			socket.emit('show.summary', tvdb);
 		};
 		
-		$scope.add = function(){
-			
-			if (!$('.modal-open').length) {
-				$('#add-modal').modal();
-			}
-		};
+		/* Open modal window containing show information */
+		socket.on('show.summary', function(json){
+			modal = $modal.open({
+				templateUrl: '/views/modal/show.html',
+				controller: 'showCtrl',
+				backdrop: 'static',
+				keyboard: false,
+				windowClass: 'modal-show',
+				resolve: {
+					summary: function(){
+						return json.summary;
+					},
+					listing: function(){
+						return json.listing;
+					}
+				}
+			});
+			modal.opened.then(function(){
+				$location.search('tvdb', json.summary.tvdb);
+				opened = true;
+			});
+			modal.result.then(function(result){
+				$location.search('tvdb', null);
+				opened = false;
+			});
+		});
+		
+		/* Retrieve shows list */
+		socket.emit('shows.list');
+		socket.on('shows.list', function(shows){
+			$scope.shows = shows;
+			$(document).trigger('lazyload');
+		});
 	});
 	
-	nessa.controller('searchCtrl', function($scope, socket){
-		$scope.query	= null;
-		$scope.results	= [];
-		$scope.selected = false;
+	nessa.controller('searchCtrl', function($scope, $modalInstance, socket){
+		/* fix this bastard */
+		$scope.query = null;
 		
 		socket.on('shows.search', function(data){
 			$scope.results = data;
 		});
+		
 		socket.on('show.added', function(){
 			socket.emit('shows.enabled');
 		});
-		$scope.save = function(){
-			socket.emit('show.add', $scope.selected);
-			$scope.selected = false;
-			$('#add-modal').modal('close');
+		
+		$scope.close = function(){
+			$modalInstance.close();
 		};
 		
-		var delaySearch = null;
-		$scope.search = function(){
+		$scope.save = function(){
+			socket.emit('show.add', $scope.selected);
+			$modalInstance.close();
+		};
+		
+	//	var delaySearch = null;
+		$scope.$watch('query', function(){
+			
+			console.log('Search: ' + $scope.query);
+			return;
+			
+			/*
 			clearTimeout(delaySearch);
 			$scope.results = [];
 			if ($scope.query.length >= 4) {
@@ -265,61 +306,58 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 					socket.emit('shows.search', $scope.query);
 				}, 500);
 			}
-		};
+			*/
+		});
 		
 		$scope.reset = function(){
 			$scope.query	= null;
 			$scope.results	= [];
 			$scope.selected = false;
 		};
-		
-		$(document).on('hidden.bs.modal', '#add-modal', $scope.reset);
 	});
 	
-	nessa.controller('showCtrl', function($scope, socket){
-		socket.on('show.summary', function(json){
-			
-			$scope.detail = json;
-			
-			$scope.summary = json.summary;
-			$scope.listing = json.listing;
-			
-			if (!$('.modal-open').length) {
-				$('#show-modal').modal({
-				//	remote: 'views/modal/show.html'
-				});
-			}
-		});
+	nessa.controller('showCtrl', function($scope, $modalInstance, socket, summary, listing){
+		$scope.summary = summary;
+		$scope.listing = listing;
 		
+		$scope.close = function(){
+			$modalInstance.close();
+		};
 		$scope.rescan = function(){
 			socket.emit('show.rescan', $scope.summary.tvdb);
 		};
 		$scope.remove = function(){
 			if (confirm('Are you sure you want to remove this show?')) {
 				socket.emit('show.remove', $scope.summary.tvdb);
-				$('#show-modal').modal('close')
+				$modalInstance.close();
 			}
 		};
 		$scope.save = function(){
-			socket.emit('show.settings', $scope.detail.summary);
+			socket.emit('show.settings', $scope.summary);
+			$modalInstance.close();
 		};
 		$scope.update = function(){
-			socket.emit('show.update', $scope.summary.tvdb, function(){
-		//		socket.emit('show.overview', $scope.summary.tvdb);
-			});
+			socket.emit('show.update', $scope.summary.tvdb);
 		};
 		$scope.watched = function(){
 		//	socket.emit('show.watched', {tvdb: $scope.summary.tvdb});
 		};
-		
-	//	$(document).on('hidden.bs.modal', '#show-modal', $scope.reset);
 	});
 	
 	nessa.controller('seasonCtrl', function($scope, socket){
 		$scope.seen = true;
+		
 		angular.forEach($scope.$parent.season.episodes, function(v,k){
 			if (!v.watched) $scope.seen = false;
 		});
+		
+		$scope.display = function(){
+			if ($scope.season.season == 0) {
+				return 'Specials';
+			} else {
+				return 'Season '+$scope.season.season;
+			}
+		};
 		
 		$scope.watched = function(){
 			$scope.seen = true;
@@ -377,7 +415,6 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 	});
 	
 	$(document).on('keyup', '#shows input.search', function(){
-		console.log('cunt');
 		$(document).trigger('lazyload');
 	});
 	
@@ -400,19 +437,6 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 			});
 		}, 100);
 	});
-	
-	var resizeModal = function(){
-		$('.modal').each(function(){
-			var headers = 80 + $('.modal-header', this).height() + $('.modal-footer', this).height();
-			$('.modal-body').css({
-				'max-height': $(window).height() - headers
-			})
-		})
-	};
-	
-	$(document).on('shown.bs.modal', '.modal', resizeModal);
-	$(window).on('resize orientationchange', resizeModal);
-	
 	
 	$(document).on('click', '.episode .title', function(){
 		var parent = $(this).parent();

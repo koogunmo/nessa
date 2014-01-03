@@ -9,6 +9,9 @@ body {
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
 	display: none !important;
 }
+.nav, .pagination, .carousel a {
+	cursor: pointer;
+}
 
 .navbar-inverse {
 	background-color: rgba(0,0,0,0.9);
@@ -88,10 +91,10 @@ input[type="search"], input.search {
 
 /* Shows */
 
-#add-modal .modal-header {
+.modal-add .modal-header {
 	border-bottom: none;
 }
-#add-modal .result {
+.modal-add .result {
 	border-bottom: 1px solid #EEEEEE;
 	box-sizing: border-box;
 	cursor: pointer;
@@ -100,22 +103,19 @@ input[type="search"], input.search {
 	padding: 5px;
 	position: relative;
 }
-#add-modal .result:last-child {
+.modal-add .result:last-child {
 	border-bottom: none;
 }
-
-#add-modal .result.selected {
+.modal-add .result.selected {
 	background-color: #DFF0D8;
 }
-
-#add-modal .result img {
+.modal-add .result img {
 	float: left;
 	height: 90px;
 	margin-right: 5px;
 	width: 61px;
 }
-
-#add-modal .result .synopsis {
+.modal-add .result .synopsis {
 	font-size: 12px;
 	max-height: 69px;
 	overflow: hidden;
@@ -136,56 +136,55 @@ input[type="search"], input.search {
 	padding: 10px;
 }
 
-#show-modal .modal-header {
+.modal-show .modal-header {
 	padding: 0px;
 }
-
-#seasons .panel-heading {
+.modal-show .nav {
+	margin-bottom: 10px;
+}
+.modal-show #seasons .panel-heading {
 	cursor: pointer;
 }
-
-
-#seasons .season .episode {
+.modal-show #seasons .season .episode {
 	border-bottom: 1px solid #EEEEEE;
 }
-#seasons .season .episode:last-child {
+.modal-show #seasons .season .episode:last-child {
 	border-bottom: none;
 }
-#seasons .season .episode .title {
+.modal-show #seasons .season .episode .title {
 	cursor: pointer;
 	margin-left: 20px;
 }
-#seasons .season .episode.unaired .title {
+.modal-show #seasons .season .episode.unaired .title {
 	color: #CCCCCC;
 }
-#seasons .season .episode .title > .small {
+.modal-show #seasons .season .episode .title > .small {
 	padding-right: 8px;
 	margin-left: -20px;
 }
-#seasons .season .episode .extended {
+.modal-show #seasons .season .episode .extended {
 	display: none;
 	padding-bottom: 10px;
 }
-#seasons .season .episode .extended .tools {
+.modal-show #seasons .season .episode .extended .tools {
 	font-size: 16px;
 	height: 22px;
 	margin-left: 10px;
 	text-align: left;
 }
-#seasons .season .episode.unaired .extended .tools {
+.modal-show #seasons .season .episode.unaired .extended .tools {
 	font-size: 14px;
 	text-align: right;
 }
 
-#seasons .season .episode .extended .tools > span {
+.modal-show #seasons .season .episode .extended .tools > span {
 	display: inline-block;
 	margin-left: 10px;
 }
-#seasons .season .episode .extended .tools > span.action {
+.modal-show #seasons .season .episode .extended .tools > span.action {
 	cursor: pointer;
 	float: right;
 }
-
 
 /* Downloads */
 

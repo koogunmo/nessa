@@ -1,8 +1,8 @@
 "use strict";
 
-define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute'], function(angular,io){
+define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute', 'ui.bootstrap'], function(angular,io){
 
-	var app = angular.module('nessa', ['ngCookies','ngResource','ngRoute']);
+	var app = angular.module('nessa', ['ngCookies','ngResource','ngRoute','ui.bootstrap']);
 	
 	app.factory('socket', function($rootScope) {
 		var port = (window.location.port) ? window.location.port : 80;
@@ -58,7 +58,6 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute'], functi
 		}
 	});
 	
-	
 	app.filter('bytes', function() {
 		return function(bytes, precision) {
 			if (isNaN(parseFloat(bytes)) || !isFinite(bytes)) return '0';
@@ -71,6 +70,9 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute'], functi
 	});
 	
 	app.config(function($routeProvider, $locationProvider, $httpProvider){
+		
+		$locationProvider.html5Mode(true).hashPrefix('!');
+		
 		var checkInstalled = function($q, $timeout, $http, $location, $rootScope){
 			// Initialize a new promise
 			var deferred = $q.defer();
@@ -122,41 +124,41 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute'], functi
 		});
 		
 		$routeProvider.when('/login', {
-			templateUrl: 'views/partials/login.html',
+			templateUrl: '/views/partials/login.html',
 			controller: 'loginCtrl'
 			
 		}).when('/dashboard', {
-			templateUrl: 'views/partials/dashboard.html',
+			templateUrl: '/views/partials/dashboard.html',
 			controller: 'homeCtrl'
 			
 		}).when('/downloads', {
-			templateUrl: 'views/partials/downloads.html',
+			templateUrl: '/views/partials/downloads.html',
 			controller: 'downloadCtrl',
 			resolve: {
 				loggedin: checkLoggedin
 			}
 			
 		}).when('/shows/:tvdb?', {
-			templateUrl: 'views/partials/shows.html',
+			templateUrl: '/views/partials/shows.html',
 			controller: 'showsCtrl',
 			reloadOnSearch: false
 			
 		}).when('/match', {
-			templateUrl: 'views/partials/match.html',
+			templateUrl: '/views/partials/match.html',
 			controller: 'matchCtrl',
 			resolve: {
 				loggedin: checkLoggedin
 			}
 			
 		}).when('/settings', {
-			templateUrl: 'views/partials/settings.html',
+			templateUrl: '/views/partials/settings.html',
 			controller: 'settingsCtrl',
 			resolve: {
 				loggedin: checkLoggedin
 			}
 			
 		}).when('/install', {
-			templateUrl: 'views/partials/install.html',
+			templateUrl: '/views/partials/install.html',
 			controller: 'installCtrl',
 			
 		}).otherwise({

@@ -133,11 +133,16 @@ try {
 				app.use(app.router);
 				
 				app.use('/assets', express.static(__dirname + '/app/assets'));
+				app.use('/template', express.static(__dirname + '/app/views/ui'));
 				app.use('/views', express.static(__dirname + '/app/views'));
 				
 				if (nconf.get('shows:base')) {
 					app.use('/media', express.static(nconf.get('shows:base')));
 				}
+				
+				app.use(function(req, res) {	
+					res.sendfile(__dirname + '/app/views/index.html');
+				});
 			});
 			logger.info('Listening on port ' + nconf.get('port'));
 
@@ -583,6 +588,8 @@ app.post('/logout', function(req,res){
 	req.logOut();
 	res.send(200);
 });
+
+
 
 /*
 setTimeout(function(){

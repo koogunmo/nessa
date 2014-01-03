@@ -11,7 +11,7 @@
 			<div class="image"></div>
 			<div>Add Show</div>
 		</div>
-		<div class="show col-sm-2" ng-repeat="show in shows | orderBy:'name' | filter:filter" ng-click="details(show.tvdb)">
+		<div class="show col-sm-2" ng-repeat="show in shows | orderBy:'name' | filter:filter" ng-click="view(show.tvdb)">
 			<div class="image">
 				<img data-src="/media/{{show.directory}}/poster.jpg" alt="" class="img-responsive" />
 			</div>
@@ -19,6 +19,3 @@
 		</div>
 	</div>
 </div>
-
-<ng-include src="'views/modal/add.html'"></ng-include>
-<ng-include src="'views/modal/show.html'"></ng-include>

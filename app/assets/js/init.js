@@ -2,8 +2,9 @@
 
 requirejs.config({
 	paths: {
-		'app': './app',
 		'bootstrap': 'https://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min',
+		'ui.bootstrap': 'libs/ui-bootstrap.min',
+		
 		'jquery': 'https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min',
 		'angular': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.2.6/angular.min',
 		'ngCookies': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.2.6/angular-cookies.min',
@@ -30,6 +31,9 @@ requirejs.config({
 		},
 		'socket.io': {
 			exports: 'io'
+		},
+		'ui.bootstrap': {
+			deps: ['angular']
 		}
 	},
 	priority: ['jquery','angular'],
