@@ -33,6 +33,22 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute', 'ui.boo
 		$rootScope.location = $location;
 	});
 	
+	/*
+	app.directive('episode', function(){
+		return {
+			replace: false,
+			templateUrl: '/template/episode/episode.html',
+			transclude: true,
+			link: function(scope, element, attributes){
+				element.on('click', '.title', function(){
+					$(this).next('.extended').slideToggle();
+				});
+				
+			}
+		};
+	});
+	*/
+	
 	app.filter('downloadName', function(){
 		return function(string){
 			return string.replace(/\./g, ' ');

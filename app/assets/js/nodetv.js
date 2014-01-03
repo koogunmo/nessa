@@ -1,6 +1,6 @@
 "use strict";
 
-require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
+require(['jquery','socket.io','app'], function($,io,nessa){
 	nessa.controller('alertsCtrl', function($scope, socket){
 		$scope.alerts = [];
 		socket.on('system.alert', function(alert){
@@ -15,6 +15,9 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 		$scope.closeAlert = function(index){
 			$scope.alerts.splice(index, 1);
 		};
+		$scope.$on('$routeChangeSuccess', function(){
+			$scope.alerts = [];
+		})
 	});
 	
 	nessa.controller('loginCtrl', function($scope, $rootScope, $http, $location, $window){
@@ -50,6 +53,13 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 			path: 'settings',
 			name: 'Settings'
 		}];
+		
+		$scope.isCollapsed = true;
+		
+		$scope.collapse = function(){
+			$scope.isCollapsed = !$scope.isCollapsed;
+		};
+		
 		$scope.isActive = function(viewLocation){
 			return viewLocation === $location.path();
 		};
@@ -151,7 +161,7 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 			$scope.users = data;
 		});
 		
-		$scope.save = function(form){
+		$scope.save = function(){
 			socket.emit('system.settings', $scope.settings)
 		};
 		
@@ -269,10 +279,14 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 		$scope.close = function(){
 			$modalInstance.close();
 		};
+		$scope.reset = function(){
+			$scope.search.query = '';
+		};
 		$scope.save = function(){
 			socket.emit('show.add', $scope.selected);
 			$modalInstance.close();
 		};
+		
 		var delaySearch = null;
 		$scope.$watch('search.query', function(){
 			clearTimeout(delaySearch);
@@ -283,9 +297,6 @@ require(['jquery','socket.io','app','bootstrap'], function($,io,nessa){
 				}, 500);
 			}
 		});
-		$scope.reset = function(){
-			$scope.search.query = null;
-		};
 	});
 	
 	nessa.controller('showCtrl', function($scope, $modalInstance, socket, summary, listing){

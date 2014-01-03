@@ -1,14 +1,7 @@
 <div id="settings">
-	<form ng-submit="save(this)">
-		<br />
-		<ul class="nav nav-pills">
-			<li class="active"><a href="#general" data-toggle="tab">General</a></li>
-			<li><a href="#security" data-toggle="tab">Security</a></li>
-			<li><a href="#system" data-toggle="tab">System</a></li>
-		</ul>
-		<br />
-		<div class="tab-content">
-			<div class="tab-pane active" id="general">
+	<form ng-submit="save()">
+		<tabset>
+			<tab heading="General">
 				<div class="panel panel-info">
 					<div class="panel-heading">
 						<h4 class="panel-title">Media</h4>
@@ -114,9 +107,9 @@
 						</div>
 					</div>
 				</div>
-			</div>
+			</tab>
 		
-			<div class="tab-pane" id="security">
+			<tab heading="Security">
 				<div class="panel panel-info" >
 					<div class="panel-heading">
 						<h4 class="panel-title">Users</h4>
@@ -154,9 +147,9 @@
 						</div>
 					</div>
 				</div>
-			</div>
+			</tab>
 			
-			<div class="tab-pane" id="system">
+			<tab heading="System">
 				<div class="panel panel-warning">
 					<div class="panel-heading">
 						<h4 class="panel-title">Library Maintenance</h4>
@@ -191,8 +184,8 @@
 						<div class="well well-sm">NodeTV checks for system updates at 3am every night, and automatically installs if available.</div>
 					</div>
 				</div>
-			</div>
-		</div>
+			</tab>
+		</tabset>
 		
 		<div class="toolbar">
 			<button type="submit" class="btn btn-success">Save settings</button>

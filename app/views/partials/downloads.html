@@ -1,26 +1,11 @@
 <div id="downloads">
-	<div class="page-header">
-		<h3>Active Downloads</h3>
-	</div>
-	<!--
-	<div class="navbar navbar-default">
-		<ul class="nav navbar-nav">
-			<li class="dropdown">
-				<a href="#" class="dropdown-toggle" data-toggle="dropdown">Sort by <span class="caret"></span></a>
-				<ul class="dropdown-menu">
-					<li><a href="" ng-click="predicate='name';reverse=!reverse;sort='Name'">Name</a></li>
-					<li><a href="" ng-click="predicate='startDate';reverse=!reverse;sort='Age'">Age</a></li>
-					<li><a href="" ng-click="predicate='uploadRatio';reverse=!reverse;sort='Ratio'">Ratio</a></li>
-				</ul>
-			</li>
-		</ul>
-	</div>
-	-->
 	<div class="form-group">
-		<label for=""></label>
-		<input type="text" class="form-control" placeholder="Filter downloads" ng-model="search.name">
+		<label></label>
+		<div class="input-group">
+			<input type="text" class="form-control search" placeholder="Filter Downloads..." ng-model="search.name">
+			<span class="input-group-addon" ng-click="search.name=''"><span class="glyphicon glyphicon-remove"></span></span>
+		</div>
 	</div>
-	
 	<div class="download" ng-repeat="download in downloads | orderBy:predicate:reverse | filter:search">
 		<button class="btn btn-xs btn-danger pull-right" ng-click="remove(download.id);">Remove</button>
 		<h4>{{download.name}}</h4>

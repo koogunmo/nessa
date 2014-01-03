@@ -11,9 +11,9 @@
 			</tab>
 			
 			<tab heading="Episodes">
-				<!--
-				<accordion>
-					<accordion-group heading="{{display()}}" ng-repeat="season in listing | orderBy:'season':true" ng-controller="seasonCtrl">
+				
+				<accordion class="seasons">
+					<accordion-group heading="{{display()}}" class="season" ng-repeat="season in listing | orderBy:'season':true" ng-controller="seasonCtrl">
 						
 						<div class="episode" ng-repeat="episode in season.episodes | orderBy:'episode'" ng-controller="episodeCtrl" ng-class="{unaired: !hasAired()}">
 							<h5 class="title"><span class="small">{{episode.episode | zeroPad:2}}</span>{{episode.title || 'TBA'}}</h5>
@@ -38,8 +38,8 @@
 						</div>
 					</accordion-group>
 				</accordion>
-				-->
 				
+				<!--
 				<div id="seasons" class="panel-group">
 					<div class="panel panel-default" ng-repeat="season in listing | orderBy:'season':true" ng-controller="seasonCtrl">
 						<div class="panel-heading" data-toggle="collapse" data-parent="#seasons" href="#season-{{season.season}}">
@@ -50,9 +50,6 @@
 						</div>
 						<div id="season-{{season.season}}" class="season panel-collapse collapse">
 							<div class="panel-body">
-								<div>
-								<!-- Mark season as watched -->
-								</div>
 								<div class="episode" ng-repeat="episode in season.episodes | orderBy:'episode'" ng-controller="episodeCtrl" ng-class="{unaired: !hasAired()}">
 									
 									<h5 class="title"><span class="small">{{episode.episode | zeroPad:2}}</span>{{episode.title || 'TBA'}}</h5>
@@ -79,6 +76,7 @@
 						</div>
 					</div>	
 				</div>
+				-->
 			</tab>
 			<tab heading="Settings">
 				<div class="well" ng-switch on="summary.status">

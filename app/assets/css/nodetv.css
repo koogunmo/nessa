@@ -9,7 +9,7 @@ body {
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
 	display: none !important;
 }
-.nav, .pagination, .carousel a {
+.accordion-toggle, .nav, .pagination, .carousel a {
 	cursor: pointer;
 }
 
@@ -144,46 +144,46 @@ input[type="search"], input.search {
 .modal-show .nav {
 	margin-bottom: 10px;
 }
-.modal-show #seasons .panel-heading {
+.modal-show .seasons .panel-heading {
 	cursor: pointer;
 }
-.modal-show #seasons .season .episode {
+.modal-show .seasons .season .episode {
 	border-bottom: 1px solid #EEEEEE;
 }
-.modal-show #seasons .season .episode:last-child {
+.modal-show .seasons .season .episode:last-child {
 	border-bottom: none;
 }
-.modal-show #seasons .season .episode .title {
+.modal-show .seasons .season .episode .title {
 	cursor: pointer;
 	margin-left: 20px;
 }
-.modal-show #seasons .season .episode.unaired .title {
+.modal-show .seasons .season .episode.unaired .title {
 	color: #CCCCCC;
 }
-.modal-show #seasons .season .episode .title > .small {
+.modal-show .seasons .season .episode .title > .small {
 	padding-right: 8px;
 	margin-left: -20px;
 }
-.modal-show #seasons .season .episode .extended {
+.modal-show .seasons .season .episode .extended {
 	display: none;
 	padding-bottom: 10px;
 }
-.modal-show #seasons .season .episode .extended .tools {
+.modal-show .seasons .season .episode .extended .tools {
 	font-size: 16px;
 	height: 22px;
 	margin-left: 10px;
 	text-align: left;
 }
-.modal-show #seasons .season .episode.unaired .extended .tools {
+.modal-show .seasons .season .episode.unaired .extended .tools {
 	font-size: 14px;
 	text-align: right;
 }
 
-.modal-show #seasons .season .episode .extended .tools > span {
+.modal-show .seasons .season .episode .extended .tools > span {
 	display: inline-block;
 	margin-left: 10px;
 }
-.modal-show #seasons .season .episode .extended .tools > span.action {
+.modal-show .seasons .season .episode .extended .tools > span.action {
 	cursor: pointer;
 	float: right;
 }
@@ -205,6 +205,11 @@ input[type="search"], input.search {
 
 #match, #settings {
 	padding-bottom: 50px;
+}
+
+#settings .nav {
+	margin-bottom: 10px;
+	margin-top: 10px;
 }
 
 #match .toolbar,
@@ -244,7 +249,7 @@ input[type="search"], input.search {
 		width: 100%;
 		max-width: 400px;
 	}
-	#seasons .season .episode .extended .synopsis {
+	.seasons .season .episode .extended .synopsis {
 		font-size: 12px;
 	}
 }
@@ -284,7 +289,7 @@ input[type="search"], input.search {
 		display: none;
 	}
 	
-	#seasons .season .episode .extended .synopsis {
+	.seasons .season .episode .extended .synopsis {
 		margin-left: 20px;
 	}
 }
