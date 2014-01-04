@@ -32,7 +32,7 @@
 			<nav class="collapse navbar-collapse" collapse="isCollapsed">
 				<ul class="nav navbar-nav">
 					<li ng-repeat="item in menu" ng-class="{active: isActive('/'+item.path)}" ng-cloak>
-						<a href="/{{item.path}}">{{item.name}}</a>
+						<a href="/{{item.path}}" ng-click="collapse()">{{item.name}}</a>
 					</li>
 				</ul>
 			</nav>
