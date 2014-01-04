@@ -54,14 +54,17 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 			name: 'Settings'
 		}];
 		
+		$scope.isActive = function(viewLocation){
+			return viewLocation === $location.path();
+		};
+		
 		$scope.isCollapsed = true;
 		
 		$scope.collapse = function(){
-			$scope.isCollapsed = !$scope.isCollapsed;
+			$scope.isCollapsed = true;
 		};
-		
-		$scope.isActive = function(viewLocation){
-			return viewLocation === $location.path();
+		$scope.toggle = function(){
+			$scope.isCollapsed = !$scope.isCollapsed;
 		};
 	});
 	
