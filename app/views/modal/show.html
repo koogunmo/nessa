@@ -94,7 +94,7 @@
 						<label for="ipt_setting_feed">RSS Feed</label>
 						<input type="text" name="feed" ng-model="summary.feed" class="form-control" />
 					</div>
-					<div class="form-group" ng-switch-when="true">
+					<div ng-switch-when="true">
 						<input type="checkbox" name="hd" ng-model="summary.hd" ng-checked="summary.hd" />
 						<label for="ipt_setting_hd">Prefer HD video</label>
 					</div>
