@@ -9,11 +9,12 @@
 				<h4 class="panel-title">Database</h4>
 			</div>
 			<div class="panel-body">
+				<p>NodeTV uses MongoDB to store your show data.</p>
 				<div class="form-group">
-					<label for="">Host</label><input type="text" class="form-control" ng-model="settings.mongo.host" />
+					<label for="">Host</label><input type="text" class="form-control" placeholder="127.0.0.1" required="true" ng-model="settings.mongo.host" />
 				</div>
 				<div class="form-group">
-					<label for="">Port</label><input type="text" class="form-control" ng-model="settings.mongo.port" />
+					<label for="">Port</label><input type="text" class="form-control" placeholder="27017" required="true" ng-model="settings.mongo.port" />
 				</div>
 				
 				<div class="form-group">
@@ -21,10 +22,10 @@
 				</div>
 				
 				<div class="form-group" ng-if="settings.mongo.auth">
-					<label for="">Username</label><input type="text" class="form-control" ng-model="settings.mongo.username" />
+					<label for="">Username</label><input type="text" class="form-control" required="true" ng-model="settings.mongo.username" />
 				</div>
 				<div class="form-group" ng-if="settings.mongo.auth">
-					<label for="">Password</label><input type="password" class="form-control" ng-model="settings.mongo.password" />
+					<label for="">Password</label><input type="password" class="form-control" required="true" ng-model="settings.mongo.password" />
 				</div>
 			</div>
 		</div>
@@ -35,7 +36,7 @@
 			</div>
 			<div class="panel-body">
 				<div class="form-group">
-					<label for="">Media Directory</label><input type="text" class="form-control" ng-model="settings.shows.base" />
+					<label for="">Media Directory</label><input type="text" class="form-control" required="true" ng-model="settings.shows.base" />
 				</div>
 			</div>
 		</div>
@@ -45,9 +46,11 @@
 				<h4 class="panel-title">Trakt.tv</h4>
 			</div>
 			<div class="panel-body">
-				<div class="form-group"><label for="">Username</label><input type="text" class="form-control" ng-model="settings.trakt.username" /></div>
-				<div class="form-group"><label for="">Password</label><input type="password" class="form-control" ng-model="settings.trakt.password" /></div>
-				<div class="form-group"><label for="">API Key</label><input type="text" class="form-control" ng-model="settings.trakt.apikey" /></div>
+				<p>A free <a href="http://trakt.tv/join">Trakt.tv account</a> is required to retrieve show and episode information.</p>
+				<div class="form-group"><label for="">Username</label><input type="text" class="form-control" required="true" ng-model="settings.trakt.username" /></div>
+				<div class="form-group"><label for="">Password</label><input type="password" class="form-control" required="true" ng-model="settings.trakt.password" /></div>
+				<div class="form-group"><label for="">API Key</label><input type="text" class="form-control" required="true" ng-model="settings.trakt.apikey" /></div>
+				<p class="small">Your trakt.tv API key can be found <a href="http://trakt.tv/settings/api" target="_blank">here</a></p>
 			</div>
 		</div>
 		
@@ -56,8 +59,8 @@
 				<h4 class="panel-title">Transmission</h4>
 			</div>
 			<div class="panel-body">
-				<div class="form-group"><label for="">Host</label><input type="text" class="form-control" ng-model="settings.transmission.host" /></div>
-				<div class="form-group"><label for="">Port</label><input type="text" class="form-control" ng-model="settings.transmission.port" /></div>
+				<div class="form-group"><label for="">Host</label><input type="text" class="form-control" placeholder="127.0.0.1" required="required" ng-model="settings.transmission.host" /></div>
+				<div class="form-group"><label for="">Port</label><input type="text" class="form-control" placeholder="9091" required="required" ng-model="settings.transmission.port" /></div>
 				<div class="form-group">
 					<label><input type="checkbox" ng-model="settings.transmission.auth" /> Transmission requires a username and password</label>
 				</div>

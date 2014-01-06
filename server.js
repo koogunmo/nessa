@@ -82,12 +82,6 @@ global.trakt = plugin('trakt').init({
 	apikey: nconf.get('trakt:apikey')
 });
 
-if (nconf.get('trakt:username') != 'greebowarrior'){
-	trakt.network.follow('greebowarrior', function(error,json){
-		logger.info(error, json);
-	});
-}
-
 var app		= express(),
 	server	= app.listen(nconf.get('port')),
 	io		= require('socket.io').listen(server, {
@@ -95,6 +89,24 @@ var app		= express(),
 		'browser client minification': true,
 		'log level': 1
 	});
+
+app.configure(function(){
+	app.use(connect.compress());
+	app.use(express.cookieParser());
+	app.use(express.urlencoded());
+	app.use(express.json());
+	
+	app.use('/assets', express.static(__dirname + '/app/assets'));
+	app.use('/template', express.static(__dirname + '/app/views/ui'));
+	app.use('/views', express.static(__dirname + '/app/views'));
+	
+	app.use(app.router);
+	
+	app.use(function(req, res) {	
+		res.sendfile(__dirname + '/app/views/index.html');
+	});
+});
+
 	
 /* MongoDB */
 try {
@@ -114,12 +126,13 @@ try {
 			logger.info('MongoDB: Connected to '+nconf.get('mongo:host'));
 			global.db = db;
 			
+			if (nconf.get('installed') && nconf.get('trakt:username') != 'greebowarrior'){
+				trakt.network.follow('greebowarrior', function(error,json){
+					logger.info(error, json);
+				});
+			}
+			
 			app.configure(function(){
-				app.use(connect.compress());
-				app.use(express.cookieParser());
-				app.use(express.urlencoded());
-				app.use(express.json());
-				
 				var MongoStore = require('connect-mongo')(connect);
 				app.use(express.session({
 					secret: 'Correct Horse Battery Staple',
@@ -130,19 +143,10 @@ try {
 				
 				app.use(passport.initialize());
 				app.use(passport.session());
-				app.use(app.router);
-				
-				app.use('/assets', express.static(__dirname + '/app/assets'));
-				app.use('/template', express.static(__dirname + '/app/views/ui'));
-				app.use('/views', express.static(__dirname + '/app/views'));
 				
 				if (nconf.get('shows:base')) {
 					app.use('/media', express.static(nconf.get('shows:base')));
 				}
-				
-				app.use(function(req, res) {	
-					res.sendfile(__dirname + '/app/views/index.html');
-				});
 			});
 			logger.info('Listening on port ' + nconf.get('port'));
 
@@ -164,6 +168,10 @@ try {
 		});
 	} else {
 		nconf.set('installed', false);
+		logger.info('Waiting for install');
+		
+		
+		
 	}
 } catch(e){
 	logger.error(e.message);
@@ -436,6 +444,10 @@ io.sockets.on('connection', function(socket) {
 				socket.emit('shows.list', results);
 			});
 		});
+	}).on('show.filecheck', function(tvdb){
+		// check all files referenced in db actually exist
+		var shows = plugin('showdata');
+		
 	});
 	
 	// Utility
@@ -512,9 +524,6 @@ io.sockets.on('connection', function(socket) {
 			});
 		}
 	});
-	
-	/*************** Old methods to be converted ***************/
-	
 	
 	socket.on('show.episode.download', function(data){
 		var shows = plugin('showdata');
@@ -596,13 +605,3 @@ app.post('/logout', function(req,res){
 	req.logOut();
 	res.send(200);
 });
-
-
-
-/*
-setTimeout(function(){
-	var showdata = plugin('showdata');
-//	showdata.getLatest();
-//	showdata.getHashes(263724);
-}, 500);
-*/

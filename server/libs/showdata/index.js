@@ -90,6 +90,7 @@ var ShowData = {
 	},
 	
 	latest: function(callback){
+		
 		var self = this;
 		var lastweek = Math.round(new Date()/1000) - (7*24*60*60);
 		
@@ -101,21 +102,17 @@ var ShowData = {
 			file: {$exists: true},
 			airdate: {$gt: lastweek-1, $lt: Math.round(new Date()/1000)}
 		}).toArray(function(error, results){
+			
 			var count = 0;
 			results.forEach(function(result){
 				showCollection.findOne({tvdb: result.tvdb}, function(error, show){
 					var episode = result;
 					episode.show_name = show.name;
 					episode.tvdb = show.tvdb;
-					list.push(episode);
-					count++;
+					
+					if (typeof(callback) == 'function') callback(null, episode);
 				});
 			});
-			setTimeout(function(){
-				if (count == results.length) {
-					if (typeof(callback) == 'function') callback(null, list);
-				}
-			}, 100);
 		});
 	},
 	

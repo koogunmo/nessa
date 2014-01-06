@@ -110,10 +110,11 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 	nessa.controller('homeCtrl', function($scope, socket){
 		$scope.unmatched = 0;
 		$scope.upcoming = [];
+		$scope.latest = [];
 		
 		socket.emit('dashboard');
 		socket.on('dashboard.latest', function(data){
-			$scope.latest = data;
+			$scope.latest.push(data);
 		});
 		socket.on('dashboard.stats', function(data){
 			$scope.stats = data;
