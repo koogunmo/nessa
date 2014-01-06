@@ -2,24 +2,24 @@ module.exports = function(grunt){
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
 		
+		concurrent: {
+			build: ['sass'],
+			run: {
+				tasks: ['watch','nodemon'],
+				options: {
+					logConcurrentOutput: true
+				}
+			}
+		},
 		watch: {
-			compass: {
+			sass: {
 				files: ['app/assets/css/scss/*.{scss,sass}'],
 				tasks: ['sass:dev']
 			},
 		},
-		
-		compass: {
-			dev: {
-				options: {
-					sassDir: ['app/assets/css/scss'],
-					cssDir: ['app/assets/css'],
-					outputStyle: 'compressed',
-					environment: 'development'
-				}
-			}
+		nodemon: {
+			dev: {}
 		},
-		
 		sass: {
 			dev: {
 				options: {
@@ -36,9 +36,12 @@ module.exports = function(grunt){
 		}
 	});
 	
-	grunt.loadNpmTasks('grunt-contrib-watch');
+	grunt.loadNpmTasks('grunt-concurrent');
+	grunt.loadNpmTasks('grunt-nodemon');
 	grunt.loadNpmTasks('grunt-contrib-sass');
+	grunt.loadNpmTasks('grunt-contrib-watch');
 	
-	grunt.registerTask('default', ['sass','watch']);
+//	grunt.registerTask('default', ['sass','nodemon','watch']);
+	grunt.registerTask('default', ['concurrent']);
 	
 };

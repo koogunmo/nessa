@@ -101,10 +101,6 @@ app.configure(function(){
 	app.use('/views', express.static(__dirname + '/app/views'));
 	
 	app.use(app.router);
-	
-	app.use(function(req, res) {	
-		res.sendfile(__dirname + '/app/views/index.html');
-	});
 });
 
 	
@@ -147,6 +143,9 @@ try {
 				if (nconf.get('shows:base')) {
 					app.use('/media', express.static(nconf.get('shows:base')));
 				}
+				app.use(function(req, res) {	
+					res.sendfile(__dirname + '/app/views/index.html');
+				});
 			});
 			logger.info('Listening on port ' + nconf.get('port'));
 
@@ -170,8 +169,9 @@ try {
 		nconf.set('installed', false);
 		logger.info('Waiting for install');
 		
-		
-		
+		app.use(function(req, res) {	
+			res.sendfile(__dirname + '/app/views/index.html');
+		});
 	}
 } catch(e){
 	logger.error(e.message);
