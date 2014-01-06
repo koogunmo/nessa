@@ -11,14 +11,13 @@ module.exports = function(grunt){
 				}
 			}
 		},
-		watch: {
-			sass: {
-				files: ['app/assets/css/scss/*.{scss,sass}'],
-				tasks: ['sass:dev']
-			},
-		},
 		nodemon: {
 			dev: {}
+		},
+		release: {
+			options: {
+				npm: false
+			}
 		},
 		sass: {
 			dev: {
@@ -33,13 +32,20 @@ module.exports = function(grunt){
 					ext: '.min.css'
 				}]
 			}
+		},
+		watch: {
+			sass: {
+				files: ['app/assets/css/scss/*.{scss,sass}'],
+				tasks: ['sass:dev']
+			},
 		}
 	});
 	
 	grunt.loadNpmTasks('grunt-concurrent');
-	grunt.loadNpmTasks('grunt-nodemon');
 	grunt.loadNpmTasks('grunt-contrib-sass');
 	grunt.loadNpmTasks('grunt-contrib-watch');
+	grunt.loadNpmTasks('grunt-nodemon');
+	grunt.loadNpmTasks('grunt-release');
 	
 //	grunt.registerTask('default', ['sass','nodemon','watch']);
 	grunt.registerTask('default', ['concurrent']);
