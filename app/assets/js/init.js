@@ -8,7 +8,10 @@ requirejs.config({
 		'ngResource': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.2.7/angular-resource.min',
 		'ngRoute': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.2.7/angular-route.min',
 		'socket.io': 'https://cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min',
-		'ui.bootstrap': 'libs/ui-bootstrap.min'
+		'ui.bootstrap': 'libs/ui-bootstrap.min',
+		
+		'firebase': 'https://cdn.firebase.com/v0/firebase',
+		'angularfire': 'https://cdn.firebase.com/libs/angularfire/0.5.0-rc1/angularfire.min'
 	},
 	shim: {
 		'angular': {
@@ -29,6 +32,12 @@ requirejs.config({
 		},
 		'ui.bootstrap': {
 			deps: ['angular']
+		},
+		'firebase': {
+			exports: 'firebase'
+		},
+		'angularfire': {
+			deps: ['angular','firebase']
 		}
 	},
 	priority: ['jquery','angular'],

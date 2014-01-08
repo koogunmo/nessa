@@ -17,7 +17,7 @@ sudo add-apt-repository -y ppa:transmissionbt/ppa
 ## Install libraries
 
 sudo apt-get update
-sudo apt-get install -y mongodb-10gen nodejs transmission git
+sudo apt-get install -y mongodb-10gen nodejs transmission-daemon git
 sudo npm -g install nodemon forever
 
 ## Fetch NodeTV
@@ -32,10 +32,21 @@ sudo apt-get install libavcodec52 libavformat54 libavutil52 libc6 libexif12 libf
 
 # to do
 
+## Create a user and group
+
+sudo groupadd media
+sudo useradd -g media -G debian-transmission -m media
+
+sudo mkdir /home/media/Video
+sudo chown media:media /home/media/Video
+sudo chmod 0775 /home/media/Video
+
 
 ## Add Upstart script
 
 sudo cp /opt/nodetv/scripts/upstart.conf /etc/init/nodetv.conf
+sudo ln -s /lib/init/upstart-job nodetv
+sudo update-rc.d nodetv defaults
 sudo initctl reload-configuration
 
 ## Install node modules
@@ -45,7 +56,7 @@ source ~/.bash_profile
 
 chdir /opt/nodetv
 npm install
-npm link npm
+sudo npm link npm
 
 ## Start NodeTV
 

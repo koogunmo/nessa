@@ -39,17 +39,6 @@ if (process.cwd() != __dirname) {
 	}
 }
 
-/* Change ownership of the process */
-if (process.getuid) {
-	try {
-		if (nconf.get('run:group')) process.setgid(nconf.get('run:group'));
-		if (nconf.get('run:user')) process.setuid(nconf.get('run:user'));
-		process.env['HOME'] = process.cwd();
-	} catch(e) {
-		console.warn(e.message);
-	}
-}
-
 /* Set a friendly process name */
 if (process.title) process.title = 'NodeTV';
 
@@ -89,6 +78,19 @@ var app		= express(),
 		'browser client minification': true,
 		'log level': 1
 	});
+	
+/* Change ownership of the process */
+/* Doing it here allows us to run NodeTV on port 80, if required */
+if (process.getuid) {
+	try {
+		if (nconf.get('run:group')) process.setgid(nconf.get('run:group'));
+		if (nconf.get('run:user')) process.setuid(nconf.get('run:user'));
+		process.env['HOME'] = process.cwd();
+	} catch(e) {
+		console.warn(e.message);
+	}
+}
+
 
 app.configure(function(){
 	app.use(connect.compress());
