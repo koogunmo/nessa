@@ -157,6 +157,14 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute', 'ui.boo
 				loggedin: checkLoggedin
 			}
 			
+		}).when('/movies', {
+			templateUrl: '/views/partials/movies.html',
+			controller: 'moviesCtrl',
+			reloadOnSearch: false,
+			resolve: {
+				loggedin: checkLoggedin
+			}
+			
 		}).when('/shows', {
 			templateUrl: '/views/partials/shows.html',
 			controller: 'showsCtrl',

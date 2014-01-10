@@ -276,10 +276,6 @@ input.ng-invalid {
 			max-width: 400px;
 		}
 	}
-	modal-show .seasons
-	.seasons .season .episode .extended .synopsis {
-		font-size: 12px;
-	}
 }
 
 @media screen and (min-width: 768px) {
@@ -288,34 +284,33 @@ input.ng-invalid {
 		margin-right: 10px;
 		width: 120px;
 	}
-	
-	#shows .show {
-		border: none;
-		height: 160px;
-		padding: 10px 0px 0px;
-		text-align: center;
+	#shows {
+		.show {
+			border: none;
+			height: 160px;
+			padding: 10px 0px 0px;
+			text-align: center;
+			div.image {
+				background-color: #666666;
+				background-image: url('../gfx/no-cover.png');
+				background-position: center center;
+				background-repeat: no-repeat;
+				background-size: contain;
+				box-shadow: 0px 0px 5px black;
+				display: block;
+				height: 100px;
+				margin: 0px auto;
+				transition: all 0.5s;
+				-moz-transition: all 0.5s;
+				-ms-transition: all 0.5s;
+				-webkit-transition: all 0.5s;
+				width: 68px;
+			}
+			> img {
+				display: none;
+			}
+		}
 	}
-	
-	#shows .show div.image {
-		background-color: #666666;
-		background-image: url('../gfx/no-cover.png');
-		background-position: center center;
-		background-repeat: no-repeat;
-		background-size: contain;
-		box-shadow: 0px 0px 5px black;
-		display: block;
-		height: 100px;
-		margin: 0px auto;
-		transition: all 0.5s;
-		-moz-transition: all 0.5s;
-		-ms-transition: all 0.5s;
-		-webkit-transition: all 0.5s;
-		width: 68px;
-	}
-	#shows .show div.image > img {
-		display: none;
-	}
-	
 	.seasons .season .episode .extended .synopsis {
 		margin-left: 20px;
 	}

@@ -44,6 +44,9 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 			path: 'dashboard',
 			name: 'Dashboard'
 		},{
+			path: 'movies',
+			name: 'Movies'
+		},{
 			path: 'shows',
 			name: 'Shows'
 		},{
@@ -193,6 +196,17 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 				socket.emit('system.update');
 			}
 		};
+	});
+	
+	nessa.controller('moviesCtrl', function($scope, $modal, socket){
+		$scope.movies = [];
+		
+		
+		socket.on('movies.list', function(results){
+			$scope.movies = results;
+			$(document).trigger('lazyload');
+		});
+		socket.emit('movies.list');
 	});
 	
 	nessa.controller('showsCtrl', function($scope, $modal, $location, socket){
