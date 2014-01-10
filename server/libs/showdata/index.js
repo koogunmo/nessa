@@ -159,6 +159,7 @@ var ShowData = {
 		var self = this;
 		var showCollection = db.collection('show');
 		showCollection.findOne({tvdb: tvdb}, function(error, show){
+			if (error || !show) return;
 			self.episodes(show.tvdb, function(error, episodes){
 				var response = {
 					summary: show,

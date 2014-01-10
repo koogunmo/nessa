@@ -6,7 +6,7 @@
 </div>
 <div class="modal-body" ng-show="results">
 	<div class="results">
-		<div class="result" ng-repeat="result in results" ng-class="{selected: $parent.selected==result.tvdb_id}" ng-click="$parent.selected=result.tvdb_id">
+		<div class="result" ng-repeat="result in results" ng-class="{selected: selected==result.tvdb_id}" ng-click="select(result.tvdb_id)">
 			<img ng-src="{{result.images.poster | traktPoster}}" />
 			<strong>{{result.title}}</strong>
 			<p class="synopsis">{{result.overview || 'No synopsis available'}}</p>

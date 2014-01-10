@@ -270,9 +270,11 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 	});
 	
 	nessa.controller('searchCtrl', function($scope, $modalInstance, socket){
+		$scope.selected = null;
 		$scope.search = {
 			query: ''
 		};
+		
 		socket.on('shows.search', function(results){
 			$scope.results = results;
 		});
@@ -284,6 +286,9 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		};
 		$scope.reset = function(){
 			$scope.search.query = '';
+		};
+		$scope.select = function(tvdb) {
+			$scope.selected = tvdb;
 		};
 		$scope.save = function(){
 			socket.emit('show.add', $scope.selected);

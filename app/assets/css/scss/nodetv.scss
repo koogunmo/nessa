@@ -152,56 +152,56 @@ input.ng-invalid {
 	.nav {
 		margin-bottom: 10px;
 	}
-	.modal-show {
-		.seasons {
-			.panel-heading {
-				cursor: pointer;
-			}
-			.season {
-				.episode {
-					border-bottom: 1px solid $border;
-					.title {
-						cursor: pointer;
-						margin-left: 20px;
-						
-						> .small {
-							padding-right: 8px;
-							margin-left: -20px;
-						}
+	.seasons {
+		.panel-heading {
+			cursor: pointer;
+		}
+		.season {
+			.episode {
+				border-bottom: 1px solid $border;
+				
+				.title {
+					cursor: pointer;
+					margin-left: 20px;
+					
+					> .small {
+						padding-right: 8px;
+						margin-left: -20px;
 					}
-					.extended {
-						display: none;
-						padding-bottom: 10px;
+				}
+				
+				.extended {
+					display: none;
+					padding-bottom: 10px;
+					
+					.tools {
+						font-size: 16px;
+						height: 22px;
+						margin-left: 10px;
+						text-align: left;
 						
-						.tools {
-							font-size: 16px;
-							height: 22px;
+						>span {
+							display: inline-block;
 							margin-left: 10px;
-							text-align: left;
-							
-							>span {
-								display: inline-block;
-								margin-left: 10px;
-							}
-							
-							>span.action {
-								cursor: pointer;
-								float: right;
-							}
+						}
+						
+						>span.action {
+							cursor: pointer;
+							float: right;
 						}
 					}
 				}
-				.episode:last-child {
-					border-bottom: none;
+			}
+			.episode:last-child {
+				border-bottom: none;
+			}
+			.episode.unaired {
+				.title {
+					color: #CCCCCC;
 				}
-				.episode.unaired {
-					.title {
-						color: #CCCCCC;
-					}
-					.extended .tools {
-						font-size: 14px;
-						text-align: right;
-					}
+				.extended .tools {
+					font-size: 14px;
+					text-align: right;
 				}
 			}
 		}
