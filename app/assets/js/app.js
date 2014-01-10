@@ -145,7 +145,10 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute', 'ui.boo
 			
 		}).when('/dashboard', {
 			templateUrl: '/views/partials/dashboard.html',
-			controller: 'homeCtrl'
+			controller: 'homeCtrl',
+			resolve: {
+				loggedin: checkLoggedin
+			}
 			
 		}).when('/downloads', {
 			templateUrl: '/views/partials/downloads.html',
@@ -157,7 +160,10 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute', 'ui.boo
 		}).when('/shows/:tvdb?', {
 			templateUrl: '/views/partials/shows.html',
 			controller: 'showsCtrl',
-			reloadOnSearch: false
+			reloadOnSearch: false,
+			resolve: {
+				loggedin: checkLoggedin
+			}
 			
 		}).when('/match', {
 			templateUrl: '/views/partials/match.html',

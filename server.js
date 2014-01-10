@@ -20,6 +20,7 @@ global.nconf = require('nconf');
 global.nconf.file({
 	file: __dirname + '/settings.json'
 }).defaults({
+	address: '0.0.0.0',
 	port: 6377,
 	installed: false,
 	run: {
@@ -72,7 +73,7 @@ global.trakt = plugin('trakt').init({
 });
 
 var app		= express(),
-	server	= app.listen(nconf.get('port')),
+	server	= app.listen(nconf.get('port'), nconf.get('address')),
 	io		= require('socket.io').listen(server, {
 		'browser client gzip': true,
 		'browser client minification': true,

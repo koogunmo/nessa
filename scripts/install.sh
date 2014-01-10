@@ -26,25 +26,21 @@ sudo mkdir /opt/nodetv
 sudo chown media:media /opt/nodetv
 git clone https://github.com/greebowarrior/nessa.git /opt/nodetv
 
-## Install minidlna
-
-sudo apt-get install libavcodec52 libavformat54 libavutil52 libc6 libexif12 libflac8 libid3tag0 libjpeg8 libogg0 libsqlite3-0 libvorbis0a
-
-# to do
 
 ## Create a user and group
 
 sudo groupadd media
 sudo useradd -g media -G debian-transmission -m media
 
-sudo mkdir /home/media/Video
-sudo chown media:media /home/media/Video
-sudo chmod 0775 /home/media/Video
-
+sudo mkdir /home/media/Torrents
+sudo mkdir -p /home/media/Videos/TV\ Shows
+sudo chown -R media:media /home/media/Videos
+sudo chown media:transmission-debian /home/media/Torrents
+sudo chmod -R 0775 /home/media
 
 ## Add Upstart script
 
-sudo cp /opt/nodetv/scripts/upstart.conf /etc/init/nodetv.conf
+sudo cp /opt/nodetv/scripts/upstart/nodetv.conf /etc/init/nodetv.conf
 sudo ln -s /lib/init/upstart-job nodetv
 sudo update-rc.d nodetv defaults
 sudo initctl reload-configuration
