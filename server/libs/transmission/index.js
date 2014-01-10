@@ -87,7 +87,7 @@ var torrent = {
 						showsCollection.findOne({tvdb: results[0].tvdb}, function(error, show){
 							if (error || !show) return;
 							
-							var showdir = nconf.get('shows:base') + '/' + show.directory;
+							var showdir = nconf.get('media:base') + nconf.get('media:shows:directory') + '/' + show.directory;
 							
 							var tvdb = null;
 							var episodes = [];

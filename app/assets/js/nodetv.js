@@ -211,6 +211,7 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		$scope.$on('$routeUpdate', routeChange);
 		
 		$scope.shows	= [];
+		$scope.settings	= {};
 		
 		$scope.add = function(){
 			if (opened) return;
@@ -259,6 +260,11 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 				$location.search('tvdb', null);
 				opened = false;
 			});
+		});
+		
+		socket.emit('media.settings');
+		socket.on('media.settings', function(data){
+			$scope.settings = data;
 		});
 		
 		/* Retrieve shows list */

@@ -31,7 +31,7 @@ var ShowData = {
 						feed: null
 					};
 					try {
-						mkdir(nconf.get('shows:base') + '/' + record.directory, 0775);
+						mkdir(nconf.get('media:base') + nconf.get('media:shows:directory') + '/' + record.directory, 0775);
 					} catch(e){
 						logger.error(e.message);
 					}
@@ -165,8 +165,8 @@ var ShowData = {
 					summary: show,
 					listing: episodes
 				};
-				response.displaypath = nconf.get('shows:base')+'/'+show.directory;
-				
+				response.displaypath = nconf.get('media:base') + nconf.get('media:shows:directory') + '/' +show.directory;
+			
 				if (typeof(callback) == 'function') callback(null, response);
 			});
 		});
@@ -243,7 +243,7 @@ var ShowData = {
 		showCollection.findOne({tvdb: tvdb}, function(error, show){
 			trakt.show.summary(show.tvdb, function(error, json){
 				if (json.images.banner){
-					var banner = fs.createWriteStream(nconf.get('shows:base') + '/' + show.directory + '/banner.jpg');
+					var banner = fs.createWriteStream(nconf.get('media:base') + nconf.get('media:shows:directory') + '/' + show.directory + '/banner.jpg');
 					banner.on('error', function(e){
 						console.error(e);
 					});
@@ -253,7 +253,7 @@ var ShowData = {
 				}
 				if (json.images.poster) {
 					var src = json.images.poster.replace('.jpg', '-138.jpg');
-					var poster = fs.createWriteStream(nconf.get('shows:base') + '/' + show.directory + '/poster.jpg');
+					var poster = fs.createWriteStream(nconf.get('media:base') + nconf.get('media:shows:directory') + '/' + show.directory + '/poster.jpg');
 					poster.on('error', function(e){
 						console.error(e);
 					});
@@ -462,7 +462,7 @@ var ShowData = {
 				if (error || !results.length) return;
 				results.forEach(function(result){
 					if (result.file) {
-						fs.unlink(nconf.get('shows:base') + '/' + show.directory + '/' + result.file, function(error){
+						fs.unlink(nconf.get('media:base') + nconf.get('media:shows:directory') + '/' + show.directory + '/' + result.file, function(error){
 							if (error) logger.error('showdata.deleteEpisode', error);
 						});
 					}

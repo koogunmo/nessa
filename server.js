@@ -20,9 +20,11 @@ global.nconf = require('nconf');
 global.nconf.file({
 	file: __dirname + '/settings.json'
 }).defaults({
-	address: '0.0.0.0',
-	port: 6377,
 	installed: false,
+	listen: {
+		address: '0.0.0.0',
+		port: 6377,
+	},
 	run: {
 		user: 'media',
 		group: 'media'
@@ -73,7 +75,7 @@ global.trakt = plugin('trakt').init({
 });
 
 var app		= express(),
-	server	= app.listen(nconf.get('port')), //, nconf.get('address')),
+	server	= app.listen(nconf.get('listen:port')), //, nconf.get('listen:address')),
 	io		= require('socket.io').listen(server, {
 		'browser client gzip': true,
 		'browser client minification': true,
@@ -148,8 +150,8 @@ try {
 				app.use(passport.initialize());
 				app.use(passport.session());
 				
-				if (nconf.get('shows:base')) {
-					app.use('/media', express.static(nconf.get('shows:base')));
+				if (nconf.get('media:base')) {
+					app.use('/media', express.static(nconf.get('media:base')));
 				}
 				app.use(function(req, res) {	
 					res.sendfile(__dirname + '/app/views/index.html');
@@ -250,7 +252,7 @@ io.sockets.on('connection', function(socket) {
 					autoClose: 2500
 				});
 				// Update media path
-				app.use('/media', express.static(nconf.get('shows:base')));
+				app.use('/media', express.static(nconf.get('media:base')));
 				if (typeof(callback) == 'function') callback();
 			});
 		}
@@ -312,6 +314,9 @@ io.sockets.on('connection', function(socket) {
 		});
 	});
 	
+	socket.on('media.settings', function(){
+		socket.emit('media.settings', nconf.get('media'));
+	});
 	
 	/** Dashboard **/
 	socket.on('dashboard', function(){

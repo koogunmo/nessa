@@ -13,7 +13,7 @@
 		</div>
 		<div class="show col-sm-2" ng-repeat="show in shows | orderBy:'name' | filter:filter" ng-click="view(show.tvdb)">
 			<div class="image">
-				<img data-src="/media/{{show.directory}}/poster.jpg" alt="" class="img-responsive" />
+				<img data-src="/media/{{settings.shows.directory}}/{{show.directory}}/poster.jpg" alt="" class="img-responsive" />
 			</div>
 			<div>{{show.name}}</div>
 		</div>

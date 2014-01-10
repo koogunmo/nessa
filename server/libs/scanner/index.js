@@ -28,13 +28,25 @@ function listDirectory(path, callback) {
 }
 
 var Scanner = {
+	
+	movies: function(callback){
+		var self = this;
+		var movieCollection = db.collection('movie');
+		
+		if (base = nconf.get('media:base') + nconf.get('media:movies:directory')) {
+			// scan for video files
+			
+			// search trakt for filename (without ext);
+		}
+	},
+	
 	shows: function(callback){
 		var collection = db.collection('show');
 		var unmatched = db.collection('unmatched');
 		
 		// Scan media directory for folders - calback is called for each item found
 		var self = this;
-		if (base = nconf.get('shows:base')) {
+		if (base = nconf.get('media:base') + nconf.get('media:shows:directory')) {
 			fs.readdir(base, function(error, dirs){
 				if (error) return;
 				dirs.forEach(function(dir){
@@ -69,7 +81,7 @@ var Scanner = {
 	
 	episodes: function(tvdb, callback){
 		var self = this;
-		if (base = nconf.get('shows:base')) {
+		if (base = nconf.get('media:base') + nconf.get('media:shows:directory')) {
 			var showCollection = db.collection('show');
 			var episodeCollection = db.collection('episode');
 			
