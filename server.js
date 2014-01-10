@@ -73,12 +73,17 @@ global.trakt = plugin('trakt').init({
 });
 
 var app		= express(),
-	server	= app.listen(nconf.get('port'), nconf.get('address')),
+	server	= app.listen(nconf.get('port')), //, nconf.get('address')),
 	io		= require('socket.io').listen(server, {
 		'browser client gzip': true,
 		'browser client minification': true,
 		'log level': 1
 	});
+	
+server.on('listening', function(){
+//	logger.info('Listening on http://' + server.address().address +':'+ server.address().port);
+	logger.info('Listening on port '+ server.address().port);
+});
 	
 /* Change ownership of the process */
 /* Doing it here allows us to run NodeTV on port 80, if required */
@@ -150,8 +155,7 @@ try {
 					res.sendfile(__dirname + '/app/views/index.html');
 				});
 			});
-			logger.info('Listening on port ' + nconf.get('port'));
-
+			
 			/* Load tasks */
 			if (nconf.get('installed')) {
 				fs.readdir(__dirname + '/server/tasks', function(error, files){
