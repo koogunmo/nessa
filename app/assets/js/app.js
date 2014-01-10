@@ -157,7 +157,7 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute', 'ui.boo
 				loggedin: checkLoggedin
 			}
 			
-		}).when('/shows/:tvdb?', {
+		}).when('/shows', {
 			templateUrl: '/views/partials/shows.html',
 			controller: 'showsCtrl',
 			reloadOnSearch: false,
@@ -165,7 +165,7 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute', 'ui.boo
 				loggedin: checkLoggedin
 			}
 			
-		}).when('/match', {
+		}).when('/shows/match', {
 			templateUrl: '/views/partials/match.html',
 			controller: 'matchCtrl',
 			resolve: {
