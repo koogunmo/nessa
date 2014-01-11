@@ -105,7 +105,7 @@ exports = module.exports = {
 	
 	formatName: function(data){
 		var defaults = {
-			format: nconf.get('shows:format'),
+			format: nconf.get('media:shows:format'),
 			season: null,
 			episodes: [],
 			ext: null
