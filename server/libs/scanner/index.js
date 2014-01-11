@@ -41,7 +41,7 @@ var Scanner = {
 	},
 	
 	shows: function(callback){
-		var collection = db.collection('show');
+		var showCollection = db.collection('show');
 		var unmatched = db.collection('unmatched');
 		
 		// Scan media directory for folders - calback is called for each item found
@@ -53,7 +53,7 @@ var Scanner = {
 					fs.stat(base + '/' + dir, function(error, stat){
 						if (error) return;
 						if (stat && stat.isDirectory()){
-							collection.find({$or: [{name: dir},{directory: dir}]}).toArray(function(error, results){
+							showCollection.find({$or: [{name: dir},{directory: dir}]}).toArray(function(error, results){
 								if (error) return;
 								var record = {
 									status: true,
@@ -61,8 +61,8 @@ var Scanner = {
 								};
 								if (results.length == 1) {
 									var result = results[0];
-									collection.ensureIndex('tvdb');
-									collection.update({tvdb: result.tvdb}, {$set: record}, {upsert: true}, function(error, affected){
+									showCollection.ensureIndex('tvdb', function(error, index){});
+									showCollection.update({tvdb: result.tvdb}, {$set: record}, {upsert: true}, function(error, affected){
 										if (typeof(callback) == 'function') callback(null, result.tvdb);
 									});
 									trakt.show.library(result.tvdb);
@@ -96,7 +96,7 @@ var Scanner = {
 						if (!data || !data.episodes) return;
 						
 						// Title formatting
-						episodeCollection.ensureIndex({tvdb: 1, season: 1});
+						episodeCollection.ensureIndex({tvdb: 1, season: 1}, function(error, index){});
 						episodeCollection.find({tvdb: tvdb, season: data.season}).toArray(function(error, rows){
 							if (error) return;
 							var episodes = [];
@@ -125,7 +125,7 @@ var Scanner = {
 									status: true,
 									file: target
 								};
-								episodeCollection.ensureIndex({tvdb: 1, season: 1, episode: 1});
+								episodeCollection.ensureIndex({tvdb: 1, season: 1, episode: 1}, function(error, index){});
 								episodeCollection.update({tvdb: tvdb, season: data.season, episode: episode}, {$set: record}, function(error, affected){
 								//	console.log(error, affected);
 								});

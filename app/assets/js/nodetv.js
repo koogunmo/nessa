@@ -258,6 +258,9 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 				keyboard: false,
 				windowClass: 'modal-show',
 				resolve: {
+					settings: function(){
+						return $scope.settings;
+					},
 					summary: function(){
 						return json.summary;
 					},
@@ -327,7 +330,8 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		});
 	});
 	
-	nessa.controller('showCtrl', function($scope, $modalInstance, socket, summary, listing){
+	nessa.controller('showCtrl', function($scope, $modalInstance, socket, settings, summary, listing){
+		$scope.settings = settings;
 		$scope.summary = summary;
 		$scope.listing = listing;
 		
