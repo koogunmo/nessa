@@ -17,12 +17,11 @@ var ShowData = {
 		
 		showCollection.findOne({tvdb: tvdb}, function(error, result){
 			if (error) return;
-			
 			if (!result) {
 				trakt.show.summary(tvdb, function(error, json){
 					if (error) return;
 					var record = {
-						tvdb: json.tvdb_id,
+						tvdb: parseInt(json.tvdb_id, 10),
 						imdb: json.imdb_id,
 						name: json.title,
 						synopsis: json.overview,
@@ -406,9 +405,10 @@ var ShowData = {
 					json.shows.show.forEach(function(show){
 						var record = {
 							name: show.name[0],
-							tvdb: show.tvdbid[0],
+							tvdb: parseInt(show.tvdbid[0], 10),
 							feed: show.mirrors[0].mirror[0]
 						};
+						// We could do an upsert, but it would overwrite the name and feed every time
 						showCollection.count({tvdb: record.tvdb}, function(error, count){
 							if (error || count == 1) return;
 							showCollection.insert(record, function(error, affected){

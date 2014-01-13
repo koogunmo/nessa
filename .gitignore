@@ -8,12 +8,12 @@ lib-cov
 *.gz
 .DS_Store
 
-node_modules
 .sass-cache
+newrelic.js
+node_modules
 
 docs/*.txt
 docs/*.md
-npm-debug.log
 settings.json
 
 test_data/*

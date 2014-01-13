@@ -26,10 +26,9 @@ echo "Netatalk installed"
 echo "Installing MiniDLNA"
 apt-get install autoconf gettext sqlite3 libavutil-dev libavcodec-dev libjpeg-dev libflac-dev libid3tag0-dev libavformat-dev libexif-dev libsqlite3-dev libvorbis-dev
 
-wget http://prdownloads.sourceforge.net/minidlna/minidlna-1.1.0.tar.gz -O minidlna-1.1.0.tar.gz
-tar xf minidlna-1.1.0.tar.gz
-cd minidlna-1.1.0/
-
+wget http://prdownloads.sourceforge.net/minidlna/minidlna-1.1.1.tar.gz -O minidlna-1.1.1.tar.gz
+tar xf minidlna-1.1.1.tar.gz
+cd minidlna-1.1.1/
 ./configure
 make && make install
 cd ..

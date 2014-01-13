@@ -4,7 +4,7 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute', 'ui.boo
 
 	var app = angular.module('nessa', ['ngCookies','ngResource','ngRoute','ui.bootstrap']);
 	
-	app.factory('socket', function($rootScope) {
+	app.factory('$socket', function($rootScope) {
 		var port = (window.location.port) ? window.location.port : 80;
 		var socket = io.connect('http://' + window.location.hostname + ':' + port, {
 			'connect timeout': 2000,

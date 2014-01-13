@@ -1,4 +1,4 @@
-<div id="shows">
+<div id="movies">
 	<form class="form-group">
 		<label></label>
 		<div class="input-group">
@@ -7,11 +7,11 @@
 		</div>
 	</form>
 	<div class="row">
-		<div class="movie col-sm-2" ng-repeat="movie in movies | orderBy:'name' | filter:filter" ng-click="view(show.tvdb)">
+		<div class="movie col-sm-2" ng-repeat="movie in movies | orderBy:'title' | filter:filter" ng-click="view(show.tvdb)">
 			<div class="image">
-				<!--img data-src="/media/{{settings.movies.directory}}/{{show.directory}}/poster.jpg" alt="" class="img-responsive" /-->
+				<img data-src="/media/{{settings.movies.directory}}/{{movie.title}}.cover.jpg" alt="" class="img-responsive" />
 			</div>
-			<div>{{movie.name}}</div>
+			<div>{{movie.title}}</div>
 		</div>
 	</div>
 </div>

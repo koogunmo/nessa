@@ -34,9 +34,35 @@ var Scanner = {
 		var movieCollection = db.collection('movie');
 		
 		if (base = nconf.get('media:base') + nconf.get('media:movies:directory')) {
-			// scan for video files
 			
-			// search trakt for filename (without ext);
+			listDirectory(base, function(file){
+				var ext = path.extname(file);
+				if (ext.match(/(:?jpe?g|png)$/i)) return;
+				
+				var record = {
+					status: true,
+					title: path.basename(file, ext),
+					file: file.replace(base + '/', '')
+				};
+				
+				trakt.search('movies', record.title, function(error, response){
+					if (response.length == 1) {
+						var movie = response[0];
+						record.title = movie.title;
+						record.year = movie.year;
+						record.synopsis = movie.overview;
+						record.tmdb = movie.tmdb_id;
+						record.imdb = movie.imdb_id;
+						record.genre  = movie.genres;
+					}
+					
+					movieCollection.update({file: record.file}, {$set: record}, {upsert: true}, function(error, affected){
+						if (typeof(callback) == 'function') callback(null, record);
+					});
+				
+				});
+			});
+			
 		}
 	},
 	

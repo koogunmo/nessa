@@ -222,6 +222,20 @@ input.ng-invalid {
 	}
 }
 
+#movies {
+	.input-group-addon {
+		cursor: pointer;
+	}
+	div.image {
+		display: none;
+	}
+	.movie {
+		border-bottom: 1px solid $border;
+		cursor: pointer;
+		padding: 10px;
+	}
+}
+
 /* Downloads */
 
 #downloads {
@@ -283,6 +297,33 @@ input.ng-invalid {
 		float: left; 
 		margin-right: 10px;
 		width: 120px;
+	}
+	#movies {
+		.movie {
+			border: none;
+			height: 160px;
+			padding: 10px 0px 0px;
+			text-align: center;
+			div.image {
+				background-color: #666666;
+				background-image: url('../gfx/no-cover.png');
+				background-position: center center;
+				background-repeat: no-repeat;
+				background-size: contain;
+				box-shadow: 0px 0px 5px black;
+				display: block;
+				height: 100px;
+				margin: 0px auto;
+				transition: all 0.5s;
+				-moz-transition: all 0.5s;
+				-ms-transition: all 0.5s;
+				-webkit-transition: all 0.5s;
+				width: 68px;
+			}
+			> img {
+				display: none;
+			}
+		}
 	}
 	#shows {
 		.show {

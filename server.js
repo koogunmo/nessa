@@ -113,7 +113,6 @@ app.configure(function(){
 	app.use(app.router);
 });
 
-	
 /* MongoDB */
 try {
 	if (nconf.get('mongo')) {
@@ -172,6 +171,13 @@ try {
 						require(__dirname + '/server/tasks/' + file);
 					});
 				});
+				
+				/*
+				var scanner = plugin('scanner');
+				scanner.movies(function(error, data){
+					console.log(data);
+				});
+				*/
 			}
 		});
 	} else {
@@ -365,6 +371,14 @@ io.sockets.on('connection', function(socket) {
 				});
 			}
 		});
+	});
+	
+	/** Movies **/
+	socket.on('movies.list', function(){
+		var movies = plugin('moviedata');
+		movies.list(function(error, results){
+			socket.emit('movies.list', results);
+		})
 	});
 	
 	/** Shows **/
