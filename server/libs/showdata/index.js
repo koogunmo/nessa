@@ -88,6 +88,27 @@ var ShowData = {
 		});
 	},
 	
+	fixData: function(){
+		// Dev method - used to ensure TVDB IDs are integers
+		var episodeCollection = db.collection('episode');
+		episodeCollection.find({tvdb: {$type: 2}}).toArray(function(error, results){
+			results.forEach(function(result){
+				result.tvdb = parseInt(result.tvdb, 10);
+				episodeCollection.save(result, function(error, affected){
+					
+				});
+			});
+		});
+		var showCollection = db.collection('show');
+		showCollection.find({tvdb: {$type: 2}}).toArray(function(error, results){
+			results.forEach(function(result){
+				result.tvdb = parseInt(result.tvdb, 10);
+				showCollection.save(result, function(error, affected){
+					
+				});
+			});
+		});
+	},
 	latest: function(callback){
 		
 		var self = this;
