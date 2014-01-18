@@ -6,8 +6,22 @@
 	<div ng-if="latest.length>=1">
 		<div class="page-header">
 			<h3>Latest Shows</h3>
+			<!--
+			<div class="btn-group">
+				<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+					View <span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu" role="menu">
+					<li><a href="#">All</a></li>
+					<li class="divider"></li>
+					<li><a ng-click="" href="#">Watched</a></li>
+					<li><a href="#">Unwatched</a></li>
+				</ul>
+			</div>
+			-->
 		</div>
-		<div class="panel panel-default" ng-repeat="episode in latest | orderBy:['airdate','show_name']:true" ng-controller="episodeCtrl">
+		
+		<div class="panel" ng-class="{'panel-success': episode.watched, 'panel-warning': !episode.watched}" ng-repeat="episode in latest | orderBy:['airdate','show_name']:true" ng-controller="episodeCtrl">
 			<div class="panel-heading">
 				<span class="glyphicon glyphicon-eye-open pull-right" title="Episode has been watched" ng-if="episode.watched" ng-click="watched()"></span>
 				<span class="glyphicon glyphicon-eye-close pull-right" title="Episode has not been watched" ng-if="!episode.watched" ng-click="watched()"></span>
@@ -24,8 +38,9 @@
 		<div class="page-header">
 			<h3>This Week</h3>
 		</div>
+		
 		<div ng-repeat="day in upcoming">
-			<div class="panel panel-default" ng-repeat="episode in day.episodes">
+			<div class="panel panel-info" ng-repeat="episode in day.episodes">
 				<div class="panel-heading">
 					<h4 class="panel-title">{{episode.show.title}} <span class="small">{{episode.episode.title}}</span></h4>
 				</div>
@@ -37,7 +52,7 @@
 		</div>
 	</div>
 	
-	<div class="panel panel-info">
+	<div class="panel panel-primary">
 		<div class="panel-heading">
 			<h4 class="panel-title">System details</h4>
 		</div>

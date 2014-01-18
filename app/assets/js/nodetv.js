@@ -44,9 +44,9 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 			path: 'dashboard',
 			name: 'Dashboard'
 		},{
-			path: 'movies',
-			name: 'Movies'
-		},{
+	//		path: 'movies',
+	//		name: 'Movies'
+	//	},{
 			path: 'shows',
 			name: 'Shows'
 		},{

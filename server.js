@@ -1,7 +1,10 @@
+"use strict";
+
+try {require('newrelic');} catch(e){}
 /***********************************************************************/
 /* Global Methods */
 
-global.logger = logger = require('log4js').getLogger();
+var logger = global.logger = require('log4js').getLogger();
 
 var pkg = require('./package.json');
 
@@ -105,11 +108,11 @@ app.configure(function(){
 	app.use(express.cookieParser());
 	app.use(express.urlencoded());
 	app.use(express.json());
-	
-	app.use('/assets', express.static(__dirname + '/app/assets'));
-	app.use('/template', express.static(__dirname + '/app/views/ui'));
-	app.use('/views', express.static(__dirname + '/app/views'));
-	
+	if (!nconf.get('listen:nginx')){
+		app.use('/assets', express.static(__dirname + '/app/assets'));
+		app.use('/template', express.static(__dirname + '/app/views/ui'));
+		app.use('/views', express.static(__dirname + '/app/views'));
+	}
 	app.use(app.router);
 });
 
@@ -149,7 +152,7 @@ try {
 				app.use(passport.initialize());
 				app.use(passport.session());
 				
-				if (nconf.get('media:base')) {
+				if (nconf.get('media:base') && !nconf.get('listen:nginx')){
 					app.use('/media', express.static(nconf.get('media:base')));
 				}
 				app.use(function(req, res) {	
@@ -258,7 +261,9 @@ io.sockets.on('connection', function(socket) {
 					autoClose: 2500
 				});
 				// Update media path
-				app.use('/media', express.static(nconf.get('media:base')));
+				if (!nconf.get('listen:nginx')){
+					app.use('/media', express.static(nconf.get('media:base')));
+				}
 				if (typeof(callback) == 'function') callback();
 			});
 		}

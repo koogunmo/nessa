@@ -15,10 +15,15 @@
 							<label for="ipt_listen_port">Server Port</label>
 							<input type="text" id="ipt_listen_port" name="listen:port" class="form-control" placeholder="6377" required="true" ng-model="settings.listen.port" />
 						</div>
+						<div class="form-group">
+							<label class="checkbox-inline">
+								<input type="checkbox" id="ipt_listen_nginx" name="listen:nginx" ng-model="settings.listen.nginx" />
+								<strong>Use nginx</strong>
+							</label>
+						</div>
 						<p>Changing these values will require restarting NodeTV</p>
 					</div>
 				</div>
-				
 				<div class="panel panel-info">
 					<div class="panel-heading">
 						<h4 class="panel-title">Media</h4>
@@ -50,13 +55,12 @@
 						</div>
 						<div class="form-group">
 							<label class="checkbox-inline">
-								<input type="checkbox" id="ipt_shows_hd" name="shows:hd" ng-model="settings.shows.hd" />
+								<input type="checkbox" id="ipt_media_hd" name="media:hd" ng-model="settings.media.hd" />
 								<strong>Prefer HD Videos</strong>
 							</label>
 						</div>
 					</div>
 				</div>
-
 				<div class="panel panel-info">
 					<div class="panel-heading">
 						<h4 class="panel-title">Database <small>MongoDB</small></h4>
@@ -81,8 +85,6 @@
 						</div>
 					</div>
 				</div>
-
-			
 				<div class="panel panel-info">
 					<div class="panel-heading">
 						<h4 class="panel-title">Transmission</h4>
@@ -109,7 +111,6 @@
 						</div>
 					</div>
 				</div>
-			
 				<div class="panel panel-info">
 					<div class="panel-heading">
 						<h4 class="panel-title">Trakt</h4>
@@ -138,7 +139,6 @@
 						</div>
 					</div>
 				</div>
-				
 				<div class="panel panel-info">
 					<div class="panel-heading">
 						<h4 class="panel-title">Twilio</h4>
@@ -168,7 +168,6 @@
 					</div>
 				</div>
 			</tab>
-		
 			<tab heading="Security">
 				<div class="panel panel-info" >
 					<div class="panel-heading">
@@ -208,7 +207,6 @@
 					</div>
 				</div>
 			</tab>
-			
 			<tab heading="System">
 				<div class="panel panel-warning">
 					<div class="panel-heading">
@@ -246,7 +244,6 @@
 				</div>
 			</tab>
 		</tabset>
-		
 		<div class="toolbar">
 			<button type="submit" class="btn btn-success">Save settings</button>
 		</div>
