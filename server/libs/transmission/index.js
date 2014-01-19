@@ -3,6 +3,31 @@ var transmission = require('transmission'),
 	path = require('path'),
 	uuid = require('node-uuid');
 
+/* Extend module */
+
+transmission.prototype.blocklist = function(callback){
+	var options = {
+		arguments : {},
+		method: 'blocklist-update',
+		tag : uuid()
+	}
+	this.callServer(options, callback)
+	
+};
+
+transmission.prototype.rename = function(id, path, name, callback){
+	var options = {
+		arguments : {
+			ids : [id],
+			path: path,
+			name: name
+		},
+		method: 'torrent-rename-path',
+		tag : uuid()
+	}
+	this.callServer(options, callback)
+};
+
 var torrent = {
 	rpc: false,
 	connect: function() {
@@ -27,19 +52,35 @@ var torrent = {
 		}
 	},
 	
-	blocklist: function(callback){
-		// In theory, this should trigger a blocklist update
-		try {
-			this.rpc.callServer({
-				method : this.rpc.methods.other.blockList,
-				tag : uuid.v4()
-			}, function(err, result) {
-				if (err) {
-					return callback(err)
-				}
-				var torrent = result['torrent-added']
-				callback(err, torrent)
+	autoname: function(id, callback){
+		var self = this;
+		var showCollection = db.collection('show'),
+			episodeCollection = db.collection('episode');
+			
+		this.rpc.get([id], function(error, args){
+			args.torrents.forEach(function(torrent){
+				var path = torrent.downloadDir+'/'+torrent.name;
+				episodeCollection.findOne({hash: torrent.hashString.toUpperCase()}, function(error, row){
+					if (error || !row) return;
+					showCollection.findOne({tvdb: row.tvdb}, function(error, show){
+						if (error || !show) return;
+						
+						var name = show.name+' S'+helper.zeroPadding(row.season)+'E'+helper.zeroPadding(row.episode)+' '+row.title;
+						
+						self.rpc.rename(torrent.id, path, name, function(error, args){
+							console.log(error, args);
+						});
+					});
+				});
 			});
+		});
+	},
+	
+	blocklist: function(callback){
+		try {
+			this.rpc.blocklist(function(error, args){
+				console.log(error, args);
+			})
 		} catch(e) {
 			logger.error(e.message);
 		}
@@ -47,7 +88,7 @@ var torrent = {
 	
 	complete: function() {
 		var self = this;
-		var showsCollection = db.collection('show');
+		var showCollection = db.collection('show');
 		var episodeCollection = db.collection('episode');
 		
 		try {
@@ -84,7 +125,7 @@ var torrent = {
 					episodeCollection.find({hash: hash, status: false}).toArray(function(error, results){
 						if (error || !results.length) return;
 						
-						showsCollection.findOne({tvdb: results[0].tvdb}, function(error, show){
+						showCollection.findOne({tvdb: results[0].tvdb}, function(error, show){
 							if (error || !show) return;
 							
 							var showdir = nconf.get('media:base') + nconf.get('media:shows:directory') + '/' + show.directory;

@@ -1,5 +1,6 @@
 "use strict";
 
+/* Optional New Relic app monitoring */
 try {require('newrelic');} catch(e){}
 /***********************************************************************/
 /* Global Methods */

@@ -1,0 +1,54 @@
+{
+  "installed": false,  
+  "listen": {
+    "address": "0.0.0.0",
+    "port": 6377,
+    "nginx": false
+  },
+  "run": {
+    "user": "media",
+    "group": "media"
+  },
+  "media": {
+    "base": "/home/media/Videos/",
+    "movies": {
+      "directory": "Movies"
+    },
+    "playlists": {
+      "directory": "Playlists"
+    },
+    "shows": {
+      "directory": "TV Shows",
+      "format": "Season %S/Episode %E - %T.%X"
+    },
+    "hd": false
+  },
+  "security": {
+    "enabled": false,
+    "whitelist": "192.168,127.0.0.1"
+  },
+  "mongo": {
+    "host": "127.0.0.1",
+    "port": 27017,
+    "name": "NodeTV",
+    "auth": false,
+    "username": "",
+    "password": ""
+  },
+  "trakt": {
+    "enabled": true,
+    "username": "",
+    "password": "",
+    "apikey": ""
+  },
+  "transmission": {
+    "host": "127.0.0.1",
+    "port": 9091,
+    "auth": false,
+    "username": "",
+    "password": ""
+  },
+  "system": {
+    "branch": "master"
+  }
+}

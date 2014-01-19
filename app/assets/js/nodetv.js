@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 require(['jquery','socket.io','app'], function($,io,nessa){
 	nessa.controller('alertsCtrl', function($scope, $socket){
@@ -121,6 +121,12 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		});
 		$socket.on('dashboard.stats', function(data){
 			$scope.stats = data;
+			$scope.uptime = {
+				days: Math.floor($scope.stats.uptime / 86400),
+				hour: Math.floor(($scope.stats.uptime % 86400) / 3600),
+				mins: Math.floor((($scope.stats.uptime % 86400) % 3600) / 60),
+				secs: (($scope.stats.uptime % 86400) % 3600) % 60
+			};
 		});
 		$socket.on('dashboard.unmatched', function(data){
 			$scope.unmatched = data.count;

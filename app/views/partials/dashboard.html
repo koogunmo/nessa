@@ -57,7 +57,13 @@
 			<h4 class="panel-title">System details</h4>
 		</div>
 		<div class="panel-body">
-			Version: {{stats.version}}
+			<div>Version: {{stats.version}}</div>
+			<div ng-switch="uptime.days">
+				Uptime: 
+				<span ng-switch-when="1">{{uptime.days}} day</span>
+				<span ng-switch-default>{{uptime.days}} days</span>
+				<span>{{uptime.hour|zeroPad}}:{{uptime.mins|zeroPad}}:{{uptime.secs|zeroPad}}</span>
+			</div>
 		</div>
 	</div>
 	
