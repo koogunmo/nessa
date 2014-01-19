@@ -357,7 +357,7 @@ io.sockets.on('connection', function(socket) {
 	});
 
 	/** Downloads **/
-	socket.on('download.list', function(data){
+	socket.on('download.list', function(){
 		torrent.list(function(error, data){
 			if (error) return;
 			socket.emit('download.list', data.torrents);
@@ -377,6 +377,10 @@ io.sockets.on('connection', function(socket) {
 				});
 			}
 		});
+	}).on('download.start', function(id){
+		torrent.start(id, function(error, args){});
+	}).on('download.stop', function(id){
+		torrent.stop(id, function(error, args){});
 	});
 	
 	/** Movies **/

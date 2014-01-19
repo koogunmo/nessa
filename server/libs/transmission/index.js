@@ -190,11 +190,6 @@ var torrent = {
 			logger.error(e.message);
 		}
 	},
-	
-	pause: function(data){
-		
-	},
-	
 	remove: function(data, callback){
 		// TODO: make this better
 		if (!data.id) return;
@@ -204,7 +199,6 @@ var torrent = {
 			if (typeof(callback) == 'function') callback(error);
 		});
 	},
-	
 	repacked: function(hash) {
 		var self = this;
 		try {
@@ -220,9 +214,11 @@ var torrent = {
 			logger.error(e.message);
 		}
 	},
-	
-	resume: function(data){
-		
+	start: function(id, callback){
+		this.rpc.start(id, callback);
+	},
+	stop: function(id, callback){
+		this.rpc.stop(id, callback);
 	}
 };
 

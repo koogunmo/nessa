@@ -80,7 +80,7 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		$socket.emit('system.settings');
 	});
 	
-	nessa.controller('downloadCtrl', function($scope, $socket){
+	nessa.controller('downloadsCtrl', function($scope, $socket){
 		$scope.downloads = [];
 		$scope.predicate = 'name';
 		$scope.reverse = false;
@@ -93,20 +93,21 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		$socket.on('download.list', function(data){
 			$scope.downloads = data;
 		});
-		
-		$scope.progress = function(){
-			
-		};
-		$scope.pause = function(id){
-			$socket.emit('download.pause', {id: id});
-		};
-		$scope.resume = function(id){
-			$socket.emit('download.resume', {id: id});
-		};
-		$scope.remove = function(id){
+	});
+	
+	nessa.controller('downloadCtrl', function($scope, $socket){
+		$scope.remove = function(){
 			if (confirm('Are you sure you want to delete this torrent?')) {
-				$socket.emit('download.remove', {id: id, purge: true});
+				$socket.emit('download.remove', {id: $scope.$parent.download.id, purge: true});
 			}
+		};
+		$scope.toggle = function(){
+			if (!!$scope.$parent.download.status){
+				$socket.emit('download.stop', $scope.$parent.download.id);
+			} else {
+				$socket.emit('download.start', $scope.$parent.download.id);
+			}
+			$scope.$parent.download.status = !$scope.$parent.download.status;
 		};
 	});
 	

@@ -7,7 +7,7 @@ requirejs.config({
 		'ngCookies': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.2.8/angular-cookies.min',
 		'ngResource': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.2.8/angular-resource.min',
 		'ngRoute': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.2.8/angular-route.min',
-		'socket.io': 'https://cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min',
+		'socket.io': 'libs/socket.io.min',
 		'ui.bootstrap': 'libs/ui-bootstrap.min',
 		// For future use
 		'firebase': 'https://cdn.firebase.com/v0/firebase',

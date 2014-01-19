@@ -152,7 +152,7 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute', 'ui.boo
 			
 		}).when('/downloads', {
 			templateUrl: '/views/partials/downloads.html',
-			controller: 'downloadCtrl',
+			controller: 'downloadsCtrl',
 			resolve: {
 				loggedin: checkLoggedin
 			}

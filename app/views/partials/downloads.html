@@ -6,8 +6,16 @@
 			<span class="input-group-addon" ng-click="search.name=''"><span class="glyphicon glyphicon-remove"></span></span>
 		</div>
 	</div>
-	<div class="download" ng-repeat="download in downloads | orderBy:predicate:reverse | filter:search">
-		<button class="btn btn-xs btn-danger pull-right" ng-click="remove(download.id);">Remove</button>
+	<div class="download" ng-controller="downloadCtrl" ng-repeat="download in downloads | orderBy:predicate:reverse | filter:search" ng-class="{'paused': !download.status}">
+		<span class="pull-right">
+			<button class="btn btn-xs" ng-click="toggle();">
+				<span class="glyphicon" ng-class="{'glyphicon-play': !download.status, 'glyphicon-pause': !!download.status}"></span>
+			</button>
+			<button class="btn btn-xs btn-danger" ng-click="remove(download.id);">
+				<span class="glyphicon glyphicon-trash"></span>
+			</button>
+		</span>
+		
 		<h4>{{download.name}}</h4>
 		<div class="progress progress-striped">
 			<div class="progress-bar" role="progressbar" style="width: {{download.percentDone*100}}%;" ng-class="{'progress-bar-success': download.percentDone==1}">
@@ -16,3 +24,5 @@
 		</div>
 	</div>
 </div>
+
+<!-- glyphicon glyphicon-sort -->

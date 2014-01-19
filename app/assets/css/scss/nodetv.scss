@@ -27,7 +27,6 @@ input.ng-invalid {
 	-webkit-box-shadow: 0 0 6px #f8b9b7;
 }
 
-
 /* Alerts */
 
 .alert-container {
@@ -96,12 +95,17 @@ input.ng-invalid {
 /* Dashboard */
 
 #dashboard {
+	.panel.watched {
+		opacity: 0.3;
+	}
 	.panel-heading {
 		> span {
 			cursor: pointer;
 		}
 	}
 	.small {
+		color: inherit;
+		padding-left: 10px;
 		white-space: nowrap;
 	}
 }
@@ -241,6 +245,14 @@ input.ng-invalid {
 #downloads {
 	.download {
 		border-bottom: 1px solid $border;
+		&.paused {
+			.progress-bar {
+				background-color: #AAAAAA !important;
+			}
+			h4 {
+				color: #AAAAAA !important;
+			}
+		}
 		h4 {
 			height: 20px;
 			margin-right: 60px;
