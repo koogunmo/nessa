@@ -49,6 +49,18 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute', 'ui.boo
 	});
 	*/
 	
+	app.filter('formatBytes', function(){
+		return function(bytes, si) {
+			if (bytes == 0) return '0.0B';
+			if (!si) si = true;
+			var value = (si) ? 1000 : 1024;
+			var sizes = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+			var i = parseInt(Math.floor(Math.log(bytes) / Math.log(value)));
+			if (i == 0) { return (bytes / Math.pow(value, i))+' '+sizes[i]; }
+			return (bytes / Math.pow(value, i)).toFixed(1)+' '+sizes[i];
+		}
+	});
+	
 	app.filter('downloadName', function(){
 		return function(string){
 			return string.replace(/\./g, ' ');

@@ -1,7 +1,5 @@
 "use strict";
-
-/* Optional New Relic app monitoring */
-try {require('newrelic');} catch(e){}
+try{require('newrelic');}catch(e){}
 /***********************************************************************/
 /* Global Methods */
 
@@ -218,7 +216,7 @@ io.sockets.on('connection', function(socket) {
 	}).on('disconnect', function(data){
 		// User disconnected
 		try {
-			// ???
+			delete socket._events;
 		} catch(e) {
 			logger.error('disconnect: ' + e.message);
 		}

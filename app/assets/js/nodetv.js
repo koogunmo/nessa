@@ -89,7 +89,6 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		setInterval(function(){
 			$socket.emit('download.list');
 		}, 5000);
-		
 		$socket.on('download.list', function(data){
 			$scope.downloads = data;
 		});

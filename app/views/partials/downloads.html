@@ -6,6 +6,12 @@
 			<span class="input-group-addon" ng-click="search.name=''"><span class="glyphicon glyphicon-remove"></span></span>
 		</div>
 	</div>
+	<!--
+	<div class="btn-group btn-group-xs">
+		<button type="button" class="btn btn-default" ng-click="search.status=true">Active</button>
+		<button type="button" class="btn btn-default" ng-click="search.status=false">Paused</button>
+	</div>
+	-->
 	<div class="download" ng-controller="downloadCtrl" ng-repeat="download in downloads | orderBy:predicate:reverse | filter:search" ng-class="{'paused': !download.status}">
 		<span class="pull-right">
 			<button class="btn btn-xs" ng-click="toggle();">
@@ -17,12 +23,22 @@
 		</span>
 		
 		<h4>{{download.name}}</h4>
-		<div class="progress progress-striped">
-			<div class="progress-bar" role="progressbar" style="width: {{download.percentDone*100}}%;" ng-class="{'progress-bar-success': download.percentDone==1}">
-				{{download.percentDone*100 | number:2}}%
-			</div>
+		<div class="progress progress-striped" title="{{download.percentDone*100 | number:2}}%">
+			<div class="progress-bar" role="progressbar" style="width: {{download.percentDone*100}}%;" ng-class="{'progress-bar-success': download.percentDone==1}"></div>
+		</div>
+		<div class="stats ">
+			<span class="pull-right hidden-xs">
+				<span ng-if="download.rateDownload">
+					{{download.rateDownload|formatBytes}}
+					<span class="glyphicon glyphicon-arrow-down"></span>
+				</span>
+				<span ng-if="download.rateUpload">
+					<span class="glyphicon glyphicon-arrow-up"></span>
+					{{download.rateUpload|formatBytes}}
+				</span>
+			</span>
+			<span>{{download.sizeWhenDone|formatBytes}}, uploaded {{download.uploadedEver|formatBytes}}</span>
+			<span>(Ratio: {{download.uploadedEver/download.downloadedEver|number:1}})</span>
 		</div>
 	</div>
 </div>
-
-<!-- glyphicon glyphicon-sort -->
