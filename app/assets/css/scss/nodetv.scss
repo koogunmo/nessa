@@ -249,11 +249,9 @@ input.ng-invalid {
 		margin: 0px;
 		padding: 10px 5px;
 		&.paused {
+			color: #AAAAAA !important;
 			.progress-bar {
 				background-color: #AAAAAA !important;
-			}
-			h4 {
-				color: #AAAAAA !important;
 			}
 		}
 		&:hover {
