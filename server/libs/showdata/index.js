@@ -382,7 +382,7 @@ var ShowData = {
 							if (!episode.status && !episode.file) obtain = true;
 							if (json.repack && json.hash != episode.hash) {
 								try {
-									torrent.repack(episode.hash);
+									torrent.repacked(episode.hash);
 									self.deleteEpisode(show.tvdb, json.season, json.episodes);
 									obtain = true;
 								} catch(e) {
