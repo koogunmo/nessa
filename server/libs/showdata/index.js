@@ -381,9 +381,13 @@ var ShowData = {
 						episodes.forEach(function(episode){
 							if (!episode.status && !episode.file) obtain = true;
 							if (json.repack && json.hash != episode.hash) {
-								torrent.repack(episode.hash);
-								self.deleteEpisode(show.tvdb, json.season, json.episodes);
-								obtain = true;
+								try {
+									torrent.repack(episode.hash);
+									self.deleteEpisode(show.tvdb, json.season, json.episodes);
+									obtain = true;
+								} catch(e) {
+									logger.error(e.message);
+								}
 							}
 							if (!episode.hash) insert = true;
 						});
