@@ -384,6 +384,8 @@ var ShowData = {
 								try {
 									torrent.repacked(episode.hash);
 									self.deleteEpisode(show.tvdb, json.season, json.episodes);
+									
+									insert = true;
 									obtain = true;
 								} catch(e) {
 									logger.error(e.message);
