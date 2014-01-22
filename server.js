@@ -3,8 +3,10 @@ try{require('newrelic');}catch(e){}
 /***********************************************************************/
 /* Global Methods */
 
-var logger = global.logger = require('log4js').getLogger();
-logger.replaceConsole();
+var log4js = require('log4js');
+	log4js.replaceConsole();
+var logger = global.logger = log4js.getLogger();
+logger.setLevel('WARN');
 
 var pkg = require('./package.json');
 
@@ -41,7 +43,7 @@ if (process.cwd() != __dirname) {
 	try {
 		process.chdir(__dirname);
 	} catch(e) {
-		console.error(e.message);
+		logger.error(e.message);
 	}
 }
 
@@ -66,7 +68,6 @@ var passport		= require('passport'),
 global.events = new (require('events')).EventEmitter;
 
 logger.info(process.title + ' v'+pkg.version);
-
 
 global.helper	= require('./server/core/helper');
 global.torrent	= plugin('transmission');
@@ -98,7 +99,7 @@ if (process.getuid) {
 		if (nconf.get('run:user')) process.setuid(nconf.get('run:user'));
 		process.env['HOME'] = process.cwd();
 	} catch(e) {
-		console.warn(e.message);
+		logger.warn(e.message);
 	}
 }
 
@@ -185,7 +186,7 @@ try {
 		});
 	} else {
 		nconf.set('installed', false);
-		logger.info('Waiting for install');
+		logger.warn('Waiting for install');
 		
 		app.use(function(req, res) {	
 			res.sendfile(__dirname + '/app/views/index.html');
@@ -204,22 +205,22 @@ io.sockets.on('connection', function(socket) {
 		logger.info('New connection (' + socket.transport + ') ' + sessionid);
 		
 	} catch(e) {
-		logger.error('connection: ' + e.message);
+		logger.error('Socket Connection: ' + e.message);
 	}
 	
 	socket.on('reconnected', function(data) {
 		try {
-			logger.log(data);
+			logger.info(data);
 		} catch(e) {
-			logger.error('reconnected: ' + e.message);
+			logger.error('Socket reconnect: ' + e.message);
 		}
 		
 	}).on('disconnect', function(data){
 		// User disconnected
 		try {
-			delete socket._events;
+			
 		} catch(e) {
-			logger.error('disconnect: ' + e.message);
+			logger.error('Socket disconnect: ' + e.message);
 		}
 	});
 	
