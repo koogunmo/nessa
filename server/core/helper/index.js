@@ -20,17 +20,17 @@ exports = module.exports = {
 			
 			var rd = fs.createReadStream(from);
 			rd.on('error', function(error) {
-				logger.error('READ ERROR (%d) - %s', error.errno, error.code);
+				logger.error('Read Error - %s (%d): %s', error.code, error.errno, from);
 			});
 			
 			var wr = fs.createWriteStream(to, {mode: 0775});
 			wr.on('error', function(error){
-				logger.error('WRITE ERROR (%d) - %s ', error.errno, error.code);
+				logger.error('Write Error - %s (%d): %s', error.code, error.errno, to);
 			});
 			wr.on('close', callback);
 			rd.pipe(wr);
 		} catch(e) {
-			logger.error(e.message);
+			logger.error('helper.fileCopy: %s', e.message);
 		}
 	},
 	
@@ -42,7 +42,7 @@ exports = module.exports = {
 			}
 			fs.rename(from, to, callback);
 		} catch(e) {
-			logger.error(e.message);
+			logger.error('helper.fileMove: %s', e.message);
 		}
 	},
 	
@@ -104,42 +104,45 @@ exports = module.exports = {
 	},
 	
 	formatName: function(data){
-		var defaults = {
-			format: nconf.get('media:shows:format'),
-			season: null,
-			episodes: [],
-			ext: null
-		};
-		var values = extend(defaults, data);
-		var token = {
-			'E': null,
-			'S': null,
-			'T': null,
-			'X': null,
-		};
-		
-		if (values.episodes.length > 1) {
-			values.episodes.sort(function(a,b){
-				if (a.episode < b.episode) return -1;
-				if (a.episode > b.episode) return 1;
-				return 0;
+		try {
+			var defaults = {
+				format: nconf.get('media:shows:format'),
+				season: null,
+				episodes: [],
+				ext: null
+			};
+			var values = extend(defaults, data);
+			var token = {
+				'E': null,
+				'S': null,
+				'T': null,
+				'X': null,
+			};
+			if (values.episodes.length > 1) {
+				values.episodes.sort(function(a,b){
+					if (a.episode < b.episode) return -1;
+					if (a.episode > b.episode) return 1;
+					return 0;
+				});
+				token.E = helper.zeroPadding(values.episodes[0].episode)+'-'+helper.zeroPadding(values.episodes[values.episodes.length-1].episode);
+				var titles = [];
+				values.episodes.forEach(function(episode){
+					titles.push(episode.title.replace('/', '-'));
+				});
+				token.T = titles.join('; ');
+			} else {
+				token.E = helper.zeroPadding(values.episodes[0].episode);
+				token.T = values.episodes[0].title.replace('/', '-');
+			}
+			token.S = helper.zeroPadding(values.season);
+			token.X = values.ext.replace(/^\./, '');
+			
+			return values.format.replace(/%(\w)/g, function(match, key){			
+				return token[key];
 			});
-			token.E = helper.zeroPadding(values.episodes[0].episode)+'-'+helper.zeroPadding(values.episodes[values.episodes.length-1].episode);
-			var titles = [];
-			values.episodes.forEach(function(episode){
-				titles.push(episode.title.replace('/', '-'));
-			});
-			token.T = titles.join('; ');
-		} else {
-			token.E = helper.zeroPadding(values.episodes[0].episode);
-			token.T = values.episodes[0].title.replace('/', '-');
+		} catch(e) {
+			logger.error('helper.formatName: %s', e.message);
 		}
-		token.S = helper.zeroPadding(values.season);
-		token.X = values.ext.replace(/^\./, '');
-		
-		return values.format.replace(/%(\w)/g, function(match, key){			
-			return token[key];
-		});
 	},
 	formatDirectory: function(name){
 		// Sanitize the directory names
@@ -147,11 +150,11 @@ exports = module.exports = {
 	},
 	
 	parseFeed: function(url, since, callback){
-		var helper = this;
-		// parse a rss feed
-		request.get(url, function(error, req, xml){
+		try {
+			var helper = this;
+			// parse a rss feed
+			request.get(url, function(error, req, xml){
 			if (error) return;
-			try {
 				parser.parseString(xml, function(error, json){
 					if (!json.rss.channel[0].item) return;
 					json.rss.channel[0].item.forEach(function(item){
@@ -184,10 +187,10 @@ exports = module.exports = {
 						if (typeof(callback) == 'function') callback(null, response);
 					});
 				});
-			} catch(e) {
-				logger.error('helper.parseFeed:', e.message);
-			}
-		});
+			});
+		} catch(e) {
+			logger.error('helper.parseFeed: %s', e.message);
+		}
 	},
 	
 	// Torrent methods
@@ -208,20 +211,24 @@ exports = module.exports = {
 	},
 	
 	createMagnet: function(hash, name){
-		if (!hash) return;
-		if (!name) name = hash;
-		var trackers = [
-			'udp://open.demonii.com:1337',
-			'udp://tracker.ccc.de:80',
-			'udp://tracker.coppersurfer.tk:6969',
-			'udp://tracker.istole.it:80',
-			'udp://tracker.openbittorent.com:80',
-			'udp://tracker.publicbt.com:80'
-		];
-		var tr = [];
-		trackers.forEach(function(tracker){
-			tr.push('tr='+tracker+'/announce');
-		});
-		return 'magnet:?xt=urn:btih:'+hash+'&dn='+name+'&'+tr.join('&');
+		try {
+			if (!hash) return;
+			if (!name) name = hash;
+			var trackers = [
+				'udp://open.demonii.com:1337',
+				'udp://tracker.ccc.de:80',
+				'udp://tracker.coppersurfer.tk:6969',
+				'udp://tracker.istole.it:80',
+				'udp://tracker.openbittorent.com:80',
+				'udp://tracker.publicbt.com:80'
+			];
+			var tr = [];
+			trackers.forEach(function(tracker){
+				tr.push('tr='+tracker+'/announce');
+			});
+			return 'magnet:?xt=urn:btih:'+hash+'&dn='+name+'&'+tr.join('&');
+		} catch(e){
+			logger.error('helper.createMagnet: %s', e.message);
+		}
 	}
 };

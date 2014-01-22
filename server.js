@@ -4,6 +4,7 @@ try{require('newrelic');}catch(e){}
 /* Global Methods */
 
 var logger = global.logger = require('log4js').getLogger();
+logger.replaceConsole();
 
 var pkg = require('./package.json');
 

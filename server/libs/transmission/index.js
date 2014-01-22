@@ -48,7 +48,7 @@ var torrent = {
 				if (typeof(callback) == 'function') callback(error, args);
 			});
 		} catch(e) {
-			logger.error(e.message);
+			logger.error('transmission.add: %s', e.message);
 		}
 	},
 	
@@ -82,7 +82,7 @@ var torrent = {
 				console.log(error, args);
 			})
 		} catch(e) {
-			logger.error(e.message);
+			logger.error('transmission.blocklist: %s', e.message);
 		}
 	},
 	
@@ -92,7 +92,6 @@ var torrent = {
 		var episodeCollection = db.collection('episode');
 		
 		try {
-			
 			if (!this.rpc) return;
 			// Get a list of all completed torrents
 			this.rpc.get(function(error, data){
@@ -167,8 +166,8 @@ var torrent = {
 						episodeCollection.count({hash: hash}, function(error, count){
 							if (error) return;
 							if (count >= 1){
-								self.rpc.remove({id: item.id, purge: true}, function(error){
-									if (error) logger.error(error);
+								self.remove({id: item.id, purge: true}, function(error){
+									if (error) logger.error('transmission.complete.isFinished: %s', error);
 								});
 							}
 						});
@@ -176,7 +175,7 @@ var torrent = {
 				});
 			});
 		} catch(e) {
-			logger.error(e.message);
+			logger.error('transmission.complete: %s', e.message);
 		}
 	},
 	
@@ -187,17 +186,21 @@ var torrent = {
 				if (typeof(callback) == 'function') callback(error, args);
 			});
 		} catch(e){
-			logger.error(e.message);
+			logger.error('transmission.list: %s', e.message);
 		}
 	},
 	remove: function(data, callback){
-		// TODO: make this better
-		if (!data.id) return;
-		if (!data.purge) data.purge = false;
-		
-		this.rpc.remove(data.id, data.purge, function(error){
-			if (typeof(callback) == 'function') callback(error);
-		});
+		try {
+			// TODO: make this better
+			if (!data.id) return;
+			if (!data.purge) data.purge = false;
+			
+			this.rpc.remove(data.id, data.purge, function(error){
+				if (typeof(callback) == 'function') callback(error);
+			});
+		} catch(e){
+			logger.error('transmission.list: %s', e.message);
+		}
 	},
 	repacked: function(hash) {
 		var self = this;
@@ -211,7 +214,7 @@ var torrent = {
 				});
 			});
 		} catch(e){
-			logger.error(e.message);
+			logger.error('transmission.repacked: %s', e.message);
 		}
 	},
 	start: function(id, callback){
