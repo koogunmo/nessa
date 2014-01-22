@@ -1,15 +1,19 @@
 "use strict";
-try{require('newrelic');}catch(e){}
-/***********************************************************************/
-/* Global Methods */
 
+/* Enable New Relic Monitoring, if available */
+try{require('newrelic')} catch(e){}
+
+/***********************************************************************/
+/* Set up logging to run according to the environment */
+if (!process.env.NODE_ENV) process.env.NODE_ENV = 'production';
 var log4js = require('log4js');
 	log4js.replaceConsole();
 var logger = global.logger = log4js.getLogger();
-logger.setLevel('WARN');
+logger.setLevel((process.env.NODE_ENV == 'production') ? 'WARN' : 'ALL');
 
+/***********************************************************************/
+/* Global Configuration */
 var pkg = require('./package.json');
-
 global.plugin = function(name){
 	try {
 		return require(__dirname + '/server/libs/' + name);
@@ -20,35 +24,32 @@ global.plugin = function(name){
 }
 
 /* Load Settings */
-global.nconf = require('nconf');
-
-global.nconf.file({
-	file: __dirname + '/settings.json'
-}).defaults({
-	installed: false,
-	listen: {
-		address: '0.0.0.0',
-		port: 6377,
-	},
-	run: {
-		user: 'media',
-		group: 'media'
-	},
-	system: {
-		branch: 'master'
-	}
-});
-
-if (process.cwd() != __dirname) {
-	try {
+try {
+	global.nconf = require('nconf');
+	global.nconf.file({
+		file: __dirname + '/settings.json'
+	}).defaults({
+		installed: false,
+		listen: {
+			address: '0.0.0.0',
+			port: 6377,
+		},
+		run: {
+			user: 'media',
+			group: 'media'
+		},
+		system: {
+			branch: 'master'
+		}
+	});
+	/* Set a friendly process name */
+	if (process.title) process.title = 'NodeTV';
+	if (process.cwd() != __dirname) {
 		process.chdir(__dirname);
-	} catch(e) {
-		logger.error(e.message);
 	}
+} catch(e){
+	logger.warn(e.message);
 }
-
-/* Set a friendly process name */
-if (process.title) process.title = 'NodeTV';
 
 /***********************************************************************/
 /* Load dependencies */
@@ -58,8 +59,6 @@ var connect	= require('connect'),
 	fs		= require('fs'),
 	path	= require('path'),
 	uuid	= require('node-uuid');
-
-
 
 var passport		= require('passport'),
 	LocalStrategy	= require('passport-local').Strategy;
@@ -186,8 +185,7 @@ try {
 		});
 	} else {
 		nconf.set('installed', false);
-		logger.warn('Waiting for install');
-		
+		logger.warn('Waiting for install to complete.');
 		app.use(function(req, res) {	
 			res.sendfile(__dirname + '/app/views/index.html');
 		});
