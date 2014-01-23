@@ -371,9 +371,9 @@ input.ng-invalid {
 				-ms-transition: all 0.5s;
 				-webkit-transition: all 0.5s;
 				width: 90px;
-			}
-			> img {
-				display: none;
+				> img {
+					display: none;
+				}
 			}
 			/*
 			&:hover {
