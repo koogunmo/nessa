@@ -14,7 +14,7 @@ var system = {
 					type: 'warning',
 					message: 'Update in progress'
 				});
-				var restart = (success.indexOf('already up-to-date') == 0) ? false : true;
+				var restart = (success.indexOf('Already up-to-date') == 0) ? false : true;
 				
 				var interval = setInterval(function(){
 					if (restart) {

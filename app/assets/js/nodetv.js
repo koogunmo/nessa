@@ -254,6 +254,10 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 				opened = false;
 			});
 		};
+		$scope.clearFilter = function(){
+			$scope.filter.name = '';
+			$(document).trigger('lazyload');
+		};
 		
 		$scope.view = function(tvdb){
 			if (opened) return;
