@@ -1,9 +1,11 @@
-var git = require('gitty'),
-	npm = require('npm');
+var git = require('gitty');
+var npm = require('npm');
 
 var system = {
 	update: function(callback){
 		try {
+			var restart = false;
+			
 			var repo = git(process.cwd());
 			repo.pull('origin', nconf.get('system:branch'), function(error, success){
 				if (error) {
@@ -14,19 +16,12 @@ var system = {
 					type: 'warning',
 					message: 'Update in progress'
 				});
-				var restart = (success.indexOf('Already up-to-date') == 0) ? false : true;
+				if (success.indexOf('already up-to-date') == -1) restart = true;
 				
-				var interval = setInterval(function(){
-					if (restart) {
-						clearInterval(interval);
-						logger.info('Updates installed.');
-						system.restart();
-					}
-				}, 5000);
-				
+				/*
 				npm.load({
 					loglevel: 'warn',
-				},function(error){
+				}, function(error){
 					if (error) {
 						logger.error(error);
 						return;
@@ -42,13 +37,16 @@ var system = {
 							return;
 						}
 						restart = true;
-					})
+					});
 				});
+				*/
+				if (restart) self.restart();
 			});
 		} catch(e) {
 			logger.error(e.message);
 		}
 	},
+	
 	restart: function(){
 		try {
 			logger.info('Restarting.');
