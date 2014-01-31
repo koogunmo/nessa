@@ -41,6 +41,7 @@ var system = {
 				});
 				*/
 				if (restart) self.restart();
+		//		if (typeof(callback) == 'function') callback();
 			});
 		} catch(e) {
 			logger.error(e.message);

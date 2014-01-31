@@ -12,6 +12,7 @@ var ObjectID = require('mongodb').ObjectID;
 var ShowData = {
 	
 	add: function(tvdb, callback){
+		tvdb = parseInt(tvdb, 10);
 		var self = this;
 		var showCollection = db.collection('show');
 		
@@ -176,6 +177,7 @@ var ShowData = {
 	},
 	
 	summary: function(tvdb, callback){
+		tvdb = parseInt(tvdb, 10);
 		var self = this;
 		var showCollection = db.collection('show');
 		showCollection.findOne({tvdb: tvdb}, function(error, show){
@@ -183,10 +185,20 @@ var ShowData = {
 			self.episodes(show.tvdb, function(error, episodes){
 				var response = {
 					summary: show,
-					listing: episodes
+					listing: episodes,
+					total: {
+						episodes: 0,
+						watched: 0
+					}
 				};
 				response.displaypath = nconf.get('media:base') + nconf.get('media:shows:directory') + '/' +show.directory;
-			
+				
+				episodes.forEach(function(seasons){
+					seasons.episodes.forEach(function(episode){
+						if (episode.watched) response.total.watched++;
+						response.total.episodes++;
+					});
+				});
 				if (typeof(callback) == 'function') callback(null, response);
 			});
 		});

@@ -11,7 +11,6 @@
 			</tab>
 			
 			<tab heading="Episodes">
-				
 				<accordion class="seasons">
 					<accordion-group heading="{{display()}}" class="season" ng-repeat="season in listing | orderBy:'season':true" ng-controller="seasonCtrl">
 						
@@ -38,54 +37,15 @@
 						</div>
 					</accordion-group>
 				</accordion>
-				
 				<!--
-				<div id="seasons" class="panel-group">
-					<div class="panel panel-default" ng-repeat="season in listing | orderBy:'season':true" ng-controller="seasonCtrl">
-						<div class="panel-heading" data-toggle="collapse" data-parent="#seasons" href="#season-{{season.season}}">
-							<h4 class="panel-title">
-								<span class="glyphicon glyphicon-eye-close pull-right" ng-if="!seen" title="Mark season as watched" ng-click="watched()"></span>
-								{{display()}}
-							</h4>
-						</div>
-						<div id="season-{{season.season}}" class="season panel-collapse collapse">
-							<div class="panel-body">
-								<div class="episode" ng-repeat="episode in season.episodes | orderBy:'episode'" ng-controller="episodeCtrl" ng-class="{unaired: !hasAired()}">
-									
-									<h5 class="title"><span class="small">{{episode.episode | zeroPad:2}}</span>{{episode.title || 'TBA'}}</h5>
-									
-									<div class="extended" ng-switch="hasAired()">
-										<p class="synopsis">{{episode.synopsis || 'No synopsis available'}}</p>
-										
-										<div class="tools" ng-switch-when="true">
-											<span class="glyphicon glyphicon-eye-close action" title="Mark episode as watched" ng-if="episode.file && !episode.watched" ng-click="watched()"></span>
-											<span class="glyphicon glyphicon-eye-open action" title="Episode has been watched" ng-if="episode.file && episode.watched" ng-click="watched()"></span>
-											
-											<span class="glyphicon glyphicon-cloud-download action" title="Download this episode" ng-if="!episode.file && episode.hash" ng-click="download()"></span>
-											<span class="glyphicon glyphicon-hdd" title="This episode has been downloaded" ng-if="episode.status && episode.file"></span>
-										</div>
-										
-										<div class="tools" ng-switch-when="false">
-											<span ng-if="!hasAired()">
-												{{episode.airdate*1000 | date:'yyyy-MM-dd'}}
-											</span>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>	
-				</div>
+				<progress>
+					<bar value="(total.watched/total.episodes)*100" type="success"></bar>
+					<bar value="100-((total.watched/total.episodes)*100)" type="danger"></bar>
+				</progress>
 				-->
 			</tab>
 			<tab heading="Settings">
 				<div class="well" ng-switch on="summary.status">
-					<!--
-					<div class="form-group">
-						<label for="ipt_setting_directory">Media Directory</label>
-						<input type="text" ng-model="displaypath" readonly="readonly" class="form-control" />
-					</div>
-					-->
 					<div class="form-group">
 						<input type="checkbox" name="status" ng-model="summary.status" ng-checked="summary.status" />
 						<label for="ipt_setting_status">Download new episodes when available</label>
@@ -100,9 +60,19 @@
 					</div>
 				</div>
 				<div class="form-group">
-					<button type="button" class="btn btn-info" ng-click="update()">Update listings</button>
-					<button type="button" class="btn btn-warning" ng-click="rescan()">Rescan Files</button>
-					<button type="button" class="btn btn-danger" ng-click="remove()">Remove Show</button>
+					<button type="button" class="btn btn-info" ng-click="update()">
+						<span class="glyphicon glyphicon-list"></span>
+						Update listings
+					</button>
+					<button type="button" class="btn btn-warning" ng-click="rescan()">
+						<span class="glyphicon glyphicon-refresh"></span>
+						Rescan Files
+					</button>
+					
+					<button type="button" class="btn btn-danger" ng-click="remove()">
+						<span class="glyphicon glyphicon-trash"></span>
+						Remove Show
+					</button>
 				</div>
 			</tab>
 		</tabset>

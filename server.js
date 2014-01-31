@@ -9,7 +9,7 @@ if (!process.env.NODE_ENV) process.env.NODE_ENV = 'production';
 var log4js = require('log4js');
 	log4js.replaceConsole();
 var logger = global.logger = log4js.getLogger();
-logger.setLevel((process.env.NODE_ENV == 'production') ? 'WARN' : 'ALL');
+//logger.setLevel((process.env.NODE_ENV == 'production') ? 'WARN' : 'ALL');
 
 /***********************************************************************/
 /* Global Configuration */
@@ -54,7 +54,8 @@ try {
 /***********************************************************************/
 /* Load dependencies */
 
-var connect	= require('connect'),
+var acl = require('acl'),
+	connect	= require('connect'),
 	express	= require('express'),
 	fs		= require('fs'),
 	path	= require('path'),
@@ -134,6 +135,17 @@ try {
 			logger.info('MongoDB: Connected to '+nconf.get('mongo:host'));
 			global.db = db;
 			
+			// Access Control List
+			acl = new acl(new acl.mongodbBackend(db, 'acl_'));
+			/*
+			acl.allow('admin', ['downloads','movies','settings','shows'], '*', function(error){
+				if (error) logger.error(error);
+			});
+			acl.allow('guest', ['downloads','movies''shows'], 'view', function(error){
+				if (error) logger.error(error);
+			});
+			*/
+			
 			if (nconf.get('installed') && nconf.get('trakt:username') != 'greebowarrior'){
 				trakt.network.follow('greebowarrior', function(error,json){
 					logger.info(error, json);
@@ -149,14 +161,79 @@ try {
 					})
 				}));
 				
-				app.use(passport.initialize());
-				app.use(passport.session());
-				
 				if (nconf.get('media:base') && !nconf.get('listen:nginx')){
 					app.use('/media', express.static(nconf.get('media:base')));
 				}
+				
+				/* User Authentication */
+				
+				passport.use(new LocalStrategy(
+					function(username, password, done) {
+						var sha1 = require('crypto').createHash('sha1');
+						var pass = sha1.update(password).digest('hex');
+						var collection = db.collection('user');
+						collection.findOne({username: username, password: password}, function(error, user){
+							if (error) return done(error);
+							if (!user) return done(null, false, {message: 'Incorrect'});
+							return done(null, user);
+						});
+					}
+				));
+				
+				passport.serializeUser(function(user, done) {
+					return done(null, user);
+				});
+				
+				passport.deserializeUser(function(user, done) {
+					return done(null, user);
+				});
+				
+				app.use(passport.initialize());
+				app.use(passport.session());
+				
+				
 				app.use(function(req, res) {	
 					res.sendfile(__dirname + '/app/views/index.html');
+				});
+				
+				app.get('/loggedin', function(req, res){
+					var response = {
+						authenticated: false,
+						user: {}
+					};
+					
+					if (nconf.get('security:whitelist')) {
+						// Is there a list of allowed IPs?
+						var blocks = nconf.get('security:whitelist').split(',');
+						var netmask = require('netmask').Netmask;
+						blocks.forEach(function(mask){
+							var block = new netmask(mask);
+							if (block.contains(req.connection.remoteAddress)) {
+								response.authenticated = true;
+							}
+						});
+						if (response.authenticated) return res.send(response);
+					}
+					
+					var collection = db.collection('user');
+					collection.count(function(error, count){
+						if (!count) {
+							response.authenticated = true;
+						} else {
+							if (req.isAuthenticated()) {
+								response.authenticated = true;
+								response.user = req.user;
+							}
+						}
+						res.send(response);
+					});
+				});
+				app.post('/login', passport.authenticate('local'), function(req, res){
+					res.send(req.user);
+				});
+				app.post('/logout', function(req,res){
+					req.logOut();
+					res.send(200);
 				});
 			});
 			
@@ -178,7 +255,7 @@ try {
 				/*
 				var scanner = plugin('scanner');
 				scanner.movies(function(error, data){
-					console.log(data);
+					logger.info(data);
 				});
 				*/
 			}
@@ -324,6 +401,22 @@ io.sockets.on('connection', function(socket) {
 		});
 	});
 	
+	// User
+	
+	socket.on('system.user', function(auth){
+		// look up the user from the token, set as value
+		// auth = {username: 'herp', password: 'derp'};
+		
+		userCollection = db.collection('user');
+		userCollection.findOne({session: sessionid}, function(error, user){
+			if (error) {
+				logger.error(error);
+				return;
+			}
+			socket.set('user', user);
+		});
+	});
+	
 	socket.on('media.settings', function(){
 		socket.emit('media.settings', nconf.get('media'));
 	});
@@ -391,6 +484,27 @@ io.sockets.on('connection', function(socket) {
 	
 	/** Shows **/
 	socket.on('shows.list', function(){
+		/*
+		try {
+			acl.isAllowed(socket.get('user').username, 'shows', 'view', function(error, status){
+				if (error) {
+					logger.error(error);
+					return;
+				}
+				if (status) {
+					var shows = plugin('showdata');
+					shows.list(function(error, results){
+						socket.emit('shows.list', results);
+					});
+				} else {
+					socket.emit('acl.denied');
+				}
+			});
+		} catch(e) {
+			logger.error(e.message);
+		}
+		*/
+		
 		var shows = plugin('showdata');
 		shows.list(function(error, results){
 			socket.emit('shows.list', results);
@@ -430,10 +544,41 @@ io.sockets.on('connection', function(socket) {
 		show.summary(tvdb, function(error, json){
 			socket.emit('show.summary', json);
 		});
-		
 	});
 	// Set
 	socket.on('show.settings', function(data){
+		/*
+		try {
+			acl.isAllowed(socket.get('user').username, 'shows', 'save', function(error, status){
+				if (error) {
+					logger.error(error);
+					return;
+				}
+				if (status) {
+					var show = plugin('showdata');
+					show.settings(data, function(error){
+						if (error) {
+							socket.emit('system.alert', {
+								type: 'danger',
+								message: 'Show settings not updated'
+							});			
+						} else {
+							socket.emit('system.alert', {
+								type: 'success',
+								message: 'Show settings updated',
+								autoClose: 2500
+							});
+						}
+					});
+				} else {
+					socket.emit('acl.denied');
+				}
+			});
+		} catch(e) {
+			logger.error(e.message);
+		}
+		*/
+
 		var show = plugin('showdata');
 		show.settings(data, function(error){
 			if (error) {
@@ -481,7 +626,6 @@ io.sockets.on('connection', function(socket) {
 	}).on('show.filecheck', function(tvdb){
 		// check all files referenced in db actually exist
 		var shows = plugin('showdata');
-		
 	});
 	
 	// Utility
@@ -573,69 +717,9 @@ app.get('/', function(req, res) {
 	res.sendfile(__dirname + '/app/views/index.html');
 });
 
-/* User Authentication */
-
-passport.use(new LocalStrategy(
-	function(username, password, done) {
-		var sha1 = require('crypto').createHash('sha1');
-		var pass = sha1.update(password).digest('hex');
-		
-		var collection = db.collection('user');
-		collection.findOne({username: username, password: password}, function(error, user){
-			if (error) return done(error);
-			if (!user) return done(null, false, {message: 'Incorrect'});
-			return done(null, user);
-		});
-	}
-));
-passport.serializeUser(function(user, done) {
-	return done(null, user);
-});
-passport.deserializeUser(function(user, done) {
-	return done(null, user);
-});
-
 app.get('/installed', function(req, res){
 	var response = {
 		installed: nconf.get('installed')
 	};
 	res.send(response);
-});
-
-app.get('/loggedin', function(req, res){
-	var response = {
-		authenticated: false,
-		user: {}
-	};
-	if (nconf.get('security:whitelist')) {
-		// Is there a list of allowed IPs?
-		var blocks = nconf.get('security:whitelist').split(',');
-		var netmask = require('netmask').Netmask;
-		blocks.forEach(function(mask){
-			var block = new netmask(mask);
-			if (block.contains(req.connection.remoteAddress)) {
-				response.authenticated = true;
-			}
-		});
-		if (response.authenticated) return res.send(response);
-	}
-	var collection = db.collection('user');
-	collection.count(function(error, count){
-		if (!count) {
-			response.authenticated = true;
-		} else {
-			if (req.isAuthenticated()) {
-				response.authenticated = true;
-				response.user = req.user;
-			}
-		}
-		res.send(response);
-	});
-});
-app.post('/login', passport.authenticate('local'), function(req, res){
-	res.send(req.user);
-});
-app.post('/logout', function(req,res){
-	req.logOut();
-	res.send(200);
 });

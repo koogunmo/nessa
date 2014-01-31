@@ -20,7 +20,7 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		})
 	});
 	
-	nessa.controller('loginCtrl', function($scope, $rootScope, $http, $location, $window){
+	nessa.controller('loginCtrl', function($scope, $socket, $rootScope, $http, $location, $window){
 		$scope.user = {};
 		
 		$scope.login = function(){
@@ -230,7 +230,7 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 			if ($location.search().tvdb) {
 				$scope.view($location.search().tvdb);
 			} else {
-				if (opened) modal.close('navigation');
+				if (opened && modal) modal.close('navigation');
 			}
 		};
 		$scope.$on('$routeChangeSuccess', routeChange)
@@ -260,6 +260,7 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		};
 		
 		$scope.view = function(tvdb){
+		//	console.log(tvdb, opened);
 			if (opened) return;
 			opened = true;
 			$socket.emit('show.summary', tvdb);
@@ -267,6 +268,9 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		
 		/* Open modal window containing show information */
 		$socket.on('show.summary', function(json){
+			
+			console.log(json);
+			
 			modal = $modal.open({
 				templateUrl: '/views/modal/show.html',
 				controller: 'showCtrl',
@@ -282,6 +286,9 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 					},
 					listing: function(){
 						return json.listing;
+					},
+					total: function(){
+						return json.total;
 					}
 				}
 			});
@@ -347,10 +354,13 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		});
 	});
 	
-	nessa.controller('showCtrl', function($scope, $modalInstance, $socket, settings, summary, listing){
+	nessa.controller('showCtrl', function($scope, $modalInstance, $socket, settings, summary, listing, total){
 		$scope.settings = settings;
 		$scope.summary = summary;
 		$scope.listing = listing;
+		$scope.total = total;
+		
+		console.log(total);
 		
 		$scope.close = function(){
 			$modalInstance.close();
