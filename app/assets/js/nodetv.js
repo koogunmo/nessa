@@ -233,7 +233,8 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 				if (opened && modal) modal.close('navigation');
 			}
 		};
-		$scope.$on('$routeChangeSuccess', routeChange)
+		$scope.$on('$routeChangeStart', routeChange)
+		$scope.$on('$routeChangeSuccess', routeChange);
 		$scope.$on('$routeUpdate', routeChange);
 		
 		$scope.shows	= [];

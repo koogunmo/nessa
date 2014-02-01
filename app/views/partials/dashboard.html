@@ -25,7 +25,7 @@
 			<div class="panel-heading">
 				<span class="glyphicon glyphicon-eye-open pull-right" title="Episode has been watched" ng-if="episode.watched" ng-click="watched()"></span>
 				<span class="glyphicon glyphicon-eye-close pull-right" title="Episode has not been watched" ng-if="!episode.watched" ng-click="watched()"></span>
-				<h4 class="panel-title">{{episode.show_name}} <span class="small">{{episode.title}}</span></h4>
+				<h4 class="panel-title"><a href="/shows/?tvdb={{episode.tvdb}}">{{episode.show_name}}</a> <span class="small">{{episode.title}}</span></h4>
 			</div>
 			<div class="panel-body">
 				<div><strong>Season {{episode.season}}, Episode {{episode.episode}}</strong> <span class="small">{{episode.airdate*1000 | date:'dd MMMM yyyy'}}</span></div>
@@ -42,7 +42,7 @@
 		<div ng-repeat="day in upcoming">
 			<div class="panel panel-info" ng-repeat="episode in day.episodes">
 				<div class="panel-heading">
-					<h4 class="panel-title">{{episode.show.title}} <span class="small">{{episode.episode.title}}</span></h4>
+					<h4 class="panel-title"><a href="/shows/?tvdb={{episode.show.tvdb_id}}">{{episode.show.title}}</a> <span class="small">{{episode.episode.title}}</span></h4>
 				</div>
 				<div class="panel-body">
 					<div><strong>Season {{episode.episode.season}}, Episode {{episode.episode.number}}</strong> <span class="small">{{episode.episode.first_aired*1000 | date:'dd MMMM yyyy'}}</span></div>
