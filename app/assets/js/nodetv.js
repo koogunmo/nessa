@@ -246,7 +246,12 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 			modal = $modal.open({
 				templateUrl: '/views/modal/add.html',
 				controller: 'searchCtrl',
-				windowClass: 'modal-add'
+				windowClass: 'modal-add',
+				resolve: {
+					search: function(){
+						return ($scope.filter) ? $scope.filter.name : '';
+					}
+				}
 			});
 			modal.opened.then(function(){
 				opened = true;
@@ -269,9 +274,6 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		
 		/* Open modal window containing show information */
 		$socket.on('show.summary', function(json){
-			
-			console.log(json);
-			
 			modal = $modal.open({
 				templateUrl: '/views/modal/show.html',
 				controller: 'showCtrl',
@@ -320,14 +322,17 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		$socket.emit('shows.list');
 	});
 	
-	nessa.controller('searchCtrl', function($scope, $modalInstance, $socket){
+	nessa.controller('searchCtrl', function($scope, $modalInstance, $socket, search){
 		$scope.selected = null;
 		$scope.search = {
-			query: ''
+			query: search
 		};
+		$socket.emit('shows.search', $scope.search.query);
 		
 		$socket.on('shows.search', function(results){
-			$scope.results = results;
+		//	$scope.$apply(function(){
+				$scope.results = results;
+		//	});
 		});
 		$scope.close = function(){
 			$modalInstance.close();
@@ -360,8 +365,6 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		$scope.summary = summary;
 		$scope.listing = listing;
 		$scope.total = total;
-		
-		console.log(total);
 		
 		$scope.close = function(){
 			$modalInstance.close();
