@@ -208,7 +208,7 @@ var torrent = {
 			// A torrent has been repacked - Trash the previous transfer
 			self.list(function(error, transfers){
 				transfers.torrents.forEach(function(transfer){
-					if (transfer.hashString == hash) {
+					if (transfer.hashString.toUpperCase() == hash) {
 						self.remove({id: transfer.id, purge: true});
 					}
 				});

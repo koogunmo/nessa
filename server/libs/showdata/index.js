@@ -390,22 +390,22 @@ var ShowData = {
 						var insert = false;
 						var obtain = false;
 						
+						
+						/* This chunk isn't being executed. Why? */
 						episodes.forEach(function(episode){
 							if (!episode.status && !episode.file) obtain = true;
+							if (!episode.hash) insert = true;
 							if (json.repack && json.hash != episode.hash) {
 								try {
 									torrent.repacked(episode.hash);
 									self.deleteEpisode(show.tvdb, json.season, json.episodes);
-									
 									insert = true;
 									obtain = true;
 								} catch(e) {
 									logger.error(e.message);
 								}
 							}
-							if (!episode.hash) insert = true;
 						});
-						
 						if (insert) {
 							episodeCollection.update({
 								tvdb: show.tvdb,

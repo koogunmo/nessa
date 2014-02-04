@@ -10,9 +10,7 @@ var rule = new schedule.RecurrenceRule();
 schedule.scheduleJob(rule, function(){
 	tvshows.getLatest();
 });
-setTimeout(function(){
-	tvshows.getLatest();
-}, 30000);
+tvshows.getLatest();
 
 
 
