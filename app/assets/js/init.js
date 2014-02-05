@@ -2,11 +2,11 @@
 
 requirejs.config({
 	paths: {
-		'angular': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.2.10/angular.min',
-		'jquery': 'https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min',
-		'ngCookies': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.2.10/angular-cookies.min',
-		'ngResource': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.2.10/angular-resource.min',
-		'ngRoute': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.2.10/angular-route.min',
+		'angular': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.2.11/angular.min',
+		'jquery': 'https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min',
+		'ngCookies': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.2.11/angular-cookies.min',
+		'ngResource': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.2.11/angular-resource.min',
+		'ngRoute': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.2.11/angular-route.min',
 		'socket.io': 'libs/socket.io.min',
 		'ui.bootstrap': 'libs/ui-bootstrap.min',
 		// For future use
