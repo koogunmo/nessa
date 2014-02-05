@@ -204,6 +204,14 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		};
 	});
 	
+	nessa.controller('unwatchedCtrl', function($scope, $socket){
+		$socket.emit('shows.unwatched');
+		
+		
+		
+		
+	});
+	
 	nessa.controller('moviesCtrl', function($scope, $modal, $socket){
 		$scope.movies = [];
 		$scope.settings = {};
