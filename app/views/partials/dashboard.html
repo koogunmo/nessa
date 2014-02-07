@@ -3,53 +3,56 @@
 		There are <a href="/shows/match" class="alert-link">unmatched shows</a> that need updating
 	</div>
 	
-	<div ng-if="latest.length>=1">
-		<div class="page-header">
-			<h3>Latest Shows</h3>
-			<!--
-			<div class="btn-group">
-				<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-					View <span class="caret"></span>
-				</button>
-				<ul class="dropdown-menu" role="menu">
-					<li><a href="#">All</a></li>
-					<li class="divider"></li>
-					<li><a ng-click="" href="#">Watched</a></li>
-					<li><a href="#">Unwatched</a></li>
-				</ul>
+	<div class="row">
+		<div class="col-sm-6" ng-if="latest.length>=1">
+			<div class="page-header">
+				<h3>Last 7 days</h3>
+				<!--
+				<div class="btn-group">
+					<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+						View <span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu" role="menu">
+						<li><a href="#">All</a></li>
+						<li class="divider"></li>
+						<li><a ng-click="" href="#">Watched</a></li>
+						<li><a href="#">Unwatched</a></li>
+					</ul>
+				</div>
+				-->
 			</div>
-			-->
-		</div>
-		
-		<div class="panel panel-success" ng-class="{'watched': episode.watched}" ng-repeat="episode in latest | orderBy:['airdate','show_name']:true" ng-controller="episodeCtrl">
-			<div class="panel-heading">
-				<span class="glyphicon glyphicon-eye-open pull-right" title="Episode has been watched" ng-if="episode.watched" ng-click="watched()"></span>
-				<span class="glyphicon glyphicon-eye-close pull-right" title="Episode has not been watched" ng-if="!episode.watched" ng-click="watched()"></span>
-				<h4 class="panel-title"><a href="/shows/?tvdb={{episode.tvdb}}">{{episode.show_name}}</a> <span class="small">{{episode.title}}</span></h4>
-			</div>
-			<div class="panel-body">
-				<div><strong>Season {{episode.season}}, Episode {{episode.episode}}</strong> <span class="small">{{episode.airdate*1000 | date:'dd MMMM yyyy'}}</span></div>
-				<p>{{episode.synopsis}}</p>
-			</div>
-		</div>
-	</div>
-	
-	<div ng-if="upcoming.length>=1">
-		<div class="page-header">
-			<h3>This Week</h3>
-		</div>
-		
-		<div ng-repeat="day in upcoming">
-			<div class="panel panel-info" ng-repeat="episode in day.episodes">
+			
+			<div class="panel panel-success" ng-class="{'watched': episode.watched}" ng-repeat="episode in latest | orderBy:['airdate','show_name']:true" ng-controller="episodeCtrl">
 				<div class="panel-heading">
-					<h4 class="panel-title"><a href="/shows/?tvdb={{episode.show.tvdb_id}}">{{episode.show.title}}</a> <span class="small">{{episode.episode.title}}</span></h4>
+					<span class="glyphicon glyphicon-eye-open pull-right" title="Episode has been watched" ng-if="episode.watched" ng-click="watched()"></span>
+					<span class="glyphicon glyphicon-eye-close pull-right" title="Episode has not been watched" ng-if="!episode.watched" ng-click="watched()"></span>
+					<h4 class="panel-title"><a href="/shows/?tvdb={{episode.tvdb}}">{{episode.show_name}}</a> <span class="small">{{episode.title}}</span></h4>
 				</div>
 				<div class="panel-body">
-					<div><strong>Season {{episode.episode.season}}, Episode {{episode.episode.number}}</strong> <span class="small">{{episode.episode.first_aired*1000 | date:'dd MMMM yyyy'}}</span></div>
-					<p>{{episode.episode.overview}}</p>
+					<div><strong>Season {{episode.season}}, Episode {{episode.episode}}</strong> <span class="small">{{episode.airdate*1000 | date:'dd MMMM yyyy'}}</span></div>
+					<p>{{episode.synopsis}}</p>
 				</div>
 			</div>
 		</div>
+	
+		<div class="col-sm-6" ng-if="upcoming.length>=1">
+			<div class="page-header">
+				<h3>Next 7 days</h3>
+			</div>
+			
+			<div ng-repeat="day in upcoming">
+				<div class="panel panel-info" ng-repeat="episode in day.episodes">
+					<div class="panel-heading">
+						<h4 class="panel-title"><a href="/shows/?tvdb={{episode.show.tvdb_id}}">{{episode.show.title}}</a> <span class="small">{{episode.episode.title}}</span></h4>
+					</div>
+					<div class="panel-body">
+						<div><strong>Season {{episode.episode.season}}, Episode {{episode.episode.number}}</strong> <span class="small">{{episode.episode.first_aired*1000 | date:'dd MMMM yyyy'}}</span></div>
+						<p>{{episode.episode.overview}}</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	
 	</div>
 	
 	<div class="panel panel-primary">

@@ -201,14 +201,14 @@ try {
 						authenticated: false,
 						user: {}
 					};
-					
 					if (nconf.get('security:whitelist')) {
+						var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 						// Is there a list of allowed IPs?
 						var blocks = nconf.get('security:whitelist').split(',');
 						var netmask = require('netmask').Netmask;
 						blocks.forEach(function(mask){
 							var block = new netmask(mask);
-							if (block.contains(req.connection.remoteAddress)) {
+							if (block.contains(ip)) {
 								response.authenticated = true;
 							}
 						});
