@@ -23,12 +23,12 @@
 			</div>
 			
 			<div class="panel panel-success" ng-class="{'watched': episode.watched}" ng-repeat="episode in latest | orderBy:['airdate','show_name']:true" ng-controller="episodeCtrl">
-				<div class="panel-heading">
+				<div class="panel-heading" ng-click="collapsed=!collapsed">
 					<span class="glyphicon glyphicon-eye-open pull-right" title="Episode has been watched" ng-if="episode.watched" ng-click="watched()"></span>
 					<span class="glyphicon glyphicon-eye-close pull-right" title="Episode has not been watched" ng-if="!episode.watched" ng-click="watched()"></span>
 					<h4 class="panel-title"><a href="/shows/?tvdb={{episode.tvdb}}">{{episode.show_name}}</a> <span class="small">{{episode.title}}</span></h4>
 				</div>
-				<div class="panel-body">
+				<div class="panel-body" collapse="collapsed">
 					<div><strong>Season {{episode.season}}, Episode {{episode.episode}}</strong> <span class="small">{{episode.airdate*1000 | date:'dd MMMM yyyy'}}</span></div>
 					<p>{{episode.synopsis}}</p>
 				</div>

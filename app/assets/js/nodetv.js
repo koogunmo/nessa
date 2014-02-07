@@ -425,6 +425,7 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 	
 	nessa.controller('episodeCtrl', function($scope, $socket){
 		$scope.episode = $scope.$parent.episode;
+		$scope.collapsed = $scope.episode.watched;
 		
 		$scope.watched = function(){
 			$scope.episode.watched = !$scope.episode.watched;
