@@ -191,6 +191,12 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute', 'ui.boo
 			resolve: {
 				loggedin: checkLoggedin
 			}
+		}).when('/shows/unwatched', {
+			templateUrl: '/views/partials/unwatched.html',
+			controller: 'unwatchedCtrl',
+			resolve: {
+				loggedin: checkLoggedin
+			}
 			
 		}).when('/settings', {
 			templateUrl: '/views/partials/settings.html',

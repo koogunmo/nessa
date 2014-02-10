@@ -36,7 +36,21 @@
 			</div>
 			<div class="panel-body">
 				<div class="form-group">
-					<label for="">Media Directory</label><input type="text" class="form-control" required="true" ng-model="settings.shows.base" />
+					<label for="ipt_media_base">Media Directory</label><input type="text" id="ipt_media_base" class="form-control" required="true" ng-model="settings.media.base" />
+				</div>
+				<div class="form-group">
+					<label for="ipt_shows_base">Show Subdirectory</label>
+					<div class="input-group">
+						<span class="input-group-addon">{{settings.media.base}}</span>
+						<input type="text" id="ipt_shows_base" class="form-control" required="true" ng-model="settings.media.shows.directory" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="ipt_movies_base">Movie Subdirectory</label>
+					<div class="input-group">
+						<span class="input-group-addon">{{settings.media.base}}</span>
+						<input type="text" id="ipt_movies_base" class="form-control" required="true" ng-model="settings.media.movies.directory" />
+					</div>
 				</div>
 			</div>
 		</div>

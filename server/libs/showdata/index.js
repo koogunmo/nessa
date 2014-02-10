@@ -298,6 +298,13 @@ var ShowData = {
 		});
 	},
 	
+	getCount: function(callback){
+		var episodeCollection = db.collection('episode');
+		episodeCollection.count({file: {$exists: true}}, function(error, json){
+			if (typeof(callback) == 'function') callback(error, json);
+		});
+	},
+	
 	getEpisode: function(tvdb, season, episode, callback){
 		trakt.show.episode.summary(tvdb, season, episode, function(error, episode){
 			episode.tvdb = tvdb;
@@ -483,6 +490,27 @@ var ShowData = {
 	getUnmatched: function(callback){
 		var unmatchedCollection = db.collection('unmatched');
 		unmatchedCollection.find().toArray(callback);
+	},
+	
+	getUnwatched: function(callback){
+		// Get a list of all unwatched episodes
+		var episodeCollection = db.collection('episode');
+		var showCollection = db.collection('show');
+		var where = {
+			hash: {$exists: true},
+			file: {$exists: true},
+			watched: false
+		};
+		episodeCollection.find(where).toArray(function(error, episodes){
+			var response = {};
+			episodes.forEach(function(episode){
+				if (!response[episode.tvdb]) {
+					response[episode.tvdb] = [];
+				}
+				response[episode.tvdb].push(episode);
+			});
+			if (typeof(callback) == 'function') callback(error, response);
+		});
 	},
 	
 	/******************************************************/

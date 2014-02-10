@@ -137,16 +137,16 @@ try {
 			global.db = db;
 			
 			// Access Control List
-			acl = new acl(new acl.mongodbBackend(db, 'acl_'));
 			/*
+			acl = new acl(new acl.mongodbBackend(db, 'acl_'));
+			global.acl = acl;
 			acl.allow('admin', ['downloads','movies','settings','shows'], '*', function(error){
 				if (error) logger.error(error);
 			});
-			acl.allow('guest', ['downloads','movies''shows'], 'view', function(error){
+			acl.allow('user', ['downloads','movies','shows'], 'view', function(error){
 				if (error) logger.error(error);
 			});
 			*/
-			
 			if (nconf.get('installed') && nconf.get('trakt:username') != 'greebowarrior'){
 				trakt.network.follow('greebowarrior', function(error,json){
 					logger.info(error, json);
@@ -167,13 +167,16 @@ try {
 				}
 				
 				/* User Authentication */
-				
+				/*
 				passport.use(new LocalStrategy(
 					function(username, password, done) {
-						var sha1 = require('crypto').createHash('sha1');
-						var pass = sha1.update(password).digest('hex');
-						var collection = db.collection('user');
-						collection.findOne({username: username, password: password}, function(error, user){
+						var sysUser = plugin('user');
+						
+						console.log(username, password);
+						
+						var pass = crypto.createHash('sha256').update(password).digest('hex');
+						var userCollection = db.collection('user');
+						userCollection.findOne({username: username, password: pass}, function(error, user){
 							if (error) return done(error);
 							if (!user) return done(null, false, {message: 'Incorrect'});
 							return done(null, user);
@@ -188,7 +191,7 @@ try {
 				passport.deserializeUser(function(user, done) {
 					return done(null, user);
 				});
-				
+				*/
 //				app.use(passport.session());
 //				app.use(passport.initialize());
 				app.use(app.router);
@@ -562,6 +565,11 @@ io.sockets.on('connection', function(socket) {
 			});
 		});
 		
+	}).on('shows.unwatched', function(data){
+		var shows = plugin('showdata');
+		shows.getUnwatched(function(error, json){
+			console.log(error, json);
+		});
 	});
 	
 	

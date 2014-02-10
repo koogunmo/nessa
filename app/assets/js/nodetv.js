@@ -78,6 +78,11 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 			$scope.settings = data;
 		});
 		$socket.emit('system.settings');
+		
+		$socket.on('window.reload', function(){
+			window.location.reload();
+		});
+		
 	});
 	
 	nessa.controller('downloadsCtrl', function($scope, $socket){
