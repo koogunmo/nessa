@@ -9,15 +9,15 @@
 					<div class="panel-body">
 						<div class="form-group">
 							<label for="ipt_listen_address">Server Address</label>
-							<input type="text" id="ipt_listen_address" name="listen:address" class="form-control" placeholder="0.0.0.0" required="true" ng-model="settings.listen.address" />
+							<input type="text" id="ipt_listen_address" class="form-control" placeholder="0.0.0.0" required="true" ng-model="settings.listen.address" />
 						</div>
 						<div class="form-group">
 							<label for="ipt_listen_port">Server Port</label>
-							<input type="text" id="ipt_listen_port" name="listen:port" class="form-control" placeholder="6377" required="true" ng-model="settings.listen.port" />
+							<input type="text" id="ipt_listen_port" class="form-control" placeholder="6377" required="true" ng-model="settings.listen.port" />
 						</div>
 						<div class="form-group">
 							<label class="checkbox-inline">
-								<input type="checkbox" id="ipt_listen_nginx" name="listen:nginx" ng-model="settings.listen.nginx" />
+								<input type="checkbox" id="ipt_listen_nginx" ng-model="settings.listen.nginx" />
 								<strong>Use nginx</strong>
 							</label>
 						</div>
@@ -32,7 +32,7 @@
 						<div class="form-group">
 							<label for="ipt_media_base">Base Media Directory</label>
 							<div class="input-group">
-								<input type="text" id="ipt_media_base" name="media:base" class="form-control" required="true" ng-model="settings.media.base" />
+								<input type="text" id="ipt_media_base" class="form-control" required="true" ng-model="settings.media.base" />
 								<span class="input-group-addon">
 									<span class="glyphicon glyphicon-folder-open"></span>
 								</span>
@@ -43,19 +43,19 @@
 							<label for="ipt_shows_base">Show Subdirectory</label>
 							<div class="input-group">
 								<span class="input-group-addon">{{settings.media.base}}</span>
-								<input type="text" id="ipt_shows_base" name="shows:media:directory" class="form-control" required="true" ng-model="settings.media.shows.directory" />
+								<input type="text" id="ipt_shows_base" class="form-control" required="true" ng-model="settings.media.shows.directory" />
 							</div>
 						</div>
 						<div class="form-group">
 							<label for="ipt_movies_base">Movie Subdirectory</label>
 							<div class="input-group">
 								<span class="input-group-addon">{{settings.media.base}}</span>
-								<input type="text" id="ipt_movies_base" name="media:movies:directory" class="form-control" required="true" ng-model="settings.media.movies.directory" />
+								<input type="text" id="ipt_movies_base" class="form-control" required="true" ng-model="settings.media.movies.directory" />
 							</div>
 						</div>
 						<div class="form-group">
 							<label class="checkbox-inline">
-								<input type="checkbox" id="ipt_media_hd" name="media:hd" ng-model="settings.media.hd" />
+								<input type="checkbox" id="ipt_media_hd" ng-model="settings.media.hd" />
 								<strong>Prefer HD Videos</strong>
 							</label>
 						</div>
@@ -92,22 +92,22 @@
 					<div class="panel-body">
 						<div class="form-group">
 							<label for="ipt_bt_host">Host</label>
-							<input type="text" id="ipt_bt_host" name="transmission:host" class="form-control" required="true" ng-model="settings.transmission.host" />
+							<input type="text" id="ipt_bt_host" class="form-control" required="true" ng-model="settings.transmission.host" />
 						</div>
 						<div class="form-group">
 							<label for="ipt_bt_port">Port</label>
-							<input type="text" for="ipt_bt_port" name="transmission:port" class="form-control" required="true" ng-model="settings.transmission.port" />
+							<input type="text" for="ipt_bt_port" class="form-control" required="true" ng-model="settings.transmission.port" />
 						</div>
 						<div class="form-group">
 							<label><input type="checkbox" ng-model="settings.transmission.auth" /> Transmission requires a username and password</label>
 						</div>
 						<div class="form-group" ng-if="settings.transmission.auth">
 							<label for="ipt_bt_username">Username</label>
-							<input type="text" id="ipt_bt_username" name="transmission:username" class="form-control" required="true" ng-model="settings.transmission.username" />
+							<input type="text" id="ipt_bt_username" class="form-control" required="true" ng-model="settings.transmission.username" />
 						</div>
 						<div class="form-group" ng-if="settings.transmission.auth">
 							<label for="ipt_bt_password">Password</label>
-							<input type="password" id="ipt_bt_password" name="transmission:password" class="form-control" required="true" ng-model="settings.transmission.password" />
+							<input type="password" id="ipt_bt_password" class="form-control" required="true" ng-model="settings.transmission.password" />
 						</div>
 					</div>
 				</div>
@@ -118,7 +118,7 @@
 					<div class="panel-body">
 						<div class="form-group">
 							<label class="checkbox-inline">
-								<input type="checkbox" id="ipt_trakt_enable" name="trakt:enabled" required="true" ng-model="settings.trakt.enabled" />
+								<input type="checkbox" id="ipt_trakt_enable" required="true" ng-model="settings.trakt.enabled" />
 								<strong>Enable Integration</strong>
 							</label>
 						</div>
@@ -126,15 +126,15 @@
 							<div class="alert alert-danger" ng-switch-when="false"><strong>Note</strong>: Trakt integration is <strong>required</strong></div>
 							<div class="form-group" ng-switch-when="true">
 								<label for="ipt_trakt_username">Username</label>
-								<input type="text" id="ipt_trakt_username" name="trakt:username" class="form-control" required="true" ng-model="settings.trakt.username" />
+								<input type="text" id="ipt_trakt_username" class="form-control" required="true" ng-model="settings.trakt.username" />
 							</div>
 							<div class="form-group" ng-switch-when="true">
 								<label for="ipt_trakt_password">Password</label>
-								<input type="password" id="ipt_trakt_password" name="trakt:password" class="form-control" required="true" ng-model="settings.trakt.password" />
+								<input type="password" id="ipt_trakt_password" class="form-control" required="true" ng-model="settings.trakt.password" />
 							</div>
 							<div class="form-group" ng-switch-when="true">
 								<label for="ipt_trakt_api">API Key</label>
-								<input type="text" id="ipt_trakt_api" name="trakt:apikey" class="form-control" required="true" ng-model="settings.trakt.apikey" />
+								<input type="text" id="ipt_trakt_api" class="form-control" required="true" ng-model="settings.trakt.apikey" />
 							</div>
 						</div>
 					</div>
@@ -146,7 +146,7 @@
 					<div class="panel-body">
 						<div class="form-group">
 							<label class="checkbox-inline">
-								<input type="checkbox" id="ipt_twilio_enabled" name="twilio:enabled" ng-model="settings.twilio.enabled" />
+								<input type="checkbox" id="ipt_twilio_enabled" ng-model="settings.twilio.enabled" />
 								<strong>Enable SMS Notifications</strong>
 							</label>
 						</div>
@@ -154,15 +154,15 @@
 							<div class="alert alert-warning" ng-switch-when="false"><strong>Note</strong>: SMS integration is not yet functional</div>
 							<div class="form-group" ng-switch-when="true">
 								<label for="ipt_twilio_phone">Phone</label>
-								<input type="text" id="ipt_twilio_phone" name="twilio:phone" ng-model="settings.twilio.phone" />
+								<input type="text" id="ipt_twilio_phone" ng-model="settings.twilio.phone" />
 							</div>
 							<div class="form-group" ng-switch-when="true">
 								<label for="ipt_twilio_sid">SID</label>
-								<input type="text" id="ipt_twilio_sid" name="twilio:sid" class="form-control" required="true" ng-model="settings.twilio.sid" />
+								<input type="text" id="ipt_twilio_sid" class="form-control" required="true" ng-model="settings.twilio.sid" />
 							</div>
 							<div class="form-group" ng-switch-when="true">
 								<label for="ipt_twilio_token">Token</label>
-								<input type="text" id="ipt_twilio_token" name="twilio:token" class="form-control" required="true" ng-model="settings.twilio.token" />
+								<input type="text" id="ipt_twilio_token" class="form-control" required="true" ng-model="settings.twilio.token" />
 							</div>
 						</div>
 					</div>
@@ -206,7 +206,7 @@
 					<div class="panel-body">
 						<div class="form-group">
 							<label for="ipt_security_whitelist">IP Whitelist</label>
-							<input type="text" id="ipt_security_whitelist" name="security:whitelist" ng-model="settings.security.whitelist" class="form-control" />
+							<input type="text" id="ipt_security_whitelist" ng-model="settings.security.whitelist" class="form-control" />
 						</div>
 						<div class="well">
 							Users from the allowed IP ranges will not be required to log in.
@@ -239,7 +239,7 @@
 						<div class="form-group">
 							<label for="ipt_system_branch">Update channel</label>
 							{{settings.system.derp}}
-							<select name="system:branch" id="ipt_system_branch" ng-model="settings.system.branch" ng-options="branch.name as branch.name for branch in branches" class="form-control"></select>
+							<select id="ipt_system_branch" ng-model="settings.system.branch" ng-options="branch.name as branch.name for branch in branches" class="form-control"></select>
 						</div>
 						<div class="form-group">
 							<button type="button" class="btn btn-warning" ng-click="update()">Update</button>

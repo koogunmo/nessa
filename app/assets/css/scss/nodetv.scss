@@ -230,6 +230,9 @@ input.form-control+input.form-control {
 	div.image {
 		display: none;
 	}
+	div.title {
+		
+	}
 	.show {
 		border-bottom: 1px solid $border;
 		cursor: pointer;
@@ -289,7 +292,7 @@ input.form-control+input.form-control {
 
 /* Settings */
 
-#match, #settings {
+#install, #match, #settings {
 	padding-bottom: 50px;
 	
 	.toolbar {
@@ -386,6 +389,9 @@ input.form-control+input.form-control {
 				> img {
 					display: none;
 				}
+			}
+			div.title {
+				/* display: none; */
 			}
 			/*
 			&:hover {
