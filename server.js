@@ -56,6 +56,7 @@ try {
 
 var acl = require('acl'),
 	connect	= require('connect'),
+	crypto	= require('crypto'),
 	express	= require('express'),
 	fs		= require('fs'),
 	path	= require('path'),
@@ -345,12 +346,6 @@ io.sockets.on('connection', function(socket) {
 		}
 		socket.emit('system.settings', nconf.get());
 		
-	}).on('system.users', function(){
-		var collection = db.collection('user');
-		collection.find().toArray(function(error, results){
-			if (error) return;
-		//	socket.emit('system.users', rows);
-		})
 	}).on('system.latest', function(){
 		var shows = plugin('showdata');
 		shows.getLatest();
@@ -403,19 +398,37 @@ io.sockets.on('connection', function(socket) {
 	
 	// User
 	
-	socket.on('system.user', function(auth){
-		// look up the user from the token, set as value
-		// auth = {username: 'herp', password: 'derp'};
-		
-		userCollection = db.collection('user');
-		userCollection.findOne({session: sessionid}, function(error, user){
-			if (error) {
-				logger.error(error);
-				return;
-			}
-			socket.set('user', user);
+	
+	
+	socket.on('system.users', function(){
+		var sysUser = plugin('user');
+		sysUser.list(function(error, json){
+			socket.emit('system.users', json);
 		});
-	});
+		
+	}).on('system.user', function(id){
+		var sysUser = plugin('user');
+		sysUser.get(id, function(error, json){
+			socket.emit('system.user', json);
+		});
+		
+	}).on('system.user.update', function(data){
+		var sysUser = plugin('user');
+		sysUser.update(data, function(error, json){
+			sysUser.list(function(error, json){
+				socket.emit('system.users', json);
+			});
+		});
+		
+	}).on('system.user.remove', function(id){
+		var sysUser = plugin('user');
+		sysUser.remove(id, function(error, json){
+			sysUser.list(function(error, json){
+				socket.emit('system.users', json);
+			});
+		});
+	})
+		
 	
 	socket.on('media.settings', function(){
 		socket.emit('media.settings', nconf.get('media'));

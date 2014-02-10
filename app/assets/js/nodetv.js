@@ -157,11 +157,30 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		};
 		
 	});
+	
+	nessa.controller('userCtrl', function($scope, $socket, $modalInstance, id){
+		$scope.user = {};
+		
+		$socket.emit('system.user', id);
+		$socket.on('system.user', function(json){
+			delete json.password
+			$scope.user = json;
+		});
+		$scope.save = function(){
+			$socket.emit('system.user.update', $scope.user);
+			$modalInstance.close();
+		};
+		$scope.close = function(){
+			$modalInstance.dismiss('close');
+		};
+	});
 
-	nessa.controller('settingsCtrl', function($scope, $socket){
+	nessa.controller('settingsCtrl', function($scope, $socket, $modal){
 		$scope.settings = {}
 		$scope.branches = [{name: 'master'},{name: 'nightly'}];
 		$scope.users = [];
+		
+		$scope.adduser = {};
 			
 		$socket.emit('system.settings');
 		$socket.on('system.settings', function(data){
@@ -172,6 +191,29 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		$socket.on('system.users', function(data){
 			$scope.users = data;
 		});
+		
+	//	$scope.addUser = function(){
+	//		$socket.emit('system.user.update', $scope.adduser);
+	//		$scope.adduser = {};
+	//	};
+		
+		$scope.userEdit = function(id){
+			// open modal
+			$modal.open({
+				templateUrl: '/views/modal/user.html',
+				controller: 'userCtrl',
+				resolve: {
+					id: function(){
+						return id;
+					}
+				}
+			});
+		};
+		
+		$scope.userRemove = function(id){
+			$socket.emit('system.user.remove', id);
+		};
+		
 		
 		$scope.save = function(){
 			$socket.emit('system.settings', $scope.settings)

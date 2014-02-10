@@ -27,6 +27,17 @@ input.ng-invalid {
 	-webkit-box-shadow: 0 0 6px #f8b9b7;
 }
 
+input.form-control:nth-last-child(2){
+	border-bottom-left-radius: 0px;
+	border-bottom-right-radius: 0px;
+}
+input.form-control+input.form-control {
+	border-top: 0px;
+	border-top-left-radius: 0px;
+	border-top-right-radius: 0px;
+}
+
+
 /* Alerts */
 
 .alert-container {
