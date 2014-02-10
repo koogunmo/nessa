@@ -1,8 +1,8 @@
-"use strict";
+'use strict';
 
-define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute', 'ui.bootstrap'], function(angular,io){
+define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute', 'ui.bootstrap', 'ui.router'], function(angular,io){
 
-	var app = angular.module('nessa', ['ngCookies','ngResource','ngRoute','ui.bootstrap']);
+	var app = angular.module('nessa', ['ngCookies','ngResource','ngRoute','ui.bootstrap','ui.router']);
 	
 	app.factory('$socket', function($rootScope) {
 		var port = (window.location.port) ? window.location.port : 80;

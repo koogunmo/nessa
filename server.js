@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 /* Enable New Relic Monitoring, if available */
 try{require('newrelic')} catch(e){}
@@ -115,7 +115,7 @@ app.configure(function(){
 		app.use('/template', express.static(__dirname + '/app/views/ui'));
 		app.use('/views', express.static(__dirname + '/app/views'));
 	}
-	app.use(app.router);
+	
 });
 
 /* MongoDB */
@@ -189,9 +189,9 @@ try {
 					return done(null, user);
 				});
 				
-				app.use(passport.initialize());
-				app.use(passport.session());
-				
+//				app.use(passport.session());
+//				app.use(passport.initialize());
+				app.use(app.router);
 				
 				app.use(function(req, res) {	
 					res.sendfile(__dirname + '/app/views/index.html');
@@ -229,7 +229,7 @@ try {
 						res.send(response);
 					});
 				});
-				app.post('/login', passport.authenticate('local'), function(req, res){
+				app.post('/login', function(req, res){
 					res.send(req.user);
 				});
 				app.post('/logout', function(req,res){
@@ -264,7 +264,8 @@ try {
 	} else {
 		nconf.set('installed', false);
 		logger.warn('Waiting for install to complete.');
-		app.use(function(req, res) {	
+		app.use(app.router);
+		app.use(function(req, res) {
 			res.sendfile(__dirname + '/app/views/index.html');
 		});
 	}
@@ -472,7 +473,7 @@ io.sockets.on('connection', function(socket) {
 			if (!error) {
 				socket.emit('system.alert', {
 					type: 'success',
-					message: 'Torrent successfully deleted',
+					message: 'Torrent deleted',
 					autoClose: 2500
 				});
 				torrent.list(function(error, data){
@@ -485,6 +486,18 @@ io.sockets.on('connection', function(socket) {
 		torrent.start(id, function(error, args){});
 	}).on('download.stop', function(id){
 		torrent.stop(id, function(error, args){});
+	}).on('download.url', function(url){
+		torrent.add(url, function(error, data){
+			if (error) {
+				console.error(error);
+				return;
+			}
+			socket.emit('system.alert', {
+				type: 'success',
+				message: 'Torrent added',
+				autoClose: 1500
+			});
+		});
 	});
 	
 	/** Movies **/

@@ -215,12 +215,14 @@ exports = module.exports = {
 			if (!hash) return;
 			if (!name) name = hash;
 			var trackers = [
+				'udp://inferno.demonoid.me:3396',
 				'udp://open.demonii.com:1337',
 				'udp://tracker.ccc.de:80',
 				'udp://tracker.coppersurfer.tk:6969',
 				'udp://tracker.istole.it:80',
 				'udp://tracker.openbittorent.com:80',
-				'udp://tracker.publicbt.com:80'
+				'udp://tracker.publicbt.com:80',
+				'udp://tracker.trackerfix.com:80'
 			];
 			var tr = [];
 			trackers.forEach(function(tracker){

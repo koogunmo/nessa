@@ -92,6 +92,11 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		$socket.on('download.list', function(data){
 			$scope.downloads = data;
 		});
+		
+		$scope.addUrl = function(){
+			$socket.emit('download.url', $scope.search.name);
+			$scope.search.name = '';
+		};
 	});
 	
 	nessa.controller('downloadCtrl', function($scope, $socket){
