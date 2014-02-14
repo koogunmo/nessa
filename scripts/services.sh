@@ -21,6 +21,7 @@ cd ..
 
 echo "Netatalk installed"
 
+cp avahi/nodetv.conf /etc/avahi/services/nodetv.service
 
 # MiniDLNA
 echo "Installing MiniDLNA"
