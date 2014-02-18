@@ -115,7 +115,7 @@ app.configure(function(){
 		app.use('/template', express.static(__dirname + '/app/views/ui'));
 		app.use('/views', express.static(__dirname + '/app/views'));
 	}
-	
+	app.enable('view cache');
 });
 
 /* MongoDB */

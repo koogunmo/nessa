@@ -139,7 +139,7 @@ var ShowData = {
 	
 	list: function(callback){
 		var showCollection = db.collection('show');
-		showCollection.find({status: {$exists: true}}).toArray(callback);
+		showCollection.find({status: {$exists: true}, directory: {$exists: true}}).toArray(callback);
 	},
 	
 	remove: function(tvdb, callback){
@@ -226,14 +226,14 @@ var ShowData = {
 		var showCollection = db.collection('show');
 		matches.forEach(function(match){
 			unmatchedCollection.findOne({_id: ObjectID(match.id)}, function(error, row){
-				trakt.show.summary(match.tvdb, function(error, json){
+				trakt.show.summary(parseInt(match.tvdb, 10), function(error, json){
 					var record = {
 						directory: row.directory,
 						status: !!row.status,
 						name: json.title,
-						tvdb: match.tvdb
+						tvdb: parseInt(match.tvdb, 10)
 					};
-					showCollection.update({tvdb: match.tvdb}, {$set: record}, {upsert: true}, function(error, affected){
+					showCollection.update({tvdb: parseInt(match.tvdb, 10)}, {$set: record}, {upsert: true}, function(error, affected){
 						unmatchedCollection.remove({_id: ObjectID(match.id)}, function(error, affected){
 							// Removed from unmatched list
 						});
