@@ -675,11 +675,9 @@ io.sockets.on('connection', function(socket) {
 	}).on('show.update', function(tvdb){
 		var shows = plugin('showdata');
 		shows.getArtwork(tvdb);
+		shows.getSummary(tvdb);
 		shows.getFullListings(tvdb, function(error, tvdb){
 			shows.getHashes(tvdb);
-		//	show.summary(data.id, function(error, json){
-		//		socket.emit('show.summary', json);
-		//	});
 		});
 	});
 	

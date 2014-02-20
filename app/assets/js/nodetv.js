@@ -405,8 +405,6 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		$socket.emit('shows.search', $scope.search.query);
 		
 		$socket.on('shows.search', function(results){
-			console.log(results);
-			
 			$scope.results = results;
 		});
 		$scope.close = function(){
