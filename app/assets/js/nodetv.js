@@ -4,12 +4,27 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 	nessa.controller('alertsCtrl', function($scope, $socket){
 		$scope.alerts = [];
 		$socket.on('system.alert', function(alert){
-			$scope.alerts.push(alert);
-			if (alert.autoClose) {
-				setTimeout(function(){
-					$scope.closeAlert($scope.alerts.length-1);
-					$scope.$apply();
-				}, alert.autoClose);
+			if (('Notification' in window)){
+				if (Notification.permission === 'granted'){
+					var notification = new Notification('NodeTV', {body: alert.message});
+				} else if (Notification.permission !== 'denied') {
+					Notification.requestPermission(function (permission) {
+						if (!('permission' in Notification)) {
+							Notification.permission = permission;
+						}
+						if (permission === 'granted') {
+							var notification = new Notification('NodeTV', {body: alert.message});
+						}
+					});
+				}
+			} else {
+				$scope.alerts.push(alert);
+				if (alert.autoClose) {
+					setTimeout(function(){
+						$scope.closeAlert($scope.alerts.length-1);
+						$scope.$apply();
+					}, alert.autoClose);
+				}
 			}
 		});
 		$scope.closeAlert = function(index){
@@ -390,9 +405,9 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		$socket.emit('shows.search', $scope.search.query);
 		
 		$socket.on('shows.search', function(results){
-		//	$scope.$apply(function(){
-				$scope.results = results;
-		//	});
+			console.log(results);
+			
+			$scope.results = results;
 		});
 		$scope.close = function(){
 			$modalInstance.close();

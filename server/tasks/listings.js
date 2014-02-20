@@ -18,6 +18,7 @@ function updateListings(){
 		});
 	});
 }
+shows.getShowlist();
 
 /* Every Sunday at 1am */
 var rule = new schedule.RecurrenceRule();

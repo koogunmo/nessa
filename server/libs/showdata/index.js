@@ -153,15 +153,20 @@ var ShowData = {
 			if (error) return;
 			if (results.length){
 				var response = [];
+				var count = 0;
 				results.forEach(function(result){
-					var count = 0;
 					trakt.show.summary(result.tvdb, function(error, json){
 						json.feed = result.feed;
-						response.push(json)
+						response.push(json);
 						count++;
-						if (count == results.length) callback(null, response);
 					});
 				});
+				var send = setInterval(function(){
+					if (results.length == count) {
+						clearInterval(send);
+						callback(null, response);
+					}
+				}, 500);
 			} else {
 				trakt.search('shows', query, callback);
 			}
@@ -457,6 +462,7 @@ var ShowData = {
 						// We could do an upsert, but it would overwrite the name and feed every time
 						showCollection.count({tvdb: record.tvdb}, function(error, count){
 							if (error || count == 1) return;
+							
 							showCollection.insert(record, function(error, affected){
 								self.getSummary(record.tvdb);
 							});
@@ -479,7 +485,7 @@ var ShowData = {
 			};
 			if (json.status == 'Ended') {
 				record.ended = true;
-				record.status = false;
+				if (record.status) record.status = false;
 			}
 			showCollection.update({tvdb: tvdb}, {$set: record}, function(error, affected){
 				if (typeof(callback) == 'function') callback(error, tvdb);
