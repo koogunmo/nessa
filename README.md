@@ -24,9 +24,12 @@ I tried [SickBeard](http://sickbeard.com/), but it wouldn't easily let me arrang
 ## Optional Third-party software
 NodeTV doesn't handle uPNP/DLNA (yet), so if you want to stream your content, you'll need a MediaServer. I've used the following, with various degrees of success
 
-- [ReadyMedia](minidlna.sourceforge.net) (Open-source)
-- [Twonky 7](http://twonky.com/downloads) (Commercial)
 
+[ReadyMedia](minidlna.sourceforge.net) - ** Recommended **  
+A simple uPNP/DLNA compatible MediaServer (Open Source)  
+[Twonky 7](http://twonky.com/downloads)  
+Commercial uPNP/DLNA server with companion app for mobile devices
+  
 These work reasonably well with VLC and my XBOX 360. Your mileage may vary.
 
 
@@ -49,7 +52,8 @@ Next, you'll need to install the dependencies
 On the command line, run the following
 > /usr/bin/node /path/to/nodetv/server.js
 
-You'll probably want to daemonize the process, I use [forever](https://github.com/nodejitsu/forever).
+You'll probably want to daemonize the process, I use [forever](https://github.com/nodejitsu/forever) combined with an upstart script.  
+If anyone can convert it to systemd, I would be very grateful.
 
 You can then access the interface at [http://localhost:6377](http://localhost:6377)  
 
