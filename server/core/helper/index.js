@@ -154,43 +154,47 @@ exports = module.exports = {
 			var helper = this;
 			// parse a rss feed
 			request.get(url, function(error, req, xml){
-			if (error) return;
-				parser.parseString(xml, function(error, json){
-					try {
-						if (!json || !json.rss.channel[0].item) return;
-						json.rss.channel[0].item.forEach(function(item){
-							if (since) {
-								var published = new Date(item.pubDate[0]).getTime();
-								if (published < since) return;
-							}
-							var sources = [];
-							if (item.enclosure) sources.push(item.enclosure[0]['$'].url);
-							if (item.link) sources.push(item.link[0]);
-							if (item.guid) sources.push(item.guid[0]['_']);
-							
-							var magnet = null;
-							sources.forEach(function(source){
-								if (magnet) return;
-								if (source.indexOf('magnet:?') == 0) {
-									magnet = source;
-									return;
+				if (error) return;
+				try {
+					parser.parseString(xml, function(error, json){
+						try {
+							if (!json || !json.rss.channel[0].item) return;
+							json.rss.channel[0].item.forEach(function(item){
+								if (since) {
+									var published = new Date(item.pubDate[0]).getTime();
+									if (published < since) return;
 								}
+								var sources = [];
+								if (item.enclosure) sources.push(item.enclosure[0]['$'].url);
+								if (item.link) sources.push(item.link[0]);
+								if (item.guid) sources.push(item.guid[0]['_']);
+								
+								var magnet = null;
+								sources.forEach(function(source){
+									if (magnet) return;
+									if (source.indexOf('magnet:?') == 0) {
+										magnet = source;
+										return;
+									}
+								});
+								
+								var res = helper.getEpisodeNumbers(item.title[0]);
+								var response = {
+									season: res.season,
+									episodes: res.episodes,
+									hd: helper.isHD(item.title[0]),
+									repack: helper.isRepack(item.title[0]),
+									hash: helper.getHash(magnet)
+								};
+								if (typeof(callback) == 'function') callback(null, response);
 							});
-							
-							var res = helper.getEpisodeNumbers(item.title[0]);
-							var response = {
-								season: res.season,
-								episodes: res.episodes,
-								hd: helper.isHD(item.title[0]),
-								repack: helper.isRepack(item.title[0]),
-								hash: helper.getHash(magnet)
-							};
-							if (typeof(callback) == 'function') callback(null, response);
-						});
-					} catch(e){
-						console.error(e.message);
-					}
-				});
+						} catch(e){
+							console.error(e.message);
+						}
+					});
+				} catch(e){
+					console.error(e.message);
+				}
 			});
 		} catch(e) {
 			logger.error('helper.parseFeed: %s', e.message);
