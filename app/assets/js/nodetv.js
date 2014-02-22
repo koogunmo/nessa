@@ -3,19 +3,32 @@
 require(['jquery','socket.io','app'], function($,io,nessa){
 	nessa.controller('alertsCtrl', function($scope, $socket){
 		$scope.alerts = [];
+		
 		$socket.on('system.alert', function(alert){
-			if (('Notification' in window)){
-				if (Notification.permission === 'granted'){
-					var notification = new Notification('NodeTV', {body: alert.message});
-				} else if (Notification.permission !== 'denied') {
-					Notification.requestPermission(function (permission) {
-						if (!('permission' in Notification)) {
-							Notification.permission = permission;
-						}
-						if (permission === 'granted') {
-							var notification = new Notification('NodeTV', {body: alert.message});
-						}
-					});
+			if (!alert.title) alert.title = 'NodeTV';
+			if (!alert.icon) {
+				switch (alert.type){
+					case 'danger':
+					case 'info':
+					case 'success':
+					case 'warning':
+					default:
+						alert.icon = '/assets/icons/touch-icon.png';
+				}
+			}
+			
+			if (('Notification' in window) && Notification.permission === 'granted'){
+				var notification = new Notification(alert.title, {body: alert.message, icon: alert.icon});
+				
+				notification.onclick = function(e){
+					if (notification.url) document.location = window.url;
+					notification.close();
+				}
+				
+				if (alert.autoClose){
+					setTimeout(function(){
+						notification.close();
+					}, alert.autoClose);
 				}
 			} else {
 				$scope.alerts.push(alert);
@@ -32,7 +45,7 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		};
 		$scope.$on('$routeChangeSuccess', function(){
 			$scope.alerts = [];
-		})
+		});
 	});
 	
 	nessa.controller('loginCtrl', function($scope, $socket, $rootScope, $http, $location, $window){
@@ -139,6 +152,11 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		$scope.unmatched = 0;
 		$scope.upcoming = [];
 		$scope.latest = [];
+		$scope.notifications = false;
+		
+		if (('Notification' in window) && Notification.permission === 'granted'){
+			$scope.notifications = true;
+		}
 		
 		$socket.emit('dashboard');
 		$socket.on('dashboard.latest', function(data){
@@ -159,7 +177,27 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		$socket.on('dashboard.upcoming', function(data){
 			$scope.upcoming = data;
 		});
-		
+				
+		$scope.enableAlerts = function(){
+			if (('Notification' in window)){
+				if (Notification.permission === 'granted'){
+					return;
+				} else if (Notification.permission !== 'denied') {
+					Notification.requestPermission(function(permission){
+						if (!('permission' in Notification)) {
+							Notification.permission = permission;
+						}
+						if (permission === 'granted') {
+							var notification = new Notification('NodeTV', {body: 'Desktop alerts enabled', icon: '/assets/icons/touch-icon.png'});
+							setTimeout(function(){
+								notification.close()
+							}, 1500);
+							$scope.notifications = true;
+						}
+					});
+				}
+			}
+		}
 	});
 	
 	nessa.controller('matchCtrl', function($scope, $socket){

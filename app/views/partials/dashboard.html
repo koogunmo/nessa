@@ -2,6 +2,9 @@
 	<div class="alert alert-warning" ng-if="unmatched!=0">
 		There are <a href="/shows/match" class="alert-link">unmatched shows</a> that need updating
 	</div>
+	<div class="alert alert-warning" ng-if="!notifications">
+		<a href="#" ng-click="enableAlerts()" class="alert-link">Enable desktop notifications</a>
+	</div>
 	
 	<div class="row">
 		<div class="col-sm-6" ng-if="latest.length>=1">
