@@ -380,8 +380,8 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		var opened	= false;
 		
 		var routeChange = function(){
-			if ($location.search().tvdb) {
-				$scope.view($location.search().tvdb);
+			if ($location.hash()){
+				$scope.view($location.hash());
 			} else {
 				if (opened && modal) modal.close('navigation');
 			}
@@ -450,11 +450,11 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 				}
 			});
 			modal.opened.then(function(){
-				$location.search('tvdb', json.summary.tvdb);
+			//	$location.search('tvdb', json.summary.tvdb);
 				opened = true;
 			});
 			modal.result.then(function(result){
-				$location.search('tvdb', null);
+				$location.hash('');
 				opened = false;
 			});
 		});

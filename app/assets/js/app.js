@@ -33,22 +33,6 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute', 'ui.boo
 		$rootScope.location = $location;
 	});
 	
-	/*
-	app.directive('episode', function(){
-		return {
-			replace: false,
-			templateUrl: '/template/episode/episode.html',
-			transclude: true,
-			link: function(scope, element, attributes){
-				element.on('click', '.title', function(){
-					$(this).next('.extended').slideToggle();
-				});
-				
-			}
-		};
-	});
-	*/
-	
 	app.filter('formatBytes', function(){
 		return function(bytes, si) {
 			if (bytes == 0) return '0.0B';
