@@ -1,6 +1,11 @@
 'use strict';
 
 require(['jquery','socket.io','app'], function($,io,nessa){
+	
+	nessa.controller('headCtrl', function($scope){
+		
+	});
+	
 	nessa.controller('alertsCtrl', function($scope, $socket){
 		$scope.alerts = [];
 		
@@ -189,6 +194,7 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 
 	
 	nessa.controller('homeCtrl', function($scope, $socket){
+		
 		$scope.unmatched = 0;
 		$scope.upcoming = [];
 		$scope.latest = [];

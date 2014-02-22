@@ -30,6 +30,9 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute', 'ui.boo
 			}
 		};
 	}).run(function($rootScope, $location){
+		$rootScope.$on('$routeChangeSuccess', function(event, current, previous){
+			$rootScope.pagetitle = current.$$route.title;
+		});
 		$rootScope.location = $location;
 	});
 	
@@ -136,10 +139,12 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute', 'ui.boo
 		});
 		
 		$routeProvider.when('/login', {
+			title: 'Login',
 			templateUrl: '/views/partials/login.html',
 			controller: 'loginCtrl'
 			
 		}).when('/dashboard', {
+			title: 'Dashboard',
 			templateUrl: '/views/partials/dashboard.html',
 			controller: 'homeCtrl',
 			resolve: {
@@ -147,6 +152,7 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute', 'ui.boo
 			}
 			
 		}).when('/downloads', {
+			title: 'Downloads',
 			templateUrl: '/views/partials/downloads.html',
 			controller: 'downloadsCtrl',
 			resolve: {
@@ -154,6 +160,7 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute', 'ui.boo
 			}
 			
 		}).when('/movies', {
+			title: 'Movies',
 			templateUrl: '/views/partials/movies.html',
 			controller: 'moviesCtrl',
 			reloadOnSearch: false,
@@ -162,6 +169,7 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute', 'ui.boo
 			}
 			
 		}).when('/shows', {
+			title: 'Shows',
 			templateUrl: '/views/partials/shows.html',
 			controller: 'showsCtrl',
 			reloadOnSearch: false,
@@ -170,12 +178,14 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute', 'ui.boo
 			}
 			
 		}).when('/shows/match', {
+			title: 'Unmatched shows',
 			templateUrl: '/views/partials/match.html',
 			controller: 'matchCtrl',
 			resolve: {
 				loggedin: checkLoggedin
 			}
 		}).when('/shows/unwatched', {
+			title: 'Unwatched shows',
 			templateUrl: '/views/partials/unwatched.html',
 			controller: 'unwatchedCtrl',
 			resolve: {
@@ -190,6 +200,7 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute', 'ui.boo
 			}
 			
 		}).when('/install', {
+			title: 'Installer',
 			templateUrl: '/views/partials/install.html',
 			controller: 'installCtrl',
 			
