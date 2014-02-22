@@ -150,50 +150,54 @@ exports = module.exports = {
 	},
 	
 	parseFeed: function(url, since, callback){
+		var helper = this;
 		try {
-			var helper = this;
-			// parse a rss feed
+			if (url.indexOf('tvshowsapp.com') >= 0) {
+				var oldurl = decodeURIComponent(url);
+				if (match = oldurl.match(/([\w\s\-\.\']+)$/i)){
+					url = 'http://tvshowsapp.com/feeds/cache/'+match[1];
+				}
+			}
 			request.get(url, function(error, req, xml){
-				if (error) return;
+				if (error || req.statusCode != 200) return;
+				
+				console.log(url);
+				
 				try {
 					parser.parseString(xml, function(error, json){
-						try {
-							if (!json || !json.rss.channel[0].item) return;
-							json.rss.channel[0].item.forEach(function(item){
-								if (since) {
-									var published = new Date(item.pubDate[0]).getTime();
-									if (published < since) return;
+						if (!json || !json.rss.channel[0].item) return;
+						json.rss.channel[0].item.forEach(function(item){
+							if (since) {
+								var published = new Date(item.pubDate[0]).getTime();
+								if (published < since) return;
+							}
+							var sources = [];
+							if (item.enclosure) sources.push(item.enclosure[0]['$'].url);
+							if (item.link) sources.push(item.link[0]);
+							if (item.guid) sources.push(item.guid[0]['_']);
+							
+							var magnet = null;
+							sources.forEach(function(source){
+								if (magnet) return;
+								if (source.indexOf('magnet:?') == 0) {
+									magnet = source;
+									return;
 								}
-								var sources = [];
-								if (item.enclosure) sources.push(item.enclosure[0]['$'].url);
-								if (item.link) sources.push(item.link[0]);
-								if (item.guid) sources.push(item.guid[0]['_']);
-								
-								var magnet = null;
-								sources.forEach(function(source){
-									if (magnet) return;
-									if (source.indexOf('magnet:?') == 0) {
-										magnet = source;
-										return;
-									}
-								});
-								
-								var res = helper.getEpisodeNumbers(item.title[0]);
-								var response = {
-									season: res.season,
-									episodes: res.episodes,
-									hd: helper.isHD(item.title[0]),
-									repack: helper.isRepack(item.title[0]),
-									hash: helper.getHash(magnet)
-								};
-								if (typeof(callback) == 'function') callback(null, response);
 							});
-						} catch(e){
-							console.error(e.message);
-						}
+							
+							var res = helper.getEpisodeNumbers(item.title[0]);
+							var response = {
+								season: res.season,
+								episodes: res.episodes,
+								hd: helper.isHD(item.title[0]),
+								repack: helper.isRepack(item.title[0]),
+								hash: helper.getHash(magnet)
+							};
+							if (typeof(callback) == 'function') callback(null, response);
+						});
 					});
 				} catch(e){
-					console.error(e.message);
+					console.error('XML Parser error', url, e.message);
 				}
 			});
 		} catch(e) {
