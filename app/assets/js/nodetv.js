@@ -19,12 +19,10 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 			
 			if (('Notification' in window) && Notification.permission === 'granted'){
 				var notification = new Notification(alert.title, {body: alert.message, icon: alert.icon});
-				
 				notification.onclick = function(e){
 					if (notification.url) document.location = window.url;
 					notification.close();
 				}
-				
 				if (alert.autoClose){
 					setTimeout(function(){
 						notification.close();
@@ -113,7 +111,7 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		
 	});
 	
-	nessa.controller('downloadsCtrl', function($scope, $socket){
+	nessa.controller('downloadsCtrl', function($scope, $socket, $modal){
 		$scope.downloads = [];
 		$scope.predicate = 'name';
 		$scope.reverse = false;
@@ -127,12 +125,26 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		});
 		
 		$scope.addUrl = function(){
-			$socket.emit('download.url', $scope.search.name);
-			$scope.search.name = '';
+			$modal.open({
+				templateUrl: '/views/modal/dl-add.html',
+				controller: 'downloadAddCtrl'
+			});
 		};
 	});
 	
-	nessa.controller('downloadCtrl', function($scope, $socket){
+	nessa.controller('downloadCtrl', function($scope, $socket, $modal){
+		$scope.settings = function(id){
+			$modal.open({
+				templateUrl: '/views/modal/dl-settings.html',
+				controller: 'downloadSettingsCtrl',
+				resolve: {
+					id: function(){
+						return id;
+					}
+				}
+			});
+		};
+		
 		$scope.remove = function(){
 			if (confirm('Are you sure you want to delete this torrent?')) {
 				$socket.emit('download.remove', {id: $scope.$parent.download.id, purge: true});
@@ -147,6 +159,34 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 			$scope.$parent.download.status = !$scope.$parent.download.status;
 		};
 	});
+	
+	nessa.controller('downloadAddCtrl', function($scope, $socket, $modalInstance){
+		$scope.close = function(){
+			$modalInstance.dismiss('close');
+		};
+		$scope.save = function(){
+			$socket.emit('download.url', $scope.url);
+			$modalInstance.close();
+		};
+	});
+
+	nessa.controller('downloadSettingsCtrl', function($scope, $socket, $modalInstance, id){
+		
+		// fetch info
+		$socket.emit('torrent.info', id);
+		$socket.on('torrent.info', function(data){
+			if (data.id != id) return;
+			
+			
+		});
+		$scope.close = function(){
+			$modalInstance.dismiss('close');
+		};
+		$scope.save = function(){
+			$modalInstance.close();
+		};
+	});
+
 	
 	nessa.controller('homeCtrl', function($scope, $socket){
 		$scope.unmatched = 0;
@@ -386,6 +426,7 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		};
 		
 		/* Open modal window containing show information */
+		// this could be a cause of our multiple modal issue
 		$socket.on('show.summary', function(json){
 			modal = $modal.open({
 				templateUrl: '/views/modal/show.html',
@@ -558,7 +599,7 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		};
 		
 		$scope.hasAired = function(){
-			return ($scope.episode.airdate*1000 < new Date().getTime());
+			return ($scope.episode.airdate && $scope.episode.airdate*1000 < new Date().getTime());
 		};
 	});
 	

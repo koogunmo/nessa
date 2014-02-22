@@ -15,10 +15,13 @@
 	-->
 	<div class="download" ng-controller="downloadCtrl" ng-repeat="download in downloads | orderBy:predicate:reverse | filter:search" ng-class="{'paused': !download.status}">
 		<span class="pull-right">
-			<button class="btn btn-xs" ng-click="toggle();">
+			<button type="button" class="btn btn-xs btn-info" ng-click="settings(download.id)">
+				<span class="glyphicon glyphicon-cog"></span>
+			</button>
+			<button type="button" class="btn btn-xs" ng-class="{'btn-success': !!download.status}" ng-click="toggle();">
 				<span class="glyphicon" ng-class="{'glyphicon-play': !download.status, 'glyphicon-pause': !!download.status}"></span>
 			</button>
-			<button class="btn btn-xs btn-danger" ng-click="remove(download.id);">
+			<button type="button" class="btn btn-xs btn-danger" ng-click="remove(download.id);">
 				<span class="glyphicon glyphicon-trash"></span>
 			</button>
 		</span>
