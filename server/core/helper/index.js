@@ -148,23 +148,42 @@ exports = module.exports = {
 		// Sanitize the directory names
 		return name.replace(/\/\:/g, '-');
 	},
-	
+	fixFeedUrl: function(url, full){
+		var full = (typeof(full) == 'undefined') ? false: true;
+		if (url.indexOf('tvshowsapp.com') >= 0) {
+			var oldurl = decodeURIComponent(url);
+			userAgent = 'TVShows 2 (http://tvshowsapp.com/)';
+			if (match = oldurl.match(/([\w\s\-\.\']+)$/i)){
+				url = 'http://tvshowsapp.com/feeds/cache/'+encodeURI(match[1]);
+			}
+			if (full && url.indexOf('.full.xml') == -1) {
+				url = url.replace(/\.xml$/, '.full.xml');
+			}
+		}
+		return url;
+	},
 	parseFeed: function(url, since, callback){
 		var helper = this;
 		try {
+			var userAgent = 'NodeTV '+global.pkg.version;
 			if (url.indexOf('tvshowsapp.com') >= 0) {
-				var oldurl = decodeURIComponent(url);
-				if (match = oldurl.match(/([\w\s\-\.\']+)$/i)){
-					url = 'http://tvshowsapp.com/feeds/cache/'+match[1];
-				}
+				url = helper.fixFeedUrl(url);
+				userAgent = 'TVShows 2 (http://tvshowsapp.com/)';
 			}
-			request.get(url, function(error, req, xml){
+			var options = {
+				url: url,
+				headers: {
+					'User-Agent': userAgent
+				}
+			};
+			request.get(options, function(error, req, xml){
 				if (error || req.statusCode != 200) return;
-				
-				console.log(url);
-				
 				try {
 					parser.parseString(xml, function(error, json){
+						if (error) {
+							console.error(error);
+							return;
+						}
 						if (!json || !json.rss.channel[0].item) return;
 						json.rss.channel[0].item.forEach(function(item){
 							if (since) {

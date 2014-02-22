@@ -13,7 +13,7 @@ var logger = global.logger = log4js.getLogger();
 
 /***********************************************************************/
 /* Global Configuration */
-var pkg = require('./package.json');
+global.pkg = require('./package.json');
 global.plugin = function(name){
 	try {
 		return require(__dirname + '/server/libs/' + name);
