@@ -41,6 +41,7 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute', 'ui.boo
 			if (bytes == 0) return '0.0B';
 			if (!si) si = true;
 			var value = (si) ? 1000 : 1024;
+			// Yes, this is excessive. No, I don't care.
 			var sizes = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 			var i = parseInt(Math.floor(Math.log(bytes) / Math.log(value)));
 			if (i == 0) { return (bytes / Math.pow(value, i))+' '+sizes[i]; }
