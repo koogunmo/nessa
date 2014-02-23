@@ -110,8 +110,8 @@ var ShowData = {
 			});
 		});
 	},
+	
 	latest: function(callback){
-		
 		var self = this;
 		var lastweek = Math.round(new Date()/1000) - (7*24*60*60);
 		
@@ -123,17 +123,21 @@ var ShowData = {
 			file: {$exists: true},
 			airdate: {$gt: lastweek-1, $lt: Math.round(new Date()/1000)}
 		}).toArray(function(error, results){
-			
+			if (error){
+				console.error(error);
+				return;
+			}
 			var count = 0;
-			results.forEach(function(result){
-				showCollection.findOne({tvdb: result.tvdb}, function(error, show){
-					var episode = result;
-					episode.show_name = show.name;
-					episode.tvdb = show.tvdb;
-					
-					if (typeof(callback) == 'function') callback(null, episode);
+			if (results.length){
+				results.forEach(function(result){
+					showCollection.findOne({tvdb: result.tvdb}, function(error, show){
+						var episode = result;
+						episode.show_name = show.name;
+						episode.tvdb = show.tvdb;
+						if (typeof(callback) == 'function') callback(null, episode);
+					});
 				});
-			});
+			}
 		});
 	},
 	
