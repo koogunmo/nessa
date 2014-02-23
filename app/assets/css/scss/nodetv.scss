@@ -235,8 +235,11 @@ input.form-control+input.form-control {
 	}
 	.show {
 		border-bottom: 1px solid $border;
-		cursor: pointer;
 		padding: 10px;
+		a {
+			color: inherit;
+			text-decoration: none;
+		}
 	}
 }
 
