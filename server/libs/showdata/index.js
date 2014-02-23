@@ -355,7 +355,6 @@ var ShowData = {
 			helper.parseFeed(show.feed, null, function(error, item){
 				if (error || !item.hash) return;
 				if (!!show.hd != item.hd) return;
-				
 				var update	= {hash: item.hash};
 				var where	= {
 					tvdb: tvdb,

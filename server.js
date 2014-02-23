@@ -677,6 +677,7 @@ io.sockets.on('connection', function(socket) {
 		shows.getArtwork(tvdb);
 		shows.getSummary(tvdb);
 		shows.getFullListings(tvdb, function(error, tvdb){
+			if (error) console.log(error);
 			shows.getHashes(tvdb);
 		});
 	});

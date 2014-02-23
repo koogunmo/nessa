@@ -200,12 +200,11 @@ exports = module.exports = {
 							var magnet = null;
 							sources.forEach(function(source){
 								if (magnet) return;
-								if (source.indexOf('magnet:?') == 0) {
+								if (source.indexOf('magnet') == 0) {
 									magnet = source;
 									return;
 								}
 							});
-							
 							var res = helper.getEpisodeNumbers(item.title[0]);
 							var response = {
 								season: res.season,
@@ -237,7 +236,7 @@ exports = module.exports = {
 	},
 	
 	getHash: function(magnet){
-		if (match = magnet.match(/btih\:([0-9A-F]{40})/i)){
+		if (match = magnet.match(/btih\:([\w]{32,40})/i)){
 			return match[1].toUpperCase();
 		}
 		return false;
