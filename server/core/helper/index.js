@@ -153,9 +153,11 @@ exports = module.exports = {
 		if (url.indexOf('tvshowsapp.com') >= 0) {
 			var oldurl = decodeURIComponent(url);
 			userAgent = 'TVShows 2 (http://tvshowsapp.com/)';
+			/*
 			if (match = oldurl.match(/([\w\s\-\.\']+)$/i)){
 				url = 'http://tvshowsapp.com/feeds/cache/'+encodeURI(match[1]);
 			}
+			*/
 			if (full && url.indexOf('.full.xml') == -1) {
 				url = url.replace(/\.xml$/, '.full.xml');
 			}
