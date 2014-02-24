@@ -384,6 +384,7 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		
 		var modal	= false;
 		var opened	= false;
+		var tvdb	= null;
 		
 		var routeChange = function(){
 			if ($location.hash()){
@@ -392,7 +393,8 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 				if (opened && modal) modal.close('navigation');
 			}
 		};
-		$scope.$on('$routeChangeStart', routeChange)
+		
+	//	$scope.$on('$routeChangeStart', routeChange)
 		$scope.$on('$routeChangeSuccess', routeChange);
 		$scope.$on('$routeUpdate', routeChange);
 		
@@ -400,8 +402,6 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		$scope.settings	= {};
 		
 		$scope.add = function(){
-			if (opened) return;
-			opened = true;
 			modal = $modal.open({
 				templateUrl: '/views/modal/add.html',
 				controller: 'searchCtrl',
@@ -412,11 +412,8 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 					}
 				}
 			});
-			modal.opened.then(function(){
-				opened = true;
-			});
 			modal.result.then(function(){
-				opened = false;
+			//	opened = false;
 			});
 		};
 		$scope.clearFilter = function(){
@@ -425,8 +422,6 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		};
 		
 		$scope.view = function(tvdb){
-		//	console.log(tvdb, opened);
-			if (opened) return;
 			opened = true;
 			$socket.emit('show.summary', tvdb);
 		};
@@ -434,6 +429,8 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		/* Open modal window containing show information */
 		// this could be a cause of our multiple modal issue
 		$socket.on('show.summary', function(json){
+			if (opened === true) return;
+			
 			modal = $modal.open({
 				templateUrl: '/views/modal/show.html',
 				controller: 'showCtrl',
@@ -456,12 +453,12 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 				}
 			});
 			modal.opened.then(function(){
-			//	$location.search('tvdb', json.summary.tvdb);
 				opened = true;
 			});
 			modal.result.then(function(result){
 				$location.hash('');
 				opened = false;
+				modal = false;
 			});
 		});
 		
