@@ -1,6 +1,7 @@
 "use strict";
 
 requirejs.config({
+//	urlArgs: 'derp=' + (new Date()).getTime(),
 	paths: {
 		'angular': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.2.13/angular.min',
 		'jquery': 'https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min',

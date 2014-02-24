@@ -194,6 +194,7 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute', 'ui.boo
 			}
 			
 		}).when('/settings', {
+			title: 'Settings',
 			templateUrl: '/views/partials/settings.html',
 			controller: 'settingsCtrl',
 			resolve: {

@@ -21,7 +21,6 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 						alert.icon = '/assets/icons/touch-icon.png';
 				}
 			}
-			
 			if (('Notification' in window) && Notification.permission === 'granted'){
 				var notification = new Notification(alert.title, {body: alert.message, icon: alert.icon});
 				notification.onclick = function(e){
@@ -191,7 +190,6 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 			$modalInstance.close();
 		};
 	});
-
 	
 	nessa.controller('homeCtrl', function($scope, $socket){
 		
@@ -429,7 +427,6 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		// this could be a cause of our multiple modal issue
 		$socket.on('show.summary', function(json){
 			if (opened === true) return;
-			
 			modal = $modal.open({
 				templateUrl: '/views/modal/show.html',
 				controller: 'showCtrl',
@@ -460,12 +457,9 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 				modal = false;
 			});
 		});
-		
-		$socket.emit('media.settings');
 		$socket.on('media.settings', function(data){
 			$scope.settings = data;
 		});
-		
 		$socket.on('show.added', function(){
 			$socket.emit('shows.list');
 		});
@@ -474,7 +468,7 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 			$(document).trigger('lazyload');
 		});
 		
-		/* Retrieve shows list */
+		$socket.emit('media.settings');
 		$socket.emit('shows.list');
 	});
 	
