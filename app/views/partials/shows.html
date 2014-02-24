@@ -8,11 +8,13 @@
 		</div>
 	</form>
 	<div class="row">
-		<div class="show col-sm-2" ng-repeat="show in shows | orderBy:'name' | filter:filter" ng-click="view(show.tvdb)">
-			<div class="image">
-				<img data-src="/media/{{settings.shows.directory}}/{{show.directory}}/poster.jpg" alt="" class="img-responsive" />
-			</div>
-			<div>{{show.name}}</div>
+		<div class="show col-sm-2" ng-repeat="show in shows | orderBy:'name' | filter:filter">
+			<a href="#{{show.tvdb}}">
+				<div class="image" title="{{show.name}}">
+					<img data-src="/media/{{settings.shows.directory}}/{{show.directory}}/poster.jpg" alt="" class="img-responsive" />
+				</div>
+				<div class="title">{{show.name}}</div>
+			</a>
 		</div>
 	</div>
 </div>

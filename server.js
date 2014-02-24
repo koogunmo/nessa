@@ -13,7 +13,7 @@ var logger = global.logger = log4js.getLogger();
 
 /***********************************************************************/
 /* Global Configuration */
-var pkg = require('./package.json');
+global.pkg = require('./package.json');
 global.plugin = function(name){
 	try {
 		return require(__dirname + '/server/libs/' + name);
@@ -115,7 +115,7 @@ app.configure(function(){
 		app.use('/template', express.static(__dirname + '/app/views/ui'));
 		app.use('/views', express.static(__dirname + '/app/views'));
 	}
-	
+	app.enable('view cache');
 });
 
 /* MongoDB */
@@ -675,11 +675,10 @@ io.sockets.on('connection', function(socket) {
 	}).on('show.update', function(tvdb){
 		var shows = plugin('showdata');
 		shows.getArtwork(tvdb);
+		shows.getSummary(tvdb);
 		shows.getFullListings(tvdb, function(error, tvdb){
+			if (error) console.log(error);
 			shows.getHashes(tvdb);
-		//	show.summary(data.id, function(error, json){
-		//		socket.emit('show.summary', json);
-		//	});
 		});
 	});
 	

@@ -19,9 +19,8 @@ function updateListings(){
 	});
 }
 
-/* Every Sunday at 1am */
+/* Every night at 1am */
 var rule = new schedule.RecurrenceRule();
-	rule.dayOfWeek	= 0;
 	rule.hour		= 1;
 	rule.minute		= 0;
 

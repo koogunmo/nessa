@@ -1,8 +1,8 @@
 'use strict';
 
-define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute', 'ui.bootstrap', 'ui.router'], function(angular,io){
+define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute', 'ui.bootstrap'], function(angular,io){
 
-	var app = angular.module('nessa', ['ngCookies','ngResource','ngRoute','ui.bootstrap','ui.router']);
+	var app = angular.module('nessa', ['ngCookies','ngResource','ngRoute','ui.bootstrap']);
 	
 	app.factory('$socket', function($rootScope) {
 		var port = (window.location.port) ? window.location.port : 80;
@@ -30,30 +30,18 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute', 'ui.boo
 			}
 		};
 	}).run(function($rootScope, $location){
+		$rootScope.$on('$routeChangeSuccess', function(event, current, previous){
+			$rootScope.pagetitle = current.$$route.title;
+		});
 		$rootScope.location = $location;
 	});
-	
-	/*
-	app.directive('episode', function(){
-		return {
-			replace: false,
-			templateUrl: '/template/episode/episode.html',
-			transclude: true,
-			link: function(scope, element, attributes){
-				element.on('click', '.title', function(){
-					$(this).next('.extended').slideToggle();
-				});
-				
-			}
-		};
-	});
-	*/
 	
 	app.filter('formatBytes', function(){
 		return function(bytes, si) {
 			if (bytes == 0) return '0.0B';
 			if (!si) si = true;
 			var value = (si) ? 1000 : 1024;
+			// Yes, this is excessive. No, I don't care.
 			var sizes = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 			var i = parseInt(Math.floor(Math.log(bytes) / Math.log(value)));
 			if (i == 0) { return (bytes / Math.pow(value, i))+' '+sizes[i]; }
@@ -152,10 +140,12 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute', 'ui.boo
 		});
 		
 		$routeProvider.when('/login', {
+			title: 'Login',
 			templateUrl: '/views/partials/login.html',
 			controller: 'loginCtrl'
 			
 		}).when('/dashboard', {
+			title: 'Dashboard',
 			templateUrl: '/views/partials/dashboard.html',
 			controller: 'homeCtrl',
 			resolve: {
@@ -163,6 +153,7 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute', 'ui.boo
 			}
 			
 		}).when('/downloads', {
+			title: 'Downloads',
 			templateUrl: '/views/partials/downloads.html',
 			controller: 'downloadsCtrl',
 			resolve: {
@@ -170,6 +161,7 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute', 'ui.boo
 			}
 			
 		}).when('/movies', {
+			title: 'Movies',
 			templateUrl: '/views/partials/movies.html',
 			controller: 'moviesCtrl',
 			reloadOnSearch: false,
@@ -178,6 +170,7 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute', 'ui.boo
 			}
 			
 		}).when('/shows', {
+			title: 'Shows',
 			templateUrl: '/views/partials/shows.html',
 			controller: 'showsCtrl',
 			reloadOnSearch: false,
@@ -186,12 +179,14 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute', 'ui.boo
 			}
 			
 		}).when('/shows/match', {
+			title: 'Unmatched shows',
 			templateUrl: '/views/partials/match.html',
 			controller: 'matchCtrl',
 			resolve: {
 				loggedin: checkLoggedin
 			}
 		}).when('/shows/unwatched', {
+			title: 'Unwatched shows',
 			templateUrl: '/views/partials/unwatched.html',
 			controller: 'unwatchedCtrl',
 			resolve: {
@@ -206,6 +201,7 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute', 'ui.boo
 			}
 			
 		}).when('/install', {
+			title: 'Installer',
 			templateUrl: '/views/partials/install.html',
 			controller: 'installCtrl',
 			

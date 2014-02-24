@@ -1,15 +1,46 @@
 'use strict';
 
 require(['jquery','socket.io','app'], function($,io,nessa){
+	
+	nessa.controller('headCtrl', function($scope){
+		
+	});
+	
 	nessa.controller('alertsCtrl', function($scope, $socket){
 		$scope.alerts = [];
+		
 		$socket.on('system.alert', function(alert){
-			$scope.alerts.push(alert);
-			if (alert.autoClose) {
-				setTimeout(function(){
-					$scope.closeAlert($scope.alerts.length-1);
-					$scope.$apply();
-				}, alert.autoClose);
+			if (!alert.title) alert.title = 'NodeTV';
+			if (!alert.icon) {
+				switch (alert.type){
+					case 'danger':
+					case 'info':
+					case 'success':
+					case 'warning':
+					default:
+						alert.icon = '/assets/icons/touch-icon.png';
+				}
+			}
+			
+			if (('Notification' in window) && Notification.permission === 'granted'){
+				var notification = new Notification(alert.title, {body: alert.message, icon: alert.icon});
+				notification.onclick = function(e){
+					if (notification.url) document.location = window.url;
+					notification.close();
+				}
+				if (alert.autoClose){
+					setTimeout(function(){
+						notification.close();
+					}, alert.autoClose);
+				}
+			} else {
+				$scope.alerts.push(alert);
+				if (alert.autoClose) {
+					setTimeout(function(){
+						$scope.closeAlert($scope.alerts.length-1);
+						$scope.$apply();
+					}, alert.autoClose);
+				}
 			}
 		});
 		$scope.closeAlert = function(index){
@@ -17,7 +48,7 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		};
 		$scope.$on('$routeChangeSuccess', function(){
 			$scope.alerts = [];
-		})
+		});
 	});
 	
 	nessa.controller('loginCtrl', function($scope, $socket, $rootScope, $http, $location, $window){
@@ -85,7 +116,7 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		
 	});
 	
-	nessa.controller('downloadsCtrl', function($scope, $socket){
+	nessa.controller('downloadsCtrl', function($scope, $socket, $modal){
 		$scope.downloads = [];
 		$scope.predicate = 'name';
 		$scope.reverse = false;
@@ -99,12 +130,26 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		});
 		
 		$scope.addUrl = function(){
-			$socket.emit('download.url', $scope.search.name);
-			$scope.search.name = '';
+			$modal.open({
+				templateUrl: '/views/modal/dl-add.html',
+				controller: 'downloadAddCtrl'
+			});
 		};
 	});
 	
-	nessa.controller('downloadCtrl', function($scope, $socket){
+	nessa.controller('downloadCtrl', function($scope, $socket, $modal){
+		$scope.settings = function(id){
+			$modal.open({
+				templateUrl: '/views/modal/dl-settings.html',
+				controller: 'downloadSettingsCtrl',
+				resolve: {
+					id: function(){
+						return id;
+					}
+				}
+			});
+		};
+		
 		$scope.remove = function(){
 			if (confirm('Are you sure you want to delete this torrent?')) {
 				$socket.emit('download.remove', {id: $scope.$parent.download.id, purge: true});
@@ -120,10 +165,44 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		};
 	});
 	
+	nessa.controller('downloadAddCtrl', function($scope, $socket, $modalInstance){
+		$scope.close = function(){
+			$modalInstance.dismiss('close');
+		};
+		$scope.save = function(){
+			$socket.emit('download.url', $scope.url);
+			$modalInstance.close();
+		};
+	});
+
+	nessa.controller('downloadSettingsCtrl', function($scope, $socket, $modalInstance, id){
+		
+		// fetch info
+		$socket.emit('torrent.info', id);
+		$socket.on('torrent.info', function(data){
+			if (data.id != id) return;
+			
+			
+		});
+		$scope.close = function(){
+			$modalInstance.dismiss('close');
+		};
+		$scope.save = function(){
+			$modalInstance.close();
+		};
+	});
+
+	
 	nessa.controller('homeCtrl', function($scope, $socket){
+		
 		$scope.unmatched = 0;
 		$scope.upcoming = [];
 		$scope.latest = [];
+		$scope.notifications = false;
+		
+		if (('Notification' in window) && Notification.permission === 'granted'){
+			$scope.notifications = true;
+		}
 		
 		$socket.emit('dashboard');
 		$socket.on('dashboard.latest', function(data){
@@ -144,7 +223,27 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		$socket.on('dashboard.upcoming', function(data){
 			$scope.upcoming = data;
 		});
-		
+				
+		$scope.enableAlerts = function(){
+			if (('Notification' in window)){
+				if (Notification.permission === 'granted'){
+					return;
+				} else if (Notification.permission !== 'denied') {
+					Notification.requestPermission(function(permission){
+						if (!('permission' in Notification)) {
+							Notification.permission = permission;
+						}
+						if (permission === 'granted') {
+							var notification = new Notification('NodeTV', {body: 'Desktop alerts enabled', icon: '/assets/icons/touch-icon.png'});
+							setTimeout(function(){
+								notification.close()
+							}, 1500);
+							$scope.notifications = true;
+						}
+					});
+				}
+			}
+		}
 	});
 	
 	nessa.controller('matchCtrl', function($scope, $socket){
@@ -285,15 +384,17 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		
 		var modal	= false;
 		var opened	= false;
+		var tvdb	= null;
 		
 		var routeChange = function(){
-			if ($location.search().tvdb) {
-				$scope.view($location.search().tvdb);
+			if ($location.hash()){
+				$scope.view($location.hash());
 			} else {
 				if (opened && modal) modal.close('navigation');
 			}
 		};
-		$scope.$on('$routeChangeStart', routeChange)
+		
+	//	$scope.$on('$routeChangeStart', routeChange)
 		$scope.$on('$routeChangeSuccess', routeChange);
 		$scope.$on('$routeUpdate', routeChange);
 		
@@ -301,8 +402,6 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		$scope.settings	= {};
 		
 		$scope.add = function(){
-			if (opened) return;
-			opened = true;
 			modal = $modal.open({
 				templateUrl: '/views/modal/add.html',
 				controller: 'searchCtrl',
@@ -313,11 +412,8 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 					}
 				}
 			});
-			modal.opened.then(function(){
-				opened = true;
-			});
 			modal.result.then(function(){
-				opened = false;
+			//	opened = false;
 			});
 		};
 		$scope.clearFilter = function(){
@@ -326,14 +422,14 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		};
 		
 		$scope.view = function(tvdb){
-		//	console.log(tvdb, opened);
-			if (opened) return;
-			opened = true;
 			$socket.emit('show.summary', tvdb);
 		};
 		
 		/* Open modal window containing show information */
+		// this could be a cause of our multiple modal issue
 		$socket.on('show.summary', function(json){
+			if (opened === true) return;
+			
 			modal = $modal.open({
 				templateUrl: '/views/modal/show.html',
 				controller: 'showCtrl',
@@ -356,12 +452,12 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 				}
 			});
 			modal.opened.then(function(){
-				$location.search('tvdb', json.summary.tvdb);
 				opened = true;
 			});
 			modal.result.then(function(result){
-				$location.search('tvdb', null);
+				$location.hash('');
 				opened = false;
+				modal = false;
 			});
 		});
 		
@@ -390,9 +486,7 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		$socket.emit('shows.search', $scope.search.query);
 		
 		$socket.on('shows.search', function(results){
-		//	$scope.$apply(function(){
-				$scope.results = results;
-		//	});
+			$scope.results = results;
 		});
 		$scope.close = function(){
 			$modalInstance.close();
@@ -507,7 +601,7 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		};
 		
 		$scope.hasAired = function(){
-			return ($scope.episode.airdate*1000 < new Date().getTime());
+			return ($scope.episode.airdate && $scope.episode.airdate*1000 < new Date().getTime());
 		};
 	});
 	

@@ -1,9 +1,8 @@
 <div id="install">
-	<div class="page-header">
-		<h1>Install NodeTV</h1>
-	</div>
-	
 	<form>
+		<div class="page-header">
+			<h1>Install NodeTV</h1>
+		</div>
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				<h4 class="panel-title">Database</h4>
@@ -11,10 +10,10 @@
 			<div class="panel-body">
 				<p>NodeTV uses MongoDB to store your show data.</p>
 				<div class="form-group">
-					<label for="">Host</label><input type="text" class="form-control" placeholder="127.0.0.1" required="true" ng-model="settings.mongo.host" />
+					<label for="ipt_mongo_host">Host</label><input type="text" id="ipt_mongo_host" class="form-control" placeholder="127.0.0.1" required="true" ng-model="settings.mongo.host" />
 				</div>
 				<div class="form-group">
-					<label for="">Port</label><input type="text" class="form-control" placeholder="27017" required="true" ng-model="settings.mongo.port" />
+					<label for="ipt_mongo_port">Port</label><input type="text" id="ipt_mongo_port" class="form-control" placeholder="27017" required="true" ng-model="settings.mongo.port" />
 				</div>
 				
 				<div class="form-group">
@@ -22,10 +21,10 @@
 				</div>
 				
 				<div class="form-group" ng-if="settings.mongo.auth">
-					<label for="">Username</label><input type="text" class="form-control" required="true" ng-model="settings.mongo.username" />
+					<label for="ipt_mongo_user">Username</label><input type="text" id="ipt_mongo_user" class="form-control" required="true" ng-model="settings.mongo.username" />
 				</div>
 				<div class="form-group" ng-if="settings.mongo.auth">
-					<label for="">Password</label><input type="password" class="form-control" required="true" ng-model="settings.mongo.password" />
+					<label for="ipt_mongo_pass">Password</label><input type="password" id="ipt_mongo_pass" class="form-control" required="true" ng-model="settings.mongo.password" />
 				</div>
 			</div>
 		</div>
@@ -61,9 +60,9 @@
 			</div>
 			<div class="panel-body">
 				<p>A free <a href="http://trakt.tv/join">Trakt.tv account</a> is required to retrieve show and episode information.</p>
-				<div class="form-group"><label for="">Username</label><input type="text" class="form-control" required="true" ng-model="settings.trakt.username" /></div>
-				<div class="form-group"><label for="">Password</label><input type="password" class="form-control" required="true" ng-model="settings.trakt.password" /></div>
-				<div class="form-group"><label for="">API Key</label><input type="text" class="form-control" required="true" ng-model="settings.trakt.apikey" /></div>
+				<div class="form-group"><label for="ipt_trakt_user">Username</label><input type="text" id="ipt_trakt_user" class="form-control" required="true" ng-model="settings.trakt.username" /></div>
+				<div class="form-group"><label for="ipt_trakt_pass">Password</label><input type="password" id="ipt_trakt_pass" class="form-control" required="true" ng-model="settings.trakt.password" /></div>
+				<div class="form-group"><label for="ipt_trakt_api">API Key</label><input type="text" id="ipt_trakt_api" class="form-control" required="true" ng-model="settings.trakt.apikey" /></div>
 				<p class="small">Your trakt.tv API key can be found <a href="http://trakt.tv/settings/api" target="_blank">here</a></p>
 			</div>
 		</div>
@@ -73,19 +72,17 @@
 				<h4 class="panel-title">Transmission</h4>
 			</div>
 			<div class="panel-body">
-				<div class="form-group"><label for="">Host</label><input type="text" class="form-control" placeholder="127.0.0.1" required="required" ng-model="settings.transmission.host" /></div>
-				<div class="form-group"><label for="">Port</label><input type="text" class="form-control" placeholder="9091" required="required" ng-model="settings.transmission.port" /></div>
+				<div class="form-group"><label for="ipt_bt_host">Host</label><input type="text" id="ipt_bt_host" class="form-control" placeholder="127.0.0.1" required="required" ng-model="settings.transmission.host" /></div>
+				<div class="form-group"><label for="ipt_bt_port">Port</label><input type="text" id="ipt_bt_port" class="form-control" placeholder="9091" required="required" ng-model="settings.transmission.port" /></div>
 				<div class="form-group">
 					<label><input type="checkbox" ng-model="settings.transmission.auth" /> Transmission requires a username and password</label>
 				</div>
-				<div class="form-group" ng-if="settings.transmission.auth"><label for="">Username</label><input type="text" class="form-control" ng-model="settings.transmission.username" /></div>
-				<div class="form-group" ng-if="settings.transmission.auth"><label for="">Password</label><input type="password" class="form-control" ng-model="settings.transmission.password" /></div>
+				<div class="form-group" ng-if="settings.transmission.auth"><label for="ipt_bt_user">Username</label><input type="text" id="ipt_bt_user" class="form-control" ng-model="settings.transmission.username" /></div>
+				<div class="form-group" ng-if="settings.transmission.auth"><label for="ipt_bt_pass">Password</label><input type="password" id="ipt_bt_pass" class="form-control" ng-model="settings.transmission.password" /></div>
 			</div>
 		</div>
-		
+		<div class="toolbar">
+			<button type="submit" class="btn btn-success">Save &amp; Install</button>
+		</div>		
 	</form>
-	<ul class="pager">
-		<li class="previous disabled"><a href="#">&larr; Previous</a></li>
-		<li class="next disabled"><a href="#">Next &rarr;</a></li>
-	</ul>
 </div>

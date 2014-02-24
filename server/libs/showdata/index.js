@@ -110,8 +110,8 @@ var ShowData = {
 			});
 		});
 	},
+	
 	latest: function(callback){
-		
 		var self = this;
 		var lastweek = Math.round(new Date()/1000) - (7*24*60*60);
 		
@@ -123,23 +123,27 @@ var ShowData = {
 			file: {$exists: true},
 			airdate: {$gt: lastweek-1, $lt: Math.round(new Date()/1000)}
 		}).toArray(function(error, results){
-			
+			if (error){
+				console.error(error);
+				return;
+			}
 			var count = 0;
-			results.forEach(function(result){
-				showCollection.findOne({tvdb: result.tvdb}, function(error, show){
-					var episode = result;
-					episode.show_name = show.name;
-					episode.tvdb = show.tvdb;
-					
-					if (typeof(callback) == 'function') callback(null, episode);
+			if (results.length){
+				results.forEach(function(result){
+					showCollection.findOne({tvdb: result.tvdb}, function(error, show){
+						var episode = result;
+						episode.show_name = show.name;
+						episode.tvdb = show.tvdb;
+						if (typeof(callback) == 'function') callback(null, episode);
+					});
 				});
-			});
+			}
 		});
 	},
 	
 	list: function(callback){
 		var showCollection = db.collection('show');
-		showCollection.find({status: {$exists: true}}).toArray(callback);
+		showCollection.find({status: {$exists: true}, directory: {$exists: true}}).toArray(callback);
 	},
 	
 	remove: function(tvdb, callback){
@@ -153,15 +157,20 @@ var ShowData = {
 			if (error) return;
 			if (results.length){
 				var response = [];
+				var count = 0;
 				results.forEach(function(result){
-					var count = 0;
 					trakt.show.summary(result.tvdb, function(error, json){
-						json.feed = result.feed;
-						response.push(json)
 						count++;
-						if (count == results.length) callback(null, response);
+						json.feed = result.feed;
+						response.push(json);
 					});
 				});
+				var send = setInterval(function(){
+					if (results.length == count) {
+						clearInterval(send);
+						callback(null, response);
+					}
+				}, 500);
 			} else {
 				trakt.search('shows', query, callback);
 			}
@@ -226,14 +235,14 @@ var ShowData = {
 		var showCollection = db.collection('show');
 		matches.forEach(function(match){
 			unmatchedCollection.findOne({_id: ObjectID(match.id)}, function(error, row){
-				trakt.show.summary(match.tvdb, function(error, json){
+				trakt.show.summary(parseInt(match.tvdb, 10), function(error, json){
 					var record = {
 						directory: row.directory,
 						status: !!row.status,
 						name: json.title,
-						tvdb: match.tvdb
+						tvdb: parseInt(match.tvdb, 10)
 					};
-					showCollection.update({tvdb: match.tvdb}, {$set: record}, {upsert: true}, function(error, affected){
+					showCollection.update({tvdb: parseInt(match.tvdb, 10)}, {$set: record}, {upsert: true}, function(error, affected){
 						unmatchedCollection.remove({_id: ObjectID(match.id)}, function(error, affected){
 							// Removed from unmatched list
 						});
@@ -277,7 +286,7 @@ var ShowData = {
 				if (json.images.banner){
 					var banner = fs.createWriteStream(nconf.get('media:base') + nconf.get('media:shows:directory') + '/' + show.directory + '/banner.jpg');
 					banner.on('error', function(e){
-						console.error(e);
+						logger.error(e);
 					});
 					var request = http.get(json.images.banner, function(response){
 						response.pipe(banner);
@@ -287,7 +296,7 @@ var ShowData = {
 					var src = json.images.poster.replace('.jpg', '-138.jpg');
 					var poster = fs.createWriteStream(nconf.get('media:base') + nconf.get('media:shows:directory') + '/' + show.directory + '/poster.jpg');
 					poster.on('error', function(e){
-						console.error(e);
+						logger.error(e);
 					});
 					var request = http.get(src, function(response){
 						response.pipe(poster);
@@ -342,16 +351,10 @@ var ShowData = {
 		
 		showCollection.findOne({tvdb: tvdb}, function(error, show){
 			if (error || !show || !show.feed) return;
-			
-			if (show.feed.indexOf('tvshowsapp.com') > 0 && show.feed.indexOf('.full.xml') == -1) {
-				// If it's a TVShowsApp feed, get the .full.xml instead
-				show.feed.replace(/\.xml$/, '.full.xml');
-			}
-			
+			show.feed = helper.fixFeedUrl(show.feed, true);
 			helper.parseFeed(show.feed, null, function(error, item){
 				if (error || !item.hash) return;
 				if (!!show.hd != item.hd) return;
-				
 				var update	= {hash: item.hash};
 				var where	= {
 					tvdb: tvdb,
@@ -362,7 +365,7 @@ var ShowData = {
 				};
 				if (!item.repack) where.hash = {$exists: false};
 				episodeCollection.update(where, {$set: update}, function(error, affected){
-					if (error) console.error('derp', error);
+					if (error) logger.error(error);
 				});
 				if (typeof(callback) == 'function') callback(null, tvdb);
 			});
@@ -443,7 +446,13 @@ var ShowData = {
 		var self = this;
 		var showCollection = db.collection('show');
 		// Get the latest showlist feed from TVShows and add new entries into the local database
-		request.get('http://tvshowsapp.com/showlist/showlist.xml', function(error, req, xml){
+		var options = {
+			url: 'http://tvshowsapp.com/showlist/showlist.xml',
+			headers: {
+				'User-Agent': 'TVShows 2 (http://tvshowsapp.com/)'
+			}
+		};
+		request.get(options, function(error, req, xml){
 			if (error) return;
 			try {
 				parser.parseString(xml, function(error, json){
@@ -452,11 +461,12 @@ var ShowData = {
 						var record = {
 							name: show.name[0],
 							tvdb: parseInt(show.tvdbid[0], 10),
-							feed: show.mirrors[0].mirror[0]
+							feed: helper.fixFeedUrl(show.mirrors[0].mirror[0])
 						};
 						// We could do an upsert, but it would overwrite the name and feed every time
 						showCollection.count({tvdb: record.tvdb}, function(error, count){
 							if (error || count == 1) return;
+							
 							showCollection.insert(record, function(error, affected){
 								self.getSummary(record.tvdb);
 							});
@@ -464,7 +474,7 @@ var ShowData = {
 					});
 				});
 			} catch(e) {
-				console.error('showdata.getShowlist', e.message);
+				logger.error('showdata.getShowlist', e.message);
 			}
 		});
 	},
@@ -472,17 +482,23 @@ var ShowData = {
 	getSummary: function(tvdb, callback){
 		var showCollection = db.collection('show');
 		trakt.show.summary(tvdb, function(error, json){
-			var record = {
-				name: json.title,
-				imdb: json.imdb_id,
-				synopsis: json.overview
-			};
-			if (json.status == 'Ended') {
-				record.ended = true;
-				record.status = false;
+			if (error) {
+				logger.error(error);
+				return;
 			}
-			showCollection.update({tvdb: tvdb}, {$set: record}, function(error, affected){
-				if (typeof(callback) == 'function') callback(error, tvdb);
+			showCollection.findOne({tvdb: tvdb}, function(error, show){
+				show.name = json.title;
+				show.imdb = json.imdb_id;
+				show.synopsis = json.overview;
+				
+				if (json.status == 'Ended') {
+					show.ended = true;
+					if (show.status === true) show.status = false;
+				}
+				
+				showCollection.save(show, function(error, result){
+					if (typeof(callback) == 'function') callback(error, tvdb);
+				});
 			});
 		});
 	},
