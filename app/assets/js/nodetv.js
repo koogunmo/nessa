@@ -422,7 +422,6 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		};
 		
 		$scope.view = function(tvdb){
-			opened = true;
 			$socket.emit('show.summary', tvdb);
 		};
 		
