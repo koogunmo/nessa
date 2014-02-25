@@ -12,45 +12,41 @@ var ObjectID = require('mongodb').ObjectID;
 var ShowData = {
 	
 	add: function(tvdb, callback){
-		tvdb = parseInt(tvdb, 10);
 		var self = this;
+		
+		var tvdb = parseInt(tvdb, 10);
 		var showCollection = db.collection('show');
 		
-		showCollection.findOne({tvdb: tvdb}, function(error, result){
-			if (error) return;
-			if (!result) {
-				trakt.show.summary(tvdb, function(error, json){
-					if (error) return;
+		trakt.show.summary(tvdb, function(error, json){
+			if (error) logger.error(error);
+			showCollection.findOne({tvdb: tvdb}, function(error, record){
+				if (error) logger.error(error);
+				if (record) {
+					record.imdb = json.imdb_id;
+					record.name = json.title;
+					record.status = (record.feed) ? true : false;
+					record.synopsis = json.overview;
+				} else {
 					var record = {
 						tvdb: parseInt(json.tvdb_id, 10),
 						imdb: json.imdb_id,
 						name: json.title,
 						synopsis: json.overview,
-						directory: helper.formatDirectory(json.title),
-						status: true,
-						feed: null
+						status: false
 					};
-					try {
-						var dir = nconf.get('media:base') + nconf.get('media:shows:directory') + '/' + record.directory;
-						mkdir(dir, 0775, function(error, made){
-							if (error) logger.error(error);
-						});
-					} catch(e){
-						logger.error(e.message);
-					}
-					showCollection.insert(record, function(error, affected){
-						if (typeof(callback) == 'function') callback(error, tvdb);
+				}
+				if (!record.directory){
+					record.directory = helper.formatDirectory(record.name);
+					var dir = nconf.get('media:base') + nconf.get('media:shows:directory') + '/' + record.directory;
+					mkdir(dir, 0775, function(error){
+						if (error) logger.error(error);
 					});
-				});
-			} else {
-				var record = {
-					directory: helper.formatDirectory(result.name),
-					status: true
-				};
-				showCollection.update({tvdb: tvdb}, {$set: record}, function(error, affected){
+				}
+				showCollection.save(record, {safe: true}, function(error, result){
 					if (typeof(callback) == 'function') callback(error, tvdb);
 				});
-			}
+				
+			});
 		});
 	},
 	
@@ -156,10 +152,16 @@ var ShowData = {
 	
 	search: function(query, callback){
 		var showCollection = db.collection('show');
+		trakt.search('shows', query, callback);
+		
+		/*
 		var regex = new RegExp(query.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&"), 'i');
 		showCollection.find({name: regex, status: {$exists: false}}).toArray(function(error, results){
 			if (error) return;
 			if (results.length){
+				
+				console.log('Local match: get Trakt data');
+				
 				var response = [];
 				var count = 0;
 				results.forEach(function(result){
@@ -179,6 +181,7 @@ var ShowData = {
 				trakt.search('shows', query, callback);
 			}
 		});
+		*/
 	},
 	
 	settings: function(data, callback){
