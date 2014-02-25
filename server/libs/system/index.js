@@ -1,21 +1,21 @@
 var git = require('gitty');
-var npm = require('npm');
+//var npm = require('npm');
 
 var system = {
 	update: function(callback){
 		try {
+			events.emit('system.alert', {
+				type: 'warning',
+				message: 'Update in progress'
+			});
+
 			var restart = false;
-			
 			var repo = git(process.cwd());
 			repo.pull('origin', nconf.get('system:branch'), function(error, success){
 				if (error) {
 					logger.error(error);
 					return;
 				}
-				events.emit('system.alert', {
-					type: 'warning',
-					message: 'Update in progress'
-				});
 				if (success.indexOf('already up-to-date') == -1) restart = true;
 				
 				/*
