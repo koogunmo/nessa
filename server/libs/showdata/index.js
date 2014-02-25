@@ -31,7 +31,10 @@ var ShowData = {
 						feed: null
 					};
 					try {
-						mkdir(nconf.get('media:base') + nconf.get('media:shows:directory') + '/' + record.directory, 0775);
+						var dir = nconf.get('media:base') + nconf.get('media:shows:directory') + '/' + record.directory;
+						mkdir(dir, 0775, function(error, made){
+							if (error) logger.error(error);
+						});
 					} catch(e){
 						logger.error(e.message);
 					}
