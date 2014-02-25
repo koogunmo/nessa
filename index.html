@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>Nessa by greebowarrior</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="inner">
+
+        <header>
+          <h1>Nessa</h1>
+          <h2>Automated TV torrent downloader and file manager</h2>
+        </header>
+
+        <section id="downloads" class="clearfix">
+          <a href="https://github.com/greebowarrior/nessa/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+          <a href="https://github.com/greebowarrior/nessa/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          <a href="https://github.com/greebowarrior/nessa" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        </section>
+
+        <hr>
+
+        <section id="main_content">
+          <h1>
+<a name="nodetv" class="anchor" href="#nodetv"><span class="octicon octicon-link"></span></a>NodeTV</h1>
+
+<p>Automated TV Torrenting acquisition</p>
+
+<h2>
+<a name="project-goal" class="anchor" href="#project-goal"><span class="octicon octicon-link"></span></a>Project Goal</h2>
+
+<p>"Build a system that functions in a similar manner to SickBeard, but using torrents only."</p>
+
+<p>I tried <a href="http://sickbeard.com/">SickBeard</a>, but it wouldn't easily let me arrange/name my files in a way I liked. It was also heavily skewed towards using newsgroups, which I don't use, thus NodeTV was born.</p>
+
+<h2>
+<a name="requirements" class="anchor" href="#requirements"><span class="octicon octicon-link"></span></a>Requirements</h2>
+
+<ul>
+<li>Compatible operating systems
+
+<ul>
+<li>Linux: Tested on Ubuntu</li>
+<li>OS X: 10.6 or later</li>
+<li>Windows users: You're on your own for now
+
+<ul>
+<li>Please see the note at the bottom of this document</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<a href="http://nodejs.org">Node.js</a> 0.10.x</li>
+<li>
+<a href="http://mongodb.org">MongoDB</a> 2.4.x</li>
+<li>
+<a href="http://transmissionbt.com">Transmission</a> with RPC Enabled</li>
+<li>A free <a href="http://trakt.tv">Trakt</a> account</li>
+</ul><h2>
+<a name="optional-third-party-software" class="anchor" href="#optional-third-party-software"><span class="octicon octicon-link"></span></a>Optional Third-party software</h2>
+
+<p>NodeTV doesn't handle uPNP/DLNA (yet), so if you want to stream your content, you'll need a MediaServer. I've used the following, with various degrees of success</p>
+
+<p><a href="minidlna.sourceforge.net">ReadyMedia</a> - ** Recommended **<br>
+A simple uPNP/DLNA compatible MediaServer (Open Source)<br><a href="http://twonky.com/downloads">Twonky 7</a><br>
+Commercial uPNP/DLNA server with companion app for mobile devices</p>
+
+<p>These work reasonably well with VLC and my XBOX 360. Your mileage may vary.</p>
+
+<h2>
+<a name="browser-support" class="anchor" href="#browser-support"><span class="octicon octicon-link"></span></a>Browser Support</h2>
+
+<p>NodeTV works in all current browsers. IE 8.0 and earlier are not supported.</p>
+
+<h2>
+<a name="installing" class="anchor" href="#installing"><span class="octicon octicon-link"></span></a>Installing</h2>
+
+<p>Clone the repository</p>
+
+<blockquote>
+<p>git clone <a href="https://github.com/greebowarrior/nessa.git">https://github.com/greebowarrior/nessa.git</a> /opt/nodetv</p>
+</blockquote>
+
+<p>Next, you'll need to install the dependencies</p>
+
+<blockquote>
+<p>npm install</p>
+</blockquote>
+
+<h2>
+<a name="running-nodetv" class="anchor" href="#running-nodetv"><span class="octicon octicon-link"></span></a>Running NodeTV</h2>
+
+<p>On the command line, run the following</p>
+
+<blockquote>
+<p>/usr/bin/node /path/to/nodetv/server.js</p>
+</blockquote>
+
+<p>You'll probably want to daemonize the process, I use <a href="https://github.com/nodejitsu/forever">forever</a> combined with an upstart script.<br>
+If anyone can convert it to systemd, I would be very grateful.</p>
+
+<p>You can then access the interface at <a href="http://localhost:6377">http://localhost:6377</a>  </p>
+
+<h3>
+<a name="ubuntu" class="anchor" href="#ubuntu"><span class="octicon octicon-link"></span></a>Ubuntu</h3>
+
+<p>An upstart job can be found at scripts/upstart.conf</p>
+
+<blockquote>
+<p>sudo cp scripts/upstart.conf /etc/init/nodetv.conf<br>
+sudo initctl reload-configuration</p>
+</blockquote>
+
+<h2>
+<a name="file-formatting" class="anchor" href="#file-formatting"><span class="octicon octicon-link"></span></a>File formatting</h2>
+
+<p>We use a human-readable format for directories and filenames.</p>
+
+<blockquote>
+<p>[Show Name]/Season ##/Episode ## - [Show Title].ext</p>
+</blockquote>
+
+<p>Season and Episode numbers always have leading zeroes.</p>
+
+<p>In the case of multipart episodes, the format is expanded:</p>
+
+<blockquote>
+<p>[Show Name]/Season ##/Episode ##-## - [Part 1 Title; Part 2 Title].ext</p>
+</blockquote>
+
+<p>For example:</p>
+
+<blockquote>
+<p>Falling Skies/Season 01/Episode 01-02 - Live and Learn; The Armory.avi</p>
+</blockquote>
+
+<p>We chose this format due to it's tidy structure, ease of navigation, and legibility. We may, in future, add the ability to customise this on a global and per-show basis.</p>
+
+<h2>
+<a name="regexp" class="anchor" href="#regexp"><span class="octicon octicon-link"></span></a>RegExp</h2>
+
+<p>We use the following Regular Expressions to detect the Season/Episode numbers in the filenames.
+We welcome any improvements you can suggest!</p>
+
+<h3>
+<a name="episodic-content" class="anchor" href="#episodic-content"><span class="octicon octicon-link"></span></a>Episodic content</h3>
+
+<pre><code>(?:S|Season)?\s?(\d{1,2})(?:[\w\s\-\:]+)?[\/\s]?(?:E|Episode|x)?\s?([\d]{2,})(?:(?:E|-)\s?([\d]{2,})){0,}
+</code></pre>
+
+<p>Which supports the following structures:</p>
+
+<pre><code>Season 01/Episode 02
+Season 01/Episode 02
+Season 01/Episode 02-03
+S01E02
+S01E02-03
+S01E02E03
+1x02
+1x02-03
+</code></pre>
+
+<p>It also supports episode spans of any size. For example, it would handle a file that contains Episodes 1 through 12, although it's unlikely that such a file would ever be released.    </p>
+
+<p>Optionally, the Season name may have subtitle:</p>
+
+<pre><code>American Horror Story/Season 02: Asylum/Episode 01 - Welcome to Briarcliff.mp4
+American Horror Story/Season 02 - Asylum/Episode 01 - Welcome to Briarcliff.mp4
+</code></pre>
+
+<p>Any episodes which are similar to:  </p>
+
+<pre><code>102
+10203
+</code></pre>
+
+<p>are ignored because that format is unbelievably stupid. Sorry folks, but you'll have to rename them yourselves.</p>
+
+<h3>
+<a name="daily-showsair-by-date" class="anchor" href="#daily-showsair-by-date"><span class="octicon octicon-link"></span></a>Daily Shows/Air-by-date</h3>
+
+<p>Shows that are aired daily (e.g The Colbert Report, The Daily Show, Conan) don't have season or episode numbers in the conventional sense.</p>
+
+<pre><code>(\d{4})\D?(\d{2})\D?(\d{2})
+</code></pre>
+
+<p>Which will match:</p>
+
+<pre><code>2013.08.01
+20130801
+</code></pre>
+
+<p>with any separator in place of the dot.
+At the time of writing, daily shows have not been tested at all.</p>
+
+<h3>
+<a name="specials--miniseries" class="anchor" href="#specials--miniseries"><span class="octicon octicon-link"></span></a>Specials / Miniseries</h3>
+
+<p>We need to create expressions for miniseries.</p>
+
+<h2>
+<a name="acknowledgments" class="anchor" href="#acknowledgments"><span class="octicon octicon-link"></span></a>Acknowledgments</h2>
+
+<p>NodeTV utilises the following third-party data sources:</p>
+
+<ul>
+<li>
+<a href="http://tvshowsapp.com">TVShowsApp</a>: Show list and RSS feeds</li>
+<li>
+<a href="http://trakt.tv">Trakt.tv</a>: Show information, artwork and social functions</li>
+</ul><h2>
+<a name="licence" class="anchor" href="#licence"><span class="octicon octicon-link"></span></a>Licence</h2>
+
+<p>This software is distributed under a Modified BSD License. Please see LICENCE.txt for full details</p>
+
+<h2>
+<a name="disclaimer" class="anchor" href="#disclaimer"><span class="octicon octicon-link"></span></a>Disclaimer</h2>
+
+<p>The authors of this software not condone, or approve of the illegal downloading and/or sharing of copyrighted material. You, the end user, are solely responsible for any legal actions against you that may occur as a result of using this software.</p>
+
+<h2>
+<a name="windows-users" class="anchor" href="#windows-users"><span class="octicon octicon-link"></span></a>Windows Users</h2>
+
+<p>There's no specific reason why NodeTV won't work on your system, but we just don't have the means to test it.</p>
+
+<p>You'll need to install <a href="http://sourceforge.net/projects/trqtw/">Transmission-QT</a></p>
+        </section>
+
+        <footer>
+          Nessa is maintained by <a href="https://github.com/greebowarrior">greebowarrior</a><br>
+          This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
+        </footer>
+
+        
+      </div>
+    </div>
+  </body>
+</html>
