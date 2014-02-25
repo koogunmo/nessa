@@ -156,7 +156,8 @@ var ShowData = {
 	
 	search: function(query, callback){
 		var showCollection = db.collection('show');
-		showCollection.find({name: new RegExp(query, 'i'), status: {$exists: false}}).toArray(function(error, results){
+		var regex = new RegExp(query.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&"), 'i');
+		showCollection.find({name: regex, status: {$exists: false}}).toArray(function(error, results){
 			if (error) return;
 			if (results.length){
 				var response = [];
