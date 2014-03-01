@@ -176,15 +176,22 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 
 	nessa.controller('downloadSettingsCtrl', function($scope, $socket, $modalInstance, id){
 		
+		$scope.torrent = {};
+		
 		// fetch info
-		$socket.emit('torrent.info', id);
-		$socket.on('torrent.info', function(data){
+		$socket.emit('download.info', id);
+		$socket.on('download.info', function(data){
 			if (data.id != id) return;
-			
-			
+			$scope.torrent = data;
 		});
 		$scope.close = function(){
 			$modalInstance.dismiss('close');
+		};
+		$scope.pause = function(){
+			
+		};
+		$scope.remove = function(){
+			
 		};
 		$scope.save = function(){
 			$modalInstance.close();

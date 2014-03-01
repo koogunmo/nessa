@@ -471,6 +471,42 @@ io.sockets.on('connection', function(socket) {
 			socket.emit('download.list', data.torrents);
 		});
 		
+	}).on('download.info', function(id){
+		var showCollection = db.collection('show');
+		var episodeCollection = db.collection('episode');
+		
+		torrent.info(id, function(error, data){
+	//		console.log(data.torrents[0]);
+			var torrent = data.torrents[0];
+			
+			var response = {
+				id: torrent.id,
+				date: {
+					started: torrent.addedDate
+				}
+			};
+			
+			episodeCollection.findOne({hash: torrent.hashString.toUpperCase()}, function(error, results){
+				if (results) {
+					// In DB, no manual move required
+					response.episode = results;
+					showCollection.findOne({tvdb: results.tvdb}, function(error, show){
+						response.show = show;
+						
+						socket.emit('download.info', response);
+					});
+				} else {
+					response.files = [];
+					torrent.files.forEach(function(file){
+						
+						
+						response.files.push(file);
+					});
+					socket.emit('download.info', response);
+				}
+			});
+		});
+		
 	}).on('download.remove', function(data){
 		torrent.remove(data, function(error){
 			if (!error) {

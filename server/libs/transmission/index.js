@@ -179,6 +179,17 @@ var torrent = {
 		}
 	},
 	
+	info: function(id, callback){
+		try {
+			this.rpc.get([id], function(error, args){
+				if (error) return;
+				if (typeof(callback) == 'function') callback(error, args);
+			});
+		} catch(e){
+			logger.error(e.message);
+		}
+	},
+	
 	list: function(callback){
 		try {
 			this.rpc.get(function(error, args){

@@ -1,6 +1,6 @@
 'use strict';
 
-define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute', 'ui.bootstrap'], function(angular,io){
+define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngRoute', 'ui.bootstrap'], function(angular,io,moment){
 
 	var app = angular.module('nessa', ['ngCookies','ngResource','ngRoute','ui.bootstrap']);
 	
@@ -34,6 +34,12 @@ define('app', ['angular','socket.io','ngCookies','ngResource','ngRoute', 'ui.boo
 			$rootScope.pagetitle = current.$$route.title;
 		});
 		$rootScope.location = $location;
+	});
+	
+	app.filter('moment', function() {
+		return function(dateString, format) {
+			return moment(dateString).format(format);
+		};
 	});
 	
 	app.filter('formatBytes', function(){

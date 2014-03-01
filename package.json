@@ -1,6 +1,6 @@
 {
   "name": "nodetv",
-  "version": "0.6.4",
+  "version": "0.6.5",
   "author": "Martin Purcell <martin.purcell@gmail.com>",
   "description": "NodeTV - TV Torrent Manager",
   "private": true,
@@ -26,6 +26,7 @@
     "netmask": "~1.0.4",
     "node-schedule": "~0.1.13",
     "node-uuid": "~1.4.1",
+    "npm": "^1.4.4",
     "passport": "~0.1.18",
     "passport-local": "~0.1.6",
     "qs": "~0.6.6",

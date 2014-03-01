@@ -1,21 +1,32 @@
 <div class="modal-header">
-	<h4 class="modal-title">Download Options</h4>
+	<button type="button" class="close" ng-click="close()">&times;</button>
+	<h4 class="modal-title">Torrent Information</h4>
 </div>
+
 <div class="modal-body">
 	
-	Nothing yet
-	<!--
-	<div>
-		<div ng-repeat="file in files">
-			<label for=""><input type="radio" /> {{file.name}}</label>
+	<div ng-if="torrent.show" class="panel panel-info">
+		<div class="panel-heading">
+			<h4 class="panel-title">{{torrent.show.name}} <small>{{torrent.episode.title}}</small></h4>
+		</div>
+		<div class="panel-body">
+			<h5>Season {{torrent.episode.season}} Episode {{torrent.episode.episode}}</h5>
+			<p>{{torrent.episode.synopsis}}</p>
 		</div>
 	</div>
 	
-	<div class="form-group">
-		<label for=""></label>
-		<input type="text" class="form-control" />
+	<div ng-if="torrent.files">
+		<h4>Move to folder</h4>
+		
+		To do: create file tree
+		
+		<div class="checkbox" ng-repeat="file in torrent.files">
+			<label for="">
+				<input type="radio" /> {{file.name}}
+			</label>
+		</div>
 	</div>
-	-->
+	
 </div>
 <div class="modal-footer">
 	<button type="button" class="btn btn-success" ng-show="selected" ng-click="save()">Move</button>
