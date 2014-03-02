@@ -18,7 +18,7 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 					case 'success':
 					case 'warning':
 					default:
-						alert.icon = '/assets/icons/touch-icon.png';
+						alert.icon = '/assets/gfx/icons/touch-icon.png';
 				}
 			}
 			if (('Notification' in window) && Notification.permission === 'granted'){
@@ -239,7 +239,7 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 							Notification.permission = permission;
 						}
 						if (permission === 'granted') {
-							var notification = new Notification('NodeTV', {body: 'Desktop alerts enabled', icon: '/assets/icons/touch-icon.png'});
+							var notification = new Notification('NodeTV', {body: 'Desktop alerts enabled', icon: '/assets/gfx/icons/touch-icon.png'});
 							setTimeout(function(){
 								notification.close()
 							}, 1500);
