@@ -39,7 +39,9 @@ try {
 			group: 'media'
 		},
 		system: {
-			branch: 'master'
+			branch: 'master',
+			dyndns: false,
+			upnp: false
 		}
 	});
 	/* Set a friendly process name */

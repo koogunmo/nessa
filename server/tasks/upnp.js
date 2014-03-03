@@ -10,8 +10,10 @@ try {
 		//	console.log(error, response);
 		});
 	};
-	setInterval(mapPorts, 600000);
-	mapPorts();
+	if (nconf.get('system:upnp')) {
+		setInterval(mapPorts, 600000);
+		mapPorts();
+	}
 } catch(e){
 	console.error(e.message);
 }

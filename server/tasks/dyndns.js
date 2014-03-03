@@ -14,9 +14,9 @@ try {
 	}
 	var rule = new schedule.RecurrenceRule(); rule.minute = [0];
 	schedule.scheduleJob(rule, function(){
-		dynamicDNS();
+		if (nconf.get('system:dyndns')) dynamicDNS();
 	});
-	dynamicDNS();
+	if (nconf.get('system:dyndns')) dynamicDNS();
 } catch(e){
 	console.error(e.message);
 }
