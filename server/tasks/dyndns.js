@@ -6,7 +6,7 @@ try {
 				console.error(error);
 				return;
 			}
-			request('http://dns.silicomedia.com:3000/api/'+nconf.get('trakt:username')+'/'+ip, function(error, response, json){
+			request('http://dns.silicomedia.com:8053/api/'+nconf.get('trakt:username')+'/'+ip, function(error, response, json){
 				if (error) console.error(error);
 				console.log(json);
 			});
