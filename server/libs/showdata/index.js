@@ -470,13 +470,24 @@ var ShowData = {
 							tvdb: parseInt(show.tvdbid[0], 10),
 							feed: helper.fixFeedUrl(show.mirrors[0].mirror[0])
 						};
-						// We could do an upsert, but it would overwrite the name and feed every time
-						showCollection.count({tvdb: record.tvdb}, function(error, count){
-							if (error || count == 1) return;
-							
-							showCollection.insert(record, function(error, affected){
-								self.getSummary(record.tvdb);
-							});
+						showCollection.findOne({tvdb: record.tvdb}, function(error, row){
+							if (error) return;
+							if (!row){
+								// New show: Add to local DB
+								showCollection.insert(record, function(error, affected){
+									if (error) return;
+									self.getSummary(record.tvdb);
+								});
+							} else {
+								if (!row.feed || row.feed == '') {
+									// Add the feed to the show record
+									showCollection.update({tvdb: record.tvdb}, {$set: {feed: record.feed}}, function(error, affected){
+										if (error) return;
+										self.getSummary(record.tvdb);
+									});
+								}
+							}
+							if (error || rowcount == 1) return;
 						});
 					});
 				});
