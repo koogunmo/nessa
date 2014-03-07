@@ -2,12 +2,16 @@
 	<form class="form-group">
 		<label></label>
 		<div class="input-group">
-			<input type="text" class="form-control search" placeholder="Search show library ({{shows.length}} shows)..." ng-model="filter.name" />
+			<input type="text" class="form-control search" placeholder="Search show library..." ng-model="filter.name" />
 			<span class="input-group-addon btn btn-success" ng-click="add()"><span class="glyphicon glyphicon-plus"></span></span>
 			<span class="input-group-addon btn btn-danger" ng-click="clearFilter()"><span class="glyphicon glyphicon-remove"></span></span>
 		</div>
 	</form>
 	<div class="row">
+		<div ng-show="shows.length" class="col-sm-12" style="text-align: right;">
+			Showing {{results.length}} of {{shows.length}} shows
+		</div>
+		
 		<div class="show col-sm-2" ng-repeat="show in results = (shows | filter:filter) | orderBy:'name'">
 			<a href="#{{show.tvdb}}">
 				<div class="image" title="{{show.name}}">
@@ -16,8 +20,11 @@
 				<div class="title">{{show.name}}</div>
 			</a>
 		</div>
-		<div class="col-sm-12" ng-hide="results.length">
-			<div ng-show="filter.name.length">No matches found</div>
+		<div class="col-sm-12" ng-show="!results.length" style="text-align: center;">
+			No matches found
 		</div>
+	</div>
+	<div class="row">
+		
 	</div>
 </div>
