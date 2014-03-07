@@ -8,13 +8,16 @@
 		</div>
 	</form>
 	<div class="row">
-		<div class="show col-sm-2" ng-repeat="show in shows | orderBy:'name' | filter:filter">
+		<div class="show col-sm-2" ng-repeat="show in results = (shows | filter:filter) | orderBy:'name'">
 			<a href="#{{show.tvdb}}">
 				<div class="image" title="{{show.name}}">
 					<img data-src="/media/{{settings.shows.directory}}/{{show.directory}}/poster.jpg" alt="" class="img-responsive" />
 				</div>
 				<div class="title">{{show.name}}</div>
 			</a>
+		</div>
+		<div class="col-sm-12" ng-hide="results.length">
+			<div ng-show="filter.name.length">No matches found</div>
 		</div>
 	</div>
 </div>
