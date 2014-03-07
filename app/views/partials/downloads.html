@@ -1,18 +1,18 @@
 <div id="downloads">
-	<div class="form-group">
-		<label></label>
-		<div class="input-group">
-			<input type="text" class="form-control search" placeholder="Filter Downloads..." ng-model="filter.name">
-			<span class="input-group-addon btn btn-success" ng-click="addUrl()"><span class="glyphicon glyphicon-plus"></span></span>
-			<span class="input-group-addon btn btn-danger" ng-click="search.name=''"><span class="glyphicon glyphicon-remove"></span></span>
+	<div class="row search">
+		<div class="col-sm-12">
+			<div class="input-group">
+				<input type="text" class="form-control search" placeholder="Search download list..." ng-model="filter.name">
+				<span class="input-group-addon btn btn-success" ng-click="addUrl()"><span class="glyphicon glyphicon-plus"></span></span>
+				<span class="input-group-addon btn btn-danger" ng-click="search.name=''"><span class="glyphicon glyphicon-remove"></span></span>
+			</div>
 		</div>
 	</div>
-	<!--
-	<div class="btn-group btn-group-xs">
-		<button type="button" class="btn btn-default" ng-click="search.status=true">Active</button>
-		<button type="button" class="btn btn-default" ng-click="search.status=false">Paused</button>
+	<div class="row">
+		<div ng-show="downloads.length" class="col-sm-12" style="text-align: right;">
+			Showing {{results.length}} of {{downloads.length}} downloads
+		</div>
 	</div>
-	-->
 	<div class="download" ng-controller="downloadCtrl" ng-repeat="download in results = (downloads | filter:filter) | orderBy:predicate:reverse" ng-class="{'paused': !download.status}">
 		<span class="pull-right">
 			<button type="button" class="btn btn-xs btn-info" ng-click="settings(download.id)">

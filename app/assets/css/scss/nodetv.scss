@@ -1,4 +1,6 @@
 $border: #EEEEEE;
+$break-large: 768px;
+$break-small: 767px;
 
 body {
 	background-color: #F7F7F7;
@@ -119,7 +121,28 @@ input.form-control+input.form-control {
 		padding-left: 10px;
 		white-space: nowrap;
 	}
+	
+	@media screen and (max-width: $break-small) {
+		.small {
+			display: block;
+			padding-left: 0px;
+			padding-top: 5px;
+		}
+		.thumbnail {
+			display: block;
+			width: 100%;
+			max-width: 400px;
+		}
+	}
+	@media screen and (min-width: 768px) {
+		.thumbnail {
+			float: left; 
+			margin-right: 10px;
+			width: 120px;
+		}
+	}
 }
+
 
 /* Shows */
 
@@ -167,6 +190,7 @@ input.form-control+input.form-control {
 	.nav {
 		margin-bottom: 10px;
 	}
+	
 	.seasons {
 		.panel-heading {
 			cursor: pointer;
@@ -202,6 +226,11 @@ input.form-control+input.form-control {
 							float: right;
 						}
 					}
+					@media screen and (min-width: $break-large){
+						.synopsis {
+							margin-left: 20px;
+						}
+					}
 				}
 			}
 			.episode:last-child {
@@ -221,6 +250,9 @@ input.form-control+input.form-control {
 }
 
 #shows {
+	div.search {
+		padding: 10px 0px;
+	}
 	.input-group-addon {
 		cursor: pointer;
 	}
@@ -238,6 +270,36 @@ input.form-control+input.form-control {
 			text-decoration: none;
 		}
 	}
+	@media screen and (min-width: $break-large){
+		.show {
+			border: none;
+			height: 180px;
+			padding: 10px 0px 0px;
+			text-align: center;
+			div.image {
+				background-color: #666666;
+				background-image: url('../gfx/no-cover.png');
+				background-position: center center;
+				background-repeat: no-repeat;
+				background-size: contain;
+				box-shadow: 0px 0px 5px black;
+				display: block;
+				height: 132px;
+				margin: 0px auto 5px;
+				transition: all 0.5s;
+				-moz-transition: all 0.5s;
+				-ms-transition: all 0.5s;
+				-webkit-transition: all 0.5s;
+				width: 90px;
+				> img {
+					display: none;
+				}
+			}
+			div.title {
+				/* display: none; */
+			}
+		}
+	}
 }
 
 #movies {
@@ -252,11 +314,42 @@ input.form-control+input.form-control {
 		cursor: pointer;
 		padding: 10px;
 	}
+	@media screen and (min-width: 768px) {
+		.movie {
+			border: none;
+			height: 160px;
+			padding: 10px 0px 0px;
+			text-align: center;
+			div.image {
+				background-color: #666666;
+				background-image: url('../gfx/no-cover.png');
+				background-position: center center;
+				background-repeat: no-repeat;
+				background-size: contain;
+				box-shadow: 0px 0px 5px black;
+				display: block;
+				height: 100px;
+				margin: 0px auto;
+				transition: all 0.5s;
+				-moz-transition: all 0.5s;
+				-ms-transition: all 0.5s;
+				-webkit-transition: all 0.5s;
+				width: 68px;
+			}
+			> img {
+				display: none;
+			}
+		}
+	}
 }
 
 /* Downloads */
 
 #downloads {
+	div.search {
+		padding: 10px 0px;
+	}
+	
 	.download {
 		border-bottom: 1px solid $border;
 		box-sizing: border-box;
@@ -315,97 +408,3 @@ input.form-control+input.form-control {
 		margin-top: 10px;
 	}
 }
-
-
-@media screen and (max-width: 767px) {
-	#dashboard {
-		.small {
-			display: block;
-			padding-left: 0px;
-			padding-top: 5px;
-		}
-		.thumbnail {
-			display: block;
-			width: 100%;
-			max-width: 400px;
-		}
-	}
-}
-
-@media screen and (min-width: 768px) {
-	#dashboard .thumbnail {
-		float: left; 
-		margin-right: 10px;
-		width: 120px;
-	}
-	#movies {
-		.movie {
-			border: none;
-			height: 160px;
-			padding: 10px 0px 0px;
-			text-align: center;
-			div.image {
-				background-color: #666666;
-				background-image: url('../gfx/no-cover.png');
-				background-position: center center;
-				background-repeat: no-repeat;
-				background-size: contain;
-				box-shadow: 0px 0px 5px black;
-				display: block;
-				height: 100px;
-				margin: 0px auto;
-				transition: all 0.5s;
-				-moz-transition: all 0.5s;
-				-ms-transition: all 0.5s;
-				-webkit-transition: all 0.5s;
-				width: 68px;
-			}
-			> img {
-				display: none;
-			}
-		}
-	}
-	#shows {
-		.show {
-			border: none;
-			height: 180px;
-			padding: 10px 0px 0px;
-			text-align: center;
-			div.image {
-				background-color: #666666;
-				background-image: url('../gfx/no-cover.png');
-				background-position: center center;
-				background-repeat: no-repeat;
-				background-size: contain;
-				box-shadow: 0px 0px 5px black;
-				display: block;
-				height: 132px;
-				margin: 0px auto 5px;
-				transition: all 0.5s;
-				-moz-transition: all 0.5s;
-				-ms-transition: all 0.5s;
-				-webkit-transition: all 0.5s;
-				width: 90px;
-				> img {
-					display: none;
-				}
-			}
-			div.title {
-				/* display: none; */
-			}
-			/*
-			&:hover {
-				div.image {
-					height: 203px;
-					margin-top: -35px;
-					width: 138px;
-				}
-			}
-			*/
-		}
-	}
-	.seasons .season .episode .extended .synopsis {
-		margin-left: 20px;
-	}
-}
-
