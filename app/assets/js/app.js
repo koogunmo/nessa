@@ -1,6 +1,6 @@
 'use strict';
 
-define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngRoute', 'ui.bootstrap'], function(angular,io,moment){
+define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngRoute','ui.bootstrap'], function(angular,io,moment){
 
 	var app = angular.module('nessa', ['ngCookies','ngResource','ngRoute','ui.bootstrap']);
 	
