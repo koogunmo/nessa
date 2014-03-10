@@ -134,7 +134,7 @@ input.form-control+input.form-control {
 			max-width: 400px;
 		}
 	}
-	@media screen and (min-width: 768px) {
+	@media screen and (min-width: $break-large) {
 		.thumbnail {
 			float: left; 
 			margin-right: 10px;
@@ -314,7 +314,7 @@ input.form-control+input.form-control {
 		cursor: pointer;
 		padding: 10px;
 	}
-	@media screen and (min-width: 768px) {
+	@media screen and (min-width: $break-large) {
 		.movie {
 			border: none;
 			height: 160px;
