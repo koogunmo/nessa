@@ -290,6 +290,13 @@ io.sockets.on('connection', function(socket) {
 		logger.error('Socket Connection: ' + e.message);
 	}
 	
+	var eventAlerts = events.on('system.alert', function(data){
+		socket.emit('system.alert', {
+			type: data.type,
+			message: data.message
+		});
+	});
+	
 	socket.on('reconnected', function(data) {
 		try {
 			logger.info(data);
@@ -300,27 +307,11 @@ io.sockets.on('connection', function(socket) {
 	}).on('disconnect', function(data){
 		// User disconnected
 		try {
-			
+			if (eventAlerts) events.removeListener('system.alert', eventAlerts);
 		} catch(e) {
 			logger.error('Socket disconnect: ' + e.message);
 		}
 	});
-	
-	events.on('system.alert', function(data){
-		socket.emit('system.alert', {
-			type: data.type,
-			message: data.message
-		});
-	});
-	
-	/*	
-	events.on('download.complete', function(data){
-		socket.emit('system.alert', {
-			type: 'info',
-			message: data.show + ' S' + data.season + 'E'+ data.episode + ' downloaded'
-		});
-	});
-	*/
 	
 	/*************** New Socket methods ***************/
 	
