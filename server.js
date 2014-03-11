@@ -290,13 +290,14 @@ io.sockets.on('connection', function(socket) {
 		logger.error('Socket Connection: ' + e.message);
 	}
 	
-	var eventAlerts = events.on('system.alert', function(data){
+	var eventAlerts = function(data){
 		socket.emit('system.alert', {
 			type: data.type,
 			message: data.message
 		});
-	});
+	};
 	
+	events.on('system.alert', eventAlerts);
 	socket.on('reconnected', function(data) {
 		try {
 			logger.info(data);
