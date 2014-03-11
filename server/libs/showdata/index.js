@@ -487,7 +487,7 @@ var ShowData = {
 									});
 								}
 							}
-							if (error || rowcount == 1) return;
+							if (error || row.count == 1) return;
 						});
 					});
 				});
