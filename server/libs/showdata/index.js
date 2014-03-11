@@ -487,7 +487,6 @@ var ShowData = {
 									});
 								}
 							}
-							if (error || row.count == 1) return;
 						});
 					});
 				});
