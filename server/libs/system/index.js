@@ -3,6 +3,7 @@ var git = require('gitty');
 
 var system = {
 	update: function(callback){
+		var self = this;
 		try {
 			events.emit('system.alert', {
 				type: 'warning',
