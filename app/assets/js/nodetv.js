@@ -488,11 +488,13 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		
 		$socket.on('shows.search', function(results){
 			$scope.results = results;
+			// TODO: clear selected if not in results
 		});
 		$scope.close = function(){
 			$modalInstance.close();
 		};
 		$scope.reset = function(){
+			$scope.selected = null;
 			$scope.search.query = '';
 		};
 		$scope.select = function(tvdb) {

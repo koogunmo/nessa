@@ -17,17 +17,20 @@ exports = module.exports = {
 			if (!fs.existsSync(path.dirname(to))) {
 				mkdirp.sync(path.dirname(to, 0775));
 			}
-			
 			var rd = fs.createReadStream(from);
 			rd.on('error', function(error) {
 				logger.error('Read Error - %s (%d): %s', error.code, error.errno, from);
 			});
 			
-			var wr = fs.createWriteStream(to, {mode: 0775});
+			var wr = fs.createWriteStream(to, {mode: 0644});
 			wr.on('error', function(error){
 				logger.error('Write Error - %s (%d): %s', error.code, error.errno, to);
 			});
-			wr.on('close', callback);
+			
+			wr.on('close', function(){
+				if (typeof(callback) == 'function') callback();
+				rd = wr = null;
+			});
 			rd.pipe(wr);
 		} catch(e) {
 			logger.error('helper.fileCopy: %s', e.message);
@@ -40,7 +43,10 @@ exports = module.exports = {
 			if (!fs.existsSync(path.dirname(to))) {
 				mkdirp.sync(path.dirname(to, 0775));
 			}
-			fs.rename(from, to, callback);
+			fs.rename(from, to, function(error){
+				fs.chmod(to, 0644);
+				if (typeof(callback) == 'function') callback(error);
+			});
 		} catch(e) {
 			logger.error('helper.fileMove: %s', e.message);
 		}
@@ -167,7 +173,7 @@ exports = module.exports = {
 	parseFeed: function(url, since, callback){
 		var helper = this;
 		try {
-			var userAgent = 'NodeTV '+global.pkg.version;
+			var userAgent = 'NodeTV '+global.pkg.version+' (http://greebowarrior.github.io/nessa/)';
 			if (url.indexOf('tvshowsapp.com') >= 0) {
 				url = helper.fixFeedUrl(url);
 				userAgent = 'TVShows 2 (http://tvshowsapp.com/)';

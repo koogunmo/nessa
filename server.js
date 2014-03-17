@@ -138,17 +138,6 @@ try {
 			logger.info('MongoDB: Connected to '+nconf.get('mongo:host'));
 			global.db = db;
 			
-			// Access Control List
-			/*
-			acl = new acl(new acl.mongodbBackend(db, 'acl_'));
-			global.acl = acl;
-			acl.allow('admin', ['downloads','movies','settings','shows'], '*', function(error){
-				if (error) logger.error(error);
-			});
-			acl.allow('user', ['downloads','movies','shows'], 'view', function(error){
-				if (error) logger.error(error);
-			});
-			*/
 			if (nconf.get('installed') && nconf.get('trakt:username') != 'greebowarrior'){
 				trakt.network.follow('greebowarrior', function(error,json){
 					logger.info(error, json);
@@ -168,34 +157,6 @@ try {
 					app.use('/media', express.static(nconf.get('media:base')));
 				}
 				
-				/* User Authentication */
-				/*
-				passport.use(new LocalStrategy(
-					function(username, password, done) {
-						var sysUser = plugin('user');
-						
-						console.log(username, password);
-						
-						var pass = crypto.createHash('sha256').update(password).digest('hex');
-						var userCollection = db.collection('user');
-						userCollection.findOne({username: username, password: pass}, function(error, user){
-							if (error) return done(error);
-							if (!user) return done(null, false, {message: 'Incorrect'});
-							return done(null, user);
-						});
-					}
-				));
-				
-				passport.serializeUser(function(user, done) {
-					return done(null, user);
-				});
-				
-				passport.deserializeUser(function(user, done) {
-					return done(null, user);
-				});
-				*/
-//				app.use(passport.session());
-//				app.use(passport.initialize());
 				app.use(app.router);
 				
 				app.use(function(req, res) {	
@@ -396,8 +357,6 @@ io.sockets.on('connection', function(socket) {
 	
 	// User
 	
-	
-	
 	socket.on('system.users', function(){
 		var sysUser = plugin('user');
 		sysUser.list(function(error, json){
@@ -470,30 +429,24 @@ io.sockets.on('connection', function(socket) {
 		var episodeCollection = db.collection('episode');
 		
 		torrent.info(id, function(error, data){
-	//		console.log(data.torrents[0]);
 			var torrent = data.torrents[0];
-			
 			var response = {
 				id: torrent.id,
 				date: {
 					started: torrent.addedDate
 				}
 			};
-			
 			episodeCollection.findOne({hash: torrent.hashString.toUpperCase()}, function(error, results){
 				if (results) {
 					// In DB, no manual move required
 					response.episode = results;
 					showCollection.findOne({tvdb: results.tvdb}, function(error, show){
 						response.show = show;
-						
 						socket.emit('download.info', response);
 					});
 				} else {
 					response.files = [];
 					torrent.files.forEach(function(file){
-						
-						
 						response.files.push(file);
 					});
 					socket.emit('download.info', response);
@@ -729,9 +682,8 @@ io.sockets.on('connection', function(socket) {
 		});
 		
 	}).on('show.season.watched', function(data){
-		
 		return;
-		
+		/*
 		trakt.show.season.seen(data.tvdb, data.season, function(error, json){
 			if (error) return;
 			if (json.status == 'success') {
@@ -741,6 +693,7 @@ io.sockets.on('connection', function(socket) {
 				});
 			}
 		});
+		*/
 		
 	}).on('show.episode.watched', function(data){
 		if (data.watched) {
