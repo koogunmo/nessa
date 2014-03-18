@@ -30,6 +30,9 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngRoute'
 						if (callback) callback.apply(socket, args);
 					});
 				});
+			},
+			removeAllListeners: function(){
+				return socket.removeAllListeners();
 			}
 		};
 		return handler;
