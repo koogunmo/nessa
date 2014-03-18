@@ -14,7 +14,7 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngRoute'
 		var handler = {
 			events: [],
 			on: function(eventName, callback){
-				if (this.events.indexOf(eventName) >= 0) return;
+			//	if (this.events.indexOf(eventName) >= 0) return;
 				// this is the bastard causing multiple modals to spawn
 				// probably other issues too
 				socket.on(eventName, function(){  
@@ -23,7 +23,7 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngRoute'
 						if (callback) callback.apply(socket, args);
 					});
 				});
-				this.events.push(eventName);
+			//	this.events.push(eventName);
 			},
 			emit: function(eventName, data, callback){	
 				socket.emit(eventName, data, function(){
