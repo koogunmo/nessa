@@ -432,6 +432,10 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		
 		/* Open modal window containing show information */
 		// this could be a cause of our multiple modal issue
+		
+		// Number of modals is directly related to the number of times /shows has been loaded
+		// i.e. shows -> downloads -> shows == 2 modals
+		
 		$socket.on('show.summary', function(json){
 			if (opened === true) return;
 			modal = $modal.open({

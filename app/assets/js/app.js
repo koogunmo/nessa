@@ -11,14 +11,19 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngRoute'
 			'max reconnection attempts': 5,
 			'sync disconnect on unload': true
 		});
-		return {
+		var handler = {
+			events: [],
 			on: function(eventName, callback){
+				if (this.events.indexOf(eventName) >= 0) return;
+				// this is the bastard causing multiple modals to spawn
+				// probably other issues too
 				socket.on(eventName, function(){  
 					var args = arguments;
 					$rootScope.$apply(function(){
 						if (callback) callback.apply(socket, args);
 					});
 				});
+				this.events.push(eventName);
 			},
 			emit: function(eventName, data, callback){	
 				socket.emit(eventName, data, function(){
@@ -29,6 +34,8 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngRoute'
 				});
 			}
 		};
+		return handler;
+		
 	}).run(function($rootScope, $location){
 		$rootScope.$on('$routeChangeSuccess', function(event, current, previous){
 			$rootScope.pagetitle = current.$$route.title;
