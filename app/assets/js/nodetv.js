@@ -2,8 +2,8 @@
 
 require(['jquery','socket.io','app'], function($,io,nessa){
 	
-	nessa.controller('headCtrl', function($scope){
-		
+	nessa.controller('headCtrl', function($scope, $state){
+//		console.log($state.current.data);
 	});
 	
 	nessa.controller('alertsCtrl', function($scope, $socket){
@@ -420,92 +420,22 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		});
 	});
 	
-	nessa.controller('showsCtrl', function($scope, $modal, $location, $socket){
-		
-		var modal	= false;
-		var opened	= false;
-		var tvdb	= null;
-		
-		var routeChange = function(){
-			if ($location.hash()){
-				$scope.view($location.hash());
-			} else {
-				if (opened && modal) modal.close('navigation');
-			}
-		};
-		
-	//	$scope.$on('$routeChangeStart', routeChange)
-		$scope.$on('$routeChangeSuccess', routeChange);
-		$scope.$on('$routeUpdate', routeChange);
+	nessa.controller('showsCtrl', function($scope, $rootScope, $modal, $location, $socket){
 		
 		$scope.shows	= [];
 		$scope.settings	= {};
 		
-		$scope.add = function(){
-			modal = $modal.open({
-				templateUrl: '/views/modal/add.html',
-				controller: 'searchCtrl',
-				windowClass: 'modal-add',
-				resolve: {
-					search: function(){
-						return ($scope.filter) ? $scope.filter.name : '';
-					}
-				}
-			});
-			modal.result.then(function(){
-			//	opened = false;
-			});
-		};
 		$scope.clearFilter = function(){
 			$scope.filter.name = '';
 			$(document).trigger('lazyload');
 		};
 		
-		$scope.view = function(tvdb){
-			$socket.emit('show.summary', tvdb);
-		};
-		
-		/* Open modal window containing show information */
-		// this could be a cause of our multiple modal issue
-		
-		// Number of modals is directly related to the number of times /shows has been loaded
-		// i.e. shows -> downloads -> shows == 2 modals
-		
-		$socket.on('show.summary', function(json){
-			if (opened === true) return;
-			modal = $modal.open({
-				templateUrl: '/views/modal/show.html',
-				controller: 'showCtrl',
-				backdrop: 'static',
-				keyboard: false,
-				windowClass: 'modal-show',
-				resolve: {
-					settings: function(){
-						return $scope.settings;
-					},
-					summary: function(){
-						return json.summary;
-					},
-					listing: function(){
-						return json.listing;
-					},
-					total: function(){
-						return json.total;
-					}
-				}
-			});
-			modal.opened.then(function(){
-				opened = true;
-			});
-			modal.result.then(function(result){
-				$location.hash('');
-				opened = false;
-				modal = false;
-			});
-		});
-		$socket.on('media.settings', function(data){
+		$socket.emit('media.settings');
+		$socket.once('media.settings', function(data){
 			$scope.settings = data;
+			$rootScope.settings = data;
 		});
+		
 		$socket.on('show.added', function(){
 			$socket.emit('shows.list');
 		});
@@ -514,7 +444,6 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 			$(document).trigger('lazyload');
 		});
 		
-		$socket.emit('media.settings');
 		$socket.emit('shows.list');
 		
 		$scope.$on('$destroy', function (event) {
@@ -522,12 +451,12 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		});
 	});
 	
-	nessa.controller('searchCtrl', function($scope, $modalInstance, $socket, search){
+	nessa.controller('searchCtrl', function($scope, $modalInstance, $socket){
 		$scope.selected = null;
 		$scope.search = {
-			query: search
+			query: ''
 		};
-		$socket.emit('shows.search', $scope.search.query);
+//		$socket.emit('shows.search', $scope.search.query);
 		
 		$socket.on('shows.search', function(results){
 			$scope.results = results;
@@ -563,21 +492,25 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		});
 	});
 	
-	nessa.controller('showCtrl', function($scope, $modalInstance, $socket, settings, summary, listing, total){
-		$scope.settings = settings;
-		$scope.summary = summary;
-		$scope.listing = listing;
-		$scope.total = total;
+	nessa.controller('showCtrl', function($scope, $modalInstance, $socket, tvdb){
+		window.modal = $modalInstance;
+		
+		$socket.emit('show.summary', tvdb);
+		$socket.once('show.summary', function(json){
+			$scope.summary = json.summary;
+			$scope.listing = json.listing;
+			$scope.total = json.total;
+		});
 		
 		$scope.close = function(){
 			$modalInstance.close();
 		};
 		$scope.rescan = function(){
-			$socket.emit('show.rescan', $scope.summary.tvdb);
+			$socket.emit('show.rescan', tvdb);
 		};
 		$scope.remove = function(){
 			if (confirm('Are you sure you want to remove this show?')) {
-				$socket.emit('show.remove', $scope.summary.tvdb);
+				$socket.emit('show.remove', tvdb);
 				$modalInstance.close();
 			}
 		};
@@ -586,14 +519,11 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 			$modalInstance.close();
 		};
 		$scope.update = function(){
-			$socket.emit('show.update', $scope.summary.tvdb);
+			$socket.emit('show.update', tvdb);
 		};
 		$scope.watched = function(){
-		//	$socket.emit('show.watched', {tvdb: $scope.summary.tvdb});
+		//	$socket.emit('show.watched', {tvdb: tvdb});
 		};
-		$scope.$on('$destroy', function (event) {
-			$socket.removeAllListeners();
-		});
 	});
 	
 	nessa.controller('seasonCtrl', function($scope, $socket){

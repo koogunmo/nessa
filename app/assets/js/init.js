@@ -10,7 +10,8 @@ requirejs.config({
 		'ngResource': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.2.14/angular-resource.min',
 		'ngRoute': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.2.14/angular-route.min',
 		'socket.io': 'libs/socket.io.min',
-		'ui.bootstrap': 'libs/ui-bootstrap.min'
+		'ui.bootstrap': 'libs/ui-bootstrap.min',
+		'ui.router': 'libs/ui-router.min'
 	},
 	shim: {
 		'angular': {
@@ -30,6 +31,9 @@ requirejs.config({
 			exports: 'io'
 		},
 		'ui.bootstrap': {
+			deps: ['angular']
+		},
+		'ui.router': {
 			deps: ['angular']
 		}
 	},

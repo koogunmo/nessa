@@ -1,8 +1,8 @@
 'use strict';
 
-define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngRoute','ui.bootstrap'], function(angular,io,moment){
+define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngRoute','ui.bootstrap','ui.router'], function(angular,io,moment){
 
-	var app = angular.module('nessa', ['ngCookies','ngResource','ngRoute','ui.bootstrap']);
+	var app = angular.module('nessa', ['ngCookies','ngResource','ngRoute','ui.bootstrap','ui.router']);
 	
 	app.factory('$socket', function($rootScope) {
 		var port = (window.location.port) ? window.location.port : 80;
@@ -23,6 +23,14 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngRoute'
 					});
 				});
 			},
+			once: function(eventName, callback){
+				socket.once(eventName, function(){  
+					var args = arguments;
+					$rootScope.$apply(function(){
+						if (callback) callback.apply(socket, args);
+					});
+				});
+			},
 			emit: function(eventName, data, callback){	
 				socket.emit(eventName, data, function(){
 					var args = arguments;
@@ -36,12 +44,10 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngRoute'
 			}
 		};
 		return handler;
-		
 	}).run(function($rootScope, $location){
-		$rootScope.$on('$routeChangeSuccess', function(event, current, previous){
-			$rootScope.pagetitle = current.$$route.title;
+		$rootScope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams){
+			$rootScope.pagetitle = toState.data.title;
 		});
-		$rootScope.location = $location;
 	});
 	
 	app.filter('moment', function() {
@@ -99,7 +105,7 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngRoute'
 		}
 	});
 	
-	app.config(function($routeProvider, $locationProvider, $httpProvider){
+	app.config(function($stateProvider, $urlRouterProvider, $routeProvider, $locationProvider, $httpProvider){
 		
 		$locationProvider.html5Mode(true).hashPrefix('!');
 		
@@ -152,6 +158,91 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngRoute'
 				);
 			}
 		});
+		
+		$urlRouterProvider.otherwise('/dashboard');
+		
+		$stateProvider.state('dashboard', {
+			url: '/dashboard',
+			controller: 'homeCtrl',
+			templateUrl: '/views/partials/dashboard.html',
+			data: {
+				title: 'Home'
+			}
+		}).state('downloads', {
+			url: '/downloads',
+			controller: 'downloadsCtrl',
+			templateUrl: '/views/partials/downloads.html',
+			data: {
+				title: 'Downloads'
+			}
+		}).state('install', {
+			
+		}).state('shows', {
+			url: '/shows',
+			controller: 'showsCtrl',
+			templateUrl: '/views/partials/shows.html',
+			data: {
+				title: 'Shows'
+			}
+		}).state('shows.add', {
+			url: '/add',
+			onEnter: function($state, $stateParams, $modal){
+				$modal.open({
+					templateUrl: '/views/modal/show/search.html',
+					controller: 'searchCtrl',
+					windowClass: 'modal-add'
+				}).result.then(function(result){
+					$state.transitionTo('shows');
+					window.modal = null;
+				});
+			},
+			onExit: function(){
+				if (window.modal) window.modal.dismiss()
+				window.modal = null;
+			}
+			
+		}).state('shows.detail', {
+			url: '/:showid',
+			onEnter: function($state, $stateParams, $modal){
+				$modal.open({
+					templateUrl: '/views/modal/show/detail.html',
+					controller: 'showCtrl',
+					backdrop: 'static',
+					keyboard: false,
+					windowClass: 'modal-show',
+					resolve: {
+						tvdb: function(){
+							return $stateParams.showid
+						}
+					}
+				}).result.then(function(result){
+					$state.transitionTo('shows');
+					window.modal = null;
+				});
+			},
+			onExit: function(){
+				if (window.modal) window.modal.dismiss()
+				window.modal = null;
+			}
+			
+		}).state('shows.match', {
+			url: '/match',
+			controller: 'matchCtrl',
+			templateUrl: '/views/partials/match.html',
+			data: {
+				title: 'Unmatched Shows'
+			}
+			
+		}).state('settings', {
+			url: '/settings',
+			controller: 'settingsCtrl',
+			templateUrl: '/views/partials/settings.html',
+			data: {
+				title: 'Settings'
+			}
+		});
+		
+		/*
 		
 		$routeProvider.when('/login', {
 			title: 'Login',
@@ -226,6 +317,7 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngRoute'
 			},
 			redirectTo: '/dashboard'
 		});
+		*/
 	});
 		
 	return app;
