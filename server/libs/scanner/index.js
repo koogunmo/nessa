@@ -107,6 +107,7 @@ var Scanner = {
 	
 	episodes: function(tvdb, callback){
 		var self = this;
+		tvdb = parseInt(tvdb, 10);
 		if (base = nconf.get('media:base') + nconf.get('media:shows:directory')) {
 			var showCollection = db.collection('show');
 			var episodeCollection = db.collection('episode');

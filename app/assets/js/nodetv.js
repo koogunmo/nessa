@@ -44,7 +44,7 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		$scope.closeAlert = function(index){
 			$scope.alerts.splice(index, 1);
 		};
-		$scope.$on('$routeChangeSuccess', function(){
+		$scope.$on('$stateChangeSuccess', function(){
 			$scope.alerts = [];
 		});
 	});
@@ -119,12 +119,11 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		$scope.reverse = false;
 		
 		$socket.emit('download.list');
-		setInterval(function(){
-			$socket.emit('download.list');
-		}, 5000);
 		$socket.on('download.list', function(data){
 			$scope.downloads = data;
 		});
+		
+		
 	});
 	
 	nessa.controller('downloadCtrl', function($scope, $socket, $modal){

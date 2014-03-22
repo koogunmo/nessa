@@ -419,12 +419,15 @@ io.sockets.on('connection', function(socket) {
 
 	/** Downloads **/
 	socket.on('download.list', function(){
-		torrent.list(function(error, data){
-			if (error) return;
-			socket.emit('download.list', data.torrents);
-		});
-		
-	}).on('download.info', function(id){
+		var sendList = setInterval(function(){
+			torrent.list(function(error, data){
+				if (error) return;
+				socket.emit('download.list', data.torrents);
+			});
+		}, 1000);
+	});
+	
+	socket.on('download.info', function(id){
 		var showCollection = db.collection('show');
 		var episodeCollection = db.collection('episode');
 		

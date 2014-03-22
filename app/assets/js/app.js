@@ -1,8 +1,8 @@
 'use strict';
 
-define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngRoute','ngTouch','ui.bootstrap','ui.router'], function(angular,io,moment){
+define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch','ui.bootstrap','ui.router'], function(angular,io,moment){
 
-	var app = angular.module('nessa', ['ngCookies','ngResource','ngRoute','ui.bootstrap','ui.router']);
+	var app = angular.module('nessa', ['ngCookies','ngResource','ui.bootstrap','ui.router']);
 	
 	app.factory('$socket', function($rootScope) {
 		var port = (window.location.port) ? window.location.port : 80;
@@ -105,7 +105,7 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngRoute'
 		}
 	});
 	
-	app.config(function($stateProvider, $urlRouterProvider, $routeProvider, $locationProvider, $httpProvider){
+	app.config(function($stateProvider, $urlRouterProvider, $locationProvider, $httpProvider){
 		
 		$locationProvider.html5Mode(true).hashPrefix('!');
 		
