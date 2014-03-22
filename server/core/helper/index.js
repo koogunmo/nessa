@@ -21,15 +21,12 @@ exports = module.exports = {
 			rd.on('error', function(error) {
 				logger.error('Read Error - %s (%d): %s', error.code, error.errno, from);
 			});
-			
 			var wr = fs.createWriteStream(to, {mode: 0644});
 			wr.on('error', function(error){
 				logger.error('Write Error - %s (%d): %s', error.code, error.errno, to);
 			});
-			
 			wr.on('close', function(){
 				if (typeof(callback) == 'function') callback();
-				rd = wr = null;
 			});
 			rd.pipe(wr);
 		} catch(e) {

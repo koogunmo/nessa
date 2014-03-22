@@ -13,7 +13,6 @@ var ShowData = {
 	
 	add: function(tvdb, callback){
 		var self = this;
-		
 		var tvdb = parseInt(tvdb, 10);
 		var showCollection = db.collection('show');
 		
@@ -44,13 +43,16 @@ var ShowData = {
 				}
 				showCollection.save(record, {safe: true}, function(error, result){
 					if (typeof(callback) == 'function') callback(error, tvdb);
+					record = null;
 				});
-				
 			});
+			json = null;
 		});
+		showCollection = null;
 	},
 	
 	download: function(tvdb, season, episode, callback){
+		tvdb = parseInt(tvdb, 10);
 		var episodeCollection = db.collection('episode');
 		episodeCollection.findOne({tvdb: tvdb, season: season, episode: episode}, function(error, result){
 			if (error || !result.hash) return;
@@ -63,11 +65,14 @@ var ShowData = {
 					});
 				//	if (typeof(callback) == 'function') callback(error, args);
 				});
+				magnet = null;
 			}
+			result = null;
 		});
 	},
 	
 	episodes: function(tvdb, callback){
+		tvdb = parseInt(tvdb, 10);
 		var episodeCollection = db.collection('episode');
 		episodeCollection.find({tvdb: tvdb}).toArray(function(error, results){
 			var seasons = [], episodes = [], response = [];
@@ -83,8 +88,10 @@ var ShowData = {
 					episodes: episodes[season]
 				}
 				response.push(record);
+				record = null;
 			});
 			if (typeof(callback) == 'function') callback(null, response);
+			seasons = episodes = response = null;
 		});
 	},
 	
@@ -98,6 +105,7 @@ var ShowData = {
 					
 				});
 			});
+			results = null;
 		});
 		var showCollection = db.collection('show');
 		showCollection.find({tvdb: {$type: 2}}).toArray(function(error, results){
@@ -107,6 +115,7 @@ var ShowData = {
 					
 				});
 			});
+			results = null;
 		});
 	},
 	
@@ -137,6 +146,7 @@ var ShowData = {
 					});
 				});
 			}
+			results = null;
 		});
 	},
 	
@@ -146,6 +156,7 @@ var ShowData = {
 	},
 	
 	remove: function(tvdb, callback){
+		tvdb = parseInt(tvdb, 10);
 		var showCollection = db.collection('show');
 		showCollection.update({tvdb: tvdb}, {$unset: {status: true}}, {upsert: true}, callback);
 	},
@@ -153,35 +164,6 @@ var ShowData = {
 	search: function(query, callback){
 		var showCollection = db.collection('show');
 		trakt.search('shows', query, callback);
-		
-		/*
-		var regex = new RegExp(query.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&"), 'i');
-		showCollection.find({name: regex, status: {$exists: false}}).toArray(function(error, results){
-			if (error) return;
-			if (results.length){
-				
-				console.log('Local match: get Trakt data');
-				
-				var response = [];
-				var count = 0;
-				results.forEach(function(result){
-					trakt.show.summary(result.tvdb, function(error, json){
-						count++;
-						json.feed = result.feed;
-						response.push(json);
-					});
-				});
-				var send = setInterval(function(){
-					if (results.length == count) {
-						clearInterval(send);
-						callback(null, response);
-					}
-				}, 500);
-			} else {
-				trakt.search('shows', query, callback);
-			}
-		});
-		*/
 	},
 	
 	settings: function(data, callback){
@@ -262,17 +244,7 @@ var ShowData = {
 	
 	watched: function(tvdb, season, episode, callback){
 		// Mark an episode as watched
-		/*
-		db.get("SELECT S.tvdb, E.id FROM show AS S INNER JOIN show_episode AS E ON S.id = E.show_id WHERE S.id = ? AND E.season = ? AND E.episode = ?", id, season, episode, function(error, row){
-			if (error) {
-				logger.error(error);
-				return;
-			}
-			if (row === undefined) return;
-			db.run("UPDATE show_episode SET watched = 1 WHERE id = ?", row.id);
-			trakt.show.episode.seen(row.tvdb, [{season: row.season, episode: row.episode}]);
-		});
-		*/
+		tvdb = parseInt(tvdb, 10);
 		var record = {
 			watched: true
 		};
@@ -286,9 +258,11 @@ var ShowData = {
 	
 	getArtwork: function(tvdb, callback){
 		var self = this;
+		tvdb = parseInt(tvdb, 10);
 		var http = require('http');
 		var showCollection = db.collection('show');
 		showCollection.findOne({tvdb: tvdb}, function(error, show){
+			if (error || !show) return;
 			trakt.show.summary(show.tvdb, function(error, json){
 				if (json.images.banner){
 					var banner = fs.createWriteStream(nconf.get('media:base') + nconf.get('media:shows:directory') + '/' + show.directory + '/banner.jpg');
@@ -311,6 +285,7 @@ var ShowData = {
 				}
 				if (typeof(callback) == 'function') callback(null, show.tvdb);
 			});
+			show = null;
 		});
 	},
 	
@@ -322,6 +297,7 @@ var ShowData = {
 	},
 	
 	getEpisode: function(tvdb, season, episode, callback){
+		tvdb = parseInt(tvdb, 10);
 		trakt.show.episode.summary(tvdb, season, episode, function(error, episode){
 			episode.tvdb = tvdb;
 			self.setEpisode(episode, function(error, response){
@@ -332,6 +308,7 @@ var ShowData = {
 	
 	getFullListings: function(tvdb, callback){
 		var self = this;
+		tvdb = parseInt(tvdb, 10);
 		// Fetch episode listings
 		trakt.show.seasons(tvdb, function(error, seasons){
 			var count = 0;
@@ -352,6 +329,7 @@ var ShowData = {
 	},
 	
 	getHashes: function(tvdb, callback){
+		tvdb = parseInt(tvdb, 10);
 		// Get all the hashes we can find, and add them to the database
 		var showCollection = db.collection('show');
 		var episodeCollection = db.collection('episode');
@@ -497,6 +475,7 @@ var ShowData = {
 	},
 	
 	getSummary: function(tvdb, callback){
+		tvdb = parseInt(tvdb, 10);
 		var showCollection = db.collection('show');
 		trakt.show.summary(tvdb, function(error, json){
 			if (error) {
@@ -549,6 +528,7 @@ var ShowData = {
 	/******************************************************/
 	
 	deleteEpisode: function(tvdb, season, episodes){
+		tvdb = parseInt(tvdb, 10);
 		var showCollection = db.collection('show');
 		var episodeCollection = db.collection('episode');
 		var where = {
