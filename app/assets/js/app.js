@@ -175,6 +175,41 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngRoute'
 			data: {
 				title: 'Downloads'
 			}
+		}).state('downloads.add', {
+			url: '/add',
+			onEnter: function($state, $modal){
+				$modal.open({
+					controller: 'downloadAddCtrl',
+					templateUrl: '/views/modal/download/add.html'
+				}).result.then(function(result){
+					$state.transitionTo('downloads');
+					window.modal = null;
+				});
+			},
+			onExit: function(){
+				if (window.modal) window.modal.dismiss()
+				window.modal = null;
+			}
+		}).state('download.info', {
+			url: '/:id',
+			onEnter: function($state, $stateParams, $modal){
+				$modal.open({
+					controller: 'downloadAddCtrl',
+					templateUrl: '/views/modal/download/add.html',
+					resolve: {
+						id: function(){
+							return $stateParams.id
+						}
+					}
+				}).result.then(function(result){
+					$state.transitionTo('downloads');
+					window.modal = null;
+				});
+			},
+			onExit: function(){
+				if (window.modal) window.modal.dismiss()
+				window.modal = null;
+			}
 		}).state('install', {
 			
 		}).state('shows', {
@@ -241,83 +276,6 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngRoute'
 				title: 'Settings'
 			}
 		});
-		
-		/*
-		
-		$routeProvider.when('/login', {
-			title: 'Login',
-			templateUrl: '/views/partials/login.html',
-			controller: 'loginCtrl'
-			
-		}).when('/dashboard', {
-			title: 'Dashboard',
-			templateUrl: '/views/partials/dashboard.html',
-			controller: 'homeCtrl',
-			resolve: {
-				loggedin: checkLoggedin
-			}
-			
-		}).when('/downloads', {
-			title: 'Downloads',
-			templateUrl: '/views/partials/downloads.html',
-			controller: 'downloadsCtrl',
-			resolve: {
-				loggedin: checkLoggedin
-			}
-			
-		}).when('/movies', {
-			title: 'Movies',
-			templateUrl: '/views/partials/movies.html',
-			controller: 'moviesCtrl',
-			reloadOnSearch: false,
-			resolve: {
-				loggedin: checkLoggedin
-			}
-			
-		}).when('/shows', {
-			title: 'Shows',
-			templateUrl: '/views/partials/shows.html',
-			controller: 'showsCtrl',
-			reloadOnSearch: false,
-			resolve: {
-				loggedin: checkLoggedin
-			}
-			
-		}).when('/shows/match', {
-			title: 'Unmatched shows',
-			templateUrl: '/views/partials/match.html',
-			controller: 'matchCtrl',
-			resolve: {
-				loggedin: checkLoggedin
-			}
-		}).when('/shows/unwatched', {
-			title: 'Unwatched shows',
-			templateUrl: '/views/partials/unwatched.html',
-			controller: 'unwatchedCtrl',
-			resolve: {
-				loggedin: checkLoggedin
-			}
-			
-		}).when('/settings', {
-			title: 'Settings',
-			templateUrl: '/views/partials/settings.html',
-			controller: 'settingsCtrl',
-			resolve: {
-				loggedin: checkLoggedin
-			}
-			
-		}).when('/install', {
-			title: 'Installer',
-			templateUrl: '/views/partials/install.html',
-			controller: 'installCtrl',
-			
-		}).otherwise({
-			resolve: {
-				installed: checkInstalled
-			},
-			redirectTo: '/dashboard'
-		});
-		*/
 	});
 		
 	return app;

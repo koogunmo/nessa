@@ -3,7 +3,6 @@
 require(['jquery','socket.io','app'], function($,io,nessa){
 	
 	nessa.controller('headCtrl', function($scope, $state){
-//		console.log($state.current.data);
 	});
 	
 	nessa.controller('alertsCtrl', function($scope, $socket){
@@ -48,9 +47,6 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		$scope.$on('$routeChangeSuccess', function(){
 			$scope.alerts = [];
 		});
-		$scope.$on('$destroy', function (event) {
-			$socket.removeAllListeners();
-		});
 	});
 	
 	nessa.controller('loginCtrl', function($scope, $socket, $rootScope, $http, $location, $window){
@@ -70,9 +66,6 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 				$location.url('/login');
 			});
 		};
-		$scope.$on('$destroy', function (event) {
-			$socket.removeAllListeners();
-		});
 	});
 	
 	nessa.controller('navCtrl', function($scope, $rootScope, $location){
@@ -118,9 +111,6 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		$socket.on('window.reload', function(){
 			window.location.reload();
 		});
-		$scope.$on('$destroy', function (event) {
-			$socket.removeAllListeners();
-		});
 	});
 	
 	nessa.controller('downloadsCtrl', function($scope, $socket, $modal){
@@ -135,22 +125,12 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		$socket.on('download.list', function(data){
 			$scope.downloads = data;
 		});
-		
-		$scope.addUrl = function(){
-			$modal.open({
-				templateUrl: '/views/modal/dl-add.html',
-				controller: 'downloadAddCtrl'
-			});
-		};
-		$scope.$on('$destroy', function (event) {
-			$socket.removeAllListeners();
-		});
 	});
 	
 	nessa.controller('downloadCtrl', function($scope, $socket, $modal){
 		$scope.settings = function(id){
 			$modal.open({
-				templateUrl: '/views/modal/dl-settings.html',
+				templateUrl: '/views/modal/download/settings.html',
 				controller: 'downloadSettingsCtrl',
 				resolve: {
 					id: function(){
@@ -173,22 +153,18 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 			}
 			$scope.$parent.download.status = !$scope.$parent.download.status;
 		};
-		$scope.$on('$destroy', function (event) {
-			$socket.removeAllListeners();
-		});
 	});
 	
 	nessa.controller('downloadAddCtrl', function($scope, $socket, $modalInstance){
+		window.modal = $modalInstance;
+		
 		$scope.close = function(){
-			$modalInstance.dismiss('close');
+			$modalInstance.close();
 		};
 		$scope.save = function(){
 			$socket.emit('download.url', $scope.url);
 			$modalInstance.close();
 		};
-		$scope.$on('$destroy', function (event) {
-			$socket.removeAllListeners();
-		});
 	});
 
 	nessa.controller('downloadSettingsCtrl', function($scope, $socket, $modalInstance, id){
@@ -213,9 +189,6 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		$scope.save = function(){
 			$modalInstance.close();
 		};
-		$scope.$on('$destroy', function (event) {
-			$socket.removeAllListeners();
-		});
 	});
 	
 	nessa.controller('homeCtrl', function($scope, $socket){
@@ -269,9 +242,6 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 				}
 			}
 		}
-		$scope.$on('$destroy', function (event) {
-			$socket.removeAllListeners();
-		});
 	});
 	
 	nessa.controller('matchCtrl', function($scope, $socket){
@@ -292,9 +262,6 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 			});
 			$socket.emit('shows.matched', matched);
 		};
-		$scope.$on('$destroy', function (event) {
-			$socket.removeAllListeners();
-		});
 	});
 	
 	nessa.controller('userCtrl', function($scope, $socket, $modalInstance, id){
@@ -312,9 +279,6 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		$scope.close = function(){
 			$modalInstance.dismiss('close');
 		};
-		$scope.$on('$destroy', function (event) {
-			$socket.removeAllListeners();
-		});
 	});
 
 	nessa.controller('settingsCtrl', function($scope, $socket, $modal){
@@ -386,18 +350,12 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 				$socket.emit('system.update');
 			}
 		};
-		$scope.$on('$destroy', function (event) {
-			$socket.removeAllListeners();
-		});
 	});
 	
 	nessa.controller('unwatchedCtrl', function($scope, $socket){
 		$socket.emit('shows.unwatched');
 		
 		
-		$scope.$on('$destroy', function (event) {
-			$socket.removeAllListeners();
-		});
 	});
 	
 	nessa.controller('moviesCtrl', function($scope, $modal, $socket){
@@ -415,9 +373,6 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		
 		$socket.emit('media.settings');
 		$socket.emit('movies.list');
-		$scope.$on('$destroy', function (event) {
-			$socket.removeAllListeners();
-		});
 	});
 	
 	nessa.controller('showsCtrl', function($scope, $rootScope, $modal, $location, $socket){
@@ -446,9 +401,6 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		
 		$socket.emit('shows.list');
 		
-		$scope.$on('$destroy', function (event) {
-			$socket.removeAllListeners();
-		});
 	});
 	
 	nessa.controller('searchCtrl', function($scope, $modalInstance, $socket){
@@ -456,7 +408,6 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		$scope.search = {
 			query: ''
 		};
-//		$socket.emit('shows.search', $scope.search.query);
 		
 		$socket.on('shows.search', function(results){
 			$scope.results = results;
@@ -487,9 +438,6 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 				}, 500);
 			}
 		});
-		$scope.$on('$destroy', function (event) {
-			$socket.removeAllListeners();
-		});
 	});
 	
 	nessa.controller('showCtrl', function($scope, $modalInstance, $socket, tvdb){
@@ -507,6 +455,7 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		};
 		$scope.rescan = function(){
 			$socket.emit('show.rescan', tvdb);
+			$modalInstance.close();
 		};
 		$scope.remove = function(){
 			if (confirm('Are you sure you want to remove this show?')) {
@@ -520,6 +469,7 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		};
 		$scope.update = function(){
 			$socket.emit('show.update', tvdb);
+			$modalInstance.close();
 		};
 		$scope.watched = function(){
 		//	$socket.emit('show.watched', {tvdb: tvdb});
@@ -549,9 +499,6 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 			};
 			$socket.emit('show.season.watched', data);
 		};
-		$scope.$on('$destroy', function (event) {
-			$socket.removeAllListeners();
-		});
 	});
 	
 	nessa.controller('episodeCtrl', function($scope, $socket){
@@ -588,9 +535,6 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		$scope.hasAired = function(){
 			return ($scope.episode.airdate && $scope.episode.airdate*1000 < new Date().getTime());
 		};
-		$scope.$on('$destroy', function (event) {
-			$socket.removeAllListeners();
-		});
 	});
 	
 	// Bootstrap to document
