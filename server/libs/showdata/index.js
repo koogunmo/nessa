@@ -21,10 +21,11 @@ var ShowData = {
 			showCollection.findOne({tvdb: tvdb}, function(error, record){
 				if (error) logger.error(error);
 				if (record) {
-					record.imdb = json.imdb_id;
+					if (json.imdb_id) record.imdb = json.imdb_id;
+					if (json.overview) record.synopsis = json.overview;
 					record.name = json.title;
 					record.status = (record.feed) ? true : false;
-					record.synopsis = json.overview;
+					
 				} else {
 					var record = {
 						tvdb: parseInt(json.tvdb_id, 10),
