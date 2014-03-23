@@ -13,12 +13,11 @@ var ShowData = {
 	
 	add: function(tvdb, callback){
 		var self = this;
-		var tvdb = parseInt(tvdb, 10);
-		
+		tvdb = parseInt(tvdb, 10);
 		trakt.show.summary(tvdb, function(error, json){
 			if (error) logger.error(error);
 			var showCollection = db.collection('show');
-			showCollection.findOne({tvdb: tvdb}, function(error, record){
+			showCollection.findOne({tvdb: json.tvdb_id}, function(error, record){
 				if (error) logger.error(error);
 				if (record) {
 					if (json.imdb_id) record.imdb = json.imdb_id;
