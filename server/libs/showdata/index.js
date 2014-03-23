@@ -14,10 +14,10 @@ var ShowData = {
 	add: function(tvdb, callback){
 		var self = this;
 		var tvdb = parseInt(tvdb, 10);
-		var showCollection = db.collection('show');
 		
 		trakt.show.summary(tvdb, function(error, json){
 			if (error) logger.error(error);
+			var showCollection = db.collection('show');
 			showCollection.findOne({tvdb: tvdb}, function(error, record){
 				if (error) logger.error(error);
 				if (record) {
@@ -48,7 +48,6 @@ var ShowData = {
 			});
 			json = null;
 		});
-		showCollection = null;
 	},
 	
 	download: function(tvdb, season, episode, callback){
