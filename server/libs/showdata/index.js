@@ -43,7 +43,6 @@ var ShowData = {
 				}
 				showCollection.save(record, {safe: true}, function(error, result){
 					if (typeof(callback) == 'function') callback(error, tvdb);
-					record = null;
 				});
 			});
 		});
@@ -63,9 +62,7 @@ var ShowData = {
 					});
 				//	if (typeof(callback) == 'function') callback(error, args);
 				});
-				magnet = null;
 			}
-			result = null;
 		});
 	},
 	
@@ -86,10 +83,8 @@ var ShowData = {
 					episodes: episodes[season]
 				}
 				response.push(record);
-				record = null;
 			});
 			if (typeof(callback) == 'function') callback(null, response);
-			seasons = episodes = response = null;
 		});
 	},
 	
@@ -103,7 +98,6 @@ var ShowData = {
 					
 				});
 			});
-			results = null;
 		});
 		var showCollection = db.collection('show');
 		showCollection.find({tvdb: {$type: 2}}).toArray(function(error, results){
@@ -113,7 +107,6 @@ var ShowData = {
 					
 				});
 			});
-			results = null;
 		});
 	},
 	
@@ -144,7 +137,6 @@ var ShowData = {
 					});
 				});
 			}
-			results = null;
 		});
 	},
 	
@@ -282,8 +274,8 @@ var ShowData = {
 					});
 				}
 				if (typeof(callback) == 'function') callback(null, show.tvdb);
+				show = null;
 			});
-			show = null;
 		});
 	},
 	
