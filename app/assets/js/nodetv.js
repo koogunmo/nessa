@@ -444,6 +444,7 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		
 		$socket.emit('show.summary', tvdb);
 		$socket.once('show.summary', function(json){
+			if (typeof(json.summary.trakt) == 'undefined') json.summary.trakt = true;
 			$scope.summary = json.summary;
 			$scope.listing = json.listing;
 			$scope.total = json.total;

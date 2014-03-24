@@ -157,7 +157,8 @@ var torrent = {
 								episodeCollection.update({hash: hash}, {$set: record}, function(error, affected){
 									if (error) return;
 								});
-								trakt.show.episode.library(tvdb, library);
+								if (typeof(show.trakt) == 'undefined') show.trakt = true;
+								if (show.trakt) trakt.show.episode.library(tvdb, library);
 							});
 						});
 					});

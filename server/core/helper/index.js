@@ -15,7 +15,7 @@ exports = module.exports = {
 	fileCopy: function(from, to, callback) {
 		try {
 			if (!fs.existsSync(path.dirname(to))) {
-				mkdirp.sync(path.dirname(to, 0775));
+				mkdirp.sync(path.dirname(to, 0755));
 			}
 			var rd = fs.createReadStream(from);
 			rd.on('error', function(error) {
@@ -38,7 +38,7 @@ exports = module.exports = {
 		// Move a file to the correct location
 		try {
 			if (!fs.existsSync(path.dirname(to))) {
-				mkdirp.sync(path.dirname(to, 0775));
+				mkdirp.sync(path.dirname(to, 0755));
 			}
 			fs.rename(from, to, function(error){
 				fs.chmod(to, 0644);

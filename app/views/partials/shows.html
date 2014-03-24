@@ -15,12 +15,19 @@
 	</div>
 	<div class="row">
 		<div class="show col-sm-2" ng-repeat="show in results = (shows | filter:filter) | orderBy:'name'">
-			<a href="/shows/{{show.tvdb}}">
-				<div class="image" title="{{show.name}}">
+			<div class="image" title="{{show.name}}">
+				<a href="/shows/{{show.tvdb}}">
 					<img data-src="/media/{{settings.shows.directory}}/{{show.directory}}/poster.jpg" alt="" class="img-responsive" />
-				</div>
-				<div class="title">{{show.name}}</div>
-			</a>
+					<div class="overlay">
+						<div class="title">{{show.name}}</div>
+					</div>
+				</a>
+				<div class="actions">
+					<span class="glyphicon glyphicon-cloud-download" title="Download all available episodes"></span>
+					<span class="glyphicon glyphicon-eye-open" title="Mark entire series as watched"></span>
+				</div>				
+			</div>
+			<!-- <div class="title">{{show.name}}</div> -->
 		</div>
 		<div class="col-sm-12" ng-show="!results.length" style="text-align: center;">
 			No matches found

@@ -4,6 +4,7 @@ $break-small: 767px;
 
 body {
 	background-color: #F7F7F7;
+	font-family: 'Droid Sans', Arial, sans-serif;
 	font-weight: 200;
 	padding-top: 50px;
 }
@@ -273,7 +274,7 @@ input.form-control+input.form-control {
 	@media screen and (min-width: $break-large){
 		.show {
 			border: none;
-			height: 180px;
+			height: 200px;
 			padding: 10px 0px 0px;
 			text-align: center;
 			div.image {
@@ -284,19 +285,85 @@ input.form-control+input.form-control {
 				background-size: contain;
 				box-shadow: 0px 0px 5px black;
 				display: block;
-				height: 132px;
+				height: 174px;
 				margin: 0px auto 5px;
+				position: relative;
 				transition: all 0.5s;
 				-moz-transition: all 0.5s;
 				-ms-transition: all 0.5s;
 				-webkit-transition: all 0.5s;
-				width: 90px;
-				> img {
+				width: 118px;
+				a {
+					display: block;
+					height: 100%;
+					width: 100%;
+				}
+				img {
 					display: none;
+				}
+				.actions {
+					bottom: 0px;
+					display: none !important;
+					font-size: 20px;
+					height: 35px;
+					left: 0px;
+					opacity: 0;
+					position: absolute;
+					right: 0px;
+					transition: all 0.5s;
+					-moz-transition: all 0.5s;
+					-ms-transition: all 0.5s;
+					-webkit-transition: all 0.5s;
+					visibility: hidden;
+					
+					> .glyphicon {
+						color: #AAAAAA;
+						cursor: pointer;
+						padding: 0px 5px;
+						&:hover {
+							color: #FFFFFF !important;
+						}
+					} 
+				}
+				
+				.overlay {
+					background-color: rgba(0,0,0,0.8);
+					bottom: 0px;
+					color: #FFFFFF;
+					/* height: 35px; */
+					left: 0px;
+					opacity: 0;
+					position: absolute;
+					right: 0px;
+					top: 0px;
+					transition: all 0.5s;
+					-moz-transition: all 0.5s;
+					-ms-transition: all 0.5s;
+					-webkit-transition: all 0.5s;
+					visibility: hidden;
+					
+					> .title {
+						font-size: 12px;
+						font-weight: bold;
+						padding: 15px;
+					}
+				}
+				&:hover {
+					.actions {
+						opacity: 1;
+						visibility: visible;
+					}
+					.overlay {
+						opacity: 1;
+						visibility: visible;
+					}
 				}
 			}
 			div.title {
-				/* display: none; */
+				font-size: 12px;
+				margin: 0px auto;
+				width: 118px;
+				
 			}
 		}
 	}

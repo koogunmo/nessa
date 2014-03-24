@@ -24,6 +24,7 @@ var ShowData = {
 					if (json.overview) record.synopsis = json.overview;
 					record.name = json.title;
 					record.status = (record.feed) ? true : false;
+					record.trakt = (typeof(record.trakt) != 'undefined') ? record.trakt : true;
 					
 				} else {
 					var record = {
@@ -31,7 +32,8 @@ var ShowData = {
 						imdb: json.imdb_id,
 						name: json.title,
 						synopsis: json.overview,
-						status: false
+						status: false,
+						trakt: true
 					};
 				}
 				if (!record.directory){
@@ -42,6 +44,7 @@ var ShowData = {
 					});
 				}
 				showCollection.save(record, {safe: true}, function(error, result){
+					trakt.show.library(tvdb)
 					if (typeof(callback) == 'function') callback(error, tvdb);
 				});
 			});
@@ -162,6 +165,13 @@ var ShowData = {
 		showCollection.update({tvdb: data.tvdb}, {$set: data}, {upsert: true}, function(error, affected){
 			if (typeof(callback) == 'function') callback(error, !!affected);
 		});
+		/*
+		if (data.trakt) {
+			trakt.show.library(data.tvdb);
+		} else {
+			trakt.show.unlibrary(data.tvdb);
+		}
+		*/
 	},
 	
 	summary: function(tvdb, callback){
@@ -255,7 +265,7 @@ var ShowData = {
 			if (error || !show) return;
 			trakt.show.summary(show.tvdb, function(error, json){
 				if (json.images.banner){
-					var banner = fs.createWriteStream(nconf.get('media:base') + nconf.get('media:shows:directory') + '/' + show.directory + '/banner.jpg');
+					var banner = fs.createWriteStream(nconf.get('media:base') + nconf.get('media:shows:directory') + '/' + show.directory + '/banner.jpg', {flags: 'w', mode: 0644});
 					banner.on('error', function(e){
 						logger.error(e);
 					});
@@ -265,7 +275,7 @@ var ShowData = {
 				}
 				if (json.images.poster) {
 					var src = json.images.poster.replace('.jpg', '-138.jpg');
-					var poster = fs.createWriteStream(nconf.get('media:base') + nconf.get('media:shows:directory') + '/' + show.directory + '/poster.jpg');
+					var poster = fs.createWriteStream(nconf.get('media:base') + nconf.get('media:shows:directory') + '/' + show.directory + '/poster.jpg', {flags: 'w', mode: 0644});
 					poster.on('error', function(e){
 						logger.error(e);
 					});
