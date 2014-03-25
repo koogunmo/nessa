@@ -374,7 +374,7 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		$socket.emit('movies.list');
 	});
 	
-	nessa.controller('showsCtrl', function($scope, $rootScope, $modal, $location, $socket){
+	nessa.controller('showsCtrl', function($scope, $rootScope, $socket){
 		
 		$scope.shows	= [];
 		$scope.settings	= {};
