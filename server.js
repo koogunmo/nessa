@@ -677,7 +677,7 @@ io.sockets.on('connection', function(socket) {
 		var showCollection = db.collection('show');
 		var episodeCollection = db.collection('episode');
 		
-		showCollection.findOne({tvdb, data,tvdb}, function(error, show){
+		showCollection.findOne({tvdb: data.tvdb}, function(error, show){
 			if (error) return;
 			if (typeof(show.trakt) == 'undefined') show.trakt = true;
 			episodeCollection.update({tvdb: data.tvdb}, {$set: {watched: true}}, function(error, affected){
