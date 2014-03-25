@@ -554,7 +554,8 @@ io.sockets.on('connection', function(socket) {
 	}).on('shows.unwatched', function(data){
 		var shows = plugin('showdata');
 		shows.getUnwatched(function(error, json){
-			console.log(error, json);
+			if (error) console.error(error);
+			console.log(json);
 		});
 	});
 	
@@ -663,7 +664,7 @@ io.sockets.on('connection', function(socket) {
 		shows.getArtwork(tvdb);
 		shows.getSummary(tvdb);
 		shows.getFullListings(tvdb, function(error, tvdb){
-			if (error) console.log(error);
+			if (error) console.error(error);
 			shows.getHashes(tvdb);
 		});
 	});
@@ -671,46 +672,53 @@ io.sockets.on('connection', function(socket) {
 	// Trakt 'watched' functionality
 	
 	socket.on('show.watched', function(data){
-		
 		return;
 		
-		trakt.show.seen(data.tvdb, function(error, json){
-			if (error) return;
-			if (json.status == 'success') {
-				var collection = db.collection('episode');
-				collection.update({tvdb: data.tvdb}, {$set: {watched: true}}, function(error, affected){
-					if (error) return;
-				});
-			}
-		});
+		var showCollection = db.collection('show');
+		var episodeCollection = db.collection('episode');
 		
+		showCollection.findOne({tvdb, data,tvdb}, function(error, show){
+			if (error) return;
+			if (typeof(show.trakt) == 'undefined') show.trakt = true;
+			episodeCollection.update({tvdb: data.tvdb}, {$set: {watched: true}}, function(error, affected){
+				if (error) return;
+				trakt.show.seen(data.tvdb);
+			});
+		});
 	}).on('show.season.watched', function(data){
 		return;
-		/*
-		trakt.show.season.seen(data.tvdb, data.season, function(error, json){
+		
+		var showCollection = db.collection('show');
+		var episodeCollection = db.collection('episode');
+		
+		showCollection.findOne({tvdb: data.tvdb}, function(error, show){
 			if (error) return;
-			if (json.status == 'success') {
-				var collection = db.collection('episode');
-				collection.update({tvdb: data.tvdb, season: data.season}, {$set: {watched: true}}, function(error, affected){
+			if (typeof(show.trakt) == 'undefined') show.trakt = true;
+			episodeCollection.update({tvdb: data.tvdb, season: data.season}, {$set: {watched: true}}, function(error, affected){
+				if (error) return;
+				if (show.trakt) trakt.show.season.seen(data.tvdb, data.season);
+			});
+		});
+		
+	}).on('show.episode.watched', function(data){
+		var showCollection = db.collection('show');
+		var episodeCollection = db.collection('episode');
+		
+		showCollection.findOne({tvdb: data.tvdb}, function(error, show){
+			if (error) return;
+			if (typeof(show.trakt) == 'undefined') show.trakt = true;
+			if (data.watched) {
+				episodeCollection.update({tvdb: show.tvdb, season: data.season, episode: data.episode}, {$set: {watched: true}}, function(error, affected){
 					if (error) return;
+					if (show.trakt) trakt.show.episode.seen(data.tvdb, data.season, data.episode);
+				});
+			} else {
+				episodeCollection.update({tvdb: show.tvdb, season: data.season, episode: data.episode}, {$set: {watched: false}}, function(error, affected){
+					if (error) return;
+					if (show.trakt) trakt.show.episode.unseen(data.tvdb, data.season, data.episode);
 				});
 			}
 		});
-		*/
-		
-	}).on('show.episode.watched', function(data){
-		var episodeCollection = db.collection('episode');
-		if (data.watched) {
-			episodeCollection.update({tvdb: data.tvdb, season: data.season, episode: data.episode}, {$set: {watched: true}}, function(error, affected){
-				if (error) return;
-				trakt.show.episode.seen(data.tvdb, data.season, data.episode);
-			});
-		} else {
-			episodeCollection.update({tvdb: data.tvdb, season: data.season, episode: data.episode}, {$set: {watched: false}}, function(error, affected){
-				if (error) return;
-				trakt.show.episode.unseen(data.tvdb, data.season, data.episode);
-			});
-		}
 	});
 	
 	socket.on('show.episode.download', function(data){
