@@ -699,25 +699,16 @@ io.sockets.on('connection', function(socket) {
 		*/
 		
 	}).on('show.episode.watched', function(data){
+		var episodeCollection = db.collection('episode');
 		if (data.watched) {
-			trakt.show.episode.seen(data.tvdb, data.season, data.episode, function(error, json){
+			episodeCollection.update({tvdb: data.tvdb, season: data.season, episode: data.episode}, {$set: {watched: true}}, function(error, affected){
 				if (error) return;
-				if (json.status == 'success') {
-					var collection = db.collection('episode');
-					collection.update({tvdb: data.tvdb, season: data.season, episode: data.episode}, {$set: {watched: true}}, function(error, affected){
-						if (error) return;
-					});
-				}
+				trakt.show.episode.seen(data.tvdb, data.season, data.episode);
 			});
 		} else {
-			trakt.show.episode.unseen(data.tvdb, data.season, data.episode, function(error, json){
+			episodeCollection.update({tvdb: data.tvdb, season: data.season, episode: data.episode}, {$set: {watched: false}}, function(error, affected){
 				if (error) return;
-				if (json.status == 'success') {
-					var collection = db.collection('episode');
-					collection.update({tvdb: data.tvdb, season: data.season, episode: data.episode}, {$set: {watched: false}}, function(error, affected){
-						if (error) return;
-					});
-				}
+				trakt.show.episode.unseen(data.tvdb, data.season, data.episode);
 			});
 		}
 	});
