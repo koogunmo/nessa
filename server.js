@@ -721,8 +721,34 @@ io.sockets.on('connection', function(socket) {
 		});
 	});
 	
-	socket.on('show.episode.download', function(data){
+	socket.on('show.download', function(data){
+		// Download all available episodes
 		var shows = plugin('showdata');
+		var episodeCollection = db.collection('episode');
+
+		episodeCollection.find({tvdb: data.tvdb, hash: {$exists: true}, file: {$exists: false}}).toArray(function(error, results){
+			if (error) return;
+			results.forEach(function(result){
+				shows.download(result.tvdb, result.season, result.episode);
+			});
+		});
+		
+	}).on('show.season.download', function(data){
+		// Download all available episodes for a given season
+		var shows = plugin('showdata');
+		var episodeCollection = db.collection('episode');
+		
+		episodeCollection.find({tvdb: data.tvdb, season: parseInt(data.season, 10), hash: {$exists: true}, file: {$exists: false}}).toArray(function(error, results){
+			if (error) return;
+			results.forEach(function(result){
+				shows.download(result.tvdb, result.season, result.episode);
+			});
+		});
+		
+	}).on('show.episode.download', function(data){
+		var shows = plugin('showdata');
+		var episodeCollection = db.collection('episode');
+		
 		shows.download(data.tvdb, data.season, data.episode);
 	});
 	
