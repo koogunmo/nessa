@@ -359,11 +359,8 @@ input.form-control+input.form-control {
 					}
 				}
 			}
-			div.title {
-				font-size: 12px;
-				margin: 0px auto;
-				width: 118px;
-				
+			> .title {
+				display: none;
 			}
 		}
 	}
