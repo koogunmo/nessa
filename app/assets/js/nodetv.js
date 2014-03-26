@@ -49,26 +49,22 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		});
 	});
 	
-	nessa.controller('loginCtrl', function($scope, $socket, $rootScope, $http, $location, $window){
+	nessa.controller('loginCtrl', function($auth, $rootScope, $scope, $state, $window){
 		$scope.user = {};
-		
 		$scope.login = function(){
-			$http.post('/login', {
-				username: $scope.user.username,
-				password: $scope.user.password,
-			}).success(function(user){
-				$window.history.back();
-			}).error(function(){
+			$auth.login($scope.user.username, $scope.user.password, !!$scope.user.remember).then(function(success){
+				$state.transitionTo('dashboard');
+			}, function(error){
+				if (error) console.error(error);
 				$socket.emit('system.alert', {
 					type: 'danger',
 					message: 'Incorrect login details'
 				});
-				$location.url('/login');
 			});
 		};
 	});
 	
-	nessa.controller('navCtrl', function($scope, $rootScope, $location){
+	nessa.controller('navCtrl', function($location, $rootScope, $scope){
 		$scope.menu = [{
 			path: 'dashboard',
 			name: 'Dashboard'
@@ -84,6 +80,9 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		},{
 			path: 'settings',
 			name: 'Settings'
+		},{
+			path: 'logout',
+			name: 'Log out'
 		}];
 		
 		$scope.isActive = function(viewLocation){

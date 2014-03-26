@@ -56,16 +56,12 @@ try {
 /***********************************************************************/
 /* Load dependencies */
 
-var acl = require('acl'),
-	connect	= require('connect'),
+var connect	= require('connect'),
 	crypto	= require('crypto'),
 	express	= require('express'),
 	fs		= require('fs'),
 	path	= require('path'),
 	uuid	= require('node-uuid');
-
-var passport		= require('passport'),
-	LocalStrategy	= require('passport-local').Strategy;
 
 /* Global methods */
 global.events = new (require('events')).EventEmitter;
@@ -145,29 +141,14 @@ try {
 			}
 			
 			app.configure(function(){
-				var MongoStore = require('connect-mongo')(connect);
-				app.use(express.session({
-					secret: 'Correct Horse Battery Staple',
-					store: new MongoStore({
-						db: db
-					})
-				}));
-				
 				if (nconf.get('media:base') && !nconf.get('listen:nginx')){
 					app.use('/media', express.static(nconf.get('media:base')));
 				}
-				
 				app.use(app.router);
 				
-				app.use(function(req, res) {	
-					res.sendfile(__dirname + '/app/views/index.html');
-				});
-				
-				app.get('/loggedin', function(req, res){
-					var response = {
-						authenticated: false,
-						user: {}
-					};
+				app.post('/api/auth/check', function(req, res){
+					var response = {success: false};
+					
 					if (nconf.get('security:whitelist')) {
 						var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 						// Is there a list of allowed IPs?
@@ -176,31 +157,70 @@ try {
 						blocks.forEach(function(mask){
 							var block = new netmask(mask);
 							if (block.contains(ip)) {
-								response.authenticated = true;
+						//		response.success = true;
 							}
 						});
-						if (response.authenticated) return res.send(response);
+					//	if (response.success) return res.send(response);
 					}
+					if (!req.body.session) return res.send(response);
 					
-					var collection = db.collection('user');
-					collection.count(function(error, count){
-						if (!count) {
-							response.authenticated = true;
+					var userCollection = db.collection('user');
+					userCollection.count(function(error, count){
+						if (error) console.error(error);
+						
+						if (count){
+							userCollection.findOne({session: req.body.session}, function(error, result){
+								if (error) console.error(error);
+								if (result) {
+									response.success = true;
+									return res.send(response);
+								}
+								res.send(response);
+							});
 						} else {
-							if (req.isAuthenticated()) {
-								response.authenticated = true;
-								response.user = req.user;
-							}
+							response.success = true;
+							res.send(response);
+						}
+					});
+					
+				}).post('/api/auth/login', function(req, res){
+					var ObjectID = require('mongodb').ObjectID;
+					
+					var userCollection = db.collection('user');
+					var response = {
+						success: false
+					};
+					
+					var hashed = crypto.createHash('sha256').update(req.body.password).digest('hex');
+					userCollection.findOne({username: req.body.username, password: hashed}, function(error, result){
+						if (error) {
+							res.send(response);
+							return;
+						}
+						if (result){
+							response.success = true;
+							response.session = uuid.v4();
+							userCollection.update({_id: result._id}, {$set: {session: response.session}}, function(error, affected){
+								console.log(error, affected);
+							});
 						}
 						res.send(response);
 					});
+					
+				}).post('/api/auth/logout', function(req,res){
+					if (req.body.session){
+						var userCollection = db.collection('user');
+						userCollection.findOne({session: req.body.session}, function(error, result){
+							result.session = null;
+							userCollection.save(result);
+						});
+					}
+					res.send(401);
 				});
-				app.post('/login', function(req, res){
-					res.send(req.user);
-				});
-				app.post('/logout', function(req,res){
-					req.logOut();
-					res.send(200);
+				
+				/* Default route */
+				app.use(function(req, res) {	
+					res.sendfile(__dirname + '/app/views/index.html');
 				});
 			});
 			
@@ -229,7 +249,7 @@ try {
 		});
 	} else {
 		nconf.set('installed', false);
-		logger.warn('Waiting for install to complete.');
+		logger.warn('Waiting for install.');
 		app.use(app.router);
 		app.use(function(req, res) {
 			res.sendfile(__dirname + '/app/views/index.html');
@@ -568,38 +588,6 @@ io.sockets.on('connection', function(socket) {
 	});
 	// Set
 	socket.on('show.settings', function(data){
-		/*
-		try {
-			acl.isAllowed(socket.get('user').username, 'shows', 'save', function(error, status){
-				if (error) {
-					logger.error(error);
-					return;
-				}
-				if (status) {
-					var show = plugin('showdata');
-					show.settings(data, function(error){
-						if (error) {
-							socket.emit('system.alert', {
-								type: 'danger',
-								message: 'Show settings not updated'
-							});			
-						} else {
-							socket.emit('system.alert', {
-								type: 'success',
-								message: 'Show settings updated',
-								autoClose: 2500
-							});
-						}
-					});
-				} else {
-					socket.emit('acl.denied');
-				}
-			});
-		} catch(e) {
-			logger.error(e.message);
-		}
-		*/
-
 		var show = plugin('showdata');
 		show.settings(data, function(error){
 			if (error) {

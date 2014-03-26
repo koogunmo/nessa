@@ -38,9 +38,7 @@ var users = {
 		}
 		userCollection.update({_id: ObjectID(data._id)}, {$set: record}, {upsert: true}, function(error, count, json){
 			if (!error && !json.updatedExisting) {
-				acl.addUserRoles(json.upserted, 'user', function(error){
-					if (error) console.error(error);
-				});
+				
 			}
 			if (typeof(callback) == 'function') callback(error, json);
 		});
