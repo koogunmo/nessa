@@ -3,14 +3,11 @@
 define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch','ui.bootstrap','ui.router'], function(angular,io,moment){
 	var app = angular.module('nessa', ['ngCookies','ngResource','ui.bootstrap','ui.router']);
 	
-	app.factory('$auth', function($cookies, $http, $location, $q, $rootScope){
+	app.factory('$auth', function($cookieStore, $http, $location, $q, $rootScope){
 		var auth = {
 			check: function(){
 				var deferred = $q.defer();
-				var session = ($rootScope.session) ? $rootScope.session : (($cookies.session) ? $cookies.session : null);
-				
-				console.log($rootScope.session, $cookies.session, session);
-				
+				var session = ($rootScope.session) ? $rootScope.session : (($cookieStore.get('session')) ? $cookieStore.get('session') : null);
 				$http({
 					url: '/api/auth/check',
 					method: 'POST',
@@ -41,7 +38,7 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 				}).success(function(json, status){
 					if (json.success){
 						$rootScope.session = json.session;
-						if (remember) $cookies.session = json.session;
+						if (remember) $cookieStore.put('session', json.session);
 						deferred.resolve();
 					} else {						
 						deferred.reject(401);
@@ -61,11 +58,11 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 					}
 				}).success(function(json, status){
 					$rootScope.session = null;
-					$cookies.session = null;
+					$cookieStore.remove('session');
 					deferred.resolve();
 				}).error(function(json, status){
 					$rootScope.session = null;
-					$cookies.session = null;
+					$cookieStore.remove('session');
 					deferred.resolve();
 				});
 				return deferred.promise;
@@ -234,6 +231,9 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 			}
 		}).state('logout', {
 			url: '/logout',
+			data: {
+				secure: false
+			},
 			onEnter: function($auth, $location){
 				$auth.logout().then(function(){
 					$location.path('/login');
@@ -375,13 +375,10 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 		});
 	});
 	
-	app.run(function($auth, $cookies, $location, $rootScope, $state){
+	app.run(function($auth, $cookieStore, $location, $rootScope, $state){
 		$rootScope.session = null;
 		$rootScope.loggedIn = function(){
-			
-			console.log($rootScope.session, $cookies.session);
-			
-			return ($rootScope.session != null || $cookies.session != 'null') ? true : false;
+			return ($rootScope.session != null || $cookieStore.get('session')) ? true : false;
 		};
 		$rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams){
 			if (toState.data.secure){

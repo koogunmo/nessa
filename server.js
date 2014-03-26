@@ -157,10 +157,9 @@ try {
 						blocks.forEach(function(mask){
 							var block = new netmask(mask);
 							if (block.contains(ip)) {
-						//		response.success = true;
+								response.success = true;
 							}
 						});
-					//	if (response.success) return res.send(response);
 					}
 					if (!req.body.session) return res.send(response);
 					
@@ -212,10 +211,12 @@ try {
 						var userCollection = db.collection('user');
 						userCollection.findOne({session: req.body.session}, function(error, result){
 							result.session = null;
-							userCollection.save(result);
+							userCollection.save(result, function(error, affected){
+								console.log(error, affected);
+							});
 						});
 					}
-					res.send(401);
+					res.send({success: true});
 				});
 				
 				/* Default route */
