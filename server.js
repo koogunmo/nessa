@@ -157,7 +157,7 @@ try {
 						blocks.forEach(function(mask){
 							var block = new netmask(mask);
 							if (block.contains(ip)) {
-						//		response.success = true;
+								response.success = true;
 							}
 						});
 					}
