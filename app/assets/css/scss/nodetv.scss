@@ -109,14 +109,24 @@ input.form-control+input.form-control {
 /* Dashboard */
 
 #dashboard {
-	.panel.watched {
-		opacity: 0.3;
-	}
-	.panel-heading {
-		> span {
-			cursor: pointer;
+	
+	.panel {
+		&.panel-success {
+			opacity: 0.5;
+		}
+		.panel-heading {
+			> span {
+				cursor: pointer;
+			}
+		}
+		.panel-body {
+			.tools {
+				padding-right: 2px;
+				text-align: right;
+			}
 		}
 	}
+	
 	.small {
 		color: inherit;
 		padding-left: 10px;

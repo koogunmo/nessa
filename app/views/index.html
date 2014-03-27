@@ -32,7 +32,7 @@
 				<a class="navbar-brand" href="/">NodeTV</a>
 			</div>
 			<nav class="collapse navbar-collapse" collapse="isCollapsed">
-				<ul class="nav navbar-nav" ng-show="loggedIn()">
+				<ul class="nav navbar-nav" ng-show="authenticated">
 					<li ng-repeat="item in menu" ng-class="{active: isActive('/'+item.path)}" ng-cloak>
 						<a ui-sref="{{item.path}}" ng-click="collapse()">{{item.name}}</a>
 					</li>

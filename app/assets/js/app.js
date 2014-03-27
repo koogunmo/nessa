@@ -377,19 +377,26 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 	
 	app.run(function($auth, $cookieStore, $location, $rootScope, $state){
 		$rootScope.session = null;
-		$rootScope.loggedIn = function(){
-			return ($rootScope.session != null || $cookieStore.get('session')) ? true : false;
-		};
+		
 		$rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams){
 			if (toState.data.secure){
 				$auth.check().then(function(success){
+					$rootScope.authenticated = true;
 					$rootScope.pagetitle = toState.data.title;
 				}, function(error){
 					event.preventDefault();
+					$rootScope.authenticated = false;
 					$state.transitionTo('login');
 				});
 			} else {
-				if ($rootScope.loggedIn() && toState.name == 'login') $location.path('/dashboard');
+				if (toState.name == 'login') {
+					$auth.check().then(function(){
+						$rootScope.authenticated = true;
+						$location.path('/dashboard');
+					}, function(){
+						$rootScope.authenticated = false;
+					});
+				}
 				$rootScope.pagetitle = toState.data.title;
 			}
 		});
