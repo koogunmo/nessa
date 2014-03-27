@@ -60,6 +60,7 @@ var ShowData = {
 			if (magnet) {
 				torrent.add(magnet, function(error, args){
 					if (error) return;
+					console.log('HASHES: %s %s', result.hash, args.hashString);
 					episodeCollection.update({hash: result.hash}, {$set: {status: false}}, function(error, affected){
 						
 					});

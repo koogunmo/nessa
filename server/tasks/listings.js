@@ -6,15 +6,15 @@ try {
 	function updateListings(){
 		// Update show listings
 		shows.getShowlist();
-		
 		// Update show information (synopsis, artwork, etc)
-		var collection = db.collection('show');
-		collection.find({status: {$exists: true}}).toArray(function(error, results){
+		var showCollection = db.collection('show');
+		showCollection.find({status: {$exists: true}}).toArray(function(error, results){
 			if (error || !results) return;
 			results.forEach(function(show){
 				shows.getArtwork(show.tvdb);
 				shows.getSummary(show.tvdb, function(error, tvdb){
 					shows.getFullListings(tvdb);
+					shows.getHashes(tvdb);
 				});
 			});
 		});

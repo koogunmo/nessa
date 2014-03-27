@@ -17,8 +17,7 @@ var system = {
 					logger.error(error);
 					return;
 				}
-				if (success.indexOf('already up-to-date') == -1) restart = true;
-				
+				if (success.toLowerCase().indexOf('already up-to-date') == -1) restart = true;
 				/*
 				npm.load({
 					loglevel: 'warn',

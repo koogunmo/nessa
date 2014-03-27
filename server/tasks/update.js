@@ -8,6 +8,10 @@ var rule = new schedule.RecurrenceRule();
 	rule.minute = 0;
 
 schedule.scheduleJob(rule, function(){
-	var system = plugin('system');
-	system.update();
+	try {
+		var system = plugin('system');
+		system.update();
+	} catch(e){
+		console.error(e.message);
+	}
 });
