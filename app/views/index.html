@@ -32,9 +32,20 @@
 				<a class="navbar-brand" href="/">NodeTV</a>
 			</div>
 			<nav class="collapse navbar-collapse" collapse="isCollapsed">
-				<ul class="nav navbar-nav" ng-show="authenticated">
+				<ul class="nav navbar-nav navbar-left" ng-show="authenticated">
 					<li ng-repeat="item in menu" ng-class="{active: isActive('/'+item.path)}" ng-cloak>
-						<a ui-sref="{{item.path}}" ng-click="collapse()">{{item.name}}</a>
+						<a ui-sref="{{item.path}}" ng-click="collapse()">
+							<span class="glyphicon glyphicon-{{item.icon}}"></span>
+							{{item.name}}
+						</a>
+					</li>
+				</ul>
+				<ul class="nav navbar-nav navbar-right" ng-show="authenticated">
+					<li>
+						<a ui.sref="logout">
+							<span class="glyphicon glyphicon-log-out"></span>
+							Logout
+						</a>
 					</li>
 				</ul>
 			</nav>

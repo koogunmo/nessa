@@ -67,22 +67,24 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 	nessa.controller('navCtrl', function($location, $rootScope, $scope){
 		$scope.menu = [{
 			path: 'dashboard',
-			name: 'Dashboard'
+			name: 'Dashboard',
+			icon: 'home'
 		},{
 	//		path: 'movies',
 	//		name: 'Movies'
 	//	},{
 			path: 'shows',
-			name: 'Shows'
+			name: 'Shows',
+			icon: 'th'
 		},{
 			path: 'downloads',
-			name: 'Downloads'
+			name: 'Downloads',
+			icon: 'download'
 		},{
 			path: 'settings',
-			name: 'Settings'
-		},{
-			path: 'logout',
-			name: 'Log out'
+			name: 'Settings',
+			icon: 'cog'
+			
 		}];
 		
 		$scope.isActive = function(viewLocation){

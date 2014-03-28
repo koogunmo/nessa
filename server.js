@@ -200,7 +200,7 @@ try {
 							response.success = true;
 							response.session = uuid.v4();
 							userCollection.update({_id: result._id}, {$set: {session: response.session}}, function(error, affected){
-								console.log(error, affected);
+							//	console.log(error, affected);
 							});
 						}
 						res.send(response);
@@ -212,7 +212,7 @@ try {
 						userCollection.findOne({session: req.body.session}, function(error, result){
 							result.session = null;
 							userCollection.save(result, function(error, affected){
-								console.log(error, affected);
+							//	console.log(error, affected);
 							});
 						});
 					}
