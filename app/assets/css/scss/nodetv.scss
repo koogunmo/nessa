@@ -17,9 +17,23 @@ body {
 .accordion-toggle, .nav, .pagination, .carousel a {
 	cursor: pointer;
 }
+
 .navbar-inverse {
 	background-color: rgba(0,0,0,0.9);
+	box-shadow: 0px 3px 8px #666666;
 }
+
+ul.navbar-nav a {
+	> span.glyphicon {
+		margin-right: 5px;
+	}
+	@media screen and (max-width: $break-small){
+		> span.glyphicon {
+			float: right;
+		}
+	}
+}
+
 /* Form elements */
 input[type="search"], input.search {
 	text-transform: capitalize;
@@ -270,6 +284,15 @@ input.form-control+input.form-control {
 	div.image {
 		display: none;
 	}
+	h6 {
+		box-sizing: border-box;
+		margin: 0px;
+		padding: 3px;
+		position: absolute;
+		top: 125px;
+		width: 100%;
+		z-index: 2;
+	}
 	div.title {
 		
 	}
@@ -357,7 +380,7 @@ input.form-control+input.form-control {
 					-ms-transition: all 0.5s;
 					-webkit-transition: all 0.5s;
 					visibility: hidden;
-					
+					z-index: 3;
 					> .title {
 						font-size: 12px;
 						font-weight: bold;
@@ -469,9 +492,10 @@ input.form-control+input.form-control {
 	padding-bottom: 50px;
 	
 	.toolbar {
-		background-color: $border;
+		background-color: #F7F7F7;
 		border-top: 1px solid $border;
 		bottom: 0px;
+		box-shadow: 0px 3px 8px #666666;
 		box-sizing: border-box;
 		height: 45px;
 		left: 0px;

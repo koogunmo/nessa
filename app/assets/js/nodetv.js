@@ -115,16 +115,8 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 	});
 	
 	nessa.controller('downloadsCtrl', function($scope, $socket, $modal){
-		$scope.downloads = [];
 		$scope.predicate = 'name';
 		$scope.reverse = false;
-		
-		$socket.emit('download.list');
-		$socket.on('download.list', function(data){
-			$scope.downloads = data;
-		});
-		
-		
 	});
 	
 	nessa.controller('downloadCtrl', function($scope, $socket, $modal){
@@ -377,7 +369,6 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 	
 	nessa.controller('showsCtrl', function($scope, $rootScope, $socket){
 		
-		$scope.shows	= [];
 		$scope.settings	= {};
 		
 		$scope.clearFilter = function(){
@@ -393,10 +384,6 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		
 		$socket.on('show.added', function(){
 			$socket.emit('shows.list');
-		});
-		$socket.on('shows.list', function(shows){
-			$scope.shows = shows;
-			$(document).trigger('lazyload');
 		});
 		
 		$socket.emit('shows.list');
@@ -559,11 +546,14 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		
 		setTimeout(function(){
 			$('div.image img[data-src]').one('load', function(){
+				$(this).siblings('h6').hide();
 				$(this).fadeIn();
+				
 			}).each(function(){
 				if ($(this).attr('src')) return;
 				var offset = $(this).parents('div.image').offset()
 				if (offset.top < height+top) {
+					
 					$(this).attr({
 						src: $(this).data('src')
 					});

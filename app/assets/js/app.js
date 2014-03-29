@@ -375,8 +375,18 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 		});
 	});
 	
-	app.run(function($auth, $cookieStore, $location, $rootScope, $state){
+	app.run(function($auth, $cookieStore, $location, $rootScope, $socket, $state){
 		$rootScope.session = null;
+		$rootScope.downloads = null;
+		
+		$socket.on('download.list', function(data){
+			$rootScope.downloads = data;
+		});
+		
+		$socket.on('shows.list', function(shows){
+			$rootScope.shows = shows;
+			$(document).trigger('lazyload');
+		});
 		
 		$rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams){
 			if (toState.data.secure){
