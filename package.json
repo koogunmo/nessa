@@ -15,7 +15,7 @@
     "connect-mongo": "^0.4.0",
     "express": "^3.4.8",
     "feedparser": "^0.16.5",
-    "gitty": "^2.0.0",
+    "gitty": "~1.2.6",
     "log4js": "^0.6.12",
     "mime": "~1.2.11",
     "mkdirp": "^0.3.5",

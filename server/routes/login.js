@@ -1,5 +1,7 @@
 'use strict';
 
+var uuid = require('node-uuid');
+
 module.exports = function(app, db){
 	app.post('/api/auth/check', function(req, res){
 		var response = {success: false};
