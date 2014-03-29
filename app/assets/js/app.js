@@ -73,7 +73,7 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 	
 	app.factory('$socket', function($rootScope) {
 		var port = (window.location.port) ? window.location.port : 80;
-		var socket = io.connect('http://' + window.location.hostname + ':' + port, {
+		var socket = io.connect(window.location.protocol+'//'+window.location.hostname+':'+port, {
 			'connect timeout': 2000,
 			'max reconnection attempts': 5,
 			'sync disconnect on unload': true
