@@ -41,9 +41,11 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 				}
 			}
 		});
+		
 		$scope.closeAlert = function(index){
 			$scope.alerts.splice(index, 1);
 		};
+		
 		$scope.$on('$stateChangeSuccess', function(){
 			$scope.alerts = [];
 		});

@@ -456,11 +456,6 @@ io.sockets.on('connection', function(socket) {
 		})
 	});
 	
-	var shows = plugin('showdata');
-	shows.list(function(error, results){
-		socket.emit('shows.list', results);
-	});
-	
 	/** Shows **/
 	socket.on('shows.list', function(){
 

@@ -145,8 +145,12 @@ var ShowData = {
 	},
 	
 	list: function(callback){
-		var showCollection = db.collection('show');
-		showCollection.find({status: {$exists: true}, directory: {$exists: true}}).toArray(callback);
+		try {
+			var showCollection = db.collection('show');
+			showCollection.find({status: {$exists: true}, directory: {$exists: true}}).toArray(callback);
+		} catch(e){
+			console.error(e.message);
+		}
 	},
 	
 	remove: function(tvdb, callback){

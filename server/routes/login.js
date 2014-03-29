@@ -23,12 +23,12 @@ module.exports = function(app, db){
 		var userCollection = db.collection('user');
 		userCollection.count(function(error, count){
 			if (error) console.error(error);
-			
 			if (count){
 				userCollection.findOne({session: req.body.session}, function(error, result){
 					if (error) console.error(error);
 					if (result) {
 						response.success = true;
+						userCollection.update({_id: result._id}, {$set: {last: Date.now()}}, function(error, affected){});
 						return res.send(response);
 					}
 					res.send(response);
@@ -56,7 +56,7 @@ module.exports = function(app, db){
 			if (result){
 				response.success = true;
 				response.session = uuid.v4();
-				userCollection.update({_id: result._id}, {$set: {session: response.session}}, function(error, affected){
+				userCollection.update({_id: result._id}, {$set: {session: response.session, last: Date.now()}}, function(error, affected){
 				//	console.log(error, affected);
 				});
 			}
