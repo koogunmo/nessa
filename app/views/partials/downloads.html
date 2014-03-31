@@ -13,16 +13,11 @@
 			Showing {{results.length}} of {{downloads.length}} downloads
 		</div>
 	</div>
-	<div class="download" ng-controller="downloadCtrl" ng-repeat="download in results = (downloads | filter:filter) | orderBy:predicate:reverse" ng-class="{'paused': !download.status}">
+	
+	<div class="download" ng-controller="downloadCtrl" ng-repeat="download in results = (downloads | filter:filter) | orderBy:predicate:reverse" ng-class="{'paused': !download.status}" ui-sref="downloads.info({id: download.id})">
 		<span class="pull-right">
-			<button type="button" class="btn btn-xs btn-info" ng-click="settings(download.id)">
+			<button type="button" class="btn btn-xs btn-info">
 				<span class="glyphicon glyphicon-cog"></span>
-			</button>
-			<button type="button" class="btn btn-xs" ng-class="{'btn-success': !!download.status}" ng-click="toggle();">
-				<span class="glyphicon" ng-class="{'glyphicon-play': !download.status, 'glyphicon-pause': !!download.status}"></span>
-			</button>
-			<button type="button" class="btn btn-xs btn-danger" ng-click="remove(download.id);">
-				<span class="glyphicon glyphicon-trash"></span>
 			</button>
 		</span>
 		

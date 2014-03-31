@@ -390,30 +390,36 @@ io.sockets.on('connection', function(socket) {
 		var showCollection = db.collection('show');
 		var episodeCollection = db.collection('episode');
 		
-		torrent.info(id, function(error, data){
-			var torrent = data.torrents[0];
-			var response = {
-				id: torrent.id,
-				date: {
-					started: torrent.addedDate
-				}
-			};
-			episodeCollection.findOne({hash: torrent.hashString.toUpperCase()}, function(error, results){
-				if (results) {
-					// In DB, no manual move required
-					response.episode = results;
-					showCollection.findOne({tvdb: results.tvdb}, function(error, show){
-						response.show = show;
+		torrent.info(parseInt(id, 10), function(error, data){
+			try {
+				var torrent = data.torrents[0];
+				var response = {
+					id: torrent.id,
+					status: !!torrent.status,
+					hash: torrent.hashString,
+					date: {
+						started: torrent.addedDate
+					},
+				};
+				episodeCollection.findOne({hash: torrent.hashString.toUpperCase()}, function(error, results){
+					if (results) {
+						// In DB, no manual move required
+						response.episode = results;
+						showCollection.findOne({tvdb: results.tvdb}, function(error, show){
+							response.show = show;
+							socket.emit('download.info', response);
+						});
+					} else {
+						response.files = [];
+						torrent.files.forEach(function(file){
+							response.files.push(file);
+						});
 						socket.emit('download.info', response);
-					});
-				} else {
-					response.files = [];
-					torrent.files.forEach(function(file){
-						response.files.push(file);
-					});
-					socket.emit('download.info', response);
-				}
-			});
+					}
+				});
+			} catch(e){
+				console.error(e.message);
+			}
 		});
 		
 	}).on('download.remove', function(data){

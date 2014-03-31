@@ -281,20 +281,15 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 				if (window.modal) window.modal.dismiss()
 				window.modal = null;
 			}
-		}).state('download.info', {
-			url: '/:id',
+		}).state('downloads.info', {
+			url: '/{id:[0-9]{1,}}',
 			data: {
 				secure: true
 			},
 			onEnter: function($state, $stateParams, $modal){
 				$modal.open({
-					controller: 'downloadAddCtrl',
-					templateUrl: '/views/modal/download/add.html',
-					resolve: {
-						id: function(){
-							return $stateParams.id
-						}
-					}
+					controller: 'downloadSettingsCtrl',
+					templateUrl: '/views/modal/download/settings.html'
 				}).result.then(function(result){
 					$state.transitionTo('downloads');
 					window.modal = null;

@@ -123,31 +123,7 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 	});
 	
 	nessa.controller('downloadCtrl', function($scope, $socket, $modal){
-		$scope.settings = function(id){
-			$modal.open({
-				templateUrl: '/views/modal/download/settings.html',
-				controller: 'downloadSettingsCtrl',
-				resolve: {
-					id: function(){
-						return id;
-					}
-				}
-			});
-		};
 		
-		$scope.remove = function(){
-			if (confirm('Are you sure you want to delete this torrent?')) {
-				$socket.emit('download.remove', {id: $scope.$parent.download.id, purge: true});
-			}
-		};
-		$scope.toggle = function(){
-			if (!!$scope.$parent.download.status){
-				$socket.emit('download.stop', $scope.$parent.download.id);
-			} else {
-				$socket.emit('download.start', $scope.$parent.download.id);
-			}
-			$scope.$parent.download.status = !$scope.$parent.download.status;
-		};
 	});
 	
 	nessa.controller('downloadAddCtrl', function($scope, $socket, $modalInstance){
@@ -162,24 +138,31 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		};
 	});
 
-	nessa.controller('downloadSettingsCtrl', function($scope, $socket, $modalInstance, id){
-		
+	nessa.controller('downloadSettingsCtrl', function($modalInstance, $scope, $socket, $state, $stateParams){
 		$scope.torrent = {};
-		
 		// fetch info
-		$socket.emit('download.info', id);
+		
+		$socket.emit('download.info', $stateParams.id);
 		$socket.on('download.info', function(data){
-			if (data.id != id) return;
+			if (data.id != $stateParams.id) return;
 			$scope.torrent = data;
 		});
+		$scope.remove = function(){
+			if (confirm('Are you sure you want to delete this torrent?')) {
+				$socket.emit('download.remove', {id: $scope.torrent.id, purge: true});
+				$modalInstance.dismiss('close');
+			}
+		};
+		$scope.toggle = function(){
+			$scope.torrent.status = !$scope.torrent.status;
+			if ($scope.torrent.status){
+				$socket.emit('download.start', $scope.torrent.id);
+			} else {
+				$socket.emit('download.stop', $scope.torrent.id);
+			}
+		};
 		$scope.close = function(){
 			$modalInstance.dismiss('close');
-		};
-		$scope.pause = function(){
-			
-		};
-		$scope.remove = function(){
-			
 		};
 		$scope.save = function(){
 			$modalInstance.close();
