@@ -6,7 +6,7 @@ body {
 	background-color: #F7F7F7;
 	font-family: 'Droid Sans', Arial, sans-serif;
 	font-weight: 200;
-	padding-top: 50px;
+	padding-top: 60px;
 }
 
 /* Global elements */
@@ -214,6 +214,32 @@ input.form-control+input.form-control {
 	}
 	.nav {
 		margin-bottom: 10px;
+	}
+	.tab-pane {
+		div.buttons {
+			text-align: center;
+			
+			button.btn {
+				display: inline-block;
+				margin-bottom: 5px;
+				width: 45%;
+				> .glyphicon {
+					margin-right: 5px;
+				}
+			}
+			
+			@media screen and (max-width: $break-small){
+				button.btn {
+					display: block;
+					text-align: left;
+					width: 100%;
+					> .glyphicon {
+						float: right;
+						margin-right: 0px;
+					}
+				}
+			}
+		}
 	}
 	
 	.seasons {

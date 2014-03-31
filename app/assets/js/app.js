@@ -288,7 +288,7 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 			},
 			onEnter: function($state, $stateParams, $modal){
 				$modal.open({
-					controller: 'downloadSettingsCtrl',
+					controller: 'downloadCtrl',
 					templateUrl: '/views/modal/download/settings.html'
 				}).result.then(function(result){
 					$state.transitionTo('downloads');

@@ -1,5 +1,5 @@
 <div id="settings">
-	<form ng-submit="save()">
+	<form name="settingsForm" ng-submit="save()">
 		<tabset>
 			<tab heading="General">
 				<accordion close-others="true">
@@ -78,7 +78,7 @@
 				</accordion>
 			</tab>
 		</tabset>
-		<div class="toolbar">
+		<div class="toolbar" ng-show="settingsForm.$dirty">
 			<button type="submit" class="btn btn-success">Save settings</button>
 		</div>
 	</form>

@@ -120,15 +120,11 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 	nessa.controller('downloadsCtrl', function($scope, $socket, $modal){
 		$scope.predicate = 'name';
 		$scope.reverse = false;
+		$socket.emit('download.list');
 	});
-	
-	nessa.controller('downloadCtrl', function($scope, $socket, $modal){
 		
-	});
-	
 	nessa.controller('downloadAddCtrl', function($scope, $socket, $modalInstance){
 		window.modal = $modalInstance;
-		
 		$scope.close = function(){
 			$modalInstance.close();
 		};
@@ -138,7 +134,7 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		};
 	});
 
-	nessa.controller('downloadSettingsCtrl', function($modalInstance, $scope, $socket, $state, $stateParams){
+	nessa.controller('downloadCtrl', function($modalInstance, $scope, $socket, $state, $stateParams){
 		$scope.torrent = {};
 		// fetch info
 		
