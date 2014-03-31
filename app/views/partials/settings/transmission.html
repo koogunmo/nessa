@@ -1,0 +1,22 @@
+<div class="form-group">
+	<label for="ipt_bt_host">Host</label>
+	<input type="text" id="ipt_bt_host" class="form-control" placeholder="127.0.0.1" required="required" ng-model="settings.transmission.host" /></div>
+<div class="form-group">
+	<label for="ipt_bt_port">Port</label>
+	<input type="text" id="ipt_bt_port" class="form-control" placeholder="9091" required="required" ng-model="settings.transmission.port" />
+</div>
+<div class="checkbox">
+	<label>
+		<input type="checkbox" ng-model="settings.transmission.auth" /> Transmission requires a username and password
+	</label>
+</div>
+<div ng-if="settings.transmission.auth">
+	<div class="form-group">
+		<label for="ipt_bt_user">Username</label>
+		<input type="text" id="ipt_bt_user" class="form-control" ng-model="settings.transmission.username" />
+	</div>
+	<div class="form-group">
+		<label for="ipt_bt_pass">Password</label>
+		<input type="password" id="ipt_bt_pass" class="form-control" ng-model="settings.transmission.password" />
+	</div>
+</div>
