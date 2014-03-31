@@ -70,7 +70,7 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		$scope.menu = [{
 			path: 'dashboard',
 			name: 'Dashboard',
-			icon: 'home'
+			icon: 'dashboard'
 		},{
 	//		path: 'movies',
 	//		name: 'Movies'
@@ -104,16 +104,17 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 	
 	// Section-specific controllers
 	
-	nessa.controller('installCtrl', function($scope, $socket){
+	nessa.controller('installCtrl', function($scope, $socket, $state){
 		$scope.settings = {};
+		
+		$scope.save = function(){
+			$socket.emit('system.settings', $scope.settings);
+			$state.transitionTo('shows.match');
+		};
 		$socket.on('system.settings', function(data){
 			$scope.settings = data;
 		});
 		$socket.emit('system.settings');
-		
-		$socket.on('window.reload', function(){
-			window.location.reload();
-		});
 	});
 	
 	nessa.controller('downloadsCtrl', function($scope, $socket, $modal){
@@ -238,23 +239,24 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		}
 	});
 	
-	nessa.controller('matchCtrl', function($scope, $socket){
+	nessa.controller('matchCtrl', function($modalInstance, $scope, $socket, $state){
 		$scope.unmatched	= [];
+		$scope.matched		= [];
+		
 		$socket.emit('shows.unmatched');
+		
 		$socket.on('shows.unmatched', function(data){
 			$scope.unmatched.push(data);
 		});
-		
+		$scope.close = function(){
+			$modalInstance.dismiss('close');
+		};
+		$scope.set = function(id, tvdb){
+			$scope.matched[id] = {id: id, tvdb: tvdb};
+		};
 		$scope.save = function(){
-			var matched = [];
-			$('input[type=radio]:checked').each(function(){
-				var record = {
-					id: $(this).data('id'),
-					tvdb: $(this).val()
-				}
-				matched.push(record);
-			});
-			$socket.emit('shows.matched', matched);
+			$socket.emit('shows.matched', $scope.matched);
+			$scope.close();
 		};
 	});
 	

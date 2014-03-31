@@ -1,0 +1,21 @@
+<form name="matchForm" ng-submit="save()">
+	<div class="modal-header">
+		<h4 class="modal-title">Unmatched Shows</h4>
+	</div>
+	<div class="modal-body">
+		<accordion close-others="true">
+			<accordion-group heading="{{show.name}}" ng-repeat="show in unmatched | orderBy:'name'">
+				<div class="checkbox" ng-repeat="match in show.matches">
+					<label ng-click="set(show.id, match.tvdb_id)">
+						<input type="radio" name="match[{{show.id}}]" id="ipt_match_{{match.tvdb_id}}" value="{{match.tvdb_id}}" data-id="{{show.id}}" /> 
+						{{match.title}} ({{match.year}})
+					</label>
+				</div>
+			</accordion-group>
+		</accordion>
+	</div>
+	<div class="modal-footer">
+		<button type="submit" class="btn btn-success" ng-show="matched.length">Save</button>
+		<button type="button" class="btn btn-default" ng-click="close()">Close</button>
+	</div>
+</form>

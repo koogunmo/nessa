@@ -361,7 +361,7 @@ io.sockets.on('connection', function(socket) {
 		
 		// Check for unmatched shows
 		shows.getUnmatched(function(error, json){
-			if (json && json.length) socket.emit('dashboard.unmatched', json.length);
+			if (!error && json && json.length) socket.emit('dashboard.unmatched', json.length);
 		});
 		
 		// Get upcoming shows
@@ -489,7 +489,6 @@ io.sockets.on('connection', function(socket) {
 				});
 			});
 		});
-		
 	}).on('shows.unwatched', function(data){
 		var shows = plugin('showdata');
 		shows.getUnwatched(function(error, json){

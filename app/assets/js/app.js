@@ -272,6 +272,9 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 				}).result.then(function(result){
 					$state.transitionTo('downloads');
 					window.modal = null;
+				}, function(result){
+					$state.transitionTo('downloads');
+					window.modal = null;
 				});
 			},
 			onExit: function(){
@@ -293,6 +296,9 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 						}
 					}
 				}).result.then(function(result){
+					$state.transitionTo('downloads');
+					window.modal = null;
+				}, function(result){
 					$state.transitionTo('downloads');
 					window.modal = null;
 				});
@@ -330,6 +336,9 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 				}).result.then(function(result){
 					$state.transitionTo('shows');
 					window.modal = null;
+				}, function(result){
+					$state.transitionTo('shows');
+					window.modal = null;
 				});
 			},
 			onExit: function(){
@@ -338,11 +347,11 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 			}
 			
 		}).state('shows.detail', {
-			url: '/:showid',
+			url: '/{showid:[0-9]{1,}}',
 			data: {
 				secure: true
 			},
-			onEnter: function($state, $stateParams, $modal){
+			onEnter: function($modal, $state, $stateParams){
 				$modal.open({
 					templateUrl: '/views/modal/show/detail.html',
 					controller: 'showCtrl',
@@ -357,6 +366,9 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 				}).result.then(function(result){
 					$state.transitionTo('shows');
 					window.modal = null;
+				}, function(result){
+					$state.transitionTo('shows');
+					window.modal = null;
 				});
 			},
 			onExit: function(){
@@ -366,13 +378,28 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 			
 		}).state('shows.match', {
 			url: '/match',
-			controller: 'matchCtrl',
-			templateUrl: '/views/partials/match.html',
 			data: {
 				secure: true,
 				title: 'Unmatched Shows'
+			},
+			onEnter: function($modal, $state){
+				$modal.open({
+					templateUrl: '/views/modal/show/match.html',
+					controller: 'matchCtrl',
+					backdrop: 'static',
+					keyboard: false
+				}).result.then(function(result){
+					$state.transitionTo('shows');
+					window.modal = null;
+				}, function(result){
+					$state.transitionTo('shows');
+					window.modal = null;				
+				});
+			},
+			onExit: function(){
+				if (window.modal) window.modal.dismiss()
+				window.modal = null;
 			}
-			
 		}).state('settings', {
 			url: '/settings',
 			controller: 'settingsCtrl',

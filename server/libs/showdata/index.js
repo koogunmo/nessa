@@ -209,7 +209,7 @@ var ShowData = {
 	
 	unmatched: function(callback){
 		var unmatchedCollection = db.collection('unmatched');
-		unmatchedCollection.find({}).toArray(function(error, shows){
+		unmatchedCollection.find().toArray(function(error, shows){
 			shows.forEach(function(show){
 				trakt.search('shows', show.directory, function(error, json){
 					var result = {
