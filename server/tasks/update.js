@@ -9,7 +9,7 @@ var rule = new schedule.RecurrenceRule();
 
 schedule.scheduleJob(rule, function(){
 	try {
-		var system = plugin('system');
+		var system = require('nodetv-system');
 		system.update();
 	} catch(e){
 		console.error(e.message);

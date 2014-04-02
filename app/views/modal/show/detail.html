@@ -9,25 +9,19 @@
 					{{summary.synopsis || 'No synopsis available'}}
 				</div>
 			</tab>
-			
 			<tab heading="Episodes">
 				<accordion class="seasons">
 					<accordion-group heading="{{display()}}" class="season" ng-repeat="season in listing | orderBy:'season':true" ng-controller="seasonCtrl">
-						
 						<div class="episode" ng-repeat="episode in season.episodes | orderBy:'episode'" ng-controller="episodeCtrl" ng-class="{unaired: !hasAired()}">
 							<h5 class="title"><span class="small">{{episode.episode | zeroPad:2}}</span>{{episode.title || 'TBA'}}</h5>
-							
 							<div class="extended" ng-switch="hasAired()">
 								<p class="synopsis">{{episode.synopsis || 'No synopsis available'}}</p>
-								
 								<div class="tools" ng-switch-when="true">
 									<span class="glyphicon glyphicon-eye-close action" title="Mark episode as watched" ng-if="episode.file && !episode.watched" ng-click="watched()"></span>
 									<span class="glyphicon glyphicon-eye-open action" title="Episode has been watched" ng-if="episode.file && episode.watched" ng-click="watched()"></span>
-									
 									<span class="glyphicon glyphicon-cloud-download action" title="Download this episode" ng-if="!episode.file && episode.hash" ng-click="download()"></span>
 									<span class="glyphicon glyphicon-hdd" title="This episode has been downloaded" ng-if="episode.status && episode.file"></span>
 								</div>
-								
 								<div class="tools" ng-switch-when="false">
 									<span ng-if="!hasAired()">
 										{{episode.airdate*1000 | date:'yyyy-MM-dd'}}

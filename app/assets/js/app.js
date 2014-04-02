@@ -342,7 +342,7 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 			}
 			
 		}).state('shows.detail', {
-			url: '/{showid:[0-9]{1,}}',
+			url: '/{showid:[0-9]+}',
 			data: {
 				secure: true
 			},
@@ -351,13 +351,7 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 					templateUrl: '/views/modal/show/detail.html',
 					controller: 'showCtrl',
 					backdrop: 'static',
-					keyboard: false,
-					windowClass: 'modal-show',
-					resolve: {
-						tvdb: function(){
-							return $stateParams.showid
-						}
-					}
+					windowClass: 'modal-show'
 				}).result.then(function(result){
 					$state.transitionTo('shows');
 					window.modal = null;
@@ -370,7 +364,6 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 				if (window.modal) window.modal.dismiss()
 				window.modal = null;
 			}
-			
 		}).state('shows.match', {
 			url: '/match',
 			data: {

@@ -7,15 +7,14 @@ try{require('newrelic')} catch(e){}
 /* Set up logging to run according to the environment */
 if (!process.env.NODE_ENV) process.env.NODE_ENV = 'production';
 
-var log4js = require('log4js');
-	
+var log4js = require('log4js')
 log4js.configure({
 	appenders: [{
 		type: 'console',
 	}],
 	replaceConsole: true
 });
-var logger = global.logger = log4js.getLogger();
+var logger = global.logger = log4js.getLogger('nodetv-server');
 //logger.setLevel((process.env.NODE_ENV == 'production') ? 'WARN' : 'ALL');
 
 /***********************************************************************/
@@ -46,7 +45,10 @@ try {
 			group: 'media'
 		},
 		system: {
-			branch: 'master',
+			updates: {
+				enabled: true,
+				branch: 'master'
+			},
 			dyndns: false,
 			upnp: false
 		}
@@ -78,7 +80,7 @@ logger.info(process.title + ' v'+pkg.version);
 global.helper	= require('./server/core/helper');
 global.torrent	= plugin('transmission');
 
-global.trakt = plugin('trakt').init({
+global.trakt = require('nodetv-trakt').init({
 	username: nconf.get('trakt:username'),
 	password: nconf.get('trakt:password'),
 	apikey: nconf.get('trakt:apikey')
@@ -304,11 +306,11 @@ io.sockets.on('connection', function(socket) {
 		});
 		
 	}).on('system.restart', function(){
-		var system = plugin('system');
+		var system = require('nodetv-system');
 		system.restart()
 		
 	}).on('system.update', function(){
-		var system = plugin('system');
+		var system = require('nodetv-system');
 		system.update(function(){
 			socket.emit('system.loaded');
 		});
@@ -418,7 +420,7 @@ io.sockets.on('connection', function(socket) {
 					}
 				});
 			} catch(e){
-				console.error(e.message);
+				logger.error(e.message);
 			}
 		});
 		
@@ -443,7 +445,7 @@ io.sockets.on('connection', function(socket) {
 	}).on('download.url', function(url){
 		torrent.add(url, function(error, data){
 			if (error) {
-				console.error(error);
+				logger.error(error);
 				return;
 			}
 			socket.emit('system.alert', {
@@ -498,8 +500,8 @@ io.sockets.on('connection', function(socket) {
 	}).on('shows.unwatched', function(data){
 		var shows = plugin('showdata');
 		shows.getUnwatched(function(error, json){
-			if (error) console.error(error);
-			console.log(json);
+			if (error) logger.error(error);
+			logger.log(json);
 		});
 	});
 	
@@ -576,7 +578,7 @@ io.sockets.on('connection', function(socket) {
 		shows.getArtwork(tvdb);
 		shows.getSummary(tvdb);
 		shows.getFullListings(tvdb, function(error, tvdb){
-			if (error) console.error(error);
+			if (error) logger.error(error);
 			shows.getHashes(tvdb);
 		});
 	});

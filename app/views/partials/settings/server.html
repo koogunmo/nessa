@@ -1,30 +1,31 @@
-<div class="form-group">
+<div class="checkbox">
+	<label>
+		<input type="checkbox" id="ipt_listen_nginx" ng-model="settings.listen.nginx" />
+		<strong>Enable nginx support</strong><br />
+		<span class="small">Enable this if you are using nginx as a reverse proxy</span>
+	</label>
+</div>
+
+<div class="form-group" ng-hide="settings.listen.nginx">
 	<label for="ipt_listen_address">Server Address</label>
 	<input type="text" id="ipt_listen_address" class="form-control" placeholder="0.0.0.0" required="true" ng-model="settings.listen.address" />
 </div>
-<div class="form-group">
+<div class="form-group" ng-hide="settings.listen.nginx">
 	<label for="ipt_listen_port">Server Port</label>
 	<input type="text" id="ipt_listen_port" class="form-control" placeholder="6377" required="true" ng-model="settings.listen.port" />
 </div>
-<div class="form-group">
-	<label class="checkbox-inline">
-		<input type="checkbox" id="ipt_listen_nginx" ng-model="settings.listen.nginx" />
-		<strong>Use nginx</strong>
-	</label>
-</div>
 
-<div class="form-group">
-	<label class="checkbox-inline">
-		<input type="checkbox" id="ipt_upnp" ng-model="settings.system.upnp" />
-		<strong>Enable UPnP routing</strong>
-	</label>
-</div>
-
-<div class="form-group">
-	<label class="checkbox-inline">
+<div class="checkbox">
+	<label>
 		<input type="checkbox" id="ipt_dyndns" ng-model="settings.system.dyndns" />
-		<strong>Enable Dynamic DNS</strong>
+		<strong>Enable Dynamic DNS</strong><br />
+		<span class="small">Automatically map a URL to point to your home server</span>
 	</label>
 </div>
-
-<p>Changing these values will require restarting NodeTV</p>
+<div class="checkbox" ng-show="settings.system.dyndns">
+	<label>
+		<input type="checkbox" id="ipt_upnp" ng-model="settings.system.upnp" />
+		<strong>Enable UPnP routing</strong><br />
+		<span class="small">Automatically enable port forwarding on your router</span>
+	</label>
+</div>

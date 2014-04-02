@@ -7,7 +7,7 @@
 <div ng-if="settings.system.updates.enabled">
 	<div class="form-group">
 		<label for="ipt_system_branch">Update channel</label>
-		<select id="ipt_system_branch" ng-model="settings.system.branch" ng-options="branch.name as branch.name for branch in branches" class="form-control"></select>
+		<select id="ipt_system_branch" ng-model="settings.system.updates.branch" ng-options="branch.name as branch.name for branch in branches" class="form-control"></select>
 	</div>
 	<div class="well well-sm">NodeTV will check for system updates at 3am every night.</div>
 </div>

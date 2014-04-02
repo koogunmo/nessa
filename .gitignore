@@ -10,7 +10,8 @@ lib-cov
 
 .sass-cache
 newrelic.js
-node_modules
+node_modules/*
+!node_modules/nodetv-*
 
 docs/*.txt
 docs/*.md

@@ -14,9 +14,9 @@
 		</div>
 	</div>
 	
-	<div class="download" ng-repeat="download in results = (downloads | filter:filter) | orderBy:predicate:reverse" ng-class="{'paused': !download.status}" ui-sref="downloads.info({id: download.id})">
+	<div class="download" ng-repeat="download in results = (downloads | filter:filter) | orderBy:predicate:reverse" ng-class="{'paused': !download.status}">
 		<span class="pull-right">
-			<button type="button" class="btn btn-xs btn-info">
+			<button type="button" class="btn btn-xs btn-info" ui-sref="downloads.info({id: download.id})">
 				<span class="glyphicon glyphicon-cog"></span>
 			</button>
 		</span>

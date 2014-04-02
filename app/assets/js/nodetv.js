@@ -410,8 +410,9 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		});
 	});
 	
-	nessa.controller('showCtrl', function($scope, $modalInstance, $socket, tvdb){
+	nessa.controller('showCtrl', function($scope, $modalInstance, $socket, $stateParams){
 		window.modal = $modalInstance;
+		var tvdb = parseInt($stateParams.showid, 10);
 		
 		$socket.emit('show.summary', tvdb);
 		$socket.once('show.summary', function(json){

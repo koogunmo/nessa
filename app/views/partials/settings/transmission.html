@@ -13,10 +13,10 @@
 <div ng-if="settings.transmission.auth">
 	<div class="form-group">
 		<label for="ipt_bt_user">Username</label>
-		<input type="text" id="ipt_bt_user" class="form-control" ng-model="settings.transmission.username" />
+		<input type="text" id="ipt_bt_user" class="form-control" required="true" ng-model="settings.transmission.username" />
 	</div>
 	<div class="form-group">
 		<label for="ipt_bt_pass">Password</label>
-		<input type="password" id="ipt_bt_pass" class="form-control" ng-model="settings.transmission.password" />
+		<input type="password" id="ipt_bt_pass" class="form-control" required="true" ng-model="settings.transmission.password" />
 	</div>
 </div>
