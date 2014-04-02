@@ -1,7 +1,17 @@
 /* Scan local filesystem for shows and episodes */
 
 var fs		= require('fs'),
+	log4js	= require('log4js'),
 	path	= require('path');
+
+log4js.configure({
+	appenders: [{
+		type: 'console'
+	}],
+	replaceConsole: true
+});
+var logger = log4js.getLogger('nodetv-scanner');
+
 
 function listDirectory(path, callback) {
 	fs.readdir(path, function(error, list){
@@ -94,7 +104,7 @@ var Scanner = {
 									trakt.show.library(result.tvdb);
 								} else {
 									unmatched.update({directory: dir}, {$set: record}, {upsert: true}, function(error, result){
-										console.log('Unmatched: '+dir);
+										logger.log('Unmatched: '+dir);
 									});
 								}
 							});
@@ -154,7 +164,7 @@ var Scanner = {
 								};
 								episodeCollection.ensureIndex({tvdb: 1, season: 1, episode: 1}, function(error, index){});
 								episodeCollection.update({tvdb: tvdb, season: data.season, episode: episode}, {$set: record}, function(error, affected){
-								//	console.log(error, affected);
+								//	logger.log(error, affected);
 								});
 								library.push({
 									season: data.season,

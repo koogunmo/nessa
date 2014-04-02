@@ -1,8 +1,18 @@
 'use strict';
 
-var crypto = require('crypto'),
+var crypto	= require('crypto'),
+	log4js	= require('log4js'),
 	ObjectID = require('mongodb').ObjectID;
-	
+
+log4js.configure({
+	appenders: [{
+		type: 'console'
+	}],
+	replaceConsole: true
+});
+var logger = log4js.getLogger('nodetv-user');
+
+
 var userCollection = db.collection('user');
 
 var users = {

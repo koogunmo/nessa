@@ -1,6 +1,15 @@
 'use strict';
 
-var uuid = require('node-uuid');
+var uuid	= require('node-uuid'),
+	log4js	= require('log4js');
+
+log4js.configure({
+	appenders: [{
+		type: 'console'
+	}],
+	replaceConsole: true
+});
+var logger = log4js.getLogger('routes:login');
 
 module.exports = function(app, db){
 	app.post('/api/auth/check', function(req, res){
@@ -22,10 +31,10 @@ module.exports = function(app, db){
 		
 		var userCollection = db.collection('user');
 		userCollection.count(function(error, count){
-			if (error) console.error(error);
+			if (error) logger.error(error);
 			if (count){
 				userCollection.findOne({session: req.body.session}, function(error, result){
-					if (error) console.error(error);
+					if (error) logger.error(error);
 					if (result) {
 						response.success = true;
 						userCollection.update({_id: result._id}, {$set: {last: Date.now()}}, function(error, affected){});
@@ -57,7 +66,7 @@ module.exports = function(app, db){
 				response.success = true;
 				response.session = uuid.v4();
 				userCollection.update({_id: result._id}, {$set: {session: response.session, last: Date.now()}}, function(error, affected){
-				//	console.log(error, affected);
+				//	logger.log(error, affected);
 				});
 			}
 			res.send(response);
@@ -69,7 +78,7 @@ module.exports = function(app, db){
 			userCollection.findOne({session: req.body.session}, function(error, result){
 				result.session = null;
 				userCollection.save(result, function(error, affected){
-				//	console.log(error, affected);
+				//	logger.log(error, affected);
 				});
 			});
 		}

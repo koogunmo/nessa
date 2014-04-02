@@ -1,11 +1,21 @@
 var extend	= require('xtend'),
 	fs		= require('fs'),
+	log4js	= require('log4js'),
 	mkdirp	= require('mkdirp'),
 	parser	= new(require('xml2js')).Parser(),
 	path	= require('path'),
 	qs		= require('querystring'),
 	request	= require('request'),
 	url		= require('url');
+
+log4js.configure({
+	appenders: [{
+		type: 'console'
+	}],
+	replaceConsole: true
+});
+var logger = log4js.getLogger('nodetv-helper');
+
 
 // Common helper functions
 
@@ -50,12 +60,12 @@ exports = module.exports = {
 	},
 	
 	copyFile: function(from, to, callback) {
-		console.warn('helper.copyFile is deprecated');
+		logger.warn('helper.copyFile is deprecated');
 		return this.fileCopy(from, to, callback);
 	},
 	
 	moveFile: function(from, to, callback) {
-		console.warn('helper.moveFile is deprecated');
+		logger.warn('helper.moveFile is deprecated');
 		return this.fileMove(from, to, callback);
 	},
 	
@@ -186,7 +196,7 @@ exports = module.exports = {
 				try {
 					parser.parseString(xml, function(error, json){
 						if (error) {
-							console.error(error);
+							logger.error(error);
 							return;
 						}
 						if (!json || !json.rss.channel[0].item) return;
@@ -220,7 +230,7 @@ exports = module.exports = {
 						});
 					});
 				} catch(e){
-					console.error('XML Parser error', url, e.message);
+					logger.error('XML Parser error', url, e.message);
 				}
 			});
 		} catch(e) {

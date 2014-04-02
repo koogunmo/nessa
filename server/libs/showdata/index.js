@@ -2,10 +2,19 @@ var exec	= require('child_process').exec,
 	extend	= require('xtend'),
 	fs		= require('fs'),
 	http	= require('http'),
+	log4js	= require('log4js'),
 	mkdir	= require('mkdirp'),
 	parser	= new(require('xml2js')).Parser(),
 	request	= require('request'),
 	util	= require('util');
+
+log4js.configure({
+	appenders: [{
+		type: 'console'
+	}],
+	replaceConsole: true
+});
+var logger = log4js.getLogger('nodetv-showdata');
 
 var ObjectID = require('mongodb').ObjectID;
 
@@ -60,7 +69,7 @@ var ShowData = {
 			if (magnet) {
 				torrent.add(magnet, function(error, args){
 					if (error) return;
-				//	console.log('HASHES: %s %s', result.hash, args.hashString);
+				//	logger.log('HASHES: %s %s', result.hash, args.hashString);
 					episodeCollection.update({hash: result.hash}, {$set: {status: false, hash: args.hashString.toUpperCase()}}, function(error, affected){
 						
 					});
@@ -127,7 +136,7 @@ var ShowData = {
 			airdate: {$gt: lastweek-1, $lt: Math.round(new Date()/1000)}
 		}).toArray(function(error, results){
 			if (error){
-				console.error(error);
+				logger.error(error);
 				return;
 			}
 			var count = 0;
@@ -149,7 +158,7 @@ var ShowData = {
 			var showCollection = db.collection('show');
 			showCollection.find({status: {$exists: true}, directory: {$exists: true}}).toArray(callback);
 		} catch(e){
-			console.error(e.message);
+			logger.error(e.message);
 		}
 	},
 	
