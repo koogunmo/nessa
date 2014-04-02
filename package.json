@@ -1,6 +1,6 @@
 {
   "name": "nodetv",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "author": "Martin Purcell <martin.purcell@gmail.com>",
   "description": "NodeTV - TV Torrent Manager",
   "private": true,
@@ -10,7 +10,6 @@
   },
   "main": "./server.js",
   "dependencies": {
-    "acl": "~0.2.6",
     "connect": "^2.14.0",
     "connect-mongo": "^0.4.0",
     "express": "^3.4.8",
@@ -36,7 +35,8 @@
     "xtend": "~2.1.2"
   },
   "bundleDependencies": {
-    "nodetv-system": "0.7.0"
+    "nodetv-system": "0.7.0",
+    "nodetv-trakt": "0.7.0"
   },
   "devDependencies": {
     "grunt": "~0.4.2",

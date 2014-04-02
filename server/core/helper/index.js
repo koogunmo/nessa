@@ -154,6 +154,8 @@ exports = module.exports = {
 			token.S = helper.zeroPadding(values.season);
 			token.X = values.ext.replace(/^\./, '');
 			
+			// TO DO: fix names that look like 'Episode 01 - '
+			
 			return values.format.replace(/%(\w)/g, function(match, key){			
 				return token[key];
 			});
