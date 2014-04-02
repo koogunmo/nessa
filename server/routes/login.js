@@ -1,7 +1,8 @@
 'use strict';
 
 var uuid	= require('node-uuid'),
-	log4js	= require('log4js');
+	log4js	= require('log4js'),
+	netmask	= require('netmask').Netmask;
 
 log4js.configure({
 	appenders: [{
@@ -14,18 +15,20 @@ var logger = log4js.getLogger('routes:login');
 module.exports = function(app, db){
 	app.post('/api/auth/check', function(req, res){
 		var response = {success: false};
-		
 		if (nconf.get('security:whitelist')) {
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 			// Is there a list of allowed IPs?
-			var blocks = nconf.get('security:whitelist').split(',');
-			var netmask = require('netmask').Netmask;
-			blocks.forEach(function(mask){
-				var block = new netmask(mask);
-				if (block.contains(ip)) {
-					response.success = true;
+			if (nconf.get('security:whitelist')){
+				var blocks = nconf.get('security:whitelist').split(',');
+				if (blocks){
+					blocks.forEach(function(mask){
+						var block = new netmask(mask);
+						if (block.contains(ip)) {
+							response.success = true;
+						}
+					});
 				}
-			});
+			}
 		}
 		if (!req.body.session) return res.send(response);
 		

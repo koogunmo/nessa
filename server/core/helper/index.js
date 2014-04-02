@@ -140,12 +140,16 @@ exports = module.exports = {
 				token.E = helper.zeroPadding(values.episodes[0].episode)+'-'+helper.zeroPadding(values.episodes[values.episodes.length-1].episode);
 				var titles = [];
 				values.episodes.forEach(function(episode){
-					titles.push(episode.title.replace('/', '-'));
+					if (episode.title.indexOf('Episode') != 0) titles.push(episode.title.replace('/', '-'));
 				});
-				token.T = titles.join('; ');
+				token.T = (titles.length) ? titles.join('; ') : '';
 			} else {
 				token.E = helper.zeroPadding(values.episodes[0].episode);
-				token.T = values.episodes[0].title.replace('/', '-');
+				if (values.episodes[0].title.indexOf('Episode') != 0){
+					token.T = values.episodes[0].title.replace('/', '-');
+				} else {
+					token.T = '';
+				}
 			}
 			token.S = helper.zeroPadding(values.season);
 			token.X = values.ext.replace(/^\./, '');
