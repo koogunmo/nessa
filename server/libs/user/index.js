@@ -38,15 +38,16 @@ var users = {
 	
 	update: function(data, callback){
 		// Update or create a new user
-		var record = {};
+		var record = data;
 		
-		if (data.username) record.username = data.username;
-		if (data.password && data.passconf) {
-			if (data.password == data.passconf) {
-				record.password = crypto.createHash('sha256').update(data.password).digest('hex');
-			}
+		if (data.password && data.passconf && data.password == data.passconf) {
+			record.password = crypto.createHash('sha256').update(data.password).digest('hex');
+		} else {
+			delete record.password;
 		}
-		userCollection.update({_id: ObjectID(data._id)}, {$set: record}, {upsert: true}, function(error, count, json){
+		delete record.passconf;
+		
+		userCollection.update({_id: ObjectID(record._id)}, {$set: record}, {upsert: true}, function(error, count, json){
 			if (!error && !json.updatedExisting) {
 				
 			}

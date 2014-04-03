@@ -239,20 +239,29 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		};
 	});
 	
-	nessa.controller('userCtrl', function($scope, $socket, $modalInstance, id){
+	nessa.controller('userCtrl', function($modalInstance, $scope, $socket, $state, $stateParams){
+		window.modal = $modalInstance;
 		$scope.user = {};
-		
-		$socket.emit('system.user', id);
-		$socket.on('system.user', function(json){
-			delete json.password
-			$scope.user = json;
-		});
+		if ($stateParams.id) {
+			var id = $stateParams.id;
+			$socket.emit('system.user', id);
+			$socket.on('system.user', function(json){
+				delete json.password
+				$scope.user = json;
+			});
+		}
+		$scope.remove = function(){
+			if (confirm('Are you sure?')){
+				$socket.emit('system.user.remove', $scope.user._id);
+				$modalInstance.close();
+			}
+		};
 		$scope.save = function(){
 			$socket.emit('system.user.update', $scope.user);
 			$modalInstance.close();
 		};
 		$scope.close = function(){
-			$modalInstance.dismiss('close');
+			$modalInstance.dismiss();
 		};
 	});
 
@@ -261,8 +270,6 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		$scope.branches = [{name: 'master'},{name: 'nightly'}];
 		$scope.users = [];
 		
-		$scope.adduser = {};
-			
 		$socket.emit('system.settings');
 		$socket.on('system.settings', function(data){
 			$scope.settings = data;
@@ -273,33 +280,9 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 			$scope.users = data;
 		});
 		
-	//	$scope.addUser = function(){
-	//		$socket.emit('system.user.update', $scope.adduser);
-	//		$scope.adduser = {};
-	//	};
-		
-		$scope.userEdit = function(id){
-			// open modal
-			$modal.open({
-				templateUrl: '/views/modal/user.html',
-				controller: 'userCtrl',
-				resolve: {
-					id: function(){
-						return id;
-					}
-				}
-			});
-		};
-		
-		$scope.userRemove = function(id){
-			$socket.emit('system.user.remove', id);
-		};
-		
-		
 		$scope.save = function(){
 			$socket.emit('system.settings', $scope.settings)
 		};
-		
 		$scope.latest = function(){
 			if (confirm('This will update all show listings and artwork. NodeTV may become VERY laggy. Continue anyway?')) {
 				$socket.emit('system.latest');

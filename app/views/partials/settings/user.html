@@ -1,0 +1,21 @@
+<table class="table table-stripe table-hover">
+	<thead>
+		<tr>
+			<th class="col-sm-3">Username</th>
+			<th class="col-sm-8">&nbsp;</th>
+			<th class="col-sm-1">&nbsp;</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="user in users" ui-sref="settings.user.edit({id: user._id})">
+			<td>{{user.username}}</td>
+			<td>&nbsp;</td>
+			<td align="right">
+				<span class="glyphicon glyphicon-edit"></span>
+			</td>
+		</tr>
+	</tbody>
+</table>
+<button type="button" class="btn btn-success" ui-sref="settings.user.add">
+	<span class="glyphicon glyphicon-plus"></span> Add User
+</button>

@@ -374,8 +374,7 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 				$modal.open({
 					templateUrl: '/views/modal/show/match.html',
 					controller: 'matchCtrl',
-					backdrop: 'static',
-					keyboard: false
+					backdrop: 'static'
 				}).result.then(function(result){
 					$state.transitionTo('shows');
 					window.modal = null;
@@ -395,6 +394,47 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 			data: {
 				secure: true,
 				title: 'Settings'
+			}
+		}).state('settings.user', {
+			abstract: true,
+			url: '/user'
+		}).state('settings.user.add', {
+			url: '/add',
+			onEnter: function($modal, $state){
+				$modal.open({
+					templateUrl: '/views/modal/user.html',
+					controller: 'userCtrl',
+					backdrop: 'static'
+				}).result.then(function(result){
+					$state.transitionTo('settings');
+					window.modal = null;
+				}, function(result){
+					$state.transitionTo('settings');
+					window.modal = null;				
+				});
+			},
+			onExit: function(){
+				if (window.modal) window.modal.dismiss();
+				window.modal = null;
+			}
+		}).state('settings.user.edit', {
+			url: '/edit/{id:[0-9a-f]{24}}',
+			onEnter: function($modal, $state){
+				$modal.open({
+					templateUrl: '/views/modal/user.html',
+					controller: 'userCtrl',
+					backdrop: 'static'
+				}).result.then(function(result){
+					$state.transitionTo('settings');
+					window.modal = null;
+				}, function(result){
+					$state.transitionTo('settings');
+					window.modal = null;				
+				});
+			},
+			onExit: function(){
+				if (window.modal) window.modal.dismiss();
+				window.modal = null;
 			}
 		});
 	});

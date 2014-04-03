@@ -14,7 +14,7 @@ body {
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
 	display: none !important;
 }
-.accordion-toggle, .nav, .pagination, .carousel a {
+.accordion-toggle, .nav, .pagination, .carousel a, [ui-sref] {
 	cursor: pointer;
 }
 

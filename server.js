@@ -87,10 +87,9 @@ global.trakt = require('nodetv-trakt').init({
 });
 
 var app		= express(),
-	server	= app.listen(nconf.get('listen:port')), //, nconf.get('listen:address')),
+	server	= app.listen((nconf.get('listen:nginx')) ? 6377 : nconf.get('listen:port'), nconf.get('listen:address')),
 	io		= require('socket.io').listen(server, {
-		'browser client gzip': true,
-		'browser client minification': true,
+		'browser client': false,
 		'log level': 1
 	});
 	
@@ -100,17 +99,15 @@ server.on('listening', function(){
 });
 	
 /* Change ownership of the process */
-/* Doing it here allows us to run NodeTV on port 80, if required */
 if (process.getuid) {
 	try {
+		process.env['HOME'] = process.cwd();
 		if (nconf.get('run:group')) process.setgid(nconf.get('run:group'));
 		if (nconf.get('run:user')) process.setuid(nconf.get('run:user'));
-		process.env['HOME'] = process.cwd();
 	} catch(e) {
 		logger.warn(e.message);
 	}
 }
-
 
 app.configure(function(){
 	app.use(connect.compress());

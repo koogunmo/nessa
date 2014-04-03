@@ -22,50 +22,14 @@
 			</tab>
 			
 			<tab heading="Security">
-				<div class="panel panel-info" >
-					<div class="panel-heading">
-						<h4 class="panel-title">Users</h4>
-					</div>
-					
-					<div class="panel-body">
-						<table class="table table-stripe table-hover">
-							<thead>
-								<tr>
-									<th class="col-sm-3">Username</th>
-									<th class="col-sm-8">Privileges</th>
-									<th class="col-sm-1">&nbsp;</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr ng-repeat="user in users">
-									<td>{{user.username}}</td>
-									<td>
-										<span ng-repeat="role in user.roles">{{role}}</span>
-									</td>
-									<td align="right">
-										<button type="button" class="btn btn-xs btn-warning" ng-click="userEdit(user._id)"><span class="glyphicon glyphicon-edit"></span></button>
-										<button type="button" class="btn btn-xs btn-danger" ng-click="userRemove(user._id)"><span class="glyphicon glyphicon-trash"></span></button>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-						<button type="button" class="btn btn-success" ng-click="userEdit()"><span class="glyphicon glyphicon-plus"></span> Add User</button>
-					</div>
-				</div>
-				<div class="panel panel-info">
-					<div class="panel-heading">
-						<h4 class="panel-title">Network Security</h4>
-					</div>
-					<div class="panel-body">
-						<div class="form-group">
-							<label for="ipt_security_whitelist">IP Whitelist</label>
-							<input type="text" id="ipt_security_whitelist" ng-model="settings.security.whitelist" class="form-control" />
-						</div>
-						<div class="well">
-							Users from the allowed IP ranges will not be required to log in.
-						</div>
-					</div>
-				</div>
+				<accordion>
+					<accordion-group heading="Users" class="panel-info">
+						<div ng-include="'/views/partials/settings/user.html'"></div>
+					</accordion-group>
+					<accordion-group heading="Network" class="panel-info">
+						<div ng-include="'/views/partials/settings/network.html'"></div>
+					</accordion-group>
+				</accordion>
 			</tab>
 			<tab heading="System">
 				<accordion close-others="true">
