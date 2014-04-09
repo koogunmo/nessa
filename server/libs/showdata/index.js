@@ -68,12 +68,16 @@ var ShowData = {
 			var magnet = helper.createMagnet(result.hash);
 			if (magnet) {
 				torrent.add(magnet, function(error, args){
-					if (error) return;
-				//	logger.log('HASHES: %s %s', result.hash, args.hashString);
-					episodeCollection.update({hash: result.hash}, {$set: {status: false, hash: args.hashString.toUpperCase()}}, function(error, affected){
-						
-					});
-				//	if (typeof(callback) == 'function') callback(error, args);
+					if (error) {
+						console.error(error);
+						return;
+					}
+					if (args){
+						episodeCollection.update({hash: result.hash}, {$set: {status: false, hash: args.hashString.toUpperCase()}}, function(error, affected){
+							console.log(error, affected);
+						});
+					//	if (typeof(callback) == 'function') callback(error, args);
+					}
 				});
 			}
 		});
@@ -404,8 +408,6 @@ var ShowData = {
 							if (!episode.hash) insert = true;
 							if (json.repack && json.hash != episode.hash) {
 								try {
-									// TODO: log old hashes to db document
-									// Only likely to happen IF the episode has multiple repacks
 									torrent.repacked(episode.hash);
 									self.deleteEpisode(show.tvdb, json.season, json.episodes);
 									insert = true;
@@ -420,18 +422,20 @@ var ShowData = {
 								tvdb: show.tvdb,
 								season: json.season,
 								episode: {$in: json.episodes}
-							}, {$set: {hash: json.hash}}, function(error, affected){
-								if (error) return;
-							});
+							}, {$set: {hash: json.hash}}, {w: 0});
 						}
-						
 						if (obtain) {
 							var magnet = helper.createMagnet(json.hash);
 							torrent.add(magnet, function(error, args){
 								if (error) return;
-								episodeCollection.update({hash: json.hash}, {$set: {status: false}}, function(error, affected){
-									if (error) return;
-								});
+								if (args){
+									episodeCollection.update({hash: json.hash}, {
+										$set: {
+											hash: args.hashString.toUpperCase(),
+											status: false
+										}
+									}, {w: 0});
+								}
 							});
 							self.getFullListings(show.tvdb);
 						} 
@@ -562,9 +566,7 @@ var ShowData = {
 					}
 				});
 				var update = {file: '', status: ''};
-				episodeCollection.update(where, {$unset: update}, function(error, affected){
-					if (error) return;
-				});
+				episodeCollection.update(where, {$unset: update}, {w: 0});
 			});
 		});
 	},
