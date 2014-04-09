@@ -73,9 +73,12 @@ var ShowData = {
 						return;
 					}
 					if (args){
-						episodeCollection.update({hash: result.hash}, {$set: {status: false, hash: args.hashString.toUpperCase()}}, function(error, affected){
-							console.log(error, affected);
-						});
+						episodeCollection.update({hash: result.hash}, {
+							$set: {
+								hash: args.hashString.toUpperCase(),
+								status: false
+							}
+						}, {w: 0});
 					//	if (typeof(callback) == 'function') callback(error, args);
 					}
 				});
