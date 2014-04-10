@@ -87,7 +87,11 @@ global.trakt = require('nodetv-trakt').init({
 });
 
 var app		= express(),
-	server	= app.listen((nconf.get('listen:nginx')) ? 6377 : nconf.get('listen:port'), nconf.get('listen:address')),
+	listen	= {
+		host: (nconf.get('listen:nginx')) ? '127.0.0.1' : nconf.get('listen:address'),
+		port: (nconf.get('listen:nginx')) ? 6377 : nconf.get('listen:port')
+	},
+	server	= app.listen(listen.port, listen.host),
 	io		= require('socket.io').listen(server, {
 		'browser client': false,
 		'log level': 1

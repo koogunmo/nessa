@@ -15,7 +15,8 @@
 	</div>
 	<div class="row">
 		<div class="show col-sm-2" ng-repeat="show in results = (shows | filter:filter) | orderBy:'name'">
-			<div class="image" title="{{show.name}}">
+			<div class="image" title="{{show.name}}" ng-class="{'ended': show.ended}">
+				<div class="corner"></div>
 				<a href="/shows/{{show.tvdb}}">
 					<img data-src="/media/{{settings.shows.directory}}/{{show.directory}}/poster.jpg" alt="" class="img-responsive" />
 					<h6>{{show.name}}</h6>

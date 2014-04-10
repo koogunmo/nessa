@@ -315,6 +315,24 @@ input.form-control+input.form-control {
 	}
 	div.image {
 		display: none;
+		.corner {
+			display: none;
+			height: 25px;
+			position: absolute;
+			right: 0px;
+			top: 0px;
+			width: 25px;
+			z-index: 2;
+		}
+		&.ended {
+			.corner {
+				background-image: url('../gfx/icons/ended.png');
+				background-position: left top;
+				background-repeat: no-repeat;
+				background-size: contain;
+				display: block;
+			}
+		}
 	}
 	h6 {
 		box-sizing: border-box;
