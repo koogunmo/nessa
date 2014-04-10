@@ -129,6 +129,16 @@ input.form-control+input.form-control {
 /* Dashboard */
 
 #dashboard {
+	h3 {
+		.badge {
+			vertical-align: top;
+		}
+	}
+	.panel.date {
+		h4 {
+			text-align: center;
+		}
+	}
 	
 	.panel {
 		&.panel-success {
