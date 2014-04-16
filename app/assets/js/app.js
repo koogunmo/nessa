@@ -170,7 +170,28 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 			return (bytes / Math.pow(1024, Math.floor(number))).toFixed(precision) +  ' ' + units[number];
 		}
 	});
-	
+	/*
+	app.directive('lazySrc', function($document, $window){
+		return {
+			restrict: 'A',
+			link: function(scope, element, attrs){
+				if (attrs.src) return;
+				var src = attrs.lazySrc;
+				var offset = element.parents('.ng-scope').offset();
+				var lazyLoad = function(){
+					var visible = $document.scrollTop() + $window.innerHeight;
+					if (offset.top < visible){
+						element.attr('src', src).bind('load', function(){
+							element.addClass('lazy-loaded');
+						});
+					}
+				}
+				angular.element(document).bind('scroll', lazyLoad);
+				lazyLoad();
+			}
+		}
+	});
+	*/
 	app.config(function($stateProvider, $urlRouterProvider, $locationProvider, $httpProvider){
 		$locationProvider.html5Mode(true).hashPrefix('!');
 		

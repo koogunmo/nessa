@@ -513,14 +513,11 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		
 		setTimeout(function(){
 			$('div.image img[data-src]').one('load', function(){
-				$(this).siblings('h6').hide();
-				$(this).fadeIn();
-				
+				$(this).addClass('lazy-loaded');
 			}).each(function(){
 				if ($(this).attr('src')) return;
 				var offset = $(this).parents('div.image').offset()
 				if (offset.top < height+top) {
-					
 					$(this).attr({
 						src: $(this).data('src')
 					});

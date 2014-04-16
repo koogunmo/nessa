@@ -385,7 +385,7 @@ var ShowData = {
 		// Check each of the feeds for new episodes
 		showCollection.find({
 			status: true,
-			ended: {$exists: false},
+		//	ended: {$exists: false},
 			feed: {$exists: true, $ne: null}
 		}).toArray(function(error, shows){
 			if (error || !shows) return;
@@ -507,12 +507,10 @@ var ShowData = {
 				show.name = json.title;
 				show.imdb = json.imdb_id;
 				show.synopsis = json.overview;
-				
 				if (json.status == 'Ended') {
 					show.ended = true;
-					if (show.status === true) show.status = false;
+				//	if (show.status === true) show.status = false;
 				}
-				
 				showCollection.save(show, function(error, result){
 					if (typeof(callback) == 'function') callback(error, tvdb);
 				});
