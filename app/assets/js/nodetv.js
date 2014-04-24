@@ -488,7 +488,7 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		};
 		
 		$scope.hasAired = function(){
-			return ($scope.episode.airdate && $scope.episode.airdate*1000 < new Date().getTime());
+			return (!!$scope.episode.file || $scope.episode.airdate && $scope.episode.airdate*1000 < new Date().getTime());
 		};
 	});
 	
