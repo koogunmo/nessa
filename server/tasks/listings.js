@@ -12,6 +12,7 @@ try {
 			if (error || !results) return;
 			results.forEach(function(show){
 				shows.getArtwork(show.tvdb);
+				shows.getProgresss(show.tvdb);
 				shows.getSummary(show.tvdb, function(error, tvdb){
 					shows.getFullListings(tvdb);
 					shows.getHashes(tvdb);

@@ -8,6 +8,16 @@
 				<div class="synopsis well">
 					{{summary.synopsis || 'No synopsis available'}}
 				</div>
+				<div ng-if="summary.progress">
+					<hr />
+					<p>Watched {{summary.progress.completed}} of {{summary.progress.aired}} episodes</p>
+					<progress animate="false">
+						<bar type="success" value="summary.progress.percentage">
+							<span ng-hide="summary.progress.percentage<=5">{{summary.progress.percentage}}%</span>
+						</bar>
+						<bar type="danger" value="100-summary.progress.percentage"></bar>
+					</progress>
+				</div>
 			</tab>
 			<tab heading="Episodes">
 				<accordion class="seasons">

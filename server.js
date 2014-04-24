@@ -578,6 +578,7 @@ io.sockets.on('connection', function(socket) {
 		var shows = plugin('showdata');
 		shows.getArtwork(tvdb);
 		shows.getSummary(tvdb);
+		shows.getProgress(tvdb);
 		shows.getFullListings(tvdb, function(error, tvdb){
 			if (error) logger.error(error);
 			shows.getHashes(tvdb);

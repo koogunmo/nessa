@@ -448,6 +448,29 @@ var ShowData = {
 		});
 	},
 	
+	getProgress: function(tvdb, callback){
+		var self = this;
+		var showCollection = db.collection('show');
+		var episodeCollection = db.collection('episode');
+		showCollection.findOne({tvdb: tvdb}, function(error, result){
+			if (error){
+				console.error(error);
+				return;
+			}
+			if (result){
+				trakt.user.progress.watched(result.tvdb, function(error, response){
+					if (error) {
+						console.error(error);
+						return;
+					}
+					if (response){
+						showCollection.update({tvdb: result.tvdb}, {$set: {progress: response[0].progress, seasons: response[0].seasons}}, {w:0});
+					}
+				});
+			}
+		});
+	},
+	
 	getShowlist: function(callback){
 		var self = this;
 		var showCollection = db.collection('show');
