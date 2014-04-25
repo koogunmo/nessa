@@ -6,18 +6,23 @@ try {
 	function updateListings(){
 		// Update show listings
 		shows.getShowlist();
-		// Update show information (synopsis, artwork, etc)
+		// Update existing show information (synopsis, artwork, etc)
 		var showCollection = db.collection('show');
 		showCollection.find({status: {$exists: true}}).toArray(function(error, results){
-			if (error || !results) return;
-			results.forEach(function(show){
-				shows.getArtwork(show.tvdb);
-				shows.getProgresss(show.tvdb);
-				shows.getSummary(show.tvdb, function(error, tvdb){
-					shows.getFullListings(tvdb);
-					shows.getHashes(tvdb);
+			if (error){
+				console.error(error);
+				return;
+			}
+			if (results){
+				results.forEach(function(show){
+					shows.getArtwork(show.tvdb);
+					shows.getProgress(show.tvdb);
+					shows.getSummary(show.tvdb, function(error, tvdb){
+						shows.getFullListings(tvdb);
+						shows.getHashes(tvdb);
+					});
 				});
-			});
+			}
 		});
 	}
 	
