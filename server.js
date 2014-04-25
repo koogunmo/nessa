@@ -283,6 +283,7 @@ io.sockets.on('connection', function(socket) {
 		showCollection.find({status: {$exists: true}}).toArray(function(error, results){
 			results.forEach(function(show){
 				shows.getArtwork(show.tvdb);
+				shows.getProgress(show.tvdb);
 				shows.getFullListings(show.tvdb, function(error, tvdb){
 					shows.getHashes(show.tvdb);
 				});
