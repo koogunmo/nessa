@@ -452,7 +452,7 @@ var ShowData = {
 		var self = this;
 		var showCollection = db.collection('show');
 		var episodeCollection = db.collection('episode');
-		showCollection.findOne({tvdb: tvdb}, function(error, result){
+		showCollection.findOne({tvdb: parseInt(tvdb, 10)}, function(error, result){
 			if (error){
 				console.error(error);
 				return;
@@ -463,7 +463,7 @@ var ShowData = {
 						console.error(error);
 						return;
 					}
-					if (response){
+					if (response.length){
 						showCollection.update({tvdb: result.tvdb}, {$set: {progress: response[0].progress, seasons: response[0].seasons}}, {w:0});
 					}
 				});
