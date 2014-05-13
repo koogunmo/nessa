@@ -268,7 +268,7 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 		}).state('dashboard', {
 			url: '/dashboard',
 			controller: 'homeCtrl',
-			templateUrl: '/views/partials/dashboard.html',
+			templateUrl: 'views/partials/dashboard.html',
 			data: {
 				secure: true,
 				title: 'Home'
@@ -276,7 +276,7 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 		}).state('downloads', {
 			url: '/downloads',
 			controller: 'downloadsCtrl',
-			templateUrl: '/views/partials/downloads.html',
+			templateUrl: 'views/partials/downloads.html',
 			data: {
 				secure: true,
 				title: 'Downloads'
@@ -289,7 +289,7 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 			onEnter: function($state, $modal){
 				$modal.open({
 					controller: 'downloadAddCtrl',
-					templateUrl: '/views/modal/download/add.html'
+					templateUrl: 'views/modal/download/add.html'
 				}).result.then(function(result){
 					$state.transitionTo('downloads');
 					window.modal = null;
@@ -310,7 +310,7 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 			onEnter: function($state, $stateParams, $modal){
 				$modal.open({
 					controller: 'downloadCtrl',
-					templateUrl: '/views/modal/download/settings.html'
+					templateUrl: 'views/modal/download/settings.html'
 				}).result.then(function(result){
 					$state.transitionTo('downloads');
 					window.modal = null;
@@ -326,7 +326,7 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 		}).state('install', {
 			url: '/install',
 			controller: 'installCtrl',
-			templateUrl: '/views/partials/install.html',
+			templateUrl: 'views/partials/install.html',
 			data: {
 				secure: false,
 				title: 'Install'
@@ -334,7 +334,7 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 		}).state('shows', {
 			url: '/shows',
 			controller: 'showsCtrl',
-			templateUrl: '/views/partials/shows.html',
+			templateUrl: 'views/partials/shows.html',
 			data: {
 				secure: true,
 				title: 'Shows'
@@ -346,7 +346,7 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 			},
 			onEnter: function($state, $stateParams, $modal){
 				$modal.open({
-					templateUrl: '/views/modal/show/search.html',
+					templateUrl: 'views/modal/show/search.html',
 					controller: 'searchCtrl',
 					windowClass: 'modal-add'
 				}).result.then(function(result){
@@ -369,7 +369,7 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 			},
 			onEnter: function($modal, $state, $stateParams){
 				$modal.open({
-					templateUrl: '/views/modal/show/detail.html',
+					templateUrl: 'views/modal/show/detail.html',
 					controller: 'showCtrl',
 					backdrop: 'static',
 					windowClass: 'modal-show'
@@ -393,7 +393,7 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 			},
 			onEnter: function($modal, $state){
 				$modal.open({
-					templateUrl: '/views/modal/show/match.html',
+					templateUrl: 'views/modal/show/match.html',
 					controller: 'matchCtrl',
 					backdrop: 'static'
 				}).result.then(function(result){
@@ -411,7 +411,7 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 		}).state('settings', {
 			url: '/settings',
 			controller: 'settingsCtrl',
-			templateUrl: '/views/partials/settings.html',
+			templateUrl: 'views/partials/settings.html',
 			data: {
 				secure: true,
 				title: 'Settings'
@@ -423,7 +423,7 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 			url: '/add',
 			onEnter: function($modal, $state){
 				$modal.open({
-					templateUrl: '/views/modal/user.html',
+					templateUrl: 'views/modal/user.html',
 					controller: 'userCtrl',
 					backdrop: 'static'
 				}).result.then(function(result){
@@ -442,7 +442,7 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 			url: '/edit/{id:[0-9a-f]{24}}',
 			onEnter: function($modal, $state){
 				$modal.open({
-					templateUrl: '/views/modal/user.html',
+					templateUrl: 'views/modal/user.html',
 					controller: 'userCtrl',
 					backdrop: 'static'
 				}).result.then(function(result){
