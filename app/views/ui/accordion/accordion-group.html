@@ -1,8 +1,7 @@
 <div class="panel panel-default">
-	<div class="panel-heading" ng-click="isOpen=!isOpen">
-		<span class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': !isOpen, 'glyphicon-chevron-up': isOpen}"></span>
+	<div class="panel-heading" ng-click="toggleOpen()">
 		<h4 class="panel-title">
-			<a class="accordion-toggle" accordion-transclude="heading">{{heading}}</a>
+			<a class="accordion-toggle" accordion-transclude="heading"><span ng-class="{'text-muted': isDisabled}">{{heading}}</span></a>
 		</h4>
 	</div>
 	<div class="panel-collapse" collapse="!isOpen">
