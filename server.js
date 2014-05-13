@@ -621,13 +621,15 @@ io.sockets.on('connection', function(socket) {
 		var showCollection = db.collection('show');
 		var episodeCollection = db.collection('episode');
 		
-		showCollection.findOne({tvdb: data.tvdb}, function(error, show){
+		showCollection.findOne({tvdb: parseInt(data.tvdb, 10)}, function(error, show){
 			if (error) return;
 			if (typeof(show.trakt) == 'undefined') show.trakt = true;
 			if (data.watched) {
 				episodeCollection.update({tvdb: show.tvdb, season: data.season, episode: data.episode}, {$set: {watched: true}}, function(error, affected){
 					if (error) return;
-					if (show.trakt) trakt.show.episode.seen(data.tvdb, data.season, data.episode);
+					if (show.trakt) {
+						trakt.show.episode.seen(data.tvdb, data.season, data.episode);
+					}
 				});
 			} else {
 				episodeCollection.update({tvdb: show.tvdb, season: data.season, episode: data.episode}, {$set: {watched: false}}, function(error, affected){
