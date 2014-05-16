@@ -199,7 +199,7 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 			// Initialize a new promise
 			var deferred = $q.defer();
 			// Make an AJAX call to check if installer has been run
-			$http.get('/installed').success(function(response){
+			$http.get('/api/installed').success(function(response){
 				if (response.installed) {
 					$timeout(deferred.resolve, 0);
 				} else {

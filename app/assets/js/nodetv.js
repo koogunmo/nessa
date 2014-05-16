@@ -123,7 +123,7 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		$socket.emit('download.list');
 	});
 		
-	nessa.controller('downloadAddCtrl', function($scope, $socket, $modalInstance){
+	nessa.controller('downloadAddCtrl', function($modalInstance, $scope, $socket){
 		window.modal = $modalInstance;
 		$scope.close = function(){
 			$modalInstance.close();
@@ -134,7 +134,7 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		};
 	});
 
-	nessa.controller('downloadCtrl', function($modalInstance, $scope, $socket, $state, $stateParams){
+	nessa.controller('downloadCtrl', function($http, $modalInstance, $scope, $socket, $state, $stateParams){
 		$scope.torrent = {};
 		// fetch info
 		
@@ -145,8 +145,14 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		});
 		$scope.remove = function(){
 			if (confirm('Are you sure you want to delete this torrent?')) {
+				/*
+				$http.delete('/api/downloads/'+$scope.torrent.id).success(function(json, status){
+					$modalInstance.dismiss('close');
+				}).error(function(json, status){
+					console.error(json,status);
+				});
+				*/
 				$socket.emit('download.remove', {id: $scope.torrent.id, purge: true});
-				$modalInstance.dismiss('close');
 			}
 		};
 		$scope.toggle = function(){
@@ -333,9 +339,10 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		$socket.emit('movies.list');
 	});
 	
-	nessa.controller('showsCtrl', function($scope, $rootScope, $socket){
+	nessa.controller('showsCtrl', function($http, $rootScope, $scope, $socket){
 		
-		$scope.settings	= {};
+		$scope.settings = {};
+		$scope.shows	= [];
 		
 		$scope.clearFilter = function(){
 			$scope.filter.name = '';
@@ -348,24 +355,29 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 			$rootScope.settings = data;
 		});
 		
-		$socket.on('show.added', function(){
-			$socket.emit('shows.list');
+//		$socket.on('show.added', function(){
+//			$socket.emit('shows.list');
+//		});
+		
+		$http({
+			url: '/api/shows',
+			method: 'GET',
+			responseType: 'json'
+		}).success(function(json, status){
+			if (status == 200 && json) {
+				$scope.shows = json;
+				$(document).trigger('lazyload');
+			}
+		}).error(function(json, status){
+			// 
 		});
-		
-		$socket.emit('shows.list');
-		
 	});
 	
-	nessa.controller('searchCtrl', function($scope, $modalInstance, $socket){
+	nessa.controller('searchCtrl', function($http, $modalInstance, $scope, $socket){
 		$scope.selected = null;
 		$scope.search = {
 			query: ''
 		};
-		
-		$socket.on('shows.search', function(results){
-			$scope.results = results;
-			// TODO: clear selected if not in results
-		});
 		$scope.close = function(){
 			$modalInstance.close();
 		};
@@ -377,8 +389,12 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 			$scope.selected = tvdb;
 		};
 		$scope.save = function(){
-			$socket.emit('show.add', $scope.selected);
-			$modalInstance.close();
+			$http.post('/api/shows', {tvdb: $scope.selected}).success(function(json, status){
+				$modalInstance.close();
+				
+			}).error(function(json, status){
+				console.error(json, status);
+			});
 		};
 		
 		var delaySearch = null;
@@ -387,44 +403,64 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 			$scope.results = [];
 			if ($scope.search.query.length >= 4) {
 				delaySearch = setTimeout(function(){
-					$socket.emit('shows.search', $scope.search.query);
-				}, 500);
+					$http.post('/api/shows/search', {q: $scope.search.query}).success(function(results, status){
+						$scope.results = results;
+						
+					}).error(function(json, status){
+						console.error(json, status);
+					});
+				}, 600);
 			}
 		});
 	});
 	
-	nessa.controller('showCtrl', function($scope, $modalInstance, $socket, $stateParams){
+	nessa.controller('showCtrl', function($http, $modalInstance, $scope, $socket, $stateParams){
 		window.modal = $modalInstance;
-		var tvdb = parseInt($stateParams.showid, 10);
 		
-		$socket.emit('show.summary', tvdb);
-		$socket.once('show.summary', function(json){
-			if (typeof(json.summary.trakt) == 'undefined') json.summary.trakt = true;
-			$scope.summary = json.summary;
-			$scope.listing = json.listing;
-			$scope.total = json.total;
+		var tvdb = parseInt($stateParams.showid, 10);
+		$http.get('/api/shows/'+tvdb).success(function(json, status){
+			if (status == 200 && json) {
+				$scope.summary = json.summary;
+				$scope.listing = json.listing;
+				$scope.total = json.total;
+			}
+		}).error(function(json, status){
+			console.error(json, status);
+			$scope.close();
 		});
 		
 		$scope.close = function(){
 			$modalInstance.close();
 		};
 		$scope.rescan = function(){
-			$socket.emit('show.rescan', tvdb);
-			$modalInstance.close();
+			$http.get('/api/shows/'+tvdb+'/rescan').success(function(json, status){
+				$modalInstance.close();
+			}).error(function(json, status){
+				console.error(json, status);
+			});
 		};
 		$scope.remove = function(){
 			if (confirm('Are you sure you want to remove this show?')) {
-				$socket.emit('show.remove', tvdb);
-				$modalInstance.close();
+				$http.delete('/api/shows/'+tvdb).success(function(){
+					$modalInstance.close();
+				}).error(function(json, status){
+					console.error(json, status);
+				});
 			}
 		};
 		$scope.save = function(){
-			$socket.emit('show.settings', $scope.summary);
-			$modalInstance.close();
+			$http.post('/api/shows/'+tvdb, $scope.summary).success(function(json, status){
+				$modalInstance.close();
+			}).error(function(json, status){
+				console.error(json, status);
+			});
 		};
 		$scope.update = function(){
-			$socket.emit('show.update', tvdb);
-			$modalInstance.close();
+			$http.get('/api/shows/'+tvdb+'/update').success(function(json, status){
+				$modalInstance.close();
+			}).error(function(json, status){
+				console.error(json, status);
+			});
 		};
 		$scope.watched = function(){
 		//	$socket.emit('show.watched', {tvdb: tvdb});
