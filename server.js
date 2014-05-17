@@ -65,8 +65,7 @@ try {
 /***********************************************************************/
 /* Load dependencies */
 
-var connect	= require('connect'),
-	crypto	= require('crypto'),
+var	crypto	= require('crypto'),
 	express	= require('express'),
 	fs		= require('fs'),
 	path	= require('path');
@@ -112,18 +111,21 @@ if (process.getuid) {
 	}
 }
 
-app.configure(function(){
-	app.use(connect.compress());
-	app.use(express.cookieParser());
-	app.use(express.urlencoded());
-	app.use(express.json());
-	if (!nconf.get('listen:nginx')){
-		app.use('/assets', express.static(process.cwd() + '/app/assets'));
-		app.use('/template', express.static(process.cwd() + '/app/views/ui'));
-		app.use('/views', express.static(process.cwd() + '/app/views'));
-	}
-	app.enable('view cache');
-});
+/* Set up Express */
+var bodyParser	= require('body-parser'),
+	cookieParser = require('cookie-parser'),
+	compress	= require('compression');
+	
+app.use(compress());
+app.use(cookieParser());
+app.use(bodyParser());
+
+if (!nconf.get('listen:nginx')){
+	app.use('/assets', express.static(process.cwd() + '/app/assets'));
+	app.use('/template', express.static(process.cwd() + '/app/views/ui'));
+	app.use('/views', express.static(process.cwd() + '/app/views'));
+}
+app.enable('view cache');
 
 /* MongoDB */
 try {
@@ -153,29 +155,26 @@ try {
 				});
 			}
 			
-			app.configure(function(){
-				if (nconf.get('media:base') && !nconf.get('listen:nginx')){
-					app.use('/media', express.static(nconf.get('media:base')));
-				}
-				app.use(app.router);
+			if (nconf.get('media:base') && !nconf.get('listen:nginx')){
+				app.use('/media', express.static(nconf.get('media:base')));
+			}
+			
+		//	io.sockets.on('connection', function(socket){
+				var socket = false;
+				/* Load socket listeners */
+		//		require('./server/routes/sockets')(app,db,socket);
+				/* Load routes */
+				require('./server/routes/default')(app,db,socket);
+				require('./server/routes/downloads')(app,db,socket);
+				require('./server/routes/login')(app,db,socket);
+			//	require('./server/routes/movies')(app,db,socket);
+				require('./server/routes/shows')(app,db,socket);
+				require('./server/routes/system')(app,db,socket);
 				
-				io.sockets.on('connection', function(socket){
-					/* Load socket listeners */
-					require('./server/routes/sockets')(app,db,socket);
-						
-					/* Load routes */
-					require('./server/routes/default')(app,db,socket);
-					require('./server/routes/downloads')(app,db,socket);
-					require('./server/routes/login')(app,db,socket);
-				//	require('./server/routes/movies')(app,db,socket);
-					require('./server/routes/shows')(app,db,socket);
-					require('./server/routes/system')(app,db,socket);
-				});
-				/* Default route */
 				app.use(function(req, res) {	
 					res.sendfile(process.cwd() + '/app/views/index.html');
 				});
-			});
+		//	});
 			
 			/* Load tasks */
 			if (nconf.get('installed')) {
@@ -203,7 +202,7 @@ try {
 	} else {
 		nconf.set('installed', false);
 		logger.warn('Waiting for install.');
-		app.use(app.router);
+//		app.use(app.router);
 		app.use(function(req, res) {
 			res.sendfile(process.cwd() + '/app/views/index.html');
 		});

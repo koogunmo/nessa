@@ -1,11 +1,23 @@
 'use strict';
 
+var log4js	= require('log4js');
+log4js.configure({
+	appenders: [{
+		type: 'console'
+	}],
+	replaceConsole: true
+});
+var logger = log4js.getLogger('routes:system');
+
 module.exports = function(app, db, socket){
 	
-	app.get('/api/system', function(req,res){
+	var system	= require('nodetv-system'),
+		users	= plugin('user');
+	
+	
+	app.get('/api/system/settings', function(req,res){
 		res.send(nconf.get());
-		
-	}).post('/api/system', function(req,res){
+	}).post('/api/system/settings', function(req,res){
 		for (var i in json) {
 			nconf.set(i, json[i]);
 		}
@@ -33,14 +45,36 @@ module.exports = function(app, db, socket){
 			}
 			*/
 		});
+	}).post('/api/system', function(req,res){
+		if (req.body.action){
+			switch (req.body.action){
+				case 'latest':
+					break;
+				case 'listings':
+					break;
+				case 'rescan':
+					break;
+				case 'restart':
+					system.restart();
+					break;
+				case 'update':
+					system.update();
+					break;
+			}
+			console.log(req.body.action);
+		}
 	});
 	
 	
 	app.get('/api/users', function(req,res){
 		// List users
+		users.list(function(error, json){
+			res.send(json);
+		});
 		
 	}).post('/api/users', function(req,res){
 		// Create user
+		
 		
 	});
 	

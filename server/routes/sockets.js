@@ -1,5 +1,4 @@
 module.exports = function(app,db,socket){
-	
 	var uuid	= require('node-uuid');
 	
 	try {
@@ -36,34 +35,7 @@ module.exports = function(app,db,socket){
 	/*************** New Socket methods ***************/
 	
 	// System
-	socket.on('system.settings', function(json, callback){
-		if (json) {
-			for (var i in json) {
-				nconf.set(i, json[i]);
-			}
-			nconf.save(function(error){
-				if (error) {
-					socket.emit('system.alert', {
-						type: 'danger',
-						message: 'Settings were not saved'
-					});
-					return;
-				}
-				socket.emit('system.alert', {
-					type: 'success',
-					message: 'Settings saved',
-					autoClose: 2500
-				});
-				// Update media path
-				if (!nconf.get('listen:nginx')){
-					app.use('/media', express.static(nconf.get('media:base')));
-				}
-				if (typeof(callback) == 'function') callback();
-			});
-		}
-		socket.emit('system.settings', nconf.get());
-		
-	}).on('system.latest', function(){
+	socket.on('system.latest', function(){
 		var shows = plugin('showdata');
 		shows.getLatest();
 		socket.emit('system.alert', {
@@ -103,15 +75,6 @@ module.exports = function(app,db,socket){
 			});
 		});
 		
-	}).on('system.restart', function(){
-		var system = require('nodetv-system');
-		system.restart()
-		
-	}).on('system.update', function(){
-		var system = require('nodetv-system');
-		system.update(function(){
-			socket.emit('system.loaded');
-		});
 	});
 	
 	// User

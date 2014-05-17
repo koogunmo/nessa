@@ -104,17 +104,18 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 	
 	// Section-specific controllers
 	
-	nessa.controller('installCtrl', function($scope, $socket, $state){
+	nessa.controller('installCtrl', function($http, $scope, $socket, $state){
 		$scope.settings = {};
-		
 		$scope.save = function(){
-			$socket.emit('system.settings', $scope.settings);
+			$http.post('/api/system/settings', $scope.settings);
 			$state.transitionTo('shows.match');
 		};
-		$socket.on('system.settings', function(data){
-			$scope.settings = data;
+		$http.get('/api/system/settings').success(function(json,status){
+			$scope.settings = json;
+			
+		}).error(function(json,status){
+			console.error(json,status);
 		});
-		$socket.emit('system.settings');
 	});
 	
 	nessa.controller('downloadsCtrl', function($scope, $socket, $modal){
@@ -271,50 +272,59 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		};
 	});
 
-	nessa.controller('settingsCtrl', function($scope, $socket, $modal){
+	nessa.controller('settingsCtrl', function($http, $modal, $scope, $socket){
 		$scope.settings = {}
 		$scope.branches = [{name: 'master'},{name: 'nightly'}];
 		$scope.users = [];
 		
-		$socket.emit('system.settings');
-		$socket.on('system.settings', function(data){
-			$scope.settings = data;
+		$http.get('/api/system/settings').success(function(json,status){
+			$scope.settings = json;
+		}).error(function(json,status){
+			console.error(json,status);
 		});
 		
-		$socket.emit('system.users');
-		$socket.on('system.users', function(data){
-			$scope.users = data;
+		$http.get('/api/users').success(function(json,status){
+			$scope.users = json;
+			
+		}).error(function(json,status){
+			console.error(json,status);
 		});
 		
 		$scope.save = function(){
-			$socket.emit('system.settings', $scope.settings)
+			$http.post('/api/system/settings', $scope.settings);
 		};
 		$scope.latest = function(){
 			if (confirm('This will update all show listings and artwork. NodeTV may become VERY laggy. Continue anyway?')) {
-				$socket.emit('system.latest');
+				$http.post('/api/system', {action: 'latest'});
+			//	$socket.emit('system.latest');
 			}
 		};
 		$scope.listings = function(){
 			if (confirm('This will update all show listings and artwork. NodeTV may become VERY laggy. Continue anyway?')) {
-				$socket.emit('system.listings');
+				$http.post('/api/system', {action: 'listings'});
+			//	$socket.emit('system.listings');
 			}
 		};
 		$scope.rescan = function(){
 			if (confirm('WARNING: NodeTV will probably become VERY laggy during a full rescan. Continue anyway?')) {
-				$socket.emit('system.rescan');
+				$http.post('/api/system', {action: 'rescan'});
+			//	$socket.emit('system.rescan');
 			}
 		};
 		$scope.reboot = function(){
 			if (confirm('This will restart NodeTV. Are you sure?')) {
-				$socket.emit('system.restart');
+				$http.post('/api/system', {action: 'restart'});
+			//	$socket.emit('system.restart');
 			}
 		};
 		$scope.update = function(){
 			if (confirm('This will force NodeTV to update to the latest version. Are you sure?')) {
-				$socket.emit('system.update');
+				$http.post('/api/system', {action: 'update'});
+			//	$socket.emit('system.update');
 			}
 		};
 	});
+	
 	
 	nessa.controller('unwatchedCtrl', function($scope, $socket){
 		$socket.emit('shows.unwatched');

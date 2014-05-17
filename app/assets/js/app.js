@@ -71,6 +71,20 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 		return auth;
 	});
 	
+	app.factory('loginInterceptor', function($q){
+		return {
+			response: function(response){
+				
+				return response;
+			},
+			responseError: function(response){
+				
+				return $q.reject(response);
+			}
+		
+		};
+	});
+	
 	app.factory('$socket', function($rootScope) {
 		var port = '';
 		if (window.location.protocol == 'https:'){
@@ -211,25 +225,9 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 			});
 			return deferred.promise;
 		};
-
-		var checkLoggedin = function($q, $timeout, $http, $location, $rootScope){
-			// Initialize a new promise
-			var deferred = $q.defer();
-			// Make an AJAX call to check if the user is logged in
-			$http.get('/loggedin').success(function(response){
-				if (response.authenticated) {
-					$timeout(deferred.resolve, 0);
-				} else {
-					$timeout(function(){
-						deferred.reject();
-					}, 0);
-					$location.url('/login');
-				}
-			});
-			return deferred.promise;
-		};
 		
-		$httpProvider.responseInterceptors.push(function($q, $location){
+		/*
+		$httpProvider.interceptors.push(function($q, $location){
 			return function(promise) {
 				return promise.then(
 					// Success: just return the response
@@ -244,13 +242,14 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 				);
 			}
 		});
+		*/
 		
 		$urlRouterProvider.otherwise('/dashboard');
 		
 		$stateProvider.state('login', {
 			url: '/login',
 			controller: 'loginCtrl',
-			templateUrl: '/views/partials/login.html',
+			templateUrl: 'views/partials/login.html',
 			data: {
 				secure: false,
 				title: 'Login'
@@ -481,7 +480,7 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 				}, function(error){
 					event.preventDefault();
 					$rootScope.authenticated = false;
-					$state.transitionTo('login');
+		//			$state.transitionTo('login');
 				});
 			} else {
 				if (toState.name == 'login') {
