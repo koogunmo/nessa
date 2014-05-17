@@ -159,22 +159,24 @@ try {
 				app.use('/media', express.static(nconf.get('media:base')));
 			}
 			
-		//	io.sockets.on('connection', function(socket){
-				var socket = false;
+			var socket = false;
+			io.sockets.on('connection', function(s){
 				/* Load socket listeners */
-		//		require('./server/routes/sockets')(app,db,socket);
-				/* Load routes */
-				require('./server/routes/default')(app,db,socket);
-				require('./server/routes/downloads')(app,db,socket);
-				require('./server/routes/login')(app,db,socket);
-			//	require('./server/routes/movies')(app,db,socket);
-				require('./server/routes/shows')(app,db,socket);
-				require('./server/routes/system')(app,db,socket);
-				
-				app.use(function(req, res) {	
-					res.sendfile(process.cwd() + '/app/views/index.html');
-				});
-		//	});
+				socket = s;
+				require('./server/routes/sockets')(app,db,socket);
+			});
+			
+			/* Load routes */
+			require('./server/routes/default')(app,db,socket);
+			require('./server/routes/downloads')(app,db,socket);
+			require('./server/routes/login')(app,db,socket);
+		//	require('./server/routes/movies')(app,db,socket);
+			require('./server/routes/shows')(app,db,socket);
+			require('./server/routes/system')(app,db,socket);
+			
+			app.use(function(req, res) {	
+				res.sendfile(process.cwd() + '/app/views/index.html');
+			});
 			
 			/* Load tasks */
 			if (nconf.get('installed')) {

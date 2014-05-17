@@ -65,6 +65,13 @@ module.exports = function(app, db, socket){
 		}
 	});
 	
+	app.get('/api/system/status', function(req,res){
+		res.send({
+			version: pkg.version,
+			uptime: process.uptime()
+		});
+	});
+	
 	
 	app.get('/api/users', function(req,res){
 		// List users

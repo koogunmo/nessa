@@ -172,7 +172,7 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		};
 	});
 	
-	nessa.controller('homeCtrl', function($scope, $socket){
+	nessa.controller('homeCtrl', function($http, $scope, $socket){
 		
 		$scope.unmatched = 0;
 		$scope.upcoming = [];
@@ -183,18 +183,20 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 			$scope.notifications = true;
 		}
 		
-		$socket.emit('dashboard');
-		$socket.on('dashboard.latest', function(data){
-			$scope.latest.push(data);
-		});
-		$socket.on('dashboard.stats', function(data){
-			$scope.stats = data;
+		$http.get('/api/system/status').success(function(json,status){
+			$scope.stats = json;
 			$scope.uptime = {
 				days: Math.floor($scope.stats.uptime / 86400),
 				hour: Math.floor(($scope.stats.uptime % 86400) / 3600),
 				mins: Math.floor((($scope.stats.uptime % 86400) % 3600) / 60),
 				secs: (($scope.stats.uptime % 86400) % 3600) % 60
-			};
+			};			
+		});
+		
+		
+		$socket.emit('dashboard');
+		$socket.on('dashboard.latest', function(data){
+			$scope.latest.push(data);
 		});
 		$socket.on('dashboard.unmatched', function(data){
 			$scope.unmatched = data.count;
