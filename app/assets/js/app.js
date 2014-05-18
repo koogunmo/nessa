@@ -1,24 +1,20 @@
 'use strict';
 
-define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch','ui.bootstrap','ui.router'], function(angular,io,moment){
-	var app = angular.module('nessa', ['ngCookies','ngResource','ui.bootstrap','ui.router']);
+define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngStorage','ngTouch','ui.bootstrap','ui.router'], function(angular,io,moment){
+	var app = angular.module('nessa', ['ngCookies','ngResource','ngStorage','ui.bootstrap','ui.router']);
 	
-	app.factory('$auth', function($cookieStore, $http, $location, $q, $rootScope){
+	app.factory('$auth', function($cookieStore, $http, $localStorage, $location, $q, $rootScope, $sessionStorage){
 		var auth = {
 			check: function(){
 				var deferred = $q.defer();
-				var session = ($rootScope.session) ? $rootScope.session : (($cookieStore.get('session')) ? $cookieStore.get('session') : null);
-				$http({
-					url: '/api/auth/check',
-					method: 'POST',
-					data: {
-						session: session
-					}
-				}).success(function(json, status){
+				$rootScope.$storage = $localStorage;
+				
+				$http.post('/api/auth/check', {session: $rootScope.$storage.session}).success(function(json, status){
 					if (status == 200 && json.success){
+						$rootScope.$storage.lastTime = json.lastTime;
 						deferred.resolve(status);
 					} else {
-						$rootScope.session = null;
+						$rootScope.$storage.session = false;
 						deferred.reject(json.messages);
 					}
 				}).error(function(json, status){
@@ -26,19 +22,13 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 				});
 				return deferred.promise;
 			},
+			
 			login: function(username, password, remember){
 				var deferred = $q.defer();
-				$http({
-					url: '/api/auth/login',
-					method: 'POST',
-					data: {
-						username: username,
-						password: password
-					}
-				}).success(function(json, status){
+				$http.post('/api/auth/login', {username: username, password: password}).success(function(json, status){
 					if (json.success){
-						$rootScope.session = json.session;
-						if (remember) $cookieStore.put('session', json.session);
+						$rootScope.$storage.lastTime = json.lastTime;
+						$rootScope.$storage.session = json.session;
 						deferred.resolve();
 					} else {						
 						deferred.reject(401);
@@ -50,19 +40,11 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 			},
 			logout: function(){
 				var deferred = $q.defer();
-				$http({
-					url: '/api/auth/logout',
-					method: 'POST',
-					data: {
-						session: $rootScope.session
-					}
-				}).success(function(json, status){
-					$rootScope.session = null;
-					$cookieStore.remove('session');
+				$http.post('/api/auth/logout', {session: $rootScope.$storage.session}).success(function(json, status){
+					$rootScope.$storage.session = false;
 					deferred.resolve();
 				}).error(function(json, status){
-					$rootScope.session = null;
-					$cookieStore.remove('session');
+					$rootScope.$storage.session = false;
 					deferred.resolve();
 				});
 				return deferred.promise;
@@ -71,20 +53,26 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 		return auth;
 	});
 	
-	app.factory('loginInterceptor', function($q){
+	app.factory('nessaHttp', function($location, $q, $rootScope){
 		return {
-			response: function(response){
-				
-				return response;
+			request: function(config){
+			//	if ($rootScope.$storage) config.headers['X-Session'] = $rootScope.$storage.session;
+				return config || $q.when(config);
 			},
-			responseError: function(response){
-				
-				return $q.reject(response);
+			requestError: function(rejection){
+				if (response.status === 401) $location.url('/login');
+				$q.reject(rejection);
+			},
+			response: function(response){
+				return response || $q.when(response);
+			},
+			responseError: function(rejection){
+				if (response.status === 401) $location.url('/login');
+				$q.reject(rejection);
 			}
-		
-		};
+		}
 	});
-	
+		
 	app.factory('$socket', function($rootScope) {
 		var port = '';
 		if (window.location.protocol == 'https:'){
@@ -243,6 +231,8 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 			}
 		});
 		*/
+		
+		$httpProvider.interceptors.push('nessaHttp');
 		
 		$urlRouterProvider.otherwise('/dashboard');
 		
@@ -459,8 +449,7 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 		});
 	});
 	
-	app.run(function($auth, $cookieStore, $location, $rootScope, $socket, $state){
-		$rootScope.session = null;
+	app.run(function($auth, $cookieStore, $localStorage, $location, $rootScope, $sessionStorage, $socket, $state){
 		$rootScope.downloads = null;
 		
 		$socket.on('download.list', function(data){
@@ -480,7 +469,7 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 				}, function(error){
 					event.preventDefault();
 					$rootScope.authenticated = false;
-		//			$state.transitionTo('login');
+					$state.transitionTo('login');
 				});
 			} else {
 				if (toState.name == 'login') {
@@ -495,6 +484,5 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngTouch'
 			}
 		});
 	});
-	
 	return app;
 });
