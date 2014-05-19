@@ -51,21 +51,6 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		});
 	});
 	
-	nessa.controller('loginCtrl', function($auth, $rootScope, $scope, $state, $window){
-		$scope.user = {};
-		$scope.login = function(){
-			$auth.login($scope.user.username, $scope.user.password, !!$scope.user.remember).then(function(success){
-				$state.transitionTo('dashboard');
-			}, function(error){
-				if (error) console.error(error);
-				$socket.emit('system.alert', {
-					type: 'danger',
-					message: 'Incorrect login details'
-				});
-			});
-		};
-	});
-	
 	nessa.controller('navCtrl', function($location, $rootScope, $scope){
 		$scope.menu = [{
 			path: 'dashboard',
@@ -103,21 +88,6 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 	});
 	
 	// Section-specific controllers
-	
-	nessa.controller('installCtrl', function($http, $scope, $socket, $state){
-		$scope.settings = {};
-		$scope.save = function(){
-			$http.post('/api/system/settings', $scope.settings);
-			$state.transitionTo('shows.match');
-		};
-		$http.get('/api/system/settings').success(function(json,status){
-			$scope.settings = json;
-			
-		}).error(function(json,status){
-			console.error(json,status);
-		});
-	});
-	
 	nessa.controller('downloadsCtrl', function($scope, $socket, $modal){
 		$scope.predicate = 'name';
 		$scope.reverse = false;
@@ -272,69 +242,15 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		$scope.close = function(){
 			$modalInstance.dismiss();
 		};
-	});
-
-	nessa.controller('settingsCtrl', function($http, $modal, $scope, $socket){
-		$scope.settings = {}
-		$scope.branches = [{name: 'master'},{name: 'nightly'}];
-		$scope.users = [];
-		
-		$http.get('/api/system/settings').success(function(json,status){
-			$scope.settings = json;
-		}).error(function(json,status){
-			console.error(json,status);
-		});
-		
-		$http.get('/api/users').success(function(json,status){
-			$scope.users = json;
-			
-		}).error(function(json,status){
-			console.error(json,status);
-		});
-		
-		$scope.save = function(){
-			$http.post('/api/system/settings', $scope.settings);
-		};
-		$scope.latest = function(){
-			if (confirm('This will update all show listings and artwork. NodeTV may become VERY laggy. Continue anyway?')) {
-				$http.post('/api/system', {action: 'latest'});
-			//	$socket.emit('system.latest');
-			}
-		};
-		$scope.listings = function(){
-			if (confirm('This will update all show listings and artwork. NodeTV may become VERY laggy. Continue anyway?')) {
-				$http.post('/api/system', {action: 'listings'});
-			//	$socket.emit('system.listings');
-			}
-		};
-		$scope.rescan = function(){
-			if (confirm('WARNING: NodeTV will probably become VERY laggy during a full rescan. Continue anyway?')) {
-				$http.post('/api/system', {action: 'rescan'});
-			//	$socket.emit('system.rescan');
-			}
-		};
-		$scope.reboot = function(){
-			if (confirm('This will restart NodeTV. Are you sure?')) {
-				$http.post('/api/system', {action: 'restart'});
-			//	$socket.emit('system.restart');
-			}
-		};
-		$scope.update = function(){
-			if (confirm('This will force NodeTV to update to the latest version. Are you sure?')) {
-				$http.post('/api/system', {action: 'update'});
-			//	$socket.emit('system.update');
-			}
-		};
-	});
-	
+	});	
 	
 	nessa.controller('unwatchedCtrl', function($scope, $socket){
 		$socket.emit('shows.unwatched');
 		
-		
 	});
 	
-	nessa.controller('moviesCtrl', function($scope, $modal, $socket){
+	/*
+	nessa.controller('moviesCtrl', function($http, $modal, $scope, $socket){
 		$scope.movies = [];
 		$scope.settings = {};
 		
@@ -350,40 +266,7 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		$socket.emit('media.settings');
 		$socket.emit('movies.list');
 	});
-	
-	nessa.controller('showsCtrl', function($http, $rootScope, $scope, $socket){
-		
-		$scope.settings = {};
-		$scope.shows	= [];
-		
-		$scope.clearFilter = function(){
-			$scope.filter.name = '';
-			$(document).trigger('lazyload');
-		};
-		
-		$socket.emit('media.settings');
-		$socket.once('media.settings', function(data){
-			$scope.settings = data;
-			$rootScope.settings = data;
-		});
-		
-//		$socket.on('show.added', function(){
-//			$socket.emit('shows.list');
-//		});
-		
-		$http({
-			url: '/api/shows',
-			method: 'GET',
-			responseType: 'json'
-		}).success(function(json, status){
-			if (status == 200 && json) {
-				$scope.shows = json;
-				$(document).trigger('lazyload');
-			}
-		}).error(function(json, status){
-			// 
-		});
-	});
+	*/
 	
 	nessa.controller('searchCtrl', function($http, $modalInstance, $scope, $socket){
 		$scope.selected = null;
@@ -424,59 +307,6 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 				}, 600);
 			}
 		});
-	});
-	
-	nessa.controller('showCtrl', function($http, $modalInstance, $scope, $socket, $stateParams){
-		window.modal = $modalInstance;
-		
-		var tvdb = parseInt($stateParams.showid, 10);
-		$http.get('/api/shows/'+tvdb).success(function(json, status){
-			if (status == 200 && json) {
-				$scope.summary = json.summary;
-				$scope.listing = json.listing;
-				$scope.total = json.total;
-			}
-		}).error(function(json, status){
-			console.error(json, status);
-			$scope.close();
-		});
-		
-		$scope.close = function(){
-			$modalInstance.close();
-		};
-		$scope.rescan = function(){
-			$http.get('/api/shows/'+tvdb+'/rescan').success(function(json, status){
-				$modalInstance.close();
-			}).error(function(json, status){
-				console.error(json, status);
-			});
-		};
-		$scope.remove = function(){
-			if (confirm('Are you sure you want to remove this show?')) {
-				$http.delete('/api/shows/'+tvdb).success(function(){
-					$modalInstance.close();
-				}).error(function(json, status){
-					console.error(json, status);
-				});
-			}
-		};
-		$scope.save = function(){
-			$http.post('/api/shows/'+tvdb, $scope.summary).success(function(json, status){
-				$modalInstance.close();
-			}).error(function(json, status){
-				console.error(json, status);
-			});
-		};
-		$scope.update = function(){
-			$http.get('/api/shows/'+tvdb+'/update').success(function(json, status){
-				$modalInstance.close();
-			}).error(function(json, status){
-				console.error(json, status);
-			});
-		};
-		$scope.watched = function(){
-		//	$socket.emit('show.watched', {tvdb: tvdb});
-		};
 	});
 	
 	nessa.controller('seasonCtrl', function($scope, $socket){

@@ -127,9 +127,10 @@ if (!nconf.get('listen:nginx')){
 }
 app.enable('view cache');
 
-/* MongoDB */
 try {
-	if (nconf.get('mongo')) {
+	require('./server/routes/system')(app);
+	
+	if (nconf.get('installed') && nconf.get('mongo')) {
 		var MongoDb		= require('mongodb').Db,
 			MongoClient	= require('mongodb').MongoClient,
 			MongoServer	= require('mongodb').Server;
@@ -172,7 +173,7 @@ try {
 			require('./server/routes/login')(app,db,socket);
 		//	require('./server/routes/movies')(app,db,socket);
 			require('./server/routes/shows')(app,db,socket);
-			require('./server/routes/system')(app,db,socket);
+			require('./server/routes/users')(app,db,socket);
 			
 			app.use(function(req, res) {	
 				res.sendfile(process.cwd() + '/app/views/index.html');

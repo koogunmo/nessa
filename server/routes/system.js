@@ -9,11 +9,9 @@ log4js.configure({
 });
 var logger = log4js.getLogger('routes:system');
 
-module.exports = function(app, db, socket){
+module.exports = function(app){
 	
-	var system	= require('nodetv-system'),
-		users	= plugin('user');
-	
+	var system	= require('nodetv-system');
 	
 	app.get('/api/system/settings', function(req,res){
 		res.send(nconf.get());
@@ -71,29 +69,4 @@ module.exports = function(app, db, socket){
 			uptime: process.uptime()
 		});
 	});
-	
-	
-	app.get('/api/users', function(req,res){
-		// List users
-		users.list(function(error, json){
-			res.send(json);
-		});
-		
-	}).post('/api/users', function(req,res){
-		// Create user
-		
-		
-	});
-	
-	app.get('/api/user/:id', function(req,res){
-		// Fetch user
-		
-	}).post('/api/user/:id', function(req,res){
-		// Update user
-		
-	}).delete('/api/user/:id', function(req,res){
-		// Remove user
-		
-	});
-	
 };

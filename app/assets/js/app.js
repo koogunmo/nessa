@@ -172,31 +172,9 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngStorag
 			return (bytes / Math.pow(1024, Math.floor(number))).toFixed(precision) +  ' ' + units[number];
 		}
 	});
-	/*
-	app.directive('lazySrc', function($document, $window){
-		return {
-			restrict: 'A',
-			link: function(scope, element, attrs){
-				if (attrs.src) return;
-				var src = attrs.lazySrc;
-				var offset = element.parents('.ng-scope').offset();
-				var lazyLoad = function(){
-					var visible = $document.scrollTop() + $window.innerHeight;
-					if (offset.top < visible){
-						element.attr('src', src).bind('load', function(){
-							element.addClass('lazy-loaded');
-						});
-					}
-				}
-				angular.element(document).bind('scroll', lazyLoad);
-				lazyLoad();
-			}
-		}
-	});
-	*/
-	app.config(function($stateProvider, $urlRouterProvider, $locationProvider, $httpProvider){
+	
+	app.config(function($controllerProvider, $httpProvider, $locationProvider, $stateProvider, $urlRouterProvider){
 		$locationProvider.html5Mode(true).hashPrefix('!');
-		
 		var checkInstalled = function($q, $timeout, $http, $location, $rootScope){
 			// Initialize a new promise
 			var deferred = $q.defer();
@@ -213,25 +191,7 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngStorag
 			});
 			return deferred.promise;
 		};
-		
-		/*
-		$httpProvider.interceptors.push(function($q, $location){
-			return function(promise) {
-				return promise.then(
-					// Success: just return the response
-					function(response){
-						return response;
-					},
-					// Error: check the error status to get only the 401
-					function(response) {
-						if (response.status === 401) $location.url('/login');
-						return $q.reject(response);
-					}
-				);
-			}
-		});
-		*/
-		
+				
 		$httpProvider.interceptors.push('nessaHttp');
 		
 		$urlRouterProvider.otherwise('/dashboard');
@@ -243,6 +203,16 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngStorag
 			data: {
 				secure: false,
 				title: 'Login'
+			},
+			resolve: {
+				load: function($q, $state){
+					var deferred = $q.defer();
+					require(['controllers/loginCtrl'], function(construct){
+						$controllerProvider.register('loginCtrl', construct);
+						deferred.resolve();
+					});
+					return deferred.promise;
+				}
 			}
 		}).state('logout', {
 			url: '/logout',
@@ -319,7 +289,17 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngStorag
 			data: {
 				secure: false,
 				title: 'Install'
-			}	
+			},
+			resolve: {
+				load: function($q, $state){
+					var deferred = $q.defer();
+					require(['controllers/installCtrl'], function(construct){
+						$controllerProvider.register('installCtrl', construct);
+						deferred.resolve();
+					});
+					return deferred.promise;
+				}
+			}
 		}).state('shows', {
 			url: '/shows',
 			controller: 'showsCtrl',
@@ -327,6 +307,16 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngStorag
 			data: {
 				secure: true,
 				title: 'Shows'
+			},
+			resolve: {
+				load: function($q, $state){
+					var deferred = $q.defer();
+					require(['controllers/showsCtrl'], function(construct){
+						$controllerProvider.register('showsCtrl', construct);
+						deferred.resolve();
+					});
+					return deferred.promise;
+				}
 			}
 		}).state('shows.add', {
 			url: '/add',
@@ -361,7 +351,17 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngStorag
 					templateUrl: 'views/modal/show/detail.html',
 					controller: 'showCtrl',
 					backdrop: 'static',
-					windowClass: 'modal-show'
+					windowClass: 'modal-show',
+					resolve: {
+						load: function($q, $state){
+							var deferred = $q.defer();
+							require(['controllers/showCtrl'], function(construct){
+								$controllerProvider.register('showCtrl', construct);
+								deferred.resolve();
+							});
+							return deferred.promise;
+						}
+					}
 				}).result.then(function(result){
 					$state.transitionTo('shows');
 					window.modal = null;
@@ -404,6 +404,16 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngStorag
 			data: {
 				secure: true,
 				title: 'Settings'
+			},
+			resolve: {
+				load: function($q, $state){
+					var deferred = $q.defer();
+					require(['controllers/settingsCtrl'], function(construct){
+						$controllerProvider.register('settingsCtrl', construct);
+						deferred.resolve();
+					});
+					return deferred.promise;
+				}
 			}
 		}).state('settings.user', {
 			abstract: true,
