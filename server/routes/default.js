@@ -11,10 +11,8 @@ log4js.configure({
 var logger = log4js.getLogger('routes:default');
 
 module.exports = function(app, db){
-	
 	app.get('/', function(req, res) {	
 		res.sendfile(process.cwd() + '/app/views/index.html');
-		console.log('derp')
 	});
 	
 	app.get('/api/installed', function(req, res){
@@ -23,5 +21,4 @@ module.exports = function(app, db){
 		};
 		res.send(response);
 	});
-	
 };

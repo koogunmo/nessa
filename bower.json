@@ -1,0 +1,14 @@
+{
+  "name": "NodeTV",
+  "version": "0.7.2",
+  "directory": "app/components",
+  "dependencies": {
+    "angular": "1.3.0-beta.9",
+    "angular-ui-bootstrap": "~0.11.0",
+    "angular-ui-router": "~0.2.10",
+    "jquery": "~2.1.1",
+    "moment": "~2.6.0",
+    "ngstorage": "~0.3.0",
+    "requirejs": "~2.1.11"
+  }
+}

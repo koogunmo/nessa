@@ -1,9 +1,9 @@
 'use strict';
 
-define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngStorage','ngTouch','ui.bootstrap','ui.router'], function(angular,io,moment){
-	var app = angular.module('nessa', ['ngCookies','ngResource','ngStorage','ui.bootstrap','ui.router']);
+define('app', ['angular','socket.io','moment','ngResource','ngStorage','ngTouch','ui.bootstrap','ui.router'], function(angular,io,moment){
+	var app = angular.module('nessa', ['ngResource','ngStorage','ui.bootstrap','ui.router']);
 	
-	app.factory('$auth', function($cookieStore, $http, $localStorage, $location, $q, $rootScope, $sessionStorage){
+	app.factory('$auth', function($http, $localStorage, $location, $q, $rootScope, $sessionStorage){
 		var auth = {
 			check: function(){
 				var deferred = $q.defer();
@@ -173,12 +173,19 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngStorag
 		}
 	});
 	
-	app.config(function($controllerProvider, $httpProvider, $locationProvider, $stateProvider, $urlRouterProvider){
+	app.config(function($compileProvider, $controllerProvider, $filterProvider, $httpProvider, $locationProvider, $provide, $stateProvider, $urlRouterProvider){
+		
+		app.lazy = {
+	        controller: $controllerProvider.register,
+			directive: $compileProvider.directive,
+			filter: $filterProvider.register,
+			factory: $provide.factory,
+			service: $provide.service
+	    };
+		
 		$locationProvider.html5Mode(true).hashPrefix('!');
 		var checkInstalled = function($q, $timeout, $http, $location, $rootScope){
-			// Initialize a new promise
 			var deferred = $q.defer();
-			// Make an AJAX call to check if installer has been run
 			$http.get('/api/installed').success(function(response){
 				if (response.installed) {
 					$timeout(deferred.resolve, 0);
@@ -191,9 +198,7 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngStorag
 			});
 			return deferred.promise;
 		};
-				
 		$httpProvider.interceptors.push('nessaHttp');
-		
 		$urlRouterProvider.otherwise('/dashboard');
 		
 		$stateProvider.state('login', {
@@ -208,7 +213,7 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngStorag
 				load: function($q, $state){
 					var deferred = $q.defer();
 					require(['controllers/loginCtrl'], function(construct){
-						$controllerProvider.register('loginCtrl', construct);
+						app.lazy.controller('loginCtrl', construct);
 						deferred.resolve();
 					});
 					return deferred.promise;
@@ -226,11 +231,22 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngStorag
 			}
 		}).state('dashboard', {
 			url: '/dashboard',
-			controller: 'homeCtrl',
+			controller: 'dashboardCtrl',
 			templateUrl: 'views/partials/dashboard.html',
 			data: {
 				secure: true,
-				title: 'Home'
+				title: 'Dashboard'
+			},
+			
+			resolve: {
+				load: function($q, $state){
+					var deferred = $q.defer();
+					require(['controllers/dashboardCtrl'], function(construct){
+						app.lazy.controller('dashboardCtrl', construct);
+						deferred.resolve();
+					});
+					return deferred.promise;
+				}
 			}
 		}).state('downloads', {
 			url: '/downloads',
@@ -294,7 +310,7 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngStorag
 				load: function($q, $state){
 					var deferred = $q.defer();
 					require(['controllers/installCtrl'], function(construct){
-						$controllerProvider.register('installCtrl', construct);
+						app.lazy.controller('installCtrl', construct);
 						deferred.resolve();
 					});
 					return deferred.promise;
@@ -312,7 +328,7 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngStorag
 				load: function($q, $state){
 					var deferred = $q.defer();
 					require(['controllers/showsCtrl'], function(construct){
-						$controllerProvider.register('showsCtrl', construct);
+						app.lazy.controller('showsCtrl', construct);
 						deferred.resolve();
 					});
 					return deferred.promise;
@@ -356,7 +372,7 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngStorag
 						load: function($q, $state){
 							var deferred = $q.defer();
 							require(['controllers/showCtrl'], function(construct){
-								$controllerProvider.register('showCtrl', construct);
+								app.lazy.controller('showCtrl', construct);
 								deferred.resolve();
 							});
 							return deferred.promise;
@@ -409,7 +425,7 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngStorag
 				load: function($q, $state){
 					var deferred = $q.defer();
 					require(['controllers/settingsCtrl'], function(construct){
-						$controllerProvider.register('settingsCtrl', construct);
+						app.lazy.controller('settingsCtrl', construct);
 						deferred.resolve();
 					});
 					return deferred.promise;
@@ -459,16 +475,11 @@ define('app', ['angular','socket.io','moment','ngCookies','ngResource','ngStorag
 		});
 	});
 	
-	app.run(function($auth, $cookieStore, $localStorage, $location, $rootScope, $sessionStorage, $socket, $state){
+	app.run(function($auth, $localStorage, $location, $rootScope, $sessionStorage, $socket, $state){
 		$rootScope.downloads = null;
 		
 		$socket.on('download.list', function(data){
 			$rootScope.downloads = data;
-		});
-		
-		$socket.on('shows.list', function(shows){
-			$rootScope.shows = shows;
-			$(document).trigger('lazyload');
 		});
 		
 		$rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams){

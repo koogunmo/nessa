@@ -14,6 +14,18 @@ module.exports = function(app, db, socket){
 	var scanner	= plugin('scanner'),
 		shows	= plugin('showdata');
 	
+	/*
+	app.get('/api/dashboard/latest', function(req,res){
+		shows.latest(function(error, json){
+			res.send(json);
+		});
+	}).get('/api/dashboard/upcoming', function(req,res){
+		trakt.calendar.shows(function(error, json){
+			res.send(json);
+		});
+	});
+	*/
+	
 	app.get('/api/shows', function(req,res){
 		// Get show list
 		shows.list(function(error,results){
@@ -45,6 +57,23 @@ module.exports = function(app, db, socket){
 				res.send(201);
 			});
 		}
+	});
+	
+	app.get('/api/shows/unmatched', function(req,res){
+		shows.unmatched(function(error, json){
+			res.send(json);
+		});
+		
+	}).post('/api/shows/match', function(req,res){
+		shows.match(req.body.matched, function(error, tvdb){
+			shows.getSummary(tvdb, function(error, tvdb){
+				shows.getArtwork(tvdb);
+				shows.getFullListings(tvdb, function(error, tvdb){
+					shows.getHashes(tvdb)
+					scanner.episodes(tvdb);
+				});
+			});
+		});
 	});
 	
 	app.post('/api/shows/search', function(req,res){

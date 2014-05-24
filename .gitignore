@@ -13,6 +13,8 @@ newrelic.js
 node_modules/*
 !node_modules/nodetv-*
 
+app/components/*
+
 docs/*.txt
 docs/*.md
 settings.json

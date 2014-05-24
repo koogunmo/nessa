@@ -131,12 +131,6 @@ module.exports = function(app,db,socket){
 		trakt.calendar.shows(function(error, json){
 			socket.emit('dashboard.upcoming', json);
 		});
-		
-		// Generate some stats/info for the homepage
-		socket.emit('dashboard.stats', {
-			version: pkg.version,
-			uptime: process.uptime()
-		});
 	});
 
 	/** Downloads **/
@@ -227,32 +221,15 @@ module.exports = function(app,db,socket){
 	
 	
 	/** Shows **/
-	socket.on('shows.unmatched', function(){
-		var shows = plugin('showdata');
-		shows.unmatched(function(error, json){
-			socket.emit('shows.unmatched', json);
-		});
-		
-	}).on('shows.matched', function(data){
-		var shows = plugin('showdata');
-		var scanner = plugin('scanner');
-		
-		shows.match(data, function(error, tvdb){
-			shows.getSummary(tvdb, function(error, tvdb){
-				shows.getArtwork(tvdb);
-				shows.getFullListings(tvdb, function(error, tvdb){
-					shows.getHashes(tvdb)
-					scanner.episodes(tvdb);
-				});
-			});
-		});
-	}).on('shows.unwatched', function(data){
+	socket.on('shows.unwatched', function(data){
 		var shows = plugin('showdata');
 		shows.getUnwatched(function(error, json){
 			if (error) logger.error(error);
 			logger.log(json);
 		});
 	});
+	
+	
 	
 	// Trakt 'watched' functionality
 	

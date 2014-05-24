@@ -87,6 +87,10 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		};
 	});
 	
+	/***************************************************************************/
+	
+	
+	
 	// Section-specific controllers
 	nessa.controller('downloadsCtrl', function($scope, $socket, $modal){
 		$scope.predicate = 'name';
@@ -142,79 +146,28 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		};
 	});
 	
-	nessa.controller('homeCtrl', function($http, $scope, $socket){
-		
-		$scope.unmatched = 0;
-		$scope.upcoming = [];
-		$scope.latest = [];
-		$scope.notifications = false;
-		
-		if (('Notification' in window) && Notification.permission === 'granted'){
-			$scope.notifications = true;
-		}
-		
-		$http.get('/api/system/status').success(function(json,status){
-			$scope.stats = json;
-			$scope.uptime = {
-				days: Math.floor($scope.stats.uptime / 86400),
-				hour: Math.floor(($scope.stats.uptime % 86400) / 3600),
-				mins: Math.floor((($scope.stats.uptime % 86400) % 3600) / 60),
-				secs: (($scope.stats.uptime % 86400) % 3600) % 60
-			};			
-		});
-		
-		
-		$socket.emit('dashboard');
-		$socket.on('dashboard.latest', function(data){
-			$scope.latest.push(data);
-		});
-		$socket.on('dashboard.unmatched', function(data){
-			$scope.unmatched = data.count;
-		});
-		$socket.on('dashboard.upcoming', function(data){
-			$scope.upcoming = data;
-		});
-				
-		$scope.enableAlerts = function(){
-			if (('Notification' in window)){
-				if (Notification.permission === 'granted'){
-					return;
-				} else if (Notification.permission !== 'denied') {
-					Notification.requestPermission(function(permission){
-						if (!('permission' in Notification)) {
-							Notification.permission = permission;
-						}
-						if (permission === 'granted') {
-							var notification = new Notification('NodeTV', {body: 'Desktop alerts enabled', icon: '/assets/gfx/icons/touch-icon.png'});
-							setTimeout(function(){
-								notification.close()
-							}, 1500);
-							$scope.notifications = true;
-						}
-					});
-				}
-			}
-		}
-	});
-	
-	nessa.controller('matchCtrl', function($modalInstance, $scope, $socket, $state){
+	nessa.controller('matchCtrl', function($http, $modalInstance, $scope, $socket, $state){
 		$scope.unmatched	= [];
 		$scope.matched		= [];
 		
-		$socket.emit('shows.unmatched');
+		$http.get('/api/shows/unmatched').success(function(json,status){
+			$scope.unmatched.push(json);
+		});
 		
 		$socket.on('shows.unmatched', function(data){
-			$scope.unmatched.push(data);
+			
 		});
+		
 		$scope.close = function(){
 			$modalInstance.dismiss('close');
 		};
+		$scope.save = function(){
+			$http.post('/api/shows/match', {matched: $scope.matched}).success(function(json,status){
+				$scope.close();
+			});
+		};
 		$scope.set = function(id, tvdb){
 			$scope.matched[id] = {id: id, tvdb: tvdb};
-		};
-		$scope.save = function(){
-			$socket.emit('shows.matched', $scope.matched);
-			$scope.close();
 		};
 	});
 	
@@ -249,25 +202,6 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		
 	});
 	
-	/*
-	nessa.controller('moviesCtrl', function($http, $modal, $scope, $socket){
-		$scope.movies = [];
-		$scope.settings = {};
-		
-		$socket.on('media.settings', function(data){
-			$scope.settings = data;
-		});
-		$socket.on('movies.list', function(results){
-			$scope.movies = results;
-			$(document).trigger('lazyload');
-		});
-		
-		
-		$socket.emit('media.settings');
-		$socket.emit('movies.list');
-	});
-	*/
-	
 	nessa.controller('searchCtrl', function($http, $modalInstance, $scope, $socket){
 		$scope.selected = null;
 		$scope.search = {
@@ -286,7 +220,6 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		$scope.save = function(){
 			$http.post('/api/shows', {tvdb: $scope.selected}).success(function(json, status){
 				$modalInstance.close();
-				
 			}).error(function(json, status){
 				console.error(json, status);
 			});
