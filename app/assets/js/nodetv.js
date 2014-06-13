@@ -204,7 +204,7 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 	
 	nessa.controller('searchCtrl', function($http, $modalInstance, $scope, $socket){
 		$scope.selected = null;
-		$scope.search = {
+		$scope.filter = {
 			query: ''
 		};
 		$scope.close = function(){
@@ -212,8 +212,17 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		};
 		$scope.reset = function(){
 			$scope.selected = null;
-			$scope.search.query = '';
+			$scope.filter.query = '';
 		};
+		
+		$scope.search = function(){
+			$http.post('/api/shows/search', {q: $scope.filter.query}).success(function(results, status){
+				$scope.results = results;
+			}).error(function(json, status){
+				console.error(json, status);
+			});
+		};
+		
 		$scope.select = function(tvdb) {
 			$scope.selected = tvdb;
 		};
@@ -224,22 +233,18 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 				console.error(json, status);
 			});
 		};
-		
+		/*
 		var delaySearch = null;
 		$scope.$watch('search.query', function(){
 			clearTimeout(delaySearch);
 			$scope.results = [];
-			if ($scope.search.query.length >= 4) {
+			if ($scope.filter.query.length >= 3) {
 				delaySearch = setTimeout(function(){
-					$http.post('/api/shows/search', {q: $scope.search.query}).success(function(results, status){
-						$scope.results = results;
-						
-					}).error(function(json, status){
-						console.error(json, status);
-					});
-				}, 600);
+					$scope.search()
+				}, 750);
 			}
 		});
+		*/
 	});
 	
 	nessa.controller('seasonCtrl', function($scope, $socket){
