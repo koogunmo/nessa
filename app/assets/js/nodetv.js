@@ -212,6 +212,7 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		};
 		$scope.reset = function(){
 			$scope.selected = null;
+			$scope.results = null;
 			$scope.filter.query = '';
 		};
 		
