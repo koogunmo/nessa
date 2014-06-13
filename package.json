@@ -42,12 +42,12 @@
     "nodetv-trakt": "0.7.0"
   },
   "devDependencies": {
-    "grunt": "~0.4.2",
-    "grunt-contrib-sass": "~0.6.0",
-    "grunt-contrib-watch": "~0.5.3",
-    "grunt-nodemon": "~0.1.2",
-    "grunt-concurrent": "~0.4.2",
-    "grunt-release": "~0.6.0"
+    "gulp": "^3.8.0",
+    "gulp-minify-css": "^0.3.4",
+    "gulp-nodemon": "^1.0.4",
+    "gulp-rename": "^1.2.0",
+    "gulp-sass": "^0.7.2",
+    "gulp-tag-version": "^1.0.2"
   },
   "engines": {
     "node": ">=0.10.25"
