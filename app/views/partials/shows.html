@@ -13,17 +13,31 @@
 		<div ng-show="shows.length" class="col-sm-12" style="text-align: right;">
 			Showing {{results.length}} of {{shows.length}} shows
 		</div>
+		<!--
+		<div class="btn-group btn-group-sm">
+			<button type="" class="btn btn-default" ng-click="filter.progress.left=0">Watched</button>
+			<button type="" class="btn btn-default" >Ended</button>
+		</div>
+		-->
 	</div>
 	<div class="row">
 		<div class="show col-sm-2" ng-repeat="show in results = (shows | filter:filter) | orderBy:'name'">
 			<div class="image" title="{{show.name}}" ng-class="{'ended': show.ended}">
+				<span class="badge unwatched" ng-if="show.progress.left">{{show.progress.left}}</span>
+				<!--span class="badge new" ng-if="!show.progress">&nbsp;</span-->
 				<div class="corner"></div>
 				<a href="/shows/{{show.tvdb}}">
 					<img data-src="/media/{{settings.shows.directory}}/{{show.directory}}/poster.jpg" alt="" class="img-responsive" />
 					<h6>{{show.name}}</h6>
-					
 					<div class="overlay">
 						<div class="title">{{show.name}}</div>
+						<div class="hud">
+							<span class="fa fa-rss" ng-if="show.status && !!show.feed"></span>
+						</div>
+						<progress animate="false">
+							<bar type="success" value="show.progress.percentage"></bar>
+							<bar type="danger" value="100-show.progress.percentage"></bar>
+						</progress>
 					</div>
 				</a>
 				<div class="actions">

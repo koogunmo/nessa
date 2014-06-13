@@ -334,6 +334,22 @@ input.form-control+input.form-control {
 			width: 25px;
 			z-index: 4;
 		}
+		.badge {
+			border: 1px solid transparent;
+			position: absolute;
+			right: -5px;
+			top: -10px;
+			z-index: 5;
+			&.unwatched {
+				background-color: darkred;
+				border-color: #FFFFFF;
+				display: inline;
+			}
+			&.new {
+				background-color: lightblue;
+				border-color: #6de6fa;
+			}
+		}
 		&.ended {
 			.corner {
 				background-image: url('../gfx/icons/ended.png');
@@ -453,6 +469,23 @@ input.form-control+input.form-control {
 						font-size: 12px;
 						font-weight: bold;
 						padding: 20px 15px;
+					}
+					.hud {
+						bottom: 10px;
+						height: 20px;
+						left: 0px;
+						margin: 0px 5px;
+						position: absolute;
+						right: 0px;
+						text-align: left;
+					}
+					.progress {
+						bottom: 5px;
+						height: 5px;
+						left: 0px;
+						margin: 0px 5px;
+						position: absolute;
+						right: 0px;
 					}
 				}
 				&:hover {
