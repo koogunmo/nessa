@@ -38,7 +38,7 @@
 				<ul class="nav navbar-nav navbar-left" ng-show="authenticated">
 					<li ng-repeat="item in menu" ng-class="{active: isActive('/'+item.path)}" ng-cloak>
 						<a ui-sref="{{item.path}}" ng-click="collapse()">
-							<span class="glyphicon glyphicon-{{item.icon}}"></span>
+							<span class="fa fa-{{item.icon}}"></span>
 							{{item.name}}
 						</a>
 					</li>
@@ -46,7 +46,7 @@
 				<ul class="nav navbar-nav navbar-right" ng-show="authenticated">
 					<li>
 						<a ui-sref="logout">
-							<span class="glyphicon glyphicon-log-out"></span>
+							<span class="fa fa-sign-out"></span>
 							Logout
 						</a>
 					</li>

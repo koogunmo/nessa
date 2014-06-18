@@ -70,7 +70,7 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		},{
 			path: 'settings',
 			name: 'Settings',
-			icon: 'cog'
+			icon: 'gears'
 			
 		}];
 		
