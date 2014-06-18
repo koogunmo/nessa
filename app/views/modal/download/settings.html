@@ -30,10 +30,10 @@
 	</div>
 	<div class="modal-footer">
 		<button type="button" class="btn btn-danger" ng-click="remove()">
-			<span class="glyphicon glyphicon-trash"></span>
+			<span class="fa fa-trash"></span>
 		</button>
 		<button type="button" class="btn btn-warning" ng-click="toggle();">
-			<span class="glyphicon" ng-class="{'glyphicon-play': !torrent.status, 'glyphicon-pause': !!torrent.status}"></span>
+			<span class="fa" ng-class="{'fa-play': !torrent.status, 'fa-pause': !!torrent.status}"></span>
 		</button>
 		<button type="button" class="btn btn-success" ng-show="downloadForm.$dirty" ng-click="save()">Save</button>
 		<button type="button" class="btn btn-default" ng-click="close()">Close</button>

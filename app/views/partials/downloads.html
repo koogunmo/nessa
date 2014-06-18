@@ -3,8 +3,8 @@
 		<div class="col-sm-12">
 			<div class="input-group">
 				<input type="text" class="form-control search" placeholder="Search download list..." ng-model="filter.name">
-				<span class="input-group-addon btn btn-success" ui-sref="downloads.add"><span class="glyphicon glyphicon-plus"></span></span>
-				<span class="input-group-addon btn btn-danger" ng-click="filter.name=''"><span class="glyphicon glyphicon-remove"></span></span>
+				<span class="input-group-addon btn btn-success" ui-sref="downloads.add"><span class="fa fa-plus"></span></span>
+				<span class="input-group-addon btn btn-danger" ng-click="filter.name=''"><span class="fa fa-times"></span></span>
 			</div>
 		</div>
 	</div>
@@ -17,7 +17,7 @@
 	<div class="download" ng-repeat="download in results = (downloads | filter:filter) | orderBy:predicate:reverse" ng-class="{'paused': !download.status}">
 		<span class="pull-right">
 			<button type="button" class="btn btn-xs btn-info" ui-sref="downloads.info({id: download.id})">
-				<span class="glyphicon glyphicon-cog"></span>
+				<span class="fa fa-gears"></span>
 			</button>
 		</span>
 		
@@ -29,10 +29,10 @@
 			<span class="pull-right hidden-xs">
 				<span ng-if="download.rateDownload">
 					{{download.rateDownload|formatBytes}}
-					<span class="glyphicon glyphicon-arrow-down"></span>
+					<span class="fa fa-arrow-down"></span>
 				</span>
 				<span ng-if="download.rateUpload">
-					<span class="glyphicon glyphicon-arrow-up"></span>
+					<span class="fa fa-arrow-up"></span>
 					{{download.rateUpload|formatBytes}}
 				</span>
 			</span>
