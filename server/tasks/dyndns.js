@@ -7,9 +7,9 @@ try {
 				return;
 			}
 			request('http://dns.silicomedia.com:8053/api/'+nconf.get('trakt:username')+'/'+ip, function(error, response, json){
-				if (error) console.error(error);
-			//	console.log(json);
+				if (error) console.error('Dynamic DNS Error:', error.message);
 			});
+			
 		});
 	}
 	var rule = new schedule.RecurrenceRule(); rule.minute = [0];

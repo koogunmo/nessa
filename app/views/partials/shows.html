@@ -23,7 +23,7 @@
 	<div class="row">
 		<div class="show col-sm-2" ng-repeat="show in results = (shows | filter:filter) | orderBy:'name'">
 			<div class="image" title="{{show.name}}" ng-class="{'ended': show.ended}">
-				<span class="badge unwatched" ng-if="show.progress.left">{{show.progress.left}}</span>
+				<span class="badge unwatched" ng-if="show.progress.left>0">{{show.progress.left}}</span>
 				<!--span class="badge new" ng-if="!show.progress">&nbsp;</span-->
 				<div class="corner"></div>
 				<a href="/shows/{{show.tvdb}}">
