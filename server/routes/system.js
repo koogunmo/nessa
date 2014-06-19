@@ -64,9 +64,20 @@ module.exports = function(app){
 	});
 	
 	app.get('/api/system/status', function(req,res){
-		res.send({
-			version: pkg.version,
-			uptime: process.uptime()
+		var df = require('node-df');
+		df(function(error, disks){
+			var usage = [];
+			
+			disks.forEach(function(disk){
+				if (disk.size <= 307200) return;
+				usage.push(disk);
+			});
+			
+			res.send({
+				version: pkg.version,
+				uptime: process.uptime(),
+				disks: usage
+			});
 		});
 	});
 };

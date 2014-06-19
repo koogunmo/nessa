@@ -70,6 +70,16 @@
 				<span ng-switch-default>{{uptime.days}} days</span>
 				<span>{{uptime.hour|zeroPad}}:{{uptime.mins|zeroPad}}:{{uptime.secs|zeroPad}}</span>
 			</div>
+			<hr />
+			<div ng-if="stats.disks">
+				<div ng-repeat="disk in stats.disks">
+					<span>{{disk.mount}} ({{disk.size*1024|formatBytes}}; Used: {{disk.used*1024|formatBytes}})</span>
+					<progress animate="false" title="" style="height: 10px;">
+						<bar type="danger" value="disk.capacity*100"></bar>
+						<bar type="success" value="100-(disk.capacity*100)"></bar>
+					</progress>
+				</div>
+			</div>
 		</div>
 	</div>
 	

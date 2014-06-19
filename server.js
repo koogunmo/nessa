@@ -142,7 +142,6 @@ try {
 				process.kill();
 				return;
 			}
-			
 			if (nconf.get('mongo:auth')){
 				db.authenticate(nconf.get('mongo:username'), nconf.get('mongo:password'));
 			}
@@ -162,12 +161,12 @@ try {
 			
 			var socket = false;
 			io.sockets.on('connection', function(s){
-				/* Load socket listeners */
+				// Load socket listeners
 				socket = s;
 				require('./server/routes/sockets')(app,db,socket);
 			});
 			
-			/* Load routes */
+			// Load routes
 			require('./server/routes/default')(app,db,socket);
 			require('./server/routes/downloads')(app,db,socket);
 			require('./server/routes/login')(app,db,socket);
@@ -179,7 +178,7 @@ try {
 				res.sendfile(process.cwd() + '/app/views/index.html');
 			});
 			
-			/* Load tasks */
+			// Load tasks
 			if (nconf.get('installed')) {
 				fs.readdir(process.cwd() + '/server/tasks', function(error, files){
 					if (error) {
