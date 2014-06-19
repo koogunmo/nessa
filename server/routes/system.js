@@ -69,7 +69,8 @@ module.exports = function(app){
 			var usage = [];
 			
 			disks.forEach(function(disk){
-				if (disk.size <= 307200) return;
+				// Hide filesystems smaller than 2GB, and the boot partition
+				if (disk.size <= 2097152 || disk.mount == '/boot') return;
 				usage.push(disk);
 			});
 			
