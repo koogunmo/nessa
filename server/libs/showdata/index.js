@@ -138,9 +138,12 @@ var ShowData = {
 		var episodeCollection = db.collection('episode');
 		var showCollection = db.collection('show');
 		
+		// TO DO, sort by downloaded stamp OR airdate
+		
 		episodeCollection.find({
 			file: {$exists: true},
-			airdate: {$gt: lastweek-1, $lt: Math.round(new Date()/1000)}
+			airdate: {$gt: lastweek-1}
+			
 		}).toArray(function(error, results){
 			if (error){
 				logger.error(error);

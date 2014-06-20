@@ -67,10 +67,10 @@ module.exports = function(app){
 		var df = require('node-df');
 		df(function(error, disks){
 			var usage = [];
-			
+			var ignore = ['/boot','/dev','/net','/var','/Volumes/MobileBackups']
 			disks.forEach(function(disk){
-				// Hide filesystems smaller than 2GB, and the boot partition
-				if (disk.size <= 2097152 || disk.mount == '/boot') return;
+				// Hide filesystems smaller than 2GB, and volatile filesystems
+				if (ignore.indexOf(disk.mount) >= 0 || disk.size <= 2097152) return;
 				usage.push(disk);
 			});
 			

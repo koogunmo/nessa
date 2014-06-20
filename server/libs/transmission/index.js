@@ -307,7 +307,8 @@ var torrent = {
 							});
 							var record = {
 								status: true,
-								file: target
+								file: target,
+								downloaded: Date.now()
 							};
 							helper.fileCopy(file, showdir + '/' + target, function(){
 								episodeCollection.update({hash: hash}, {$set: record}, function(error, affected){

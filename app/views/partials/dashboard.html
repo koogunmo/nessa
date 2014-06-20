@@ -12,7 +12,6 @@
 				<h3>Last 7 days</h3>
 			</div>
 			<div>
-				
 				<div class="panel" ng-class="{'panel-success': episode.watched, 'panel-warning': !episode.watched}" ng-repeat="episode in latest | orderBy:['airdate','show_name']:true" ng-controller="episodeCtrl">
 					<div class="panel-heading">
 						<span class="fa fa-lg pull-right" ng-class="{'fa-angle-down': collapsed, 'fa-angle-up': !collapsed}" ng-click="collapsed=!collapsed"></span>
@@ -55,7 +54,6 @@
 				</div>
 			</div>
 		</div>
-	
 	</div>
 	
 	<div class="panel panel-primary">
@@ -73,10 +71,11 @@
 			<hr />
 			<div ng-if="stats.disks">
 				<div ng-repeat="disk in stats.disks">
-					<span>{{disk.mount}} ({{disk.size*1024|formatBytes}}; Used: {{disk.used*1024|formatBytes}})</span>
-					<progress animate="false" title="" style="height: 10px;">
-						<bar type="danger" value="disk.capacity*100"></bar>
-						<bar type="success" value="100-(disk.capacity*100)"></bar>
+					<span class="pull-right">{{disk.size*1024|formatBytes}}</span>
+					<span>{{disk.mount}}</span>
+					<progress animate="false" title="">
+						<bar type="danger" value="disk.capacity*100">{{disk.used*1024|formatBytes}}</bar>
+						<bar type="success" value="100-(disk.capacity*100)">{{disk.available*1024|formatBytes}}</bar>
 					</progress>
 				</div>
 			</div>
