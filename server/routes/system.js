@@ -75,9 +75,14 @@ module.exports = function(app){
 			});
 			
 			res.send({
-				version: pkg.version,
+				disks: usage,
+				system: {
+					arch: process.arch,
+					node: process.version,
+					platform: process.platform
+				},
 				uptime: process.uptime(),
-				disks: usage
+				version: pkg.version
 			});
 		});
 	});

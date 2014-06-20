@@ -42,7 +42,7 @@
 						<h4 class="panel-title">{{day.date|moment:'dddd Do MMMM'}}</h4>
 					</div>
 				</div>
-				<div class="panel panel-info" ng-repeat="episode in day.episodes" ng-controller="episodeCtrl">
+				<div class="panel panel-info" ng-repeat="episode in day.episodes" ng-controller="episodeCtrl" ng-if="!episode.episode.in_collection">
 					<div class="panel-heading">
 						<span class="fa fa-lg pull-right" ng-class="{'fa-angle-down': collapsed, 'fa-angle-up': !collapsed}" ng-click="collapsed=!collapsed"></span>
 						<h4 class="panel-title"><a href="/shows/{{episode.show.tvdb_id}}">{{episode.show.title}}</a> <span class="small">{{episode.episode.title}}</span></h4>
@@ -69,6 +69,10 @@
 						<span ng-switch-when="1">{{uptime.days}} day</span>
 						<span ng-switch-default>{{uptime.days}} days</span>
 						<span>{{uptime.hour|zeroPad}}:{{uptime.mins|zeroPad}}:{{uptime.secs|zeroPad}}</span>
+					</div>
+					<hr />
+					<div>
+						Node {{stats.system.node}} ({{stats.system.platform}} {{stats.system.arch}})
 					</div>
 				</tab>
 				<tab heading="Disk Usage" ng-if="stats.disks">
