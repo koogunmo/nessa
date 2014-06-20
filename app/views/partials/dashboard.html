@@ -61,24 +61,27 @@
 			<h4 class="panel-title">System details</h4>
 		</div>
 		<div class="panel-body">
-			<div>Version: {{stats.version}}</div>
-			<div ng-switch="uptime.days">
-				Uptime: 
-				<span ng-switch-when="1">{{uptime.days}} day</span>
-				<span ng-switch-default>{{uptime.days}} days</span>
-				<span>{{uptime.hour|zeroPad}}:{{uptime.mins|zeroPad}}:{{uptime.secs|zeroPad}}</span>
-			</div>
-			<hr />
-			<div ng-if="stats.disks">
-				<div ng-repeat="disk in stats.disks">
-					<span class="pull-right">{{disk.size*1024|formatBytes}}</span>
-					<span>{{disk.mount}}</span>
-					<progress animate="false" title="">
-						<bar type="danger" value="disk.capacity*100">{{disk.used*1024|formatBytes}}</bar>
-						<bar type="success" value="100-(disk.capacity*100)">{{disk.available*1024|formatBytes}}</bar>
-					</progress>
-				</div>
-			</div>
+			<tabset>
+				<tab heading="Details">
+					<div>Version: {{stats.version}}</div>
+					<div ng-switch="uptime.days">
+						Uptime: 
+						<span ng-switch-when="1">{{uptime.days}} day</span>
+						<span ng-switch-default>{{uptime.days}} days</span>
+						<span>{{uptime.hour|zeroPad}}:{{uptime.mins|zeroPad}}:{{uptime.secs|zeroPad}}</span>
+					</div>
+				</tab>
+				<tab heading="Disk Usage" ng-if="stats.disks">
+					<div ng-repeat="disk in stats.disks">
+						<span class="pull-right">{{disk.size*1024|formatBytes}}</span>
+						<span>{{disk.mount}}</span>
+						<progress animate="false" title="">
+							<bar type="danger" value="disk.capacity*100">{{disk.used*1024|formatBytes}}</bar>
+							<bar type="success" value="100-(disk.capacity*100)">{{disk.available*1024|formatBytes}}</bar>
+						</progress>
+					</div>
+				</tab>
+			</tabset>
 		</div>
 	</div>
 	
