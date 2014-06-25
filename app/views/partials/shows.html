@@ -22,7 +22,7 @@
 	</div>
 	<div class="row">
 		<div class="show col-sm-2" ng-repeat="show in results = (shows | filter:filter) | orderBy:'name'">
-			<div class="image" title="{{show.name}}" ng-class="{'ended': show.ended}">
+			<div class="image" ng-class="{'ended': show.ended}">
 				<span class="badge unwatched" ng-if="show.progress.left>0">{{show.progress.left}}</span>
 				<!--span class="badge new" ng-if="!show.progress">&nbsp;</span-->
 				<div class="corner"></div>
@@ -34,6 +34,7 @@
 						<div class="hud">
 							<span class="fa fa-rss" ng-if="show.status && !!show.feed" title="RSS feed enabled"></span>
 							<span class="fa fa-exchange" ng-if="!!show.trakt" title="Synchronized with Trakt"></span>
+							<span class="fa fa-exclamation-circle" ng-if="show.ended" title="Series ended/cancelled"></span>
 						</div>
 						<progress animate="false" title="{{show.progress.percentage}}% Watched">
 							<bar type="success" value="show.progress.percentage"></bar>

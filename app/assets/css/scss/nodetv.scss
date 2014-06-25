@@ -4,7 +4,7 @@ $break-small: 767px;
 
 body {
 	background-color: #F7F7F7;
-	font-family: 'Droid Sans', Arial, sans-serif;
+	font-family: 'Helvetica Neue', 'Roboto', Arial, sans-serif;
 	font-weight: 200;
 	padding-top: 60px;
 }
@@ -156,11 +156,17 @@ input.form-control+input.form-control {
 			}
 		}
 	}
-	
+	.nav-tabs {
+		margin-bottom: 10px;
+	}
 	.small {
 		color: inherit;
 		padding-left: 10px;
 		white-space: nowrap;
+	}
+	hr {
+		margin-bottom: 10px;
+		margin-top: 10px;
 	}
 	
 	@media screen and (max-width: $break-small) {
