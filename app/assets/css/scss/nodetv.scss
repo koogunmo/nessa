@@ -7,6 +7,12 @@ body {
 	font-family: 'Helvetica Neue', 'Roboto', Arial, sans-serif;
 	font-weight: 200;
 	padding-top: 60px;
+	
+	@media (max-width: $break-small){
+		font-family: -apple-system-font;
+		font-size: 17px;
+		line-height: 21px;
+	}
 }
 
 /* Global elements */
@@ -24,11 +30,11 @@ body {
 }
 
 ul.navbar-nav a {
-	> span.glyphicon {
+	> span.fa {
 		margin-right: 5px;
 	}
 	@media screen and (max-width: $break-small){
-		> span.glyphicon {
+		> span.fa {
 			float: right;
 		}
 	}
@@ -37,6 +43,15 @@ ul.navbar-nav a {
 .panel-group {
 	.panel-heading {
 		cursor: pointer;
+	}
+}
+
+.modal-open {
+	#main, navbar {
+		-webkit-filter: blur(8px);
+	}
+	.alert-container {
+		display: none;
 	}
 }
 
@@ -245,7 +260,7 @@ input.form-control+input.form-control {
 				display: inline-block;
 				margin-bottom: 5px;
 				width: 45%;
-				> .glyphicon {
+				> .fa {
 					margin-right: 5px;
 				}
 			}
@@ -255,7 +270,7 @@ input.form-control+input.form-control {
 					display: block;
 					text-align: left;
 					width: 100%;
-					> .glyphicon {
+					> .fa {
 						float: right;
 						margin-right: 0px;
 					}
@@ -445,7 +460,7 @@ input.form-control+input.form-control {
 					-webkit-transition: all 0.5s;
 					visibility: hidden;
 					z-index: 5;
-					> .glyphicon {
+					> .fa {
 						color: #AAAAAA;
 						cursor: pointer;
 						padding: 0px 5px;
