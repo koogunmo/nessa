@@ -45,14 +45,19 @@ ul.navbar-nav a {
 		cursor: pointer;
 	}
 }
-
+/*
 .modal-open {
-	#main, navbar {
+	#main, .navbar {
 		-webkit-filter: blur(8px);
 	}
 	.alert-container {
 		display: none;
 	}
+}
+*/
+
+#main {
+	transition: all 0.5s;
 }
 
 /* Form elements */
@@ -347,7 +352,7 @@ input.form-control+input.form-control {
 	div.image {
 		display: none;
 		.corner {
-			display: none;
+			display: none !important;
 			height: 25px;
 			position: absolute;
 			right: 0px;
@@ -499,6 +504,10 @@ input.form-control+input.form-control {
 						position: absolute;
 						right: 0px;
 						text-align: left;
+						
+						span {
+							margin-right: 5px;
+						}
 					}
 					.progress {
 						bottom: 5px;

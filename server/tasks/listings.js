@@ -8,7 +8,9 @@ try {
 		shows.getShowlist();
 		// Update existing show information (synopsis, artwork, etc)
 		var showCollection = db.collection('show');
-		showCollection.find({status: {$exists: true}}).toArray(function(error, results){
+		
+		// Don't update ended shows automatically, nothing's gonna change
+		showCollection.find({status: {$exists: true}, ended: false}).toArray(function(error, results){
 			if (error){
 				console.error(error);
 				return;
@@ -26,7 +28,8 @@ try {
 		});
 	}
 	
-	/* Every night at 1am */
+	// Update daily at 1am
+	// need to do this more often
 	var rule = new schedule.RecurrenceRule();
 		rule.hour		= 1;
 		rule.minute		= 0;

@@ -41,6 +41,7 @@ var ShowData = {
 						imdb: json.imdb_id,
 						name: json.title,
 						synopsis: json.overview,
+						genres: json.genres,
 						status: false,
 						trakt: true
 					};
@@ -532,10 +533,16 @@ var ShowData = {
 			showCollection.findOne({tvdb: tvdb}, function(error, show){
 				show.name = json.title;
 				show.imdb = json.imdb_id;
+				show.genres = json.genres;
 				show.synopsis = json.overview;
-				if (json.status == 'Ended') {
-					show.ended = true;
-				//	if (show.status === true) show.status = false;
+				
+				switch (json.status){
+					case 'Ended':
+						show.ended = true;
+						break;
+					case 'Continuing':
+					default:
+						show.ended = false;
 				}
 				showCollection.save(show, function(error, result){
 					if (typeof(callback) == 'function') callback(error, tvdb);
