@@ -266,7 +266,7 @@ exports = module.exports = {
 			if (!hash) return;
 			if (!name) name = hash;
 			var trackers = [
-		//		'udp://inferno.demonoid.me:3396',
+				'http://inferno.demonoid.com:3396',
 				'udp://open.demonii.com:1337',
 				'udp://tracker.ccc.de:80',
 				'udp://tracker.coppersurfer.tk:6969',
