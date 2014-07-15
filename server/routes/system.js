@@ -44,13 +44,35 @@ module.exports = function(app){
 			*/
 		});
 	}).post('/api/system', function(req,res){
+		var scanner	= plugin('scanner'),
+			shows	= plugin('showdata');
+		
 		if (req.body.action){
 			switch (req.body.action){
 				case 'latest':
+					// Check for new downloads
 					break;
 				case 'listings':
+					// Update all show listings
+					var showCollection = db.collection('show');
+					showCollection.find({status: {$exists: true}}).toArray(function(error, results){
+						results.forEach(function(show){
+							shows.getArtwork(show.tvdb);
+							shows.getProgress(show.tvdb);
+							shows.getFullListings(show.tvdb, function(error, tvdb){
+								shows.getHashes(show.tvdb);
+							});
+						});
+					});
 					break;
 				case 'rescan':
+					// Rescan media
+					scanner.shows(function(error, tvdb){
+						shows.getFullListings(tvdb, function(error, tvdb){
+							shows.getHashes(tvdb);
+							scanner.episodes(tvdb);
+						});
+					});
 					break;
 				case 'restart':
 					system.restart();
@@ -59,7 +81,6 @@ module.exports = function(app){
 					system.update();
 					break;
 			}
-			console.log(req.body.action);
 		}
 	});
 	

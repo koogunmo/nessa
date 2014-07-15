@@ -10,7 +10,8 @@ try {
 		var showCollection = db.collection('show');
 		
 		// Don't update ended shows automatically, nothing's gonna change
-		showCollection.find({status: {$exists: true}, ended: false}).toArray(function(error, results){
+	//	showCollection.find({status: {$exists: true}, ended: false}).toArray(function(error, results){
+		showCollection.find({status: {$exists: true}}).toArray(function(error, results){
 			if (error){
 				console.error(error);
 				return;
