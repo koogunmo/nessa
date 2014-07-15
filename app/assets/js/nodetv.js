@@ -100,11 +100,15 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 		
 	nessa.controller('downloadAddCtrl', function($modalInstance, $scope, $socket){
 		window.modal = $modalInstance;
+		
+		$scope.magnet = {
+			url: null
+		};
 		$scope.close = function(){
 			$modalInstance.close();
 		};
 		$scope.save = function(){
-			$socket.emit('download.url', $scope.url);
+			$socket.emit('download.url', $scope.magnet.url);
 			$modalInstance.close();
 		};
 	});

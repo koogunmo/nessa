@@ -118,7 +118,8 @@ var bodyParser	= require('body-parser'),
 	
 app.use(compress());
 app.use(cookieParser());
-app.use(bodyParser());
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
 
 if (!nconf.get('listen:nginx')){
 	app.use('/assets', express.static(process.cwd() + '/app/assets'));

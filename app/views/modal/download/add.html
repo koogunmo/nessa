@@ -2,15 +2,17 @@
 	<h4 class="modal-title">Add Download</h4>
 </div>
 <div class="modal-body">
-	<div class="form-group">
-		<label for="ipt_url">Magnet link</label>
-		<span class="input-group">
-			<span class="input-group-addon"><span class="fa fa-magnet"></span></span>
-			<input type="text" id="ipt_url" class="form-control" ng-model="url" />
-		</span>
-	</div>
+	<form action="/downloads/add" ng-submit="save()">
+		<div class="form-group">
+			<label for="ipt_url">Magnet link</label>
+			<span class="input-group">
+				<span class="input-group-addon"><span class="fa fa-magnet"></span></span>
+				<input type="text" id="ipt_url" class="form-control" ng-model="magnet.url" />
+			</span>
+		</div>
+	</form>
 </div>
 <div class="modal-footer">
-	<button type="button" class="btn btn-success" ng-show="url.length" ng-click="save()">Download</button>
+	<button type="button" class="btn btn-success" ng-show="magnet.url.length" ng-click="save()">Download</button>
 	<button type="button" class="btn btn-default" ng-click="close()">Close</button>
 </div>
