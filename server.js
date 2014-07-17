@@ -132,20 +132,32 @@ try {
 	require('./server/routes/system')(app);
 	
 	if (nconf.get('installed') && nconf.get('mongo')) {
+		
+		var dsn = 'mongodb://';
+		if (nconf.get('mongo:auth')) {
+			dsn += nconf.get('mongo:username')+':'+nconf.get('mongo:password')+'@';
+		}
+		dsn += nconf.get('mongo:host')+':'+nconf.get('mongo:port')+'/'+nconf.get('mongo:name');
+		
+		
+		/*
 		var MongoDb		= require('mongodb').Db,
 			MongoClient	= require('mongodb').MongoClient,
 			MongoServer	= require('mongodb').Server;
 		
 		var mongo = new MongoDb(nconf.get('mongo:name'), new MongoServer(nconf.get('mongo:host'), nconf.get('mongo:port')), {w: 1});
-		mongo.open(function(error, db){
+		*/
+		
+		var mongo = require('mongodb').MongoClient;
+		mongo.connect(dsn, {w:1}, function(error, db){
 			if (error) {
 				console.error('Unable to connect to MongoDB');
 				process.kill();
 				return;
 			}
-			if (nconf.get('mongo:auth')){
-				db.authenticate(nconf.get('mongo:username'), nconf.get('mongo:password'));
-			}
+//			if (nconf.get('mongo:auth')){
+//				db.authenticate(nconf.get('mongo:username'), nconf.get('mongo:password'));
+//			}
 			
 			logger.info('MongoDB: Connected to '+nconf.get('mongo:host'));
 			global.db = db;
