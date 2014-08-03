@@ -3,25 +3,25 @@
 		<div class="col-sm-12">
 			<div class="input-group">
 				<span class="input-group-addon btn btn-primary"><span class="fa fa-filter"></span></span>
-				<input type="text" class="form-control search" placeholder="Search show library..." ng-model="filter.name" />
+				<input type="text" class="form-control search" placeholder="Search show library..." ng-model="filter.string.name" />
 				<span class="input-group-addon btn btn-success" ui-sref="shows.add"><span class="fa fa-plus"></span></span>
 				<span class="input-group-addon btn btn-danger" ng-click="clearFilter()"><span class="fa fa-times"></span></span>
 			</div>
+			<!--div class="col-sm-12 well filter">
+				<label><input type="checkbox" ng-model="filter.watched" ng-change="update()" /> Hide Watched</label>
+			</div-->
 		</div>
 	</div>
+	
 	<div class="row">
 		<div ng-show="shows.length" class="col-sm-12" style="text-align: right;">
 			Showing {{results.length}} of {{shows.length}} shows
 		</div>
-		<!--
-		<div class="btn-group btn-group-sm">
-			<button type="" class="btn btn-default" ng-click="filter.progress.left=0">Watched</button>
-			<button type="" class="btn btn-default" >Ended</button>
-		</div>
-		-->
 	</div>
+	
 	<div class="row">
-		<div class="show col-sm-2" ng-repeat="show in results = (shows | filter:filter) | orderBy:'name'">
+		<div class="show col-sm-2" ng-repeat="show in results = (shows | filter:filter.string) | orderBy:'name'">
+			
 			<div class="image" ng-class="{'ended': show.ended}">
 				<span class="badge unwatched" ng-if="show.progress.left>0">{{show.progress.left}}</span>
 				<!--span class="badge new" ng-if="!show.progress">&nbsp;</span-->

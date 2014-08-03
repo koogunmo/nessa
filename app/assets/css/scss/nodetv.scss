@@ -4,12 +4,11 @@ $break-small: 767px;
 
 body {
 	background-color: #F7F7F7;
-	font-family: 'Helvetica Neue', 'Roboto', Arial, sans-serif;
+	font-family: -apple-system-font, 'Roboto', Arial, sans-serif;
 	font-weight: 200;
 	padding-top: 60px;
 	
 	@media (max-width: $break-small){
-		font-family: -apple-system-font;
 		font-size: 17px;
 		line-height: 21px;
 	}
@@ -262,6 +261,19 @@ input.form-control+input.form-control {
 	.nav {
 		margin-bottom: 10px;
 	}
+	.nav-pills {
+		display: table;
+		font-size: 15px;
+		width: 100%;
+		li {
+			display: table-cell;
+			float: none;
+			width: 33.3%;
+			a {
+				text-align: center;
+			}
+		}
+	}
 	.tab-pane {
 		div.buttons {
 			text-align: center;
@@ -350,6 +362,10 @@ input.form-control+input.form-control {
 #shows {
 	div.search {
 		padding: 10px 0px;
+	}
+	.filter {
+		border-top: none;
+		border-radius: 0px 0px 5px 5px;
 	}
 	.input-group-addon {
 		cursor: pointer;

@@ -3,6 +3,12 @@ define(function(){
 		$scope.settings = {};
 		$scope.shows	= [];
 		
+		$scope.filter	= {
+			string: {
+				name: ''
+			}
+		};
+		
 		$scope.clearFilter = function(){
 			$scope.filter.name = '';
 			$(document).trigger('lazyload');

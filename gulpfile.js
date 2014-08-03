@@ -13,6 +13,6 @@ gulp.task('nodemon', function(){
 });
 
 gulp.task('sass', function(){
-	gulp.src('./app/assets/css/scss/*.scss').pipe(sass({sourceComments: 'map'})).pipe(minify()).pipe(rename({suffix: '.min'})).pipe(gulp.dest('./app/assets/css'));
+	gulp.src('./app/assets/css/scss/*.scss').pipe(sass()).pipe(minify()).pipe(rename({suffix: '.min'})).pipe(gulp.dest('./app/assets/css'));
 });
 

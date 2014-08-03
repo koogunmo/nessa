@@ -1,5 +1,4 @@
-var exec	= require('child_process').exec,
-	extend	= require('xtend'),
+var extend	= require('xtend'),
 	fs		= require('fs'),
 	http	= require('http'),
 	log4js	= require('log4js'),

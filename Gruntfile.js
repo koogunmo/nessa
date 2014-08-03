@@ -5,7 +5,7 @@ module.exports = function(grunt){
 		concurrent: {
 			build: ['sass'],
 			run: {
-				tasks: ['watch','nodemon'],
+				tasks: ['watch'], //'nodemon'],
 				options: {
 					logConcurrentOutput: true
 				}
