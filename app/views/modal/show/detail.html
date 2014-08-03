@@ -3,7 +3,7 @@
 		<img src="/assets/gfx/no-banner.png" ng-src="/media/{{settings.shows.directory}}/{{summary.directory}}/banner.jpg" alt="{{summary.name}}" class="img-responsive" />
 	</div>
 	<div class="modal-body">
-		<tabset>
+		<tabset type="pills">
 			<tab heading="Synopsis">
 				<div class="synopsis well">
 					{{summary.synopsis || 'No synopsis available'}}
