@@ -24,7 +24,7 @@ module.exports = function(app, db){
 					blocks.forEach(function(mask){
 						var block = new netmask(mask);
 						if (block.contains(ip)) {
-							response.success = true;
+			//				response.success = true;
 						}
 					});
 				}
@@ -36,12 +36,12 @@ module.exports = function(app, db){
 		userCollection.count(function(error, count){
 			if (error) logger.error(error);
 			if (count){
-				userCollection.findOne({session: req.body.session}, function(error, result){
+				userCollection.findOne({sessions: {$elemMatch: {session: req.body.session}}}, function(error, result){
 					if (error) logger.error(error);
 					if (result) {
 						response.success = true;
-						userCollection.update({_id: result._id}, {$set: {last: Date.now()}}, function(error, affected){});
-						return res.send(response);
+						result.lastAccess = Date.now();
+						userCollection.save(result, function(error, affected){});
 					}
 					res.send(response);
 				});
@@ -55,7 +55,7 @@ module.exports = function(app, db){
 		var ObjectID = require('mongodb').ObjectID;
 		
 		var userCollection = db.collection('user');
-		var response = {success: false, session: false, lastTime: Date.now()};
+		var response = {success: false, sessions: [], lastTime: Date.now()};
 		
 		var hashed = require('crypto').createHash('sha256').update(req.body.password).digest('hex');
 		userCollection.findOne({username: req.body.username, password: hashed}, function(error, result){
@@ -66,24 +66,35 @@ module.exports = function(app, db){
 			if (result){
 				response.success = true;
 				response.session = uuid.v4();
-				userCollection.update({_id: result._id}, {$set: {session: response.session, last: Date.now()}}, function(error, affected){
-				//	logger.log(error, affected);
+				
+				result.lastAccess = Date.now();
+				if (!result.sessions) result.sessions = [];
+				result.sessions.push({
+					session: response.session,
+					timestamp: Date.now()
+				});
+				userCollection.save(result, function(error, affected){
+					if (!error) res.send(response);
 				});
 			}
-			res.send(response);
 		});
 		
 	}).post('/api/auth/logout', function(req,res){
 		var response = {success: true, session: false, lastTime: Date.now()};
+		
 		if (req.body.session){
 			var userCollection = db.collection('user');
-			userCollection.findOne({session: req.body.session}, function(error, result){
-				result.session = false;
+			userCollection.findOne({sessions: {$elemMatch: {session: req.body.session}}}, function(error, result){
+				var sessions = [];
+				result.sessions.forEach(function(session){
+					if (!session.timestamp || session.session == req.body.session) return;
+					sessions.push(session);
+				});
+				result.sessions = sessions;
 				userCollection.save(result, function(error, affected){
-				//	logger.log(error, affected);
+					if (!error) res.send(response);
 				});
 			});
 		}
-		res.send(response);
 	});
 }
