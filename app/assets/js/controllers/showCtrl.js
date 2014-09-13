@@ -17,6 +17,15 @@ define(function(){
 		$scope.close = function(){
 			$modalInstance.close();
 		};
+		$scope.downloadAll = function(){
+			if (confirm('Are you sure you want to download all available episodes?')) {
+				$http.get('/api/shows/'+tvdb+'/download').success(function(){
+					$modalInstance.close();
+				}).error(function(json, status){
+					console.error(json, status);
+				});
+			}
+		};
 		$scope.rescan = function(){
 			$http.get('/api/shows/'+tvdb+'/rescan').success(function(json, status){
 				$modalInstance.close();

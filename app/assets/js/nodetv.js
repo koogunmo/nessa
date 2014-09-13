@@ -132,6 +132,7 @@ require(['jquery','socket.io','app'], function($,io,nessa){
 				});
 				*/
 				$socket.emit('download.remove', {id: $scope.torrent.id, purge: true});
+				$modalInstance.dismiss('close');
 			}
 		};
 		$scope.toggle = function(){

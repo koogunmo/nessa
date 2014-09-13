@@ -139,15 +139,6 @@ try {
 		}
 		dsn += nconf.get('mongo:host')+':'+nconf.get('mongo:port')+'/'+nconf.get('mongo:name');
 		
-		
-		/*
-		var MongoDb		= require('mongodb').Db,
-			MongoClient	= require('mongodb').MongoClient,
-			MongoServer	= require('mongodb').Server;
-		
-		var mongo = new MongoDb(nconf.get('mongo:name'), new MongoServer(nconf.get('mongo:host'), nconf.get('mongo:port')), {w: 1});
-		*/
-		
 		var mongo = require('mongodb').MongoClient;
 		mongo.connect(dsn, {w:1}, function(error, db){
 			if (error) {
@@ -155,10 +146,6 @@ try {
 				process.kill();
 				return;
 			}
-//			if (nconf.get('mongo:auth')){
-//				db.authenticate(nconf.get('mongo:username'), nconf.get('mongo:password'));
-//			}
-			
 			logger.info('MongoDB: Connected to '+nconf.get('mongo:host'));
 			global.db = db;
 			

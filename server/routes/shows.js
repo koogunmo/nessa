@@ -151,6 +151,20 @@ module.exports = function(app, db, socket){
 				shows.getHashes(tvdb);
 			});
 			res.send(202);
+		} else {
+			res.send(400);
+		}
+	}).get('/api/shows/:id/download', function(req,res){
+		// Download all missing episodes
+		if (req.params.id){
+			var tvdb = parseInt(req.params.id, 10);
+			
+			console.log(tvdb);
+			
+		//	shows.downloadAll(tvdb);
+			res.send(202);
+		} else {
+			res.send(400);
 		}
 	}).get('/api/shows/:id/rescan', function(req,res){
 		// Rescan local files
@@ -165,6 +179,8 @@ module.exports = function(app, db, socket){
 			});
 			*/
 			res.send(202);
+		} else {
+			res.send(400);
 		}
 	});
 	

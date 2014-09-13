@@ -86,6 +86,35 @@ var ShowData = {
 		});
 	},
 	
+	downloadAll: function(tvdb, callback){
+		// Download all available episode, except the ones we already have
+		tvdb = parseInt(tvdb, 10);
+		episodeCollection.find({tvdb: tvdb}).toArray(function(error, results){
+			if (error) logger.error(error);
+			results.forEach(function(result){
+				if (!result.hash || result.file) return;
+				var magnet = helper.createMagnet(result.hash);
+				if (magnet) {
+					torrent.add(magnet, function(error, args){
+						if (error) {
+							logger.error(error);
+							return;
+						}
+						if (args){
+							episodeCollection.update({hash: result.hash}, {
+								$set: {
+									hash: args.hashString.toUpperCase(),
+									status: false
+								}
+							}, {w: 0});
+						}
+					});
+				}
+			});
+		//	if (typeof(callback) == 'function') callback()
+		});
+	},
+	
 	episodes: function(tvdb, callback){
 		tvdb = parseInt(tvdb, 10);
 		var episodeCollection = db.collection('episode');

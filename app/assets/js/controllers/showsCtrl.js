@@ -10,7 +10,7 @@ define(function(){
 		};
 		
 		$scope.clearFilter = function(){
-			$scope.filter.name = '';
+			$scope.filter.string.name = '';
 			$(document).trigger('lazyload');
 		};
 		

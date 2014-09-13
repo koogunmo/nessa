@@ -20,12 +20,11 @@
 				<span class="fa fa-gears"></span>
 			</button>
 		</span>
-		
 		<h4>{{download.name}}</h4>
 		<div class="progress progress-striped" title="{{download.percentDone*100 | number:2}}%">
 			<div class="progress-bar" role="progressbar" style="width: {{download.percentDone*100}}%;" ng-class="{'progress-bar-success': download.percentDone==1}"></div>
 		</div>
-		<div class="stats ">
+		<div class="stats">
 			<span class="pull-right hidden-xs">
 				<span ng-if="download.rateDownload">
 					{{download.rateDownload|formatBytes}}

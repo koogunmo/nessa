@@ -23,21 +23,33 @@ body {
 	cursor: pointer;
 }
 
+.navbar-header {
+	.navbar-brand {
+		transition: color 0.5s;
+	}
+}
+
 .navbar-inverse {
 	background-color: rgba(0,0,0,0.9);
 	box-shadow: 0px 3px 8px #666666;
-}
-
-ul.navbar-nav a {
-	> span.fa {
-		margin-right: 5px;
-	}
-	@media screen and (max-width: $break-small){
-		> span.fa {
-			float: right;
+		
+	.navbar-nav {
+		>li {
+			>a {
+				transition: color 0.5s;
+				> span.fa {
+					margin-right: 5px;
+				}
+				@media screen and (max-width: $break-small){
+					> span.fa {
+						float: right;
+					}
+				}
+			}
 		}
 	}
 }
+
 
 .panel-group {
 	.panel-heading {
