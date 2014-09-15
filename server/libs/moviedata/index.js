@@ -5,12 +5,20 @@ var MovieData = {
 	
 	list: function(callback){
 		var movieCollection = db.collection('movie');
-		movieCollection.find({status: {$exists: true}}).toArray(callback);
+		movieCollection.find({}).toArray(callback);
+		
 	},	
+	
+	
 	remove: function(tmdb, callback){
 		var movieCollection = db.collection('movie');
 		movieCollection.update({tmdb: tmdb}, {$unset: {status: true}}, {upsert: true}, callback);
 	},
+	
+	scan: function(){
+		
+	},
+	
 	
 	unmatched: function(){},
 	match: function(){},

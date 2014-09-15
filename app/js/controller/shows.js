@@ -234,5 +234,64 @@ define(['app'], function(nessa){
 		};
 	});
 	
+	nessa.controller('matchCtrl', function($http, $modalInstance, $scope, $socket, $state){
+		$scope.unmatched	= [];
+		$scope.matched		= [];
+		
+		$http.get('/api/shows/unmatched').success(function(json,status){
+			$scope.unmatched.push(json);
+		});
+		
+		$socket.on('shows.unmatched', function(data){
+			
+		});
+		
+		$scope.close = function(){
+			$modalInstance.dismiss('close');
+		};
+		$scope.save = function(){
+			$http.post('/api/shows/match', {matched: $scope.matched}).success(function(json,status){
+				$scope.close();
+			});
+		};
+		$scope.set = function(id, tvdb){
+			$scope.matched[id] = {id: id, tvdb: tvdb};
+		};
+	});
+	
+	nessa.controller('searchCtrl', function($http, $modalInstance, $scope, $socket){
+		$scope.selected = null;
+		$scope.filter = {
+			query: ''
+		};
+		$scope.close = function(){
+			$modalInstance.close();
+		};
+		$scope.reset = function(){
+			$scope.selected = null;
+			$scope.results = null;
+			$scope.filter.query = '';
+		};
+		
+		$scope.search = function(){
+			$http.post('/api/shows/search', {q: $scope.filter.query}).success(function(results, status){
+				$scope.results = results;
+			}).error(function(json, status){
+				console.error(json, status);
+			});
+		};
+		
+		$scope.select = function(tvdb) {
+			$scope.selected = tvdb;
+		};
+		$scope.save = function(){
+			$http.post('/api/shows', {tvdb: $scope.selected}).success(function(json, status){
+				$modalInstance.close();
+			}).error(function(json, status){
+				console.error(json, status);
+			});
+		};
+	});
+
 	return nessa;
 });

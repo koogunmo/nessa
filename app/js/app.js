@@ -2,7 +2,7 @@ define('app', ['angular','socket.io','moment','ngResource','ngStorage','ngTouch'
 	
 	var nessa = angular.module('nessa', ['ngResource','ngStorage','ui.bootstrap','ui.router']);
 	
-	/****** Filter ******/
+	/****** Filters ******/
 	
 	nessa.filter('bytes', function() {
 		return function(bytes, precision) {
@@ -202,6 +202,13 @@ define('app', ['angular','socket.io','moment','ngResource','ngStorage','ngTouch'
 	});
 	
 	nessa.run(function($auth, $localStorage, $location, $rootScope, $sessionStorage, $socket, $state){
+		
+		$rootScope.downloads = null;
+		
+		$socket.on('download.list', function(data){
+			$rootScope.downloads = data;
+		});
+		
 		$rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams){
 			if (toState.data.secure){
 				$auth.check().then(function(success){

@@ -103,7 +103,32 @@ define(['app'], function(nessa){
 			}
 		};
 	});
-	
+
+	nessa.controller('userCtrl', function($modalInstance, $scope, $socket, $state, $stateParams){
+		window.modal = $modalInstance;
+		$scope.user = {};
+		if ($stateParams.id) {
+			var id = $stateParams.id;
+			$socket.emit('system.user', id);
+			$socket.on('system.user', function(json){
+				delete json.password
+				$scope.user = json;
+			});
+		}
+		$scope.remove = function(){
+			if (confirm('Are you sure?')){
+				$socket.emit('system.user.remove', $scope.user._id);
+				$modalInstance.close();
+			}
+		};
+		$scope.save = function(){
+			$socket.emit('system.user.update', $scope.user);
+			$modalInstance.close();
+		};
+		$scope.close = function(){
+			$modalInstance.dismiss();
+		};
+	});		
 	
 	return nessa;
 });

@@ -172,7 +172,7 @@ try {
 			require('./server/routes/default')(app,db,socket);
 			require('./server/routes/downloads')(app,db,socket);
 			require('./server/routes/login')(app,db,socket);
-		//	require('./server/routes/movies')(app,db,socket);
+			require('./server/routes/movies')(app,db,socket);
 			require('./server/routes/shows')(app,db,socket);
 			require('./server/routes/users')(app,db,socket);
 			
