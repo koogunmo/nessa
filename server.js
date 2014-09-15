@@ -122,6 +122,8 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
 if (!nconf.get('listen:nginx')){
+	app.use('/app', express.static(process.cwd() + '/app'));
+	
 	app.use('/assets', express.static(process.cwd() + '/app/assets'));
 	app.use('/template', express.static(process.cwd() + '/app/views/ui'));
 	app.use('/views', express.static(process.cwd() + '/app/views'));

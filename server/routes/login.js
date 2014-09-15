@@ -59,7 +59,7 @@ module.exports = function(app, db){
 		
 		var hashed = require('crypto').createHash('sha256').update(req.body.password).digest('hex');
 		userCollection.findOne({username: req.body.username, password: hashed}, function(error, result){
-			if (error) {
+			if (error || !result) {
 				res.send(response);
 				return;
 			}

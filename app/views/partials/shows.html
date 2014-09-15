@@ -26,7 +26,7 @@
 				<span class="badge unwatched" ng-if="show.progress.left>0">{{show.progress.left}}</span>
 				<!--span class="badge new" ng-if="!show.progress">&nbsp;</span-->
 				<div class="corner"></div>
-				<a href="/shows/{{show.tvdb}}">
+				<a ui-sref="shows.detail({showid: show.tvdb})">
 					<img data-src="/media/{{settings.shows.directory}}/{{show.directory}}/poster.jpg" alt="" class="img-responsive" />
 					<h6>{{show.name}}</h6>
 					<div class="overlay">
@@ -47,7 +47,7 @@
 					<span class="fa fa-eye" title="Mark entire series as watched"></span>
 				</div>				
 			</div>
-			<div class="title"><a href="/shows/{{show.tvdb}}">{{show.name}}</a></div>
+			<div class="title"><a ui-sref="shows.detail({showid: show.tvdb})">{{show.name}}</a></div>
 		</div>
 		<div class="col-sm-12" ng-show="!results.length" style="text-align: center;">
 			No matches found
