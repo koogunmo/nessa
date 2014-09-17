@@ -1,14 +1,14 @@
 'use strict';
 
-require(['app','controller/auth','controller/global','controller/dashboard','controller/downloads','controller/movies','controller/settings','controller/shows'], function(nessa){
-	console.log('NodeTV: Initializing...');
+console.log('NodeTV: Initializing...');
+require(['app','tv.auth','tv.global','tv.dashboard','tv.shows','tv.movies','tv.downloads','tv.settings'], function(nessa){
 	
 	// ???
 	
 	console.log('NodeTV: Bootstrapping...');
 	angular.bootstrap(document, ['nessa']);
 	
-	// jQuery below (must update at some point)
+	// jQuery below (must replace with directives at some point...)
 	
 	$(window).on('orientationchange resize scroll', function(){
 		$(document).trigger('lazyload');

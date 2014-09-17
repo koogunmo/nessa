@@ -2,6 +2,7 @@ define(['app'], function(nessa){
 	
 	nessa.config(function($stateProvider){
 		$stateProvider.state('settings', {
+			abstract: true,
 			url: '/settings',
 			controller: 'settingsCtrl',
 			templateUrl: 'views/partials/settings.html',
@@ -9,6 +10,8 @@ define(['app'], function(nessa){
 				secure: true,
 				title: 'Settings'
 			}
+		}).state('settings.index', {
+			url: ''
 		}).state('settings.user', {
 			abstract: true,
 			url: '/user'
@@ -50,6 +53,15 @@ define(['app'], function(nessa){
 				if (window.modal) window.modal.dismiss();
 				window.modal = null;
 			}
+		});
+	});
+	
+	nessa.run(function($rootScope){
+		$rootScope.menu.push({
+			path: 'settings.index',
+			name: 'Settings',
+			icon: 'gears',
+			order: 100
 		});
 	});
 	

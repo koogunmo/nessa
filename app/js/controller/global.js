@@ -51,34 +51,12 @@ define(['app'], function(nessa){
 	});
 	
 	nessa.controller('navCtrl', function($location, $rootScope, $scope){
-		$scope.menu = [{
-			path: 'dashboard.default',
-			name: 'Dashboard',
-			icon: 'dashboard'
-		},{
-			path: 'shows',
-			name: 'Shows',
-			icon: 'th'
-		},{
-			path: 'movies',
-			name: 'Movies',
-			icon: 'film'
-		},{
-			path: 'downloads',
-			name: 'Downloads',
-			icon: 'download'
-		},{
-			path: 'settings',
-			name: 'Settings',
-			icon: 'gears'
-			
-		}];
+		$scope.menu = $rootScope.menu;
 		
+		$scope.isCollapsed = true;
 		$scope.isActive = function(viewLocation){
 			return viewLocation === $location.path();
 		};
-		$scope.isCollapsed = true;
-		
 		$scope.collapse = function(){
 			$scope.isCollapsed = true;
 		};

@@ -31,11 +31,11 @@
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
 				</button>
-				<a class="navbar-brand" ui-sref="dashboard.default">NodeTV</a>
+				<a class="navbar-brand" ui-sref="dashboard.index">NodeTV</a>
 			</div>
 			<nav class="collapse navbar-collapse" collapse="isCollapsed">
 				<ul class="nav navbar-nav navbar-left" ng-show="authenticated">
-					<li ng-repeat="item in menu" ng-class="{active: isActive('/'+item.path)}" ng-cloak>
+					<li ng-repeat="item in menu | orderBy: 'order'" ng-class="{active: isActive('/'+item.path)}" ng-cloak>
 						<a ui-sref="{{item.path}}" ng-click="collapse()">
 							<span class="fa fa-{{item.icon}}"></span>
 							{{item.name}}
@@ -44,10 +44,7 @@
 				</ul>
 				<ul class="nav navbar-nav navbar-right" ng-show="authenticated">
 					<li>
-						<a ui-sref="logout">
-							<span class="fa fa-sign-out"></span>
-							Logout
-						</a>
+						<a ui-sref="logout"><span class="fa fa-sign-out"></span> Logout</a>
 					</li>
 				</ul>
 			</nav>

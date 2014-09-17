@@ -1,6 +1,13 @@
 define('app', ['angular','socket.io','moment','ngResource','ngStorage','ngTouch','ui.bootstrap','ui.router'], function(angular,io,moment){
-	
 	var nessa = angular.module('nessa', ['ngResource','ngStorage','ui.bootstrap','ui.router']);
+	
+	nessa.config(function($urlRouterProvider){
+		$urlRouterProvider.otherwise('/dashboard');
+	});
+	
+	nessa.run(function($rootScope){
+		$rootScope.menu = [];
+	});
 	
 	/****** Filters ******/
 	
@@ -8,8 +15,8 @@ define('app', ['angular','socket.io','moment','ngResource','ngStorage','ngTouch'
 		return function(bytes, precision) {
 			if (isNaN(parseFloat(bytes)) || !isFinite(bytes)) return '0';
 			if (typeof precision === 'undefined') precision = 1;
-			var	units = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB'],
-				number = Math.floor(Math.log(bytes) / Math.log(1024));
+			var	units	= ['bytes','KB','MB','GB','TB','PB','EB','ZB','YB'],
+				number	= Math.floor(Math.log(bytes) / Math.log(1024));
 			
 			return (bytes / Math.pow(1024, Math.floor(number))).toFixed(precision) +  ' ' + units[number];
 		}

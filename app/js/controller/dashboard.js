@@ -10,14 +10,24 @@ define(['app'], function(nessa){
 				title: 'Dashboard'
 			}
 		}).state('dashboard.default', {
-			url: '/dashboard',
-		}).state('dashboard.index', {
 			url: ''
+		}).state('dashboard.index', {
+			url: '/dashboard'
+		});
+	});
+
+	nessa.run(function($rootScope){
+		$rootScope.menu.push({
+			path: 'dashboard.index',
+			name: 'Dashboard',
+			icon: 'dashboard',
+			order: 10
 		});
 	});
 	
+	/****** Controller ******/
+	
 	nessa.controller('dashboardCtrl', function($http, $scope, $socket){
-		console.log('Dashboard: Loaded');
 		
 		$scope.unmatched = 0;
 		$scope.upcoming = [];
@@ -72,8 +82,5 @@ define(['app'], function(nessa){
 		}
 	});
 	
-	nessa.run(function(){
-		// Run after bootstrap
-	});
 	return nessa;
 });

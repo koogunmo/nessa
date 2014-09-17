@@ -2,6 +2,7 @@ define(['app'], function(nessa){
 	
 	nessa.config(function($stateProvider){
 		$stateProvider.state('shows', {
+			abstract: true,
 			url: '/shows',
 			controller: 'showsCtrl',
 			templateUrl: 'views/partials/shows.html',
@@ -9,10 +10,12 @@ define(['app'], function(nessa){
 				secure: true,
 				title: 'Shows'
 			}
+		}).state('shows.index', {
+			url: ''
 		}).state('shows.add', {
 			url: '/add',
 			data: {
-				secure: true
+				title: 'Add Show'
 			},
 			onEnter: function($state, $stateParams, $modal){
 				$modal.open({
@@ -20,10 +23,10 @@ define(['app'], function(nessa){
 					controller: 'searchCtrl',
 					windowClass: 'modal-add'
 				}).result.then(function(result){
-					$state.transitionTo('shows');
+					$state.transitionTo('shows.index');
 					window.modal = null;
 				}, function(result){
-					$state.transitionTo('shows');
+					$state.transitionTo('shows.index');
 					window.modal = null;
 				});
 			},
@@ -35,7 +38,7 @@ define(['app'], function(nessa){
 		}).state('shows.detail', {
 			url: '/{showid:[0-9]+}',
 			data: {
-				secure: true
+				title: 'Show Details'
 			},
 			onEnter: function($modal, $state, $stateParams){
 				$modal.open({
@@ -44,10 +47,10 @@ define(['app'], function(nessa){
 					backdrop: 'static',
 					windowClass: 'modal-show'
 				}).result.then(function(result){
-					$state.transitionTo('shows');
+					$state.transitionTo('shows.index');
 					window.modal = null;
 				}, function(result){
-					$state.transitionTo('shows');
+					$state.transitionTo('shows.index');
 					window.modal = null;
 				});
 			},
@@ -67,10 +70,10 @@ define(['app'], function(nessa){
 					controller: 'matchCtrl',
 					backdrop: 'static'
 				}).result.then(function(result){
-					$state.transitionTo('shows');
+					$state.transitionTo('shows.index');
 					window.modal = null;
 				}, function(result){
-					$state.transitionTo('shows');
+					$state.transitionTo('shows.index');
 					window.modal = null;				
 				});
 			},
@@ -81,20 +84,44 @@ define(['app'], function(nessa){
 		});
 	});
 	
+	nessa.run(function($rootScope){
+		$rootScope.menu.push({
+			path: 'shows.index',
+			name: 'Shows',
+			icon: 'th',
+			order: 20
+		});
+	});
+	
 	/****** Controller ******/
 	
 	nessa.controller('showsCtrl', function($http, $rootScope, $scope, $socket){
 		$scope.settings = {};
 		$scope.shows	= [];
 		
-		$scope.filter	= {
-			string: {
-				name: ''
+		$scope.filters	= {
+			name: ''
+		};
+		
+		$scope.reduce = {
+			watched: false
+		};
+		
+		$scope.filterShows = function(show){
+			
+			if ($scope.reduce.watched){
+			//	console.log(show);
+				
+				// hide watched shows
+				
+			// && !show.progress.left){
+			//	return false;
 			}
+			return true;
 		};
 		
 		$scope.clearFilter = function(){
-			$scope.filter.string.name = '';
+			$scope.filters.name = '';
 			$(document).trigger('lazyload');
 		};
 		

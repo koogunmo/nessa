@@ -1,12 +1,14 @@
 define(['app'], function(nessa){
 	
 	nessa.config(function($stateProvider){
-		$stateProvider.state('login', {
+		$stateProvider.state('auth', {
+			
+		}).state('login', {
 			url: '/login',
 			controller: 'loginCtrl',
 			templateUrl: 'app/views/partials/login.html',
 			data: {
-				secure: true,
+			//	secure: true,
 				title: 'Login'
 			},
 			onEnter: function(){

@@ -10,7 +10,15 @@ requirejs.config({
 		'ngTouch': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-rc.1/angular-touch.min',
 		'socket.io': 'https://cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min',
 		'ui.bootstrap': 'libs/ui-bootstrap.min',
-		'ui.router': 'libs/ui-router.min'
+		'ui.router': 'libs/ui-router.min',
+		
+		'tv.auth': 'controller/auth',
+		'tv.dashboard': 'controller/dashboard',
+		'tv.downloads': 'controller/downloads',
+		'tv.global': 'controller/global',
+		'tv.movies': 'controller/movies',
+		'tv.settings': 'controller/settings',
+		'tv.shows': 'controller/shows'
 	},
 	shim: {
 		'angular':		{deps: ['jquery'], exports: 'angular'},

@@ -2,27 +2,28 @@ define(['app'], function(nessa){
 	
 	nessa.config(function($stateProvider){
 		$stateProvider.state('downloads', {
+			abstract: true,
 			url: '/downloads',
-			controller: 'downloadsCtrl',
-			templateUrl: 'views/partials/downloads.html',
 			data: {
 				secure: true,
 				title: 'Downloads'
 			}
+		}).state('downloads.index', {
+			url: '',
+			controller: 'downloadsCtrl',
+			templateUrl: 'views/partials/downloads.html'
+			
 		}).state('downloads.add', {
 			url: '/add',
-			data: {
-				secure: true
-			},
 			onEnter: function($state, $modal){
 				$modal.open({
 					controller: 'downloadAddCtrl',
 					templateUrl: 'views/modal/download/add.html'
 				}).result.then(function(result){
-					$state.transitionTo('downloads');
+					$state.transitionTo('downloads.index');
 					window.modal = null;
 				}, function(result){
-					$state.transitionTo('downloads');
+					$state.transitionTo('downloads.index');
 					window.modal = null;
 				});
 			},
@@ -40,10 +41,10 @@ define(['app'], function(nessa){
 					controller: 'downloadCtrl',
 					templateUrl: 'views/modal/download/settings.html'
 				}).result.then(function(result){
-					$state.transitionTo('downloads');
+					$state.transitionTo('downloads.index');
 					window.modal = null;
 				}, function(result){
-					$state.transitionTo('downloads');
+					$state.transitionTo('downloads.index');
 					window.modal = null;
 				});
 			},
@@ -55,6 +56,14 @@ define(['app'], function(nessa){
 		
 	});
 	
+	nessa.run(function($rootScope){
+		$rootScope.menu.push({
+			path: 'downloads.index',
+			name: 'Downloads',
+			icon: 'download',
+			order: 40
+		});
+	});
 	
 	/****** Controller ******/
 	

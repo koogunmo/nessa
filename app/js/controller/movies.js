@@ -2,6 +2,7 @@ define(['app'], function(nessa){
 	
 	nessa.config(function($stateProvider){
 		$stateProvider.state('movies', {
+			abstract: true,
 			url: '/movies',
 			controller: 'moviesCtrl',
 			templateUrl: 'views/partials/movies.html',
@@ -9,6 +10,19 @@ define(['app'], function(nessa){
 				secure: true,
 				title: 'Movies'
 			}
+		}).state('movies.index', {
+			url: ''
+		}).state('movies.add', {
+			url: '/add'
+		});
+	});
+	
+	nessa.run(function($rootScope){
+		$rootScope.menu.push({
+			path: 'movies.index',
+			name: 'Movies',
+			icon: 'film',
+			order: 30
 		});
 	});
 	
@@ -36,7 +50,7 @@ define(['app'], function(nessa){
 		
 		$http.get('/api/movies').success(function(json, status){
 			
-			console.log(json, status);
+		//	console.log(json, status);
 			
 			if (status == 200 && json) {
 				$scope.movies = json;
