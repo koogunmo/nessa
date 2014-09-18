@@ -1,6 +1,7 @@
 define(['app'], function(nessa){
 	
 	nessa.config(function($stateProvider){
+		
 		$stateProvider.state('settings', {
 			abstract: true,
 			url: '/settings',
@@ -12,7 +13,9 @@ define(['app'], function(nessa){
 			}
 		}).state('settings.index', {
 			url: ''
-		}).state('settings.user', {
+		});
+		
+		$stateProvider.state('settings.user', {
 			abstract: true,
 			url: '/user'
 		}).state('settings.user.add', {
@@ -23,10 +26,10 @@ define(['app'], function(nessa){
 					controller: 'userCtrl',
 					backdrop: 'static'
 				}).result.then(function(result){
-					$state.transitionTo('settings');
+					$state.transitionTo('settings.index');
 					window.modal = null;
 				}, function(result){
-					$state.transitionTo('settings');
+					$state.transitionTo('settings.index');
 					window.modal = null;				
 				});
 			},
@@ -42,10 +45,10 @@ define(['app'], function(nessa){
 					controller: 'userCtrl',
 					backdrop: 'static'
 				}).result.then(function(result){
-					$state.transitionTo('settings');
+					$state.transitionTo('settings.index');
 					window.modal = null;
 				}, function(result){
-					$state.transitionTo('settings');
+					$state.transitionTo('settings.index');
 					window.modal = null;				
 				});
 			},
@@ -80,7 +83,7 @@ define(['app'], function(nessa){
 		});
 		
 		$http.get('/api/users').success(function(json,status){
-//			$scope.users = json;
+			$scope.users = json;
 			
 		}).error(function(json,status){
 			console.error(json,status);

@@ -1,29 +1,27 @@
 define(['app'], function(nessa){
 	
 	nessa.config(function($stateProvider){
-		$stateProvider.state('auth', {
-			
-		}).state('login', {
+		$stateProvider.state('login', {
 			url: '/login',
 			controller: 'loginCtrl',
 			templateUrl: 'app/views/partials/login.html',
 			data: {
-			//	secure: true,
+				secure: false,
 				title: 'Login'
 			},
 			onEnter: function(){
-				console.error('Authentication: Required');
+				console.warn('Authentication: Required');
 			}
 		}).state('logout', {
 			url: '/logout',
 			data: {
-				secure: false,
+				secure: true,
 				title: 'Logging out'
 			},
-			onEnter: function($auth, $location){
-				console.info('Authentication: Removed');
+			onEnter: function($auth, $state){
 				$auth.logout().then(function(){
-					$location.path('/login');
+					console.warn('Authentication: Removed');
+					$state.transitionTo('login');
 				});
 			}
 		});
@@ -37,13 +35,15 @@ define(['app'], function(nessa){
 				$state.transitionTo('dashboard.default');
 			}, function(error){
 				if (error) console.error(error);
-				console.error('Authentication: Fail');
+				console.warn('Authentication: Failed');
 			});
 		};
 	});
 		
-	nessa.run(function(){
-		// Run after bootstrap
+	nessa.run(function($auth, $state){
+		$auth.check().then(null, function(error){
+			$state.transitionTo('login');
+		});
 	});
 	
 	return nessa;

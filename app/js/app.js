@@ -1,5 +1,5 @@
-define('app', ['angular','socket.io','moment','ngResource','ngStorage','ngTouch','ui.bootstrap','ui.router'], function(angular,io,moment){
-	var nessa = angular.module('nessa', ['ngResource','ngStorage','ui.bootstrap','ui.router']);
+define('app', ['angular','socket.io','moment','ngAnimate','ngResource','ngStorage','ngTouch','ui.bootstrap','ui.router'], function(angular,io,moment){
+	var nessa = angular.module('nessa', ['ngAnimate','ngResource','ngStorage','ui.bootstrap','ui.router']);
 	
 	nessa.config(function($urlRouterProvider){
 		$urlRouterProvider.otherwise('/dashboard');
@@ -74,6 +74,8 @@ define('app', ['angular','socket.io','moment','ngResource','ngStorage','ngTouch'
 				var deferred = $q.defer();
 				$rootScope.$storage = $localStorage;
 				
+				if (!$rootScope.$storage.session) deferred.reject('No session detected');
+				
 				$http.post('/api/auth/check', {session: $rootScope.$storage.session}).success(function(json, status){
 					if (status == 200 && json.success){
 						$rootScope.$storage.lastTime = json.lastTime;
@@ -140,7 +142,7 @@ define('app', ['angular','socket.io','moment','ngResource','ngStorage','ngTouch'
 	});
 	
 	nessa.factory('$socket', function($rootScope) {
-		var port = '';
+		var port = null;
 		if (window.location.protocol == 'https:'){
 			port = 443;
 		} else {
