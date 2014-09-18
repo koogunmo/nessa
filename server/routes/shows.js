@@ -28,12 +28,14 @@ module.exports = function(app, db, socket){
 	
 	app.get('/api/shows', function(req,res){
 		// Get show list
+//		var session = req.param('session');
+		
 		shows.list(function(error,results){
 			if (error) console.error(error);
 			if (results){
 				res.send(results);
 			} else {
-				res.send(404);
+				res.status(404).end();
 			}
 		});
 	}).post('/api/shows', function(req,res){
@@ -54,7 +56,7 @@ module.exports = function(app, db, socket){
 					autoClose: 2500
 				});
 				*/
-				res.send(201);
+				res.status(201).end();
 			});
 		}
 	});
@@ -105,7 +107,7 @@ module.exports = function(app, db, socket){
 					message: 'Show settings not updated'
 				});
 				*/
-				res.send(400);
+				res.status(400).end();
 				return;
 			}
 			/*
@@ -115,7 +117,7 @@ module.exports = function(app, db, socket){
 				autoClose: 2500
 			});
 			*/
-			res.send(200);
+			res.status(200).end();
 		});
 	}).delete('/api/shows/:id', function(req,res){
 		// Delete show
@@ -124,7 +126,7 @@ module.exports = function(app, db, socket){
 			shows.remove(tvdb, function(error, response){
 				if (error){
 					console.error(error);
-					res.send(400);
+					res.status(400).end();
 					return;
 				}
 				/*
@@ -134,7 +136,7 @@ module.exports = function(app, db, socket){
 					autoClose: 2500
 				});
 				*/
-				res.send(204);
+				res.status(204).end();
 			});
 		}
 	});
@@ -150,9 +152,9 @@ module.exports = function(app, db, socket){
 				if (error) console.error(error);
 				shows.getHashes(tvdb);
 			});
-			res.send(202);
+			res.status(202).end();
 		} else {
-			res.send(400);
+			res.status(400).end();
 		}
 	}).get('/api/shows/:id/download', function(req,res){
 		// Download all missing episodes
@@ -162,9 +164,9 @@ module.exports = function(app, db, socket){
 			console.log(tvdb);
 			
 		//	shows.downloadAll(tvdb);
-			res.send(202);
+			res.status(202).end();
 		} else {
-			res.send(400);
+			res.status(400).end();
 		}
 	}).get('/api/shows/:id/rescan', function(req,res){
 		// Rescan local files
@@ -178,9 +180,9 @@ module.exports = function(app, db, socket){
 				autoClose: 2500
 			});
 			*/
-			res.send(202);
+			res.status(202).end();
 		} else {
-			res.send(400);
+			res.status(400).end();
 		}
 	});
 	

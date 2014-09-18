@@ -14,7 +14,7 @@ var logger = log4js.getLogger('routes:login');
 
 module.exports = function(app, db){
 	app.post('/api/auth/check', function(req, res){
-		var response = {success: false, lastTime: Date.now()};
+		var response = {success: false, session: null, lastTime: Date.now()};
 		if (nconf.get('security:whitelist')) {
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 			// Is there a list of allowed IPs?
@@ -41,7 +41,7 @@ module.exports = function(app, db){
 					if (result) {
 						response.success = true;
 						result.lastAccess = Date.now();
-						userCollection.save(result, function(error, affected){});
+						userCollection.save(result, {w:0});
 					}
 					res.send(response);
 				});
@@ -55,7 +55,7 @@ module.exports = function(app, db){
 		var ObjectID = require('mongodb').ObjectID;
 		
 		var userCollection = db.collection('user');
-		var response = {success: false, sessions: [], lastTime: Date.now()};
+		var response = {success: false, session: null, lastTime: Date.now()};
 		
 		var hashed = require('crypto').createHash('sha256').update(req.body.password).digest('hex');
 		userCollection.findOne({username: req.body.username, password: hashed}, function(error, result){
@@ -81,15 +81,16 @@ module.exports = function(app, db){
 		
 	}).post('/api/auth/logout', function(req,res){
 		var response = {success: true, session: false, lastTime: Date.now()};
-		
 		if (req.body.session){
 			var userCollection = db.collection('user');
 			userCollection.findOne({sessions: {$elemMatch: {session: req.body.session}}}, function(error, result){
 				var sessions = [];
-				result.sessions.forEach(function(session){
-					if (!session.timestamp || session.session == req.body.session) return;
-					sessions.push(session);
-				});
+				if (!req.body.all){
+					result.sessions.forEach(function(session){
+						if (!session.timestamp || session.session == req.body.session) return;
+						sessions.push(session);
+					});
+				}
 				result.sessions = sessions;
 				userCollection.save(result, function(error, affected){
 					if (!error) res.send(response);

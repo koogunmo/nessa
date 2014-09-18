@@ -9,7 +9,7 @@ log4js.configure({
 });
 var logger = log4js.getLogger('routes:movies');
 
-module.exports = function(app, db, socket){
+module.exports = function(app,db,socket){
 
 	var scanner	= plugin('scanner'),
 		movies	= plugin('moviedata');
@@ -19,13 +19,11 @@ module.exports = function(app, db, socket){
 		// Get show list
 		movies.list(function(error,results){
 			
-			console.log(error, results);
-			
 			if (error) console.error(error);
 			if (results){
 				res.send(results);
 			} else {
-				res.send(404);
+				res.status(404).end();
 			}
 		});
 	});

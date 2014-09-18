@@ -27,10 +27,10 @@ module.exports = function(app){
 					message: 'Settings were not saved'
 				});
 				*/
-				res.send(400);
+				res.status(400).end();
 				return;
 			}
-			res.send(200);
+			res.status(200).end();
 			/*
 			socket.emit('system.alert', {
 				type: 'success',

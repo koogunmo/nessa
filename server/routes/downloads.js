@@ -38,7 +38,7 @@ module.exports = function(app, db, socket){
 					autoClose: 1500
 				});
 				*/
-				res.send(201);
+				res.status(201).end();
 			});
 		}
 	});
@@ -95,7 +95,7 @@ module.exports = function(app, db, socket){
 					autoClose: 2500
 				});
 				*/
-				res.send(204);
+				res.status(204).end();
 			}
 		});
 	});
