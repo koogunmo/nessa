@@ -1,24 +1,25 @@
 <form name="showForm" ng-submit="save()">
-	<div class="modal-header" ng-show="settings && summary">
-		<img src="/assets/gfx/no-banner.png" ng-src="/media/{{settings.shows.directory}}/{{summary.directory}}/banner.jpg" alt="{{summary.name}}" class="img-responsive" />
+	<div class="modal-header" ng-show="settings && show">
+		<img src="/assets/gfx/no-banner.png" ng-src="/media/{{settings.shows.directory}}/{{show.directory}}/banner.jpg" alt="{{show.name}}" class="img-responsive" />
 	</div>
 	<div class="modal-body">
 		<tabset type="pills">
 			<tab heading="Synopsis">
 				<div class="synopsis well">
-					{{summary.synopsis || 'No synopsis available'}}
+					{{show.synopsis || 'No synopsis available'}}
 				</div>
-				<div ng-if="summary.progress">
+				<div ng-if="progress && progress.percentage">
 					<hr />
-					<p>Watched {{summary.progress.completed}} of {{summary.progress.aired}} episodes</p>
+					<p>Watched {{progress.completed}} of {{progress.aired}} episodes</p>
 					<progress animate="false">
-						<bar type="success" value="summary.progress.percentage">
-							<span ng-hide="summary.progress.percentage<=5">{{summary.progress.percentage}}%</span>
+						<bar type="success" value="progress.percentage">
+							<span ng-hide="progress.percentage<=5">{{progress.percentage}}%</span>
 						</bar>
-						<bar type="danger" value="100-summary.progress.percentage"></bar>
+						<bar type="danger" value="100-progress.percentage"></bar>
 					</progress>
 				</div>
 			</tab>
+			
 			<tab heading="Episodes">
 				<accordion class="seasons">
 					<accordion-group heading="{{display()}}" class="season" ng-repeat="season in listing | orderBy:'season':true" ng-controller="seasonCtrl">
@@ -43,28 +44,28 @@
 				</accordion>
 			</tab>
 			<tab heading="Settings">
-				<div class="well" ng-switch on="summary.status">
+				<div class="well" ng-switch on="show.status">
 					<div class="checkbox">
 						<label>
-							<input type="checkbox" name="trakt" ng-model="summary.trakt" ng-checked="summary.trakt" />
+							<input type="checkbox" name="trakt" ng-model="show.trakt" ng-checked="show.trakt" />
 							Synchronize show with Trakt
 						</label>
 					</div>
 					<div class="checkbox">
 						<label>
-							<input type="checkbox" name="status" ng-model="summary.status" ng-checked="summary.status" />
+							<input type="checkbox" name="status" ng-model="show.status" ng-checked="show.status" />
 							Download new episodes when available
 						</label>
 					</div>
 					<div class="checkbox" ng-switch-when="true">
 						<label>
-							<input type="checkbox" name="hd" ng-model="summary.hd" ng-checked="summary.hd" />
+							<input type="checkbox" name="hd" ng-model="show.hd" ng-checked="show.hd" />
 							Prefer HD video<br /><span class="small">Note: Xbox 360 does not support .mkv files</span>
 						</label>
 					</div>
 					<div class="form-group" ng-switch-when="true">
 						<label for="ipt_setting_feed">RSS Feed</label>
-						<input type="text" name="feed" ng-model="summary.feed" class="form-control" />
+						<input type="text" name="feed" ng-model="show.feed" class="form-control" />
 					</div>
 				</div>
 				<div class="buttons form-group">
@@ -91,6 +92,6 @@
 	
 	<div class="modal-footer">
 		<button type="submit" ng-show="showForm.$dirty" class="btn btn-success">Save</button>
-		<button type="button" class="btn btn-default" ng-click="close()">Close</button>
+		<button type="button" class="btn btn-default" ng-click="dismiss()">Close</button>
 	</div>
 </form>

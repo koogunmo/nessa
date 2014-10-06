@@ -93,8 +93,8 @@ define(['app'], function(nessa){
 			$http.post('/api/system/settings', $scope.settings);
 		};
 		$scope.latest = function(){
-			if (confirm('This will update all show listings and artwork. NodeTV may become VERY laggy. Continue anyway?')) {
-				$http.post('/api/system', {action: 'latest'});
+			if (confirm('A. This will update all show listings and artwork. NodeTV may become VERY laggy. Continue anyway?')) {
+		//		$http.post('/api/system', {action: 'latest'});
 			}
 		};
 		$scope.listings = function(){

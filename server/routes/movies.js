@@ -14,7 +14,7 @@ module.exports = function(app,db,socket){
 	var scanner	= plugin('scanner'),
 		movies	= plugin('moviedata');
 
-	app.get('/api/movies', function(req,res){
+	app.get('/api/:session?/movies', function(req,res){
 		
 		// Get show list
 		movies.list(function(error,results){

@@ -76,13 +76,6 @@ global.events = new (require('events')).EventEmitter;
 logger.info(process.title + ' v'+pkg.version);
 
 global.helper	= require('./server/core/helper');
-global.torrent	= plugin('transmission');
-
-global.trakt = require('nodetv-trakt').init({
-	username: nconf.get('trakt:username'),
-	password: nconf.get('trakt:password'),
-	apikey: nconf.get('trakt:apikey')
-});
 
 var app		= express(),
 	listen	= {
@@ -112,29 +105,28 @@ if (process.getuid) {
 }
 
 /* Set up Express */
-var bodyParser	= require('body-parser'),
-	cookieParser = require('cookie-parser'),
-	compress	= require('compression');
+var bodyParser	= require('body-parser');
 	
-app.use(compress());
-app.use(cookieParser());
-app.use(bodyParser.urlencoded({extended: true}));
-app.use(bodyParser.json());
+app.use(require('compression')());
+app.use(require('cookie-parser')());
 
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
+
+app.set('trust proxy', true);
+app.set('view cache', false);
+
+
+// Move this
 if (!nconf.get('listen:nginx')){
 	app.use('/app', express.static(process.cwd() + '/app'));
-	
 	app.use('/assets', express.static(process.cwd() + '/app/assets'));
 	app.use('/template', express.static(process.cwd() + '/app/views/ui'));
 	app.use('/views', express.static(process.cwd() + '/app/views'));
 }
-app.enable('view cache');
 
 try {
-	require('./server/routes/system')(app);
-	
 	if (nconf.get('installed') && nconf.get('mongo')) {
-		
 		var dsn = 'mongodb://';
 		if (nconf.get('mongo:auth')) {
 			dsn += nconf.get('mongo:username')+':'+nconf.get('mongo:password')+'@';
@@ -151,12 +143,15 @@ try {
 			logger.info('MongoDB: Connected to '+nconf.get('mongo:host'));
 			global.db = db;
 			
+			global.torrent	= plugin('transmission');
+			
+			/*
 			if (nconf.get('installed') && nconf.get('trakt:username') != 'greebowarrior'){
-				trakt.network.follow('greebowarrior', function(error,json){
+				trakt(user.trakt).network.follow('greebowarrior', function(error,json){
 					logger.info(error, json);
 				});
 			}
-			
+			*/
 			if (nconf.get('media:base') && !nconf.get('listen:nginx')){
 				app.use('/media', express.static(nconf.get('media:base')));
 			}
@@ -169,15 +164,17 @@ try {
 			});
 			
 			// Load routes
+			require('./server/routes/auth')(app,db,socket);
 			require('./server/routes/default')(app,db,socket);
 			require('./server/routes/downloads')(app,db,socket);
-			require('./server/routes/login')(app,db,socket);
 			require('./server/routes/movies')(app,db,socket);
 			require('./server/routes/shows')(app,db,socket);
+			require('./server/routes/system')(app,db,socket);
 			require('./server/routes/users')(app,db,socket);
 			
+			// Default to sending the index.html
 			app.use(function(req, res) {	
-				res.sendfile(process.cwd() + '/app/views/index.html');
+				res.sendFile(process.cwd() + '/app/views/index.html');
 			});
 			
 			// Load tasks
@@ -194,22 +191,14 @@ try {
 						require(process.cwd() + '/server/tasks/' + file);
 					});
 				});
-				
-				/*
-				var scanner = plugin('scanner');
-				scanner.movies(function(error, data){
-					logger.info(data);
-				});
-				*/
 			}
 		});
 	} else {
 		nconf.set('installed', false);
 		logger.warn('Waiting for install.');
-//		app.use(app.router);
-		app.use(function(req, res) {
-			res.sendfile(process.cwd() + '/app/views/index.html');
-		});
+	//	app.use(function(req, res) {
+	//		res.sendFile(process.cwd() + '/app/views/index.html');
+	//	});
 	}
 } catch(e){
 	logger.error(e.message);

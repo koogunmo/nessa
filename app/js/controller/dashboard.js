@@ -2,23 +2,19 @@ define(['app'], function(nessa){
 	
 	nessa.config(function($stateProvider){
 		$stateProvider.state('dashboard', {
-			abstract: true,
+			url: '/dashboard',
 			controller: 'dashboardCtrl',
 			templateUrl: 'app/views/partials/dashboard.html',
 			data: {
 				secure: true,
 				title: 'Dashboard'
 			}
-		}).state('dashboard.default', {
-			url: ''
-		}).state('dashboard.index', {
-			url: '/dashboard'
 		});
 	});
 
 	nessa.run(function($rootScope){
 		$rootScope.menu.push({
-			path: 'dashboard.index',
+			path: 'dashboard',
 			name: 'Dashboard',
 			icon: 'dashboard',
 			order: 10
@@ -48,11 +44,17 @@ define(['app'], function(nessa){
 			};			
 		});
 		
+	//	$http.get('/api/dashboard/latest').success(function(json,status){
+	//		console.log(json, status);
+	//	});
+		
 		/* Replace with REST */
 		$socket.emit('dashboard');
+		
 		$socket.on('dashboard.latest', function(data){
 			$scope.latest.push(data);
 		});
+	
 		$socket.on('dashboard.unmatched', function(data){
 			$scope.unmatched = data.count;
 		});

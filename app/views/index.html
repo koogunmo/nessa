@@ -31,7 +31,7 @@
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
 				</button>
-				<a class="navbar-brand" ui-sref="dashboard.index">NodeTV</a>
+				<a class="navbar-brand" ui-sref="dashboard">NodeTV</a>
 			</div>
 			<nav class="collapse navbar-collapse" collapse="isCollapsed">
 				<ul class="nav navbar-nav navbar-left" ng-show="authenticated">
@@ -42,7 +42,8 @@
 						</a>
 					</li>
 				</ul>
-				<ul class="nav navbar-nav navbar-right" ng-show="authenticated">
+				
+				<ul class="nav navbar-nav navbar-right" ng-show="authenticated" ng-cloak>
 					<li>
 						<a ui-sref="logout"><span class="fa fa-sign-out"></span> Logout</a>
 					</li>
@@ -55,7 +56,7 @@
 		<alert ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)"><strong>{{alert.message}}</strong></alert>
 	</div>
 	
-	<div id="main" class="container" role="main" ui-view>
+	<div id="main" class="container" role="main" autoscroll="autoscroll" ui-view>
 		Loading...
 	</div>
 	

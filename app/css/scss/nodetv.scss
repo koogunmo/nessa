@@ -22,19 +22,71 @@ body {
 .accordion-toggle, .nav, .pagination, .carousel a, [ui-sref] {
 	cursor: pointer;
 }
-@keyframes shake {
-	0% {transform: translateX(0);}
-	12.5% {transform: translateX(-6px) rotateY(-5deg)}
-	37.5% {transform: translateX(5px) rotateY(4deg)}
-	62.5% {transform: translateX(-3px) rotateY(-2deg)}
-	87.5% {transform: translateX(2px) rotateY(1deg)}
-	100% {transform: translateX(0)}
+
+.well[ui-view]{
+	height: 65px; 
 }
 
-.shake {
-	animation: shake 400ms ease-in-out;
+.ui-view-container {
+	position: relative;
 }
 
+
+[ui-view] {
+	left: 0px;
+	position: absolute;
+	right: 0px;
+	transition: all .5s ease-in-out;
+	&.ng-enter {
+		opacity: 0;
+		&.ng-enter-active {
+			opacity: 1;
+		}
+	}
+	&.ng-leave {
+		opacity: 1;
+		&.ng-leave-active {
+			opacity: 0;
+		}
+	}
+}
+
+/*
+[ui-view].ng-enter, [ui-view].ng-leave {
+	left: 0;
+	position: absolute;
+	right: 0;
+	transition:all .5s ease-in-out;
+}
+
+[ui-view].ng-enter {
+  opacity: 0;
+  -webkit-transform:scale3d(0.5, 0.5, 0.5);
+  -moz-transform:scale3d(0.5, 0.5, 0.5);
+  transform:scale3d(0.5, 0.5, 0.5);
+}
+
+[ui-view].ng-enter-active {
+  opacity: 1;
+  -webkit-transform:scale3d(1, 1, 1);
+  -moz-transform:scale3d(1, 1, 1);
+  transform:scale3d(1, 1, 1);
+}
+
+[ui-view].ng-leave {
+  opacity: 1; 
+  -webkit-transform:translate3d(0, 0, 0);
+  -moz-transform:translate3d(0, 0, 0);
+  transform:translate3d(0, 0, 0);
+}
+
+[ui-view].ng-leave-active {
+  opacity: 0;
+  -webkit-transform:translate3d(100px, 0, 0);
+  -moz-transform:translate3d(100px, 0, 0);
+  transform:translate3d(100px, 0, 0);
+}
+*/
 
 .navbar-header {
 	.navbar-brand {

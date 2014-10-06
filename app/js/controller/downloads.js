@@ -2,16 +2,13 @@ define(['app'], function(nessa){
 	
 	nessa.config(function($stateProvider){
 		$stateProvider.state('downloads', {
-			abstract: true,
 			url: '/downloads',
+			controller: 'downloadsCtrl',
+			templateUrl: 'views/partials/downloads.html',
 			data: {
 				secure: true,
 				title: 'Downloads'
 			}
-		}).state('downloads.index', {
-			url: '',
-			controller: 'downloadsCtrl',
-			templateUrl: 'views/partials/downloads.html'
 			
 		}).state('downloads.add', {
 			url: '/add',
@@ -20,10 +17,10 @@ define(['app'], function(nessa){
 					controller: 'downloadAddCtrl',
 					templateUrl: 'views/modal/download/add.html'
 				}).result.then(function(result){
-					$state.transitionTo('downloads.index');
+					$state.transitionTo('downloads');
 					window.modal = null;
 				}, function(result){
-					$state.transitionTo('downloads.index');
+					$state.transitionTo('downloads');
 					window.modal = null;
 				});
 			},
@@ -41,10 +38,10 @@ define(['app'], function(nessa){
 					controller: 'downloadCtrl',
 					templateUrl: 'views/modal/download/settings.html'
 				}).result.then(function(result){
-					$state.transitionTo('downloads.index');
+					$state.transitionTo('downloads');
 					window.modal = null;
 				}, function(result){
-					$state.transitionTo('downloads.index');
+					$state.transitionTo('downloads');
 					window.modal = null;
 				});
 			},
@@ -56,23 +53,45 @@ define(['app'], function(nessa){
 		
 	});
 	
-	nessa.run(function($rootScope){
+	nessa.run(function($rootScope, $socket){
+		$rootScope.downloads = [];
+		
 		$rootScope.menu.push({
-			path: 'downloads.index',
+			path: 'downloads',
 			name: 'Downloads',
 			icon: 'download',
 			order: 40
 		});
 	});
 	
-	/****** Controller ******/
+	/****** Controllers ******/
 	
-	nessa.controller('downloadsCtrl', function($scope, $socket, $modal){
+	nessa.controller('downloadsCtrl', function($http, $modal, $rootScope, $scope, $socket){
 		$scope.predicate = 'name';
 		$scope.reverse = false;
-		$socket.emit('download.list');
-	});
+		$scope.downloads = [];
 		
+		$http.get('/api/downloads').success(function(json, status){
+			$scope.downloads = json;
+		});
+	});
+	
+	nessa.controller('downloadCtrlTest', function($http, $modal, $scope, $socket){
+		$scope.active	= false;
+		$scope.selected	= false;
+		
+		$scope.start = function(){
+			
+		};
+		$scope.stop = function(){
+			
+		};
+		
+	});
+	
+	
+	
+	
 	nessa.controller('downloadAddCtrl', function($modalInstance, $scope, $socket){
 		window.modal = $modalInstance;
 		

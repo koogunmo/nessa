@@ -9,41 +9,26 @@ log4js.configure({
 });
 var logger = log4js.getLogger('routes:system');
 
-module.exports = function(app){
+module.exports = function(app,db,socket){
 	
 	var system	= require('nodetv-system');
 	
-	app.get('/api/system/settings', function(req,res){
+	app.get('/api/:session?/system/settings', function(req,res){
 		res.send(nconf.get());
-	}).post('/api/system/settings', function(req,res){
-		for (var i in json) {
-			nconf.set(i, json[i]);
-		}
+		
+	}).post('/api/:session?/system/settings', function(req,res){
+		/*
+		for (var i in json) nconf.set(i, json[i]);
+		
 		nconf.save(function(error){
 			if (error) {
-				/*
-				socket.emit('system.alert', {
-					type: 'danger',
-					message: 'Settings were not saved'
-				});
-				*/
 				res.status(400).end();
 				return;
 			}
 			res.status(200).end();
-			/*
-			socket.emit('system.alert', {
-				type: 'success',
-				message: 'Settings saved',
-				autoClose: 2500
-			});
-			// Update media path
-			if (!nconf.get('listen:nginx')){
-				app.use('/media', express.static(nconf.get('media:base')));
-			}
-			*/
 		});
-	}).post('/api/system', function(req,res){
+		*/
+	}).post('/api/:session?/system', function(req,res){
 		var scanner	= plugin('scanner'),
 			shows	= plugin('showdata');
 		
@@ -55,14 +40,17 @@ module.exports = function(app){
 				case 'listings':
 					// Update all show listings
 					var showCollection = db.collection('show');
-					showCollection.find({status: {$exists: true}}).toArray(function(error, results){
-						results.forEach(function(show){
-							shows.getArtwork(show.tvdb);
-							shows.getProgress(show.tvdb);
-							shows.getFullListings(show.tvdb, function(error, tvdb){
-								shows.getHashes(show.tvdb);
+					showCollection.find({status: true}).toArray(function(error, results){
+						if (error) return logger.error(error);
+						if (results.length >= 1){
+							results.forEach(function(show){
+								shows.getArtwork(show.tvdb);
+								shows.getProgress(req.user, show.tvdb); // Only updates for the current user
+								shows.getFullListings(show.tvdb, function(error, tvdb){
+									shows.getHashes(show.tvdb);
+								});
 							});
-						});
+						}
 					});
 					break;
 				case 'rescan':
@@ -84,7 +72,7 @@ module.exports = function(app){
 		}
 	});
 	
-	app.get('/api/system/status', function(req,res){
+	app.get('/api/:session?/system/status', function(req,res){
 		var df = require('node-df');
 		df(function(error, disks){
 			var usage = [];
@@ -94,7 +82,6 @@ module.exports = function(app){
 				if (ignore.indexOf(disk.mount) >= 0 || disk.size <= 2097152) return;
 				usage.push(disk);
 			});
-			
 			res.send({
 				disks: usage,
 				system: {

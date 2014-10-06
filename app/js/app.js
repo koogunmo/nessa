@@ -1,12 +1,37 @@
 define('app', ['angular','socket.io','moment','ngAnimate','ngResource','ngStorage','ngTouch','ui.bootstrap','ui.router'], function(angular,io,moment){
 	var nessa = angular.module('nessa', ['ngAnimate','ngResource','ngStorage','ui.bootstrap','ui.router']);
-	
+
 	nessa.config(function($urlRouterProvider){
-		$urlRouterProvider.otherwise('/dashboard');
+		$urlRouterProvider.when('/', function($state){
+			$state.transitionTo('dashboard');
+		});
 	});
 	
-	nessa.run(function($rootScope){
-		$rootScope.menu = [];
+	/****** Directives ******/
+	
+	nessa.directive('lazyLoad', function($document, $timeout, $window){
+		return {
+			restrict: 'AC',
+			link: function($scope, $element, $attr){
+				var lazyLoad = function(){
+					if ($element.hasClass('lazyLoaded') || $window.innerWidth < 750) return;
+					var height	= $window.innerHeight,
+						scrollY	= $window.scrollY,
+						bottom	= height+scrollY;
+					
+					if ($element.offset().top >= scrollY && $element.offset().top < bottom){
+						if (typeof($scope.progress) == 'function') $scope.progress();
+						var image = $element.find('img[data-src]');
+						image.one('load', function(){
+							$(this).addClass('lazy-loaded');
+						}).attr('src', image.data('src'));
+						$element.addClass('lazyLoaded');
+					}
+				};
+				$document.bind('lazyload orientationchange resize scroll', lazyLoad);
+				$timeout(lazyLoad);
+			}
+		};
 	});
 	
 	/****** Filters ******/
@@ -68,7 +93,7 @@ define('app', ['angular','socket.io','moment','ngAnimate','ngResource','ngStorag
 	
 	/****** Factory ******/
 	
-	nessa.factory('$auth', function($http, $localStorage, $location, $q, $rootScope, $sessionStorage){
+	nessa.factory('$auth', function($http, $localStorage, $location, $q, $rootScope, $sessionStorage, $socket){
 		var auth = {
 			check: function(){
 				var deferred = $q.defer();
@@ -76,8 +101,9 @@ define('app', ['angular','socket.io','moment','ngAnimate','ngResource','ngStorag
 				
 				if (!$rootScope.$storage.session) deferred.reject('No session detected');
 				
-				$http.post('/api/auth/check', {session: $rootScope.$storage.session}).success(function(json, status){
+				$http.post('/auth/check', {session: $rootScope.$storage.session}).success(function(json, status){
 					if (status == 200 && json.success){
+						$http.defaults.headers.common['session'] = json.session;
 						$rootScope.$storage.lastTime = json.lastTime;
 						deferred.resolve(status);
 					} else {
@@ -92,8 +118,9 @@ define('app', ['angular','socket.io','moment','ngAnimate','ngResource','ngStorag
 			
 			login: function(username, password, remember){
 				var deferred = $q.defer();
-				$http.post('/api/auth/login', {username: username, password: password}).success(function(json, status){
+				$http.post('/auth/login', {username: username, password: password}).success(function(json, status){
 					if (json.success){
+						$http.defaults.headers.common['session'] = json.session;
 						$rootScope.$storage.lastTime = json.lastTime;
 						$rootScope.$storage.session = json.session;
 						deferred.resolve();
@@ -108,11 +135,13 @@ define('app', ['angular','socket.io','moment','ngAnimate','ngResource','ngStorag
 			
 			logout: function(){
 				var deferred = $q.defer();
-				$http.post('/api/auth/logout', {session: $rootScope.$storage.session}).success(function(json, status){
-					$rootScope.$storage.session = false;
+				$http.post('/auth/logout', {session: $rootScope.$storage.session}).success(function(json, status){
+					$http.defaults.headers.common['session'] = null;
+					$rootScope.$storage.session = null;
 					deferred.resolve();
 				}).error(function(json, status){
-					$rootScope.$storage.session = false;
+					$http.defaults.headers.common['session'] = null;
+					$rootScope.$storage.session = null;
 					deferred.resolve();
 				});
 				return deferred.promise;
@@ -121,7 +150,7 @@ define('app', ['angular','socket.io','moment','ngAnimate','ngResource','ngStorag
 		return auth;
 	});
 	
-	nessa.factory('nessaHttp', function($location, $q, $rootScope){
+	nessa.factory('nessaHttp', function($location, $q){
 		return {
 			request: function(config){
 			//	if ($rootScope.$storage) config.headers['X-Session'] = $rootScope.$storage.session;
@@ -155,6 +184,14 @@ define('app', ['angular','socket.io','moment','ngAnimate','ngResource','ngStorag
 		});
 		var handler = {
 			events: [],
+			emit: function(eventName, data, callback){	
+				socket.emit(eventName, data, function(){
+					var args = arguments;
+					$rootScope.$apply(function(){
+						if (callback) callback.apply(socket, args);
+					});
+				});
+			},
 			on: function(eventName, callback){
 				socket.on(eventName, function(){  
 					var args = arguments;
@@ -165,14 +202,6 @@ define('app', ['angular','socket.io','moment','ngAnimate','ngResource','ngStorag
 			},
 			once: function(eventName, callback){
 				socket.once(eventName, function(){  
-					var args = arguments;
-					$rootScope.$apply(function(){
-						if (callback) callback.apply(socket, args);
-					});
-				});
-			},
-			emit: function(eventName, data, callback){	
-				socket.emit(eventName, data, function(){
 					var args = arguments;
 					$rootScope.$apply(function(){
 						if (callback) callback.apply(socket, args);
@@ -211,14 +240,16 @@ define('app', ['angular','socket.io','moment','ngAnimate','ngResource','ngStorag
 	});
 	
 	nessa.run(function($auth, $localStorage, $location, $rootScope, $sessionStorage, $socket, $state){
+		$rootScope.menu = [];
 		
-		$rootScope.downloads = null;
 		
-		$socket.on('download.list', function(data){
-			$rootScope.downloads = data;
-		});
+		
+		$rootScope.authenticated = true;
 		
 		$rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams){
+			$rootScope.pagetitle = toState.data.title;
+			
+			/*
 			if (toState.data.secure){
 				$auth.check().then(function(success){
 					$rootScope.authenticated = true;
@@ -232,13 +263,14 @@ define('app', ['angular','socket.io','moment','ngAnimate','ngResource','ngStorag
 				if (toState.name == 'login') {
 					$auth.check().then(function(){
 						$rootScope.authenticated = true;
-						$location.path('/dashboard');
+						$state.transitionTo('dashboard');
 					}, function(){
 						$rootScope.authenticated = false;
 					});
 				}
 				$rootScope.pagetitle = toState.data.title;
 			}
+			*/
 		});
 	});
 	

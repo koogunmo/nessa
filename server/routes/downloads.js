@@ -13,9 +13,12 @@ module.exports = function(app, db, socket){
 	
 	var torrents	= plugin('transmission');
 	
-	app.get('/api/downloads', function(req,res){
+	app.get('/api/:session?/downloads', function(req,res){
 		// List torrents
 		torrents.list(function(error, data){
+			
+			console.log(data);
+			
 			if (error) {
 				console.error(error);
 				return;
@@ -23,7 +26,7 @@ module.exports = function(app, db, socket){
 			res.send(data.torrents);
 		});
 			
-	}).post('/api/downloads', function(req,res){
+	}).post('/api/:session?/downloads', function(req,res){
 		// Add new torrent
 		if (req.body.url){
 			torrents.add(url, function(error, data){
@@ -43,7 +46,7 @@ module.exports = function(app, db, socket){
 		}
 	});
 	
-	app.get('/api/downloads/:id', function(req,res){
+	app.get('/api/:session?/downloads/:id', function(req,res){
 		// Get torrent info
 		var showCollection = db.collection('show');
 		var episodeCollection = db.collection('episode');
@@ -81,10 +84,10 @@ module.exports = function(app, db, socket){
 		});
 		
 		
-	}).post('/api/downloads/:id', function(req,res){
+	}).post('/api/:session?/downloads/:id', function(req,res){
 		// Update torrent settings (i.e. ratio)
 		
-	}).delete('/api/downloads/:id', function(req,res){
+	}).delete('/api/:session?/downloads/:id', function(req,res){
 		// Remove torrent
 		torrents.remove({id: req.params.id, purge: true}, function(error){
 			if (!error) {

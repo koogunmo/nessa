@@ -2,13 +2,13 @@
 
 requirejs.config({
 	paths: {
-		'angular': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-rc.2/angular.min',
+		'angular': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-rc.4/angular.min',
 		'jquery': 'https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min',
 		'moment': 'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.3/moment.min',
-		'ngAnimate': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-rc.2/angular-animate.min',
-		'ngResource': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-rc.2/angular-resource.min',
+		'ngAnimate': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-rc.4/angular-animate.min',
+		'ngResource': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-rc.4/angular-resource.min',
 		'ngStorage': 'libs/ng-storage.min',
-		'ngTouch': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-rc.2/angular-touch.min',
+		'ngTouch': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-rc.4/angular-touch.min',
 		'socket.io': 'https://cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min',
 		'ui.bootstrap': 'libs/ui-bootstrap.min',
 		'ui.router': 'libs/ui-router.min',

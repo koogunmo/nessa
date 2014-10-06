@@ -10,51 +10,56 @@ log4js.configure({
 	}],
 	replaceConsole: true
 });
-var logger = log4js.getLogger('routes:login');
+var logger = log4js.getLogger('routes:auth');
 
-module.exports = function(app, db){
-	app.post('/api/auth/check', function(req, res){
-		var response = {success: false, session: null, lastTime: Date.now()};
-		if (nconf.get('security:whitelist')) {
-			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-			// Is there a list of allowed IPs?
-			if (nconf.get('security:whitelist')){
-				var blocks = nconf.get('security:whitelist').split(',');
-				if (blocks){
-					blocks.forEach(function(mask){
-						var block = new netmask(mask);
-						if (block.contains(ip)) {
-			//				response.success = true;
-						}
-					});
-				}
-			}
-		}
-		if (!req.body.session) return res.send(response);
-		
-		var userCollection = db.collection('user');
-		userCollection.count(function(error, count){
+module.exports = function(app, db, socket){
+	
+	var userCollection = db.collection('user');
+	
+	/* Authentication Middleware */
+	app.all('/api/*', function(req,res,next){
+		var session = (req.params.session) ? req.params.session : req.headers.session;
+		db.collection('user').findOne({sessions: {$elemMatch: {session: session}}}, {_id:1,admin:1,trakt:1,username:1}, function(error, user){
 			if (error) logger.error(error);
+			if (!user){
+				var response = {
+					success: false,
+					message: 'Not authorised'
+				};
+				res.status(401).send(response);
+				return false;
+			} else {
+				req.user = user;
+				return next();
+			}
+			return false;
+		});
+	});
+	
+	app.post('/auth/check/:session?', function(req, res){
+		var response = {success: false, session: null, lastTime: Date.now()};
+		userCollection.count(function(error,count){
+			if (error) return logger.error(error);
 			if (count){
 				userCollection.findOne({sessions: {$elemMatch: {session: req.body.session}}}, function(error, result){
-					if (error) logger.error(error);
+					if (error) return logger.error(error);
 					if (result) {
+						response.session = req.body.session;
 						response.success = true;
-						result.lastAccess = Date.now();
+						result.lastAccess = response.lastTime;
 						userCollection.save(result, {w:0});
 					}
-					res.send(response);
+					return res.send(response);
 				});
 			} else {
 				response.success = true;
-				res.send(response);
+				return res.send(response);
 			}
 		});
 		
-	}).post('/api/auth/login', function(req, res){
+	}).post('/auth/login', function(req, res){
 		var ObjectID = require('mongodb').ObjectID;
 		
-		var userCollection = db.collection('user');
 		var response = {success: false, session: null, lastTime: Date.now()};
 		
 		var hashed = require('crypto').createHash('sha256').update(req.body.password).digest('hex');
@@ -79,10 +84,9 @@ module.exports = function(app, db){
 			}
 		});
 		
-	}).post('/api/auth/logout', function(req,res){
+	}).post('/auth/logout', function(req,res){
 		var response = {success: true, session: false, lastTime: Date.now()};
 		if (req.body.session){
-			var userCollection = db.collection('user');
 			userCollection.findOne({sessions: {$elemMatch: {session: req.body.session}}}, function(error, result){
 				var sessions = [];
 				if (!req.body.all){

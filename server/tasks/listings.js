@@ -6,26 +6,34 @@ try {
 	function updateListings(){
 		// Update show listings
 		shows.getShowlist();
-		// Update existing show information (synopsis, artwork, etc)
-		var showCollection = db.collection('show');
 		
-		// Don't update ended shows automatically, nothing's gonna change
-	//	showCollection.find({status: {$exists: true}, ended: false}).toArray(function(error, results){
-		showCollection.find({status: {$exists: true}}).toArray(function(error, results){
-			if (error){
-				console.error(error);
-				return;
-			}
-			if (results){
-				results.forEach(function(show){
-					shows.getArtwork(show.tvdb);
-					shows.getProgress(show.tvdb);
-					shows.getSummary(show.tvdb, function(error, tvdb){
-						shows.getFullListings(tvdb);
-						shows.getHashes(tvdb);
+		// Update existing show information (synopsis, artwork, etc)
+		var showCollection = db.collection('show'),
+			userCollection = db.collection('user');
+		
+		userCollection.findOne({admin: true}, {trakt:1}, function(error, admin){
+			if (error) return console.error(error);
+			
+			showCollection.find({status: {$exists: true}}).toArray(function(error, results){
+				if (error) return console.error(error);
+				
+				if (results){
+					results.forEach(function(show){
+						shows.getArtwork(admin, show.tvdb);
+						shows.getSummary(admin, show.tvdb, function(error, tvdb){
+							shows.getFullListings(admin, tvdb);
+							shows.getHashes(tvdb);
+						});
+						if (show.users && show.users.length >= 1){
+							show.users.forEach(function(user){
+								userCollection.findOne({username: user.username}, {trakt:1}, function(error, user){
+									shows.getProgress(user, show.tvdb);
+								});
+							});
+						}
 					});
-				});
-			}
+				}
+			});
 		});
 	}
 	

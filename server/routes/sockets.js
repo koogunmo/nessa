@@ -4,6 +4,7 @@ module.exports = function(app,db,socket){
 	try {
 		var sessionid	= uuid.v4();
 		logger.info('New connection (' + socket.transport + ') ' + sessionid);
+		
 	} catch(e) {
 		logger.error('Socket Connection: ' + e.message);
 	}
@@ -118,9 +119,9 @@ module.exports = function(app,db,socket){
 		var shows = plugin('showdata');
 		
 		// List latest downloads
-		shows.latest(function(error, json){
-			socket.emit('dashboard.latest', json);
-		});
+	//	shows.latest(function(error, json){
+	//		socket.emit('dashboard.latest', json);
+	//	});
 		
 		// Check for unmatched shows
 		shows.getUnmatched(function(error, json){
@@ -128,9 +129,11 @@ module.exports = function(app,db,socket){
 		});
 		
 		// Get upcoming shows
+		/*
 		trakt.calendar.shows(function(error, json){
 			socket.emit('dashboard.upcoming', json);
 		});
+		*/
 	});
 
 	/** Downloads **/
@@ -244,7 +247,7 @@ module.exports = function(app,db,socket){
 			if (typeof(show.trakt) == 'undefined') show.trakt = true;
 			episodeCollection.update({tvdb: data.tvdb}, {$set: {watched: true}}, function(error, affected){
 				if (error) return;
-				trakt.show.seen(data.tvdb);
+			//	trakt.show.seen(data.tvdb);
 			});
 		});
 	}).on('show.season.watched', function(data){
@@ -258,7 +261,7 @@ module.exports = function(app,db,socket){
 			if (typeof(show.trakt) == 'undefined') show.trakt = true;
 			episodeCollection.update({tvdb: data.tvdb, season: data.season}, {$set: {watched: true}}, function(error, affected){
 				if (error) return;
-				if (show.trakt) trakt.show.season.seen(data.tvdb, data.season);
+		//		if (show.trakt) trakt.show.season.seen(data.tvdb, data.season);
 			});
 		});
 		
@@ -273,13 +276,13 @@ module.exports = function(app,db,socket){
 				episodeCollection.update({tvdb: show.tvdb, season: data.season, episode: data.episode}, {$set: {watched: true}}, function(error, affected){
 					if (error) return;
 					if (show.trakt) {
-						trakt.show.episode.seen(data.tvdb, data.season, data.episode);
+				//		trakt.show.episode.seen(data.tvdb, data.season, data.episode);
 					}
 				});
 			} else {
 				episodeCollection.update({tvdb: show.tvdb, season: data.season, episode: data.episode}, {$set: {watched: false}}, function(error, affected){
 					if (error) return;
-					if (show.trakt) trakt.show.episode.unseen(data.tvdb, data.season, data.episode);
+			//		if (show.trakt) trakt.show.episode.unseen(data.tvdb, data.season, data.episode);
 				});
 			}
 		});
