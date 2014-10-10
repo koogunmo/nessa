@@ -33,19 +33,22 @@
 				</button>
 				<a class="navbar-brand" ui-sref="dashboard">NodeTV</a>
 			</div>
-			<nav class="collapse navbar-collapse" collapse="isCollapsed">
-				<ul class="nav navbar-nav navbar-left" ng-show="authenticated">
-					<li ng-repeat="item in menu | orderBy: 'order'" ng-class="{active: isActive('/'+item.path)}" ng-cloak>
+			<nav class="collapse navbar-collapse" collapse="isCollapsed" ng-cloak>
+				<ul class="nav navbar-nav navbar-left" ng-if="authenticated">
+					<li ng-repeat="item in menu | orderBy: 'order'" ng-class="{active: state.includes(item.path)}" ng-cloak>
 						<a ui-sref="{{item.path}}" ng-click="collapse()">
 							<span class="fa fa-{{item.icon}}"></span>
 							{{item.name}}
 						</a>
 					</li>
 				</ul>
-				
-				<ul class="nav navbar-nav navbar-right" ng-show="authenticated" ng-cloak>
-					<li>
-						<a ui-sref="logout"><span class="fa fa-sign-out"></span> Logout</a>
+				<ul class="nav navbar-nav navbar-right" ng-if="authenticated">
+					<li class="dropdown" ng-cloak>
+						<a class="dropdown-toggle"><span class="fa fa-user"></span> {{user.username}}</a>
+						<ul class="dropdown-menu">
+							<li><a ui-sref="profile"><span class="fa fa-cog"></span> Settings</a></li>
+							<li><a ui-sref="logout"><span class="fa fa-sign-out"></span> Logout</a></li>
+						</ul>
 					</li>
 				</ul>
 			</nav>
@@ -59,7 +62,6 @@
 	<div id="main" class="container" role="main" autoscroll="autoscroll" ui-view>
 		Loading...
 	</div>
-	
 	<script type="text/javascript" src="/app/js/libs/require.js" data-main="/app/js/init.js"></script>
 </body>
 </html>

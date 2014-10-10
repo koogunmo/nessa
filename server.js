@@ -159,12 +159,15 @@ try {
 			var socket = false;
 			io.sockets.on('connection', function(s){
 				// Load socket listeners
+				// DEPRECATED
 				socket = s;
 				require('./server/routes/sockets')(app,db,socket);
 			});
 			
 			// Load routes
-			require('./server/routes/auth')(app,db,socket);
+			require('./server/routes/auth')(app,db);
+			require('./server/routes/dashboard')(app,db);
+			
 			require('./server/routes/default')(app,db,socket);
 			require('./server/routes/downloads')(app,db,socket);
 			require('./server/routes/movies')(app,db,socket);

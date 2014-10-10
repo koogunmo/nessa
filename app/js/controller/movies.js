@@ -17,7 +17,8 @@ define(['app'], function(nessa){
 		});
 	});
 	
-	nessa.run(function($rootScope){
+	nessa.run(function($log, $rootScope){
+		$log.info('Module loaded: Movies');
 		$rootScope.menu.push({
 			path: 'movies.index',
 			name: 'Movies',

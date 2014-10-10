@@ -49,7 +49,7 @@ define(['app'], function(nessa){
 					window.modal = null;
 				}, function(result){
 					$state.transitionTo('settings.index');
-					window.modal = null;				
+					window.modal = null;
 				});
 			},
 			onExit: function(){
@@ -57,9 +57,36 @@ define(['app'], function(nessa){
 				window.modal = null;
 			}
 		});
+		
+		$stateProvider.state('profile', {
+			url: '/profile',
+			data: {
+				secure: true,
+				title: 'Profile'
+			},
+			onEnter: function($modal, $rootScope, $state){
+				var previous = ($rootScope.stateFrom.name) ? $rootScope.stateFrom.name : 'dashboard';
+				$modal.open({
+					templateUrl: 'views/modal/user.html',
+					controller: 'userCtrl'
+				}).result.then(function(result){
+					$state.transitionTo(previous);
+					window.modal = null;
+				}, function(result){
+					$state.transitionTo(previous);
+					window.modal = null;
+				});
+			},
+			onExit: function(){
+				if (window.modal) window.modal.dismiss();
+				window.modal = null;
+			}
+		});
+		
 	});
 	
-	nessa.run(function($rootScope){
+	nessa.run(function($log, $rootScope){
+		$log.info('Module loaded: Settings');
 		$rootScope.menu.push({
 			path: 'settings.index',
 			name: 'Settings',
@@ -70,7 +97,7 @@ define(['app'], function(nessa){
 	
 	/****** Controller ******/
 	
-	nessa.controller('settingsCtrl', function($http, $modal, $scope, $socket){
+	nessa.controller('settingsCtrl', function($http, $modal, $scope){
 		$scope.settings = {}
 		$scope.branches = [{name: 'master'},{name: 'nightly'}];
 		$scope.users = [];
@@ -84,14 +111,10 @@ define(['app'], function(nessa){
 		
 		$http.get('/api/users').success(function(json,status){
 			$scope.users = json;
-			
 		}).error(function(json,status){
 			console.error(json,status);
 		});
 		
-		$scope.save = function(){
-			$http.post('/api/system/settings', $scope.settings);
-		};
 		$scope.latest = function(){
 			if (confirm('A. This will update all show listings and artwork. NodeTV may become VERY laggy. Continue anyway?')) {
 		//		$http.post('/api/system', {action: 'latest'});
@@ -102,15 +125,18 @@ define(['app'], function(nessa){
 				$http.post('/api/system', {action: 'listings'});
 			}
 		};
+		$scope.reboot = function(){
+			if (confirm('This will restart NodeTV. Are you sure?')) {
+				$http.post('/api/system', {action: 'restart'});
+			}
+		};
 		$scope.rescan = function(){
 			if (confirm('WARNING: NodeTV will probably become VERY laggy during a full rescan. Continue anyway?')) {
 				$http.post('/api/system', {action: 'rescan'});
 			}
 		};
-		$scope.reboot = function(){
-			if (confirm('This will restart NodeTV. Are you sure?')) {
-				$http.post('/api/system', {action: 'restart'});
-			}
+		$scope.save = function(){
+			$http.post('/api/system/settings', $scope.settings);
 		};
 		$scope.update = function(){
 			if (confirm('This will force NodeTV to update to the latest version. Are you sure?')) {
@@ -119,31 +145,37 @@ define(['app'], function(nessa){
 		};
 	});
 
-	nessa.controller('userCtrl', function($modalInstance, $scope, $socket, $state, $stateParams){
+	nessa.controller('userCtrl', function($http, $modalInstance, $rootScope, $scope, $state, $stateParams){
 		window.modal = $modalInstance;
 		$scope.user = {};
-		if ($stateParams.id) {
-			var id = $stateParams.id;
-			$socket.emit('system.user', id);
-			$socket.on('system.user', function(json){
-				delete json.password
-				$scope.user = json;
-			});
-		}
-		$scope.remove = function(){
-			if (confirm('Are you sure?')){
-				$socket.emit('system.user.remove', $scope.user._id);
-				$modalInstance.close();
-			}
-		};
-		$scope.save = function(){
-			$socket.emit('system.user.update', $scope.user);
-			$modalInstance.close();
-		};
+		
 		$scope.close = function(){
 			$modalInstance.dismiss();
 		};
-	});		
+		$scope.load = function(id){
+			$http.get('/api/user/'+id).success(function(json, status){
+				
+			//	console.log(json, status);
+				
+				$scope.user = json;
+			});
+		};
+		$scope.remove = function(){
+			if (confirm('Are you sure you want to delete this user?')){
+				$http.delete('/api/user/'+id).success(function(json, status){
+					$modalInstance.close();
+				});
+			}
+		};
+		$scope.save = function(){
+			$http.post('/api/user/'+id, $scope.user).success(function(json, status){
+				console.log(json, status);
+		//		$modalInstance.close();
+			});
+		};
+		var id = ($stateParams && $stateParams.id) ? $stateParams.id : $rootScope.user._id;
+		$scope.load(id);
+	});
 	
 	return nessa;
 });

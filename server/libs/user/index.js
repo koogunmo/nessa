@@ -13,50 +13,69 @@ log4js.configure({
 var logger = log4js.getLogger('nodetv-user');
 
 
-var userCollection = db.collection('user');
+var showCollection = db.collection('show'),
+	userCollection = db.collection('user');
 
 var users = {
 	
+	add: function(){
+		// Create new user
+		
+	},
 	get: function(id, callback){
-		userCollection.findOne({_id: ObjectID(id)}, function(error, json){
+		// Get a user
+		userCollection.findOne({_id: ObjectID(id)}, {password:0}, function(error, json){
 			if (!json) json = {_id: null};
 			if (typeof(callback) == 'function') callback(error, json);
 		});
 	},
-	
 	list: function(callback){
+		// List all users
 		userCollection.find().toArray(function(error, json){
 			if (typeof(callback) == 'function') callback(error, json);
 		});
 	},
-	
 	remove: function(id, callback){
-		userCollection.remove({_id: ObjectID(id)}, function(error, json){
-			if (typeof(callback) == 'function') callback(error, json);
-		});
-	},
-	
-	update: function(data, callback){
-		// Update or create a new user
-		var record = data;
-		
-		if (data.password && data.passconf && data.password == data.passconf) {
-			record.password = crypto.createHash('sha256').update(data.password).digest('hex');
-		} else {
-			delete record.password;
-		}
-		delete record.passconf;
-		
-		userCollection.update({_id: ObjectID(record._id)}, {$set: record}, {upsert: true}, function(error, count, json){
-			if (!error && !json.updatedExisting) {
-				
+		// Remove a user
+		userCollection.findOne({_id: ObjectID(id)}, function(error, user){
+			if (error) return logger.error(error);
+			if (user.shows.length) {
+				user.shows.forEach(function(show){
+					// remove from show record
+					showCollection.findOne({tvdb: show.tvdb}, function(error, show){
+						var update = {
+							$pull: {users: {_id: ObjectID(user._id)}}
+						};
+						if (show.users.length == 1) update.$set = {status: false};
+						showCollection.update({tvdb: tvdb}, update, {w:0});
+					});
+				});
 			}
-			if (typeof(callback) == 'function') callback(error, json);
+			userCollection.remove({_id: ObjectID(id)}, function(error, json){
+				if (typeof(callback) == 'function') callback(error, json);
+			});
 		});
 	},
-	
-	verify: function(){
-		
+	update: function(id, data, callback){
+		var update = {};
+		if (data.username) update.username = data.username;
+		if (data.password && data.passconf && data.password == data.passconf) {
+			update.password = crypto.createHash('sha256').update(data.password).digest('hex');
+		}
+		if (data.phone) update.phone = data.phone;
+		if (data.email) update.email = data.email;
+		if (data.trakt) {
+			if (data.hash) data.trakt.password = crypto.createHash('sha256').update(data.trakt.password).digest('hex');
+			update.trakt = data.trakt;
+		}
+		console.log(update);
+		return;
+		/*
+		userCollection.update({_id: ObjectID(id)}, {$set: update}, {upsert: true}, function(error, count, json){
+		//	if (!error && !json.updatedExisting) {}
+			if (typeof(callback) == 'function') callback(error, json);
+		});
+		*/
 	}
 };
 exports = module.exports = users;

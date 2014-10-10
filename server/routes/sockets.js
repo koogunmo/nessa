@@ -39,12 +39,6 @@ module.exports = function(app,db,socket){
 	socket.on('system.latest', function(){
 		var shows = plugin('showdata');
 		shows.getLatest();
-		socket.emit('system.alert', {
-			type: 'info',
-			message: 'Checking for new downloads',
-			autoClose: 2500
-		});
-		
 	}).on('system.listings', function(){
 		// Update ALL listing information and artwork
 		var shows = plugin('showdata');
@@ -59,92 +53,21 @@ module.exports = function(app,db,socket){
 			});
 		});
 		
-	}).on('system.rescan', function(){
-		socket.emit('system.alert', {
-			type: 'info',
-			message: 'Rescanning media directory',
-			autoClose: 2500
-		});
-		
-		var scanner = plugin('scanner');
-		var shows = plugin('showdata');
-		
-		scanner.shows(function(error, tvdb){
-			shows.getFullListings(tvdb, function(error, tvdb){
-				shows.getHashes(tvdb);
-				scanner.episodes(tvdb);
-			});
-		});
-		
 	});
-	
-	// User
-	
-	socket.on('system.users', function(){
-		var sysUser = plugin('user');
-		sysUser.list(function(error, json){
-			socket.emit('system.users', json);
-		});
-		
-	}).on('system.user', function(id){
-		var sysUser = plugin('user');
-		sysUser.get(id, function(error, json){
-			socket.emit('system.user', json);
-		});
-		
-	}).on('system.user.update', function(data){
-		var sysUser = plugin('user');
-		sysUser.update(data, function(error, json){
-			sysUser.list(function(error, json){
-				socket.emit('system.users', json);
-			});
-		});
-		
-	}).on('system.user.remove', function(id){
-		var sysUser = plugin('user');
-		sysUser.remove(id, function(error, json){
-			sysUser.list(function(error, json){
-				socket.emit('system.users', json);
-			});
-		});
-	})
-		
 	
 	socket.on('media.settings', function(){
 		socket.emit('media.settings', nconf.get('media'));
 	});
 	
+	
 	/** Dashboard **/
 	socket.on('dashboard', function(){
 		var shows = plugin('showdata');
-		
-		// List latest downloads
-	//	shows.latest(function(error, json){
-	//		socket.emit('dashboard.latest', json);
-	//	});
-		
 		// Check for unmatched shows
 		shows.getUnmatched(function(error, json){
 			if (!error && json && json.length) socket.emit('dashboard.unmatched', json.length);
 		});
-		
-		// Get upcoming shows
-		/*
-		trakt.calendar.shows(function(error, json){
-			socket.emit('dashboard.upcoming', json);
-		});
-		*/
 	});
-
-	/** Downloads **/
-//	socket.on('download.list', function(){
-		var sendList = setInterval(function(){
-			torrent.list(function(error, data){
-				if (error) return;
-				socket.emit('download.list', data.torrents);
-			});
-		}, 1000);
-//	});
 	
 	socket.on('download.info', function(id){
 		var showCollection = db.collection('show');
@@ -185,11 +108,6 @@ module.exports = function(app,db,socket){
 	}).on('download.remove', function(data){
 		torrent.remove(data, function(error){
 			if (!error) {
-				socket.emit('system.alert', {
-					type: 'success',
-					message: 'Torrent deleted',
-					autoClose: 2500
-				});
 				torrent.list(function(error, data){
 					if (error) return;
 					socket.emit('download.list', data.torrents);
@@ -206,22 +124,8 @@ module.exports = function(app,db,socket){
 				logger.error(error);
 				return;
 			}
-			socket.emit('system.alert', {
-				type: 'success',
-				message: 'Torrent added',
-				autoClose: 1500
-			});
 		});
 	});
-	
-	/** Movies **/
-	socket.on('movies.list', function(){
-		var movies = plugin('moviedata');
-		movies.list(function(error, results){
-			socket.emit('movies.list', results);
-		})
-	});
-	
 	
 	/** Shows **/
 	socket.on('shows.unwatched', function(data){
@@ -235,7 +139,7 @@ module.exports = function(app,db,socket){
 	
 	
 	// Trakt 'watched' functionality
-	
+	/*
 	socket.on('show.watched', function(data){
 		return;
 		
@@ -287,7 +191,9 @@ module.exports = function(app,db,socket){
 			}
 		});
 	});
+	*/
 	
+	/*
 	socket.on('show.download', function(data){
 		// Download all available episodes
 		var shows = plugin('showdata');
@@ -317,5 +223,6 @@ module.exports = function(app,db,socket){
 		var episodeCollection = db.collection('episode');
 		
 		shows.download(data.tvdb, data.season, data.episode);
-	});	
+	});
+	*/
 };

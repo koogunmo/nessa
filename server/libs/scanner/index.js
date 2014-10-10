@@ -46,30 +46,39 @@ var Scanner = {
 		if (base = nconf.get('media:base') + nconf.get('media:movies:directory')) {
 			
 			listDirectory(base, function(file){
-				var ext = path.extname(file);
+				var ext		= path.extname(file),
+					title	= path.basename(file, ext);
+				
 				if (ext.match(/(:?jpe?g|png)$/i)) return;
+				
+				if (title.match(/\[(\d{4})\]/i)) {
+					year	= title.match(/\[(\d{4})\]/i)[1];
+					title	= title.replace(/\s?\[\d{4}\]/i, '');
+				}
 				
 				var record = {
 					status: true,
-					title: path.basename(file, ext),
+					title: title,
+					year: parseInt(year, 10),
 					file: file.replace(base + '/', '')
 				};
-				
 				trakt.search('movies', record.title, function(error, response){
-					if (response.length == 1) {
-						var movie = response[0];
-						record.title = movie.title;
-						record.year = movie.year;
-						record.synopsis = movie.overview;
-						record.tmdb = movie.tmdb_id;
-						record.imdb = movie.imdb_id;
-						record.genre  = movie.genres;
+					if (response.length) {
+						response.forEach(function(result){
+							if (record.year && result.year == record.year) {
+								
+								record.title	= result.title;
+								record.year		= result.year;
+								record.synopsis	= result.overview;
+								record.tmdb		= result.tmdb_id;
+								record.imdb		= result.imdb_id;
+								record.genre	= result.genres;
+							}
+						});
 					}
-					
 					movieCollection.update({file: record.file}, {$set: record}, {upsert: true}, function(error, affected){
 						if (typeof(callback) == 'function') callback(null, record);
 					});
-				
 				});
 			});
 			

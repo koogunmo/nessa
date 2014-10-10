@@ -53,7 +53,8 @@ define(['app'], function(nessa){
 		
 	});
 	
-	nessa.run(function($rootScope, $socket){
+	nessa.run(function($log, $rootScope, $socket){
+		$log.info('Module loaded: Downloads');
 		$rootScope.downloads = [];
 		
 		$rootScope.menu.push({
@@ -81,12 +82,20 @@ define(['app'], function(nessa){
 		$scope.selected	= false;
 		
 		$scope.start = function(){
-			
+			$scope.active = true;
 		};
 		$scope.stop = function(){
-			
+			$scope.active = false;
 		};
-		
+		$scope.update = function(){
+			if ($scope.active){
+				/*
+				$http.get('/api/downloads/'+$scope.download.id).success(function(json, status){
+					$scope.downloads = json;
+				});
+				*/
+			}
+		};
 	});
 	
 	
@@ -94,19 +103,23 @@ define(['app'], function(nessa){
 	
 	nessa.controller('downloadAddCtrl', function($modalInstance, $scope, $socket){
 		window.modal = $modalInstance;
-		
+
 		$scope.magnet = {
 			url: null
 		};
+		
 		$scope.close = function(){
-			$modalInstance.close();
+			$modalInstance.dismiss();
 		};
 		$scope.save = function(){
-			$socket.emit('download.url', $scope.magnet.url);
-			$modalInstance.close();
+			$http.post('/api/downloads', {url: $scope.magnet.url}).success(function(json, status){
+				$modalInstance.close();
+			});
 		};
 	});
-
+	
+	
+	
 	nessa.controller('downloadCtrl', function($http, $modalInstance, $scope, $socket, $state, $stateParams){
 		$scope.torrent = {};
 		// fetch info

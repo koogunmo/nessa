@@ -36,8 +36,8 @@
 			<div class="page-header">
 				<h3>Next 7 days</h3>
 			</div>
-			<div ng-repeat="day in upcoming">
-				<div class="panel panel-default date">
+			<div ng-repeat="day in upcoming" ng-controller="upcomingCtrl">
+				<div class="panel panel-default date" ng-if="visible">
 					<div class="panel-heading">
 						<h4 class="panel-title">{{day.date|moment:'dddd Do MMMM'}}</h4>
 					</div>

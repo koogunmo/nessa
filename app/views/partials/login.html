@@ -9,6 +9,6 @@
 				<input type="checkbox" name="remember" class="checkbox" ng-model="user.remember"> Remember me
 			</label>
 		</div>
-		<button type="submit" class="btn btn-lg btn-primary btn-block">Sign in</button>
+		<button type="submit" class="btn btn-lg btn-primary btn-block" ng-disabled="formLogin.$invalid">Sign in</button>
 	</form>
 </div>

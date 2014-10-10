@@ -1,9 +1,9 @@
 'use strict';
 
-console.log('NodeTV: Initializing...');
 require(['app','tv.auth','tv.global','tv.dashboard','tv.shows','tv.movies','tv.downloads','tv.settings'], function(nessa){
-	
-	console.log('NodeTV: Bootstrapping...');
+	nessa.run(function($log){
+		$log.info('NodeTV: Bootstrapping...');
+	});
 	angular.bootstrap(document, ['nessa']);	
 	
 	// jQuery below (must replace with directives at some point...)

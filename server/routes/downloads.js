@@ -16,33 +16,18 @@ module.exports = function(app, db, socket){
 	app.get('/api/:session?/downloads', function(req,res){
 		// List torrents
 		torrents.list(function(error, data){
-			
-			console.log(data);
-			
-			if (error) {
-				console.error(error);
-				return;
-			}
+		//	logger.info(data);
+			if (error) return console.error(error);
 			res.send(data.torrents);
 		});
 			
 	}).post('/api/:session?/downloads', function(req,res){
 		// Add new torrent
 		if (req.body.url){
-			torrents.add(url, function(error, data){
-				if (error) {
-					logger.error(error);
-					return;
-				}
-				/*
-				socket.emit('system.alert', {
-					type: 'success',
-					message: 'Torrent added',
-					autoClose: 1500
-				});
-				*/
-				res.status(201).end();
+			torrents.add(req.body.url, function(error, data){
+				if (error) return logger.error(error);
 			});
+			res.status(202).end();
 		}
 	});
 	
@@ -90,16 +75,8 @@ module.exports = function(app, db, socket){
 	}).delete('/api/:session?/downloads/:id', function(req,res){
 		// Remove torrent
 		torrents.remove({id: req.params.id, purge: true}, function(error){
-			if (!error) {
-				/*
-				socket.emit('system.alert', {
-					type: 'success',
-					message: 'Torrent deleted',
-					autoClose: 2500
-				});
-				*/
-				res.status(204).end();
-			}
+			if (error) return logger.error(error);
+			res.status(204).end();
 		});
 	});
 	

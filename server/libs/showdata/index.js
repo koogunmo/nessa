@@ -68,13 +68,25 @@ var ShowData = {
 						if (error) logger.error(error);
 					});
 				}
+				
 				// Add user to show.users
-				record.users.push({_id: ObjectID(user._id), username: user.username});
+				if (record.users.length){
+					var found = false;
+					record.users.forEach(function(u){
+						if (ObjectID(u._id) == ObjectID(user._id)) found = true;
+					});
+					if (found) {
+						record.users.push({_id: ObjectID(user._id), username: user.username});
+					} else {
+						self.getProgress(user, tvdb);
+					}
+				}
 				// Save show record
 				showCollection.save(record, {safe: true}, function(error, result){
-					if (error) logger.error(error);
-					userCollection.update({_id: ObjectID(user._id)}, {$push: {shows: {trakt: true, tvdb: tvdb, progress: []}}}, {w:0});
-					trakt(user.trakt).show.library(tvdb)
+					if (error) return logger.error(error);
+					trakt(user.trakt).show.library(tvdb, function(error, json){
+						userCollection.update({_id: ObjectID(user._id)}, {$push: {shows: {trakt: true, tvdb: tvdb, progress: []}}}, {w:0});
+					});
 					if (typeof(callback) == 'function') callback(error, tvdb);
 				});
 			});
@@ -161,44 +173,57 @@ var ShowData = {
 		});
 	},
 		
-	latest: function(callback){
-		
-		// TODO: this is called from sockets - need to rejiggle...
-		
+	latest: function(user, callback){
 		var self = this;
 		var lastweek = Math.round(new Date()/1000) - (7*24*60*60);
 		
-		var list = [];
-		
-	//	console.log(user);
-		
-	//	userCollection.findOne({_id: ObjectID(user._id)}, function(error, user){
-	//		if (error) logger.error(error);
-	//		if (error || !user) return;
-		
+		var list = [], shows = [];
+		userCollection.findOne({_id: ObjectID(user._id)}, function(error, result){
+			if (error) logger.error(error);
+			if (!result.shows) return;
+			result.shows.forEach(function(show){
+				shows.push(show.tvdb);
+			});
+			
 			episodeCollection.find({
 				file: {$exists: true},
-				airdate: {$gt: lastweek-1}
-			//	tvdb: {$in: user.shows}
+				airdate: {$gt: lastweek-1},
+				tvdb: {$in: shows}
 				
-			}).toArray(function(error, results){
+			}).toArray(function(error, episodes){
 				if (error){
 					logger.error(error);
 					return;
 				}
 				var count = 0;
-				if (results.length){
-					results.forEach(function(result){
-						showCollection.findOne({tvdb: result.tvdb}, function(error, show){
-							var episode = result;
-							episode.show_name = show.name;
-							episode.tvdb = show.tvdb;
-							if (typeof(callback) == 'function') callback(null, episode);
+				if (episodes.length){
+					episodes.forEach(function(episode){
+						showCollection.findOne({tvdb: episode.tvdb}, function(error, show){
+							count++;
+							var item = episode;
+							item.show_name = show.name;
+							item.tvdb = show.tvdb;
+							
+							result.shows.forEach(function(show){
+								if (show.tvdb != episode.tvdb) return;
+								if (show.progress == 100) {
+									item.watched = true;
+								} else {
+									// loop
+									if (!show.seasons) return;
+									show.seasons.forEach(function(season){
+										if (season.season != item.season) return;
+										item.watched = !!season.episodes[item.episode];
+									});
+								}
+							});
+							list.push(item);
+							if (episodes.length == count && typeof(callback) == 'function') callback(null, list);
 						});
 					});
 				}
 			});
-	//	});
+		});
 	},
 	
 	list: function(user, callback){
@@ -229,9 +254,11 @@ var ShowData = {
 	},
 	
 	remove: function(user, tvdb, callback){
+		// Remove a show from your library
 		var tvdb = parseInt(tvdb, 10);
 		try {
 			showCollection.findOne({tvdb: tvdb}, function(error, show){
+				trakt(user.trakt).show.unlibrary(tvdb);
 				var update = {
 					$pull: {users: {_id: ObjectID(user._id)}}
 				};
@@ -285,22 +312,41 @@ var ShowData = {
 		});
 	},
 	
-	syncDown: function(user, callback){
-		// TODO: Synchronise ALL show data FROM trakt TO local
+	sync: function(user, callback){
+		var self = this;
+		// Synchronise all show data from trakt to local db
 		try {
 			trakt(user.trakt).user.library.shows.all(function(error, shows){
 				shows.forEach(function(show){
-					// ???
+					self.add(user, show.tvdb_id, function(error, tvdb){
+						if (error) return logger.error(error);
+						self.getProgress(user, tvdb);
+					});
 				});
 			});
 		} catch(e){
-			logger.error(e.message);
+			logger.error('sync', e.message);
 		}
 	},
 	
+	update: function(){
+		var self = this;
+		
+		self.sanitize();
+		/*
+		userCollection.find({}).toArray(function(error, users){
+			users.forEach(function(user){
+				// Add all enabled shows to user
+				// self.add(user, 
+					// get show progress per user
+			});
+		});
+		*/
+	},
 	
 	unmatched: function(callback){
 		
+		return;
 		// rethink how this works
 		
 		unmatchedCollection.find().toArray(function(error, shows){
@@ -545,6 +591,7 @@ var ShowData = {
 	},
 	
 	getShowlist: function(callback){
+		
 		var self = this;
 		// Get the latest showlist feed from TVShows and add new entries into the local database
 		var options = {
@@ -588,6 +635,11 @@ var ShowData = {
 				logger.error('showdata.getShowlist', e.message);
 			}
 		});
+	},
+	
+	sanitize: function() {
+		// Remove unused values from the show documents
+		showCollection.update({status: {$exists: true}}, {$unset: {seasons: '', progress: '', trakt: ''}}, {w:0, multi: true});
 	},
 	
 	getSummary: function(tvdb, callback){

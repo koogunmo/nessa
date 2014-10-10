@@ -13,27 +13,7 @@ module.exports = function(app, db, socket){
 	
 	var scanner	= plugin('scanner'),
 		shows	= plugin('showdata');
-	
-	app.get('/api/:session?/dashboard/latest', function(req,res){
-		shows.latest(req.user, function(error, json){
-			if (error) logger.error(error);
-			if (json){
-				res.send(json);
-			} else {
-				res.status(404).end();
-			}
-		});
-		res.status(202).end();
-	});
-	
-	/*
-	app.get('/api/:session?/dashboard/upcoming', function(req,res){
-		trakt.calendar.shows(function(error, json){
-			res.send(json);
-		});
-	});
-	*/
-	
+		
 	app.get('/api/:session?/shows', function(req,res){
 		shows.list(req.user, function(error,results){
 			if (error) logger.error(error);

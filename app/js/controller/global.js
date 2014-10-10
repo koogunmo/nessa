@@ -50,8 +50,10 @@ define(['app'], function(nessa){
 		});
 	});
 	
-	nessa.controller('navCtrl', function($location, $rootScope, $scope){
+	nessa.controller('navCtrl', function($location, $log, $rootScope, $scope, $state){
 		$scope.menu = $rootScope.menu;
+		$scope.state = $state;
+		$scope.authenticated = false;
 		
 		$scope.isCollapsed = true;
 		$scope.isActive = function(viewLocation){
@@ -63,6 +65,14 @@ define(['app'], function(nessa){
 		$scope.toggle = function(){
 			$scope.isCollapsed = !$scope.isCollapsed;
 		};
+		
+		$scope.$on('authenticated', function(e,status){
+			$scope.authenticated = !!status;
+		});
+	});
+	
+	nessa.run(function($log){
+		$log.info('Module loaded: Notifications');
 	});
 	
 	return nessa;

@@ -17,7 +17,7 @@ define(['app'], function(nessa){
 			data: {
 				title: 'Add Show'
 			},
-			onEnter: function($modal, $scope, $state, $stateParams){
+			onEnter: function($modal, $state, $stateParams){
 				$modal.open({
 					templateUrl: 'views/modal/show/search.html',
 					controller: 'searchCtrl',
@@ -84,7 +84,8 @@ define(['app'], function(nessa){
 		});
 	});
 	
-	nessa.run(function($rootScope){
+	nessa.run(function($log, $rootScope){
+		$log.info('Module loaded: Shows');
 		$rootScope.menu.push({
 			path: 'shows.index',
 			name: 'Shows',
@@ -96,6 +97,9 @@ define(['app'], function(nessa){
 	/****** Controller ******/
 	
 	nessa.controller('showsCtrl', function($http, $log, $rootScope, $scope, $socket){
+		
+		// TO DO: improve and tidy
+		
 		$scope.settings = {};
 		$scope.shows	= [];
 		
@@ -291,8 +295,13 @@ define(['app'], function(nessa){
 		};
 		
 		$scope.hasAired = function(){
+			return ($scope.episode.airdate && $scope.episode.airdate*1000 < new Date().getTime());
+		};
+		/*
+		$scope.hasAired = function(){
 			return (!!$scope.episode.file || !!$scope.episode.hash || $scope.episode.airdate && $scope.episode.airdate*1000 < new Date().getTime());
 		};
+		*/
 	});
 	
 	nessa.controller('matchCtrl', function($http, $modalInstance, $scope, $socket, $state){
@@ -320,7 +329,7 @@ define(['app'], function(nessa){
 		};
 	});
 	
-	nessa.controller('searchCtrl', function($http, $log, $modalInstance, $scope, $socket){
+	nessa.controller('searchCtrl', function($http, $log, $modalInstance, $rootScope, $scope, $socket){
 		$scope.selected = null;
 		$scope.filter = {
 			query: ''

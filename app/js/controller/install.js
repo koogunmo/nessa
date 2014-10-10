@@ -12,6 +12,10 @@ define(['app'], function(nessa){
 		});
 	});
 	
+	nessa.run(function($log){
+		$log.info('Module loaded: Installer');
+	});
+	
 	nessa.controller('installCtrl', function($http, $scope, $socket, $state){
 		$scope.settings = {};
 		$scope.save = function(){

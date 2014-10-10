@@ -42,7 +42,6 @@ define('app', ['angular','socket.io','moment','ngAnimate','ngResource','ngStorag
 			if (typeof precision === 'undefined') precision = 1;
 			var	units	= ['bytes','KB','MB','GB','TB','PB','EB','ZB','YB'],
 				number	= Math.floor(Math.log(bytes) / Math.log(1024));
-			
 			return (bytes / Math.pow(1024, Math.floor(number))).toFixed(precision) +  ' ' + units[number];
 		}
 	});
@@ -84,67 +83,76 @@ define('app', ['angular','socket.io','moment','ngAnimate','ngResource','ngStorag
 			var num = parseInt(n, 10), len = parseInt(l, 10);
 			if (isNaN(num) || isNaN(len)) return n;
 			num = ''+num;
-			while (num.length < len) {
-				num = '0'+num;
-			}
+			while (num.length < len) num = '0'+num;
 			return num;
 		}
 	});
 	
 	/****** Factory ******/
 	
-	nessa.factory('$auth', function($http, $localStorage, $location, $q, $rootScope, $sessionStorage, $socket){
+	nessa.factory('$auth', function($http, $localStorage, $location, $log, $q, $rootScope, $sessionStorage, $socket){
+		
+		$rootScope.$storage = $localStorage;
+		
 		var auth = {
 			check: function(){
 				var deferred = $q.defer();
-				$rootScope.$storage = $localStorage;
-				
-				if (!$rootScope.$storage.session) deferred.reject('No session detected');
-				
+				if (!$rootScope.$storage.session) {
+					deferred.reject({});
+				}
 				$http.post('/auth/check', {session: $rootScope.$storage.session}).success(function(json, status){
-					if (status == 200 && json.success){
-						$http.defaults.headers.common['session'] = json.session;
-						$rootScope.$storage.lastTime = json.lastTime;
-						deferred.resolve(status);
+					if (json && json.success){
+						auth.update(json);
+						deferred.resolve(json);
 					} else {
-						$rootScope.$storage.session = false;
-						deferred.reject(json.messages);
+						auth.clear()
+						deferred.reject(json);
 					}
 				}).error(function(json, status){
-					deferred.resolve(status);
+					auth.clear()
+					deferred.reject(json);
 				});
 				return deferred.promise;
 			},
-			
+			clear: function(){
+				$http.defaults.headers.common['session'] = null;
+				$rootScope.$storage.session = null;
+				$rootScope.user = {};
+				$rootScope.$broadcast('authenticated', false);
+			},
 			login: function(username, password, remember){
 				var deferred = $q.defer();
-				$http.post('/auth/login', {username: username, password: password}).success(function(json, status){
+				$http.post('/auth/login', {username: username, password: password}).success(function(json){
 					if (json.success){
-						$http.defaults.headers.common['session'] = json.session;
-						$rootScope.$storage.lastTime = json.lastTime;
-						$rootScope.$storage.session = json.session;
-						deferred.resolve();
-					} else {						
-						deferred.reject(401);
+						auth.update(json);
+						deferred.resolve(json);
+					} else {
+						auth.clear();
+						deferred.reject(json);
 					}
-				}).error(function(json, status){
-					deferred.reject(status);
+				}).error(function(json){
+					auth.clear();
+					deferred.reject(json);
 				});
 				return deferred.promise;
 			},
-			
 			logout: function(){
 				var deferred = $q.defer();
-				$http.post('/auth/logout', {session: $rootScope.$storage.session}).success(function(json, status){
-					$http.defaults.headers.common['session'] = null;
-					$rootScope.$storage.session = null;
-					deferred.resolve();
-				}).error(function(json, status){
-					$http.defaults.headers.common['session'] = null;
-					$rootScope.$storage.session = null;
-					deferred.resolve();
+				$http.post('/auth/logout', {session: $rootScope.$storage.session}).then(function(json, status){
+					auth.clear();
+					deferred.resolve(json);
+				}, function(json, status){
+					auth.clear();
+					deferred.resolve(json);
 				});
 				return deferred.promise;
+			},
+			update: function(json){
+				$http.defaults.headers.common['session'] = json.session;
+				$rootScope.$storage.lastTime = json.lastTime;
+				$rootScope.$storage.session = json.session;
+				$rootScope.user = json.user;
+				$rootScope.$broadcast('authenticated', true);
 			}
 		};
 		return auth;
@@ -171,6 +179,9 @@ define('app', ['angular','socket.io','moment','ngAnimate','ngResource','ngStorag
 	});
 	
 	nessa.factory('$socket', function($rootScope) {
+		
+		// DEPRECATED
+		
 		var port = null;
 		if (window.location.protocol == 'https:'){
 			port = 443;
@@ -242,35 +253,10 @@ define('app', ['angular','socket.io','moment','ngAnimate','ngResource','ngStorag
 	nessa.run(function($auth, $localStorage, $location, $rootScope, $sessionStorage, $socket, $state){
 		$rootScope.menu = [];
 		
-		
-		
-		$rootScope.authenticated = true;
-		
-		$rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams){
-			$rootScope.pagetitle = toState.data.title;
-			
-			/*
-			if (toState.data.secure){
-				$auth.check().then(function(success){
-					$rootScope.authenticated = true;
-					$rootScope.pagetitle = toState.data.title;
-				}, function(error){
-					event.preventDefault();
-					$rootScope.authenticated = false;
-					$state.transitionTo('login');
-				});
-			} else {
-				if (toState.name == 'login') {
-					$auth.check().then(function(){
-						$rootScope.authenticated = true;
-						$state.transitionTo('dashboard');
-					}, function(){
-						$rootScope.authenticated = false;
-					});
-				}
-				$rootScope.pagetitle = toState.data.title;
-			}
-			*/
+		$rootScope.$on('$stateChangeStart', function(event, to, toParams, from, fromParams){
+			$rootScope.pagetitle = to.data.title;
+			$rootScope.stateTo = to;
+			$rootScope.stateFrom = from;
 		});
 	});
 	
