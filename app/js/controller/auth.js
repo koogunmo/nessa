@@ -42,6 +42,7 @@ define(['app'], function(nessa){
 		$scope.reset = function(){
 			$scope.error = null;
 		};
+		if ($rootScope.$storage.session) $state.transitionTo('dashboard');
 	});
 		
 	nessa.run(function($auth, $log, $state){
@@ -49,7 +50,6 @@ define(['app'], function(nessa){
 		$auth.check().then(function(json){
 		//	$state.transitionTo('dashboard');
 		},function(error){
-			$log.error('derp', error);
 			$state.transitionTo('login');
 		});
 	});

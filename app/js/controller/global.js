@@ -7,7 +7,7 @@ define(['app'], function(nessa){
 	nessa.controller('alertsCtrl', function($scope, $socket){
 		$scope.alerts = [];
 		
-		$socket.on('system.alert', function(alert){
+		$scope.$on('alert', function(e,alert){
 			if (!alert.title) alert.title = 'NodeTV';
 			if (!alert.icon) {
 				switch (alert.type){
@@ -20,6 +20,7 @@ define(['app'], function(nessa){
 				}
 			}
 			if (('Notification' in window) && Notification.permission === 'granted'){
+				// Use Notification API
 				var notification = new Notification(alert.title, {body: alert.message, icon: alert.icon});
 				notification.onclick = function(e){
 					if (notification.url) document.location = window.url;
@@ -31,6 +32,8 @@ define(['app'], function(nessa){
 					}, alert.autoClose);
 				}
 			} else {
+				// Use custom alerts system
+				
 				$scope.alerts.push(alert);
 				if (alert.autoClose) {
 					setTimeout(function(){

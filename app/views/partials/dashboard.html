@@ -20,7 +20,8 @@
 						</h4>
 					</div>
 					<div class="panel-body" collapse="collapsed">
-						<div><strong>Season {{episode.season}}, Episode {{episode.episode}}</strong> <span class="small">{{episode.airdate*1000 | date:'dd MMMM yyyy'}}</span></div>
+						<!--div ng-include="'/views/partials/episode.html'"></div-->
+						<div><strong>Season {{episode.season}}, Episode {{episode.episode}}</strong> <span class="small">{{episode.airdate*1000 | date:'mediumDate'}}</span></div>
 						<p>{{episode.synopsis}}</p>
 						<div class="tools">
 							<span class="fa fa-lg fa-eye" title="Episode has been watched" ng-if="episode.watched" ng-click="watched()"></span>

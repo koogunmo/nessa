@@ -5,7 +5,7 @@ define(['app'], function(nessa){
 			abstract: true,
 			url: '/shows',
 			controller: 'showsCtrl',
-			templateUrl: 'views/partials/shows.html',
+			templateUrl: 'views/section/shows.html',
 			data: {
 				secure: true,
 				title: 'Shows'
@@ -144,7 +144,6 @@ define(['app'], function(nessa){
 	
 	nessa.controller('showCtrl', function($http, $log, $scope){
 		var tvdb = parseInt($scope.show.tvdb);
-		
 		$scope.progress = function(){
 			$http.get('/api/shows/'+tvdb+'/progress').success(function(json, status){
 				$scope.show.progress = json;
@@ -182,9 +181,11 @@ define(['app'], function(nessa){
 					$scope.progress	= json.progress;
 					$scope.seasons	= json.seasons;
 					$scope.seasons.forEach(function(season){
-						$scope.listing[season.season].episodes.forEach(function(v,k){
-							$scope.listing[season.season].episodes[k].watched = season.episodes[v.episode];
-						});
+						if ($scope.listing[season.season]){
+							$scope.listing[season.season].episodes.forEach(function(v,k){
+								$scope.listing[season.season].episodes[k].watched = season.episodes[v.episode];
+							});
+						}
 					});
 				}
 			}).error(function(json, status){
@@ -292,6 +293,14 @@ define(['app'], function(nessa){
 				return true;
 			}
 			return false;
+		};
+		
+		$scope.downloadStatus = function(){
+			var status = '';
+			if ($scope.episode.hash) status = 'available';	
+			if ($scope.episode.status && !$scope.episode.file) status = 'downloading'
+			if ($scope.episode.status && $scope.episode.file) status = 'downloaded';
+			return status;
 		};
 		
 		$scope.hasAired = function(){

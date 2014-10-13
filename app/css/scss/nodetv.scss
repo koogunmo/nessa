@@ -1,9 +1,11 @@
+$font-color: #666666;
+
 $border: #EEEEEE;
 $break-large: 768px;
 $break-small: 767px;
 
 body {
-	background-color: #F7F7F7;
+	background-color: #F6F6F6;
 	font-family: -apple-system-font, 'Roboto', Arial, sans-serif;
 	font-weight: 200;
 	padding-top: 60px;
@@ -11,6 +13,11 @@ body {
 	@media (max-width: $break-small){
 		font-size: 17px;
 		line-height: 21px;
+	}
+	// Testing themes
+	&.night {
+		background-color: #272727;
+		color: #FFFFFF;
 	}
 }
 
@@ -22,15 +29,12 @@ body {
 .accordion-toggle, .nav, .pagination, .carousel a, [ui-sref] {
 	cursor: pointer;
 }
-
 .well[ui-view]{
 	height: 65px; 
 }
-
 .ui-view-container {
 	position: relative;
 }
-
 
 [ui-view] {
 	left: 0px;
@@ -51,63 +55,18 @@ body {
 	}
 }
 
-/*
-[ui-view].ng-enter, [ui-view].ng-leave {
-	left: 0;
-	position: absolute;
-	right: 0;
-	transition:all .5s ease-in-out;
-}
-
-[ui-view].ng-enter {
-  opacity: 0;
-  -webkit-transform:scale3d(0.5, 0.5, 0.5);
-  -moz-transform:scale3d(0.5, 0.5, 0.5);
-  transform:scale3d(0.5, 0.5, 0.5);
-}
-
-[ui-view].ng-enter-active {
-  opacity: 1;
-  -webkit-transform:scale3d(1, 1, 1);
-  -moz-transform:scale3d(1, 1, 1);
-  transform:scale3d(1, 1, 1);
-}
-
-[ui-view].ng-leave {
-  opacity: 1; 
-  -webkit-transform:translate3d(0, 0, 0);
-  -moz-transform:translate3d(0, 0, 0);
-  transform:translate3d(0, 0, 0);
-}
-
-[ui-view].ng-leave-active {
-  opacity: 0;
-  -webkit-transform:translate3d(100px, 0, 0);
-  -moz-transform:translate3d(100px, 0, 0);
-  transform:translate3d(100px, 0, 0);
-}
-*/
-
-.navbar-header {
-	.navbar-brand {
-	//	transition: color 0.5s;
-	}
-}
-
 .navbar-inverse {
 	background-color: rgba(0,0,0,0.9);
 	box-shadow: 0px 3px 8px #666666;
-		
 	.navbar-nav {
 		>li {
 			>a {
 				transition: color 0.5s;
 				> span.fa {
 					margin-right: 5px;
-				}
-				@media screen and (max-width: $break-small){
-					> span.fa {
-						float: right;
+					float: right;
+					@media screen and (min-width: $break-small){
+						float: none;
 					}
 				}
 			}
@@ -142,25 +101,47 @@ body {
 }
 
 /* Form elements */
-input[type="search"], input.search {
-	text-transform: capitalize;
-}
-input.ng-invalid {
-	border: 1px solid #E9322D;
-	box-shadow: 0 0 6px #f8b9b7;
-	-webkit-box-shadow: 0 0 6px #f8b9b7;
+
+input {
+	&.form-control {
+		background-color: #F0F0F0;
+		transition: background-color 0.5s;
+		&:focus {
+			background-color: #FFFFFF;
+		}
+		
+		&[type="search"], &input.search {
+			text-transform: capitalize;
+		}
+	}
+	&.ng-invalid {
+		border: 1px solid #E9322D;
+		box-shadow: 0 0 6px #f8b9b7;
+		-webkit-box-shadow: 0 0 6px #f8b9b7;
+	}
 }
 
-input.form-control:nth-last-child(2){
-	border-bottom-left-radius: 0px;
-	border-bottom-right-radius: 0px;
+.form-group {
+	input {
+		border-bottom-style: none;
+		border-radius: 0px;
+		border-top-style: none;
+		margin: 0px;
+		
+		&:first-of-type {
+			border-bottom: 1px solid #CCCCCC;
+			border-top-style: solid;
+			border-top-left-radius: 4px;
+			border-top-right-radius: 4px;
+		}
+		&:last-of-type {
+			border-top: 1px solid #CCCCCC;
+			border-bottom-style: solid;
+			border-bottom-left-radius: 4px;
+			border-bottom-right-radius: 4px;
+		}
+	}
 }
-input.form-control+input.form-control {
-	border-top: 0px;
-	border-top-left-radius: 0px;
-	border-top-right-radius: 0px;
-}
-
 
 /* Alerts */
 
@@ -186,17 +167,8 @@ input.form-control+input.form-control {
 		margin: 0px 0px 10px;
 		text-align: center;
 	}
-	
-	input[type="text"] {
-		margin-bottom: -1px;
-		border-bottom-left-radius: 0;
-		border-bottom-right-radius: 0;
-	}
-	
-	input[type="password"] {
-		margin-bottom: 10px;
-		border-top-left-radius: 0;
-		border-top-right-radius: 0;
+	input {
+		box-shadow: none !important;
 	}
 }
 
@@ -419,17 +391,18 @@ input.form-control+input.form-control {
 						}
 					}
 				}
-			}
-			.episode:last-child {
-				border-bottom: none;
-			}
-			.episode.unaired {
-				.title {
-					color: #CCCCCC;
+				&:last-child {
+					border-bottom: none;
 				}
-				.extended .tools {
-					font-size: 14px;
-					text-align: right;
+				&.unaired {
+					.title {
+						color: #CCCCCC;
+					}
+					/*
+					.extended .tools {
+						text-align: right;
+					}
+					*/
 				}
 			}
 		}

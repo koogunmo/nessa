@@ -1,0 +1,17 @@
+	<div class="episode {{downloadStatus()}}" ng-class="{unaired: !hasAired()}" ng-hide="episode.episode==0" ng-controller="episodeCtrl">
+		<h5 class="title"><span class="small">{{episode.episode | zeroPad:2}}</span>{{episode.title || 'TBA'}}</h5>
+		<div class="extended">
+			<div class="synopsis">
+				<p>{{episode.synopsis || 'No synopsis available'}}</p>
+				<p ng-if="episode.airdate > 0"><span class="fa fa-clock-o"></span> {{episode.airdate*1000 | date:'mediumDate'}}</p>
+			</div>
+			
+			<div class="tools">
+				<span class="fa fa-eye-slash action" title="Mark episode as watched" ng-if="hasAired() && !episode.watched" ng-click="watched()"></span>
+				<span class="fa fa-eye action" title="Episode has been watched" ng-if="hasAired() && episode.watched"></span>
+				
+				<span class="fa fa-download action" title="Download this episode" ng-if="!episode.file && episode.hash" ng-click="download()"></span>
+				<span class="fa fa-hdd-o" title="This episode has been downloaded" ng-if="episode.status && episode.file"></span>
+			</div>
+		</div>
+	</div>

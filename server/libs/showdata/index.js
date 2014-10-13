@@ -33,7 +33,7 @@ var ShowData = {
 			showCollection.findOne({tvdb: tvdb}, function(error, record){
 				if (error) logger.error(error);
 				if (record) {
-					// It is known, update document
+					// It is known. Update document
 					if (json.imdb_id) record.imdb = json.imdb_id;
 					if (json.overview) record.synopsis = json.overview;
 					record.name = json.title;
@@ -325,7 +325,7 @@ var ShowData = {
 				});
 			});
 		} catch(e){
-			logger.error('sync', e.message);
+			logger.error('sync: ', e.message);
 		}
 	},
 	
@@ -513,6 +513,7 @@ var ShowData = {
 	getLatest: function(){
 		var self = this;
 		// Check each of the feeds for new episodes
+		
 		showCollection.find({
 			status: true,
 		//	ended: {$exists: false},
