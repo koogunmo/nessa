@@ -137,7 +137,7 @@ define(['app'], function(nessa){
 		};
 		$scope.load();
 		
-		$scope.$on('showsReload', function(event, tvdb){
+		$scope.$on('showsRefresh', function(event, tvdb){
 			$scope.load()
 		});
 	});
@@ -156,8 +156,10 @@ define(['app'], function(nessa){
 	nessa.controller('showModalCtrl', function($http, $log, $modalInstance, $rootScope, $scope, $socket, $stateParams){
 		window.modal = $modalInstance;
 		
+		$scope.settings = {};
+		
 		$scope.close = function(){
-			$rootScope.$broadcast('showsReload', true);
+			$rootScope.$broadcast('showsRefresh', true);
 			$modalInstance.close();
 		};
 		$scope.dismiss = function(){
@@ -209,7 +211,7 @@ define(['app'], function(nessa){
 			}
 		};
 		$scope.save = function(){
-			$http.post('/api/shows/'+tvdb, $scope.summary).success(function(json, status){
+			$http.post('/api/shows/'+tvdb, $scope.show).success(function(json, status){
 				$scope.close();
 			}).error(function(json, status){
 				$log.error(json, status);
@@ -231,7 +233,7 @@ define(['app'], function(nessa){
 			});
 		};
 		
-		$scope.$on('showReload', function(e, tvdb){
+		$scope.$on('showRefresh', function(e, tvdb){
 			$log.info(tvdb);
 			$scope.load(tvdb);
 		});
@@ -354,7 +356,7 @@ define(['app'], function(nessa){
 		};
 		$scope.save = function(){
 			$http.post('/api/shows', {tvdb: $scope.selected}).success(function(json, status){
-				$rootScope.$broadcast('showsReload', $scope.selected);
+				$rootScope.$broadcast('showsRefresh', $scope.selected);
 				$modalInstance.close();
 			}).error(function(json, status){
 				$log.error(json, status);

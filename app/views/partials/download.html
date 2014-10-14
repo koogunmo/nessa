@@ -1,0 +1,28 @@
+	<div class="download" ng-class="{paused: !active}" ng-controller="downloadCtrl">
+		<span class="pull-right">
+			<button type="button" class="btn btn-xs" ng-click="startStop()" ng-class="{'btn-success': !active, 'btn-danger': active}">
+				<span class="fa" ng-class="{'fa-play': !active, 'fa-pause': active}"></span>
+			</button>
+		</span>
+		<h4>
+			<!-- <input type="checkbox" ng-model="selected"> -->
+			<span ui-sref="downloads.info({id: download.id})">{{download.name}}</span>
+		</h4>
+		<div class="progress progress-striped" title="{{download.percentDone*100 | number:2}}%">
+			<div class="progress-bar" role="progressbar" style="width: {{download.percentDone*100}}%;" ng-class="{'progress-bar-success': download.percentDone==1}"></div>
+		</div>
+		<div class="stats">
+			<span class="pull-right hidden-xs">
+				<span ng-if="download.rateDownload">
+					{{download.rateDownload|formatBytes}}
+					<span class="fa fa-arrow-down"></span>
+				</span>
+				<span ng-if="download.rateUpload">
+					<span class="fa fa-arrow-up"></span>
+					{{download.rateUpload|formatBytes}}
+				</span>
+			</span>
+			<span>{{download.sizeWhenDone|formatBytes}}, uploaded {{download.uploadedEver|formatBytes}}</span>
+			<span>(Ratio: {{download.uploadedEver/download.downloadedEver|number:1}})</span>
+		</div>
+	</div>

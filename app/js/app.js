@@ -1,5 +1,5 @@
-define('app', ['angular','socket.io','moment','ngAnimate','ngResource','ngStorage','ngTouch','ui.bootstrap','ui.router'], function(angular,io,moment){
-	var nessa = angular.module('nessa', ['ngAnimate','ngResource','ngStorage','ui.bootstrap','ui.router']);
+define('app', ['angular','socket.io','moment','ngAnimate','ngMessages','ngResource','ngStorage','ngTouch','ui.bootstrap','ui.router'], function(angular,io,moment){
+	var nessa = angular.module('nessa', ['ngAnimate','ngMessages','ngResource','ngStorage','ui.bootstrap','ui.router']);
 
 	nessa.config(function($urlRouterProvider){
 		$urlRouterProvider.when('/', function($state){
@@ -161,15 +161,14 @@ define('app', ['angular','socket.io','moment','ngAnimate','ngResource','ngStorag
 	nessa.factory('nessaHttp', function($location, $q){
 		return {
 			request: function(config){
-			//	if ($rootScope.$storage) config.headers['X-Session'] = $rootScope.$storage.session;
-				return config || $q.when(config);
+				return config;
 			},
 			requestError: function(rejection){
 				if (response.status === 401) $location.url('/login');
 				$q.reject(rejection);
 			},
 			response: function(response){
-				return response || $q.when(response);
+				return response;
 			},
 			responseError: function(rejection){
 				if (rejection.status === 401) $location.url('/login');
@@ -229,7 +228,7 @@ define('app', ['angular','socket.io','moment','ngAnimate','ngResource','ngStorag
 	/****** Config ******/
 	
 	nessa.config(function($httpProvider, $locationProvider, $stateProvider){
-		$httpProvider.interceptors.push('nessaHttp');
+	//	$httpProvider.interceptors.push('nessaHttp');
 		
 		$locationProvider.html5Mode(true).hashPrefix('!');
 		
@@ -250,11 +249,11 @@ define('app', ['angular','socket.io','moment','ngAnimate','ngResource','ngStorag
 		
 	});
 	
-	nessa.run(function($auth, $localStorage, $location, $rootScope, $sessionStorage, $socket, $state){
+	nessa.run(function($auth, $localStorage, $location, $rootScope, $sessionStorage, $socket, $state, $urlRouter){
 		$rootScope.menu = [];
 		
 		$rootScope.$on('$stateChangeStart', function(event, to, toParams, from, fromParams){
-			$rootScope.pagetitle = to.data.title;
+			if (to.data) $rootScope.pagetitle = to.data.title;
 			$rootScope.stateTo = to;
 			$rootScope.stateFrom = from;
 		});

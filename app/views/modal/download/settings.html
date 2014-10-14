@@ -1,40 +1,50 @@
 <form name="downloadForm">
 	<div class="modal-header">
-		<h4 class="modal-title">Info</h4>
+		<h4 class="modal-title">{{download.name}}</h4>
 	</div>
 	<div class="modal-body">
-		<div ng-if="torrent.show" class="panel panel-info">
-			<div class="panel-heading">
-				<h4 class="panel-title">{{torrent.show.name}} <small>{{torrent.episode.title}}</small></h4>
-			</div>
-			<div class="panel-body">
-				<h5><strong>Season {{torrent.episode.season}} Episode {{torrent.episode.episode}}</strong></h5>
-				<p>{{torrent.episode.synopsis}}</p>
-			</div>
-		</div>
-		
-		<!--
-		<div ng-if="torrent.files">
-			<h4>Assign to show</h4>
-			<select></select>
-			<hr />
-			<h4>Move to folder</h4>
-			<div class="checkbox" ng-repeat="file in torrent.files">
-				<label>
-					<input type="radio" name="file" value="{{file.name}}" /> {{file.name}}
-				</label>
-			</div>
-		</div>
-		-->
-		
+		<tabset type="pills">
+			<tab heading="Info">
+				<hr />
+				<div><strong>Added</strong>: {{download.addedDate*1000|date:'medium'}}</div>
+				<hr />
+				<div><strong>Size</strong>: {{download.totalSize|formatBytes}}</div>
+				<div><strong>Uploaded</strong>: {{download.uploadedEver|formatBytes}}</div>
+				<div><strong>Ratio</strong>: {{download.uploadedEver/download.downloadedEver|number:1}}</div>
+			</tab>
+			<tab heading="Episode" ng-if="download.show">
+				<hr />
+				<div class="panel panel-info">
+					<div class="panel-heading">
+						<h4 class="panel-title">{{download.show.name}} <small>{{download.episode.title}}</small></h4>
+					</div>
+					<div class="panel-body">
+						<h5><strong>Season {{download.episode.season}} Episode {{download.episode.episode}}</strong></h5>
+						<p>{{download.episode.synopsis}}</p>
+					</div>
+				</div>
+			</tab>
+			<!--
+			<tab heading="Files" ng-if="download.files">
+				Manually move files to folders & rename
+				<hr />
+				<div class="checkbox" ng-repeat="file in download.files">
+					<label>
+						<input type="radio" name="file" value="{{file.name}}" /> {{file.name}}
+					</label>
+				</div>
+			</tab>
+			-->
+		</tabset>
 	</div>
 	<div class="modal-footer">
 		<button type="button" class="btn btn-danger" ng-click="remove()">
 			<span class="fa fa-trash-o"></span>
 		</button>
 		<button type="button" class="btn btn-warning" ng-click="toggle();">
-			<span class="fa" ng-class="{'fa-play': !torrent.status, 'fa-pause': !!torrent.status}"></span>
+			<span class="fa" ng-class="{'fa-play': !download.status, 'fa-pause': !!download.status}"></span>
 		</button>
+		
 		<button type="button" class="btn btn-success" ng-show="downloadForm.$dirty" ng-click="save()">Save</button>
 		<button type="button" class="btn btn-default" ng-click="close()">Close</button>
 	</div>

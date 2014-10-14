@@ -281,8 +281,11 @@ var ShowData = {
 	},
 	
 	settings: function(user, data, callback){
-		if (data._id) delete data._id;
-		showCollection.update({tvdb: data.tvdb}, {$set: data}, {upsert: true}, function(error, affected){
+		var record = {
+			feed: data.feed,
+			hd: !!data.hd
+		};
+		showCollection.update({_id: ObjectID(data._id), 'users._id': ObjectID(user._id)}, {$set: record}, {upsert: true}, function(error, affected){
 			if (typeof(callback) == 'function') callback(error, !!affected);
 		});
 	},

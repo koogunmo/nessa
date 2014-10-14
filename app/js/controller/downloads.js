@@ -4,7 +4,7 @@ define(['app'], function(nessa){
 		$stateProvider.state('downloads', {
 			url: '/downloads',
 			controller: 'downloadsCtrl',
-			templateUrl: 'views/partials/downloads.html',
+			templateUrl: 'views/section/downloads.html',
 			data: {
 				secure: true,
 				title: 'Downloads'
@@ -35,7 +35,7 @@ define(['app'], function(nessa){
 			},
 			onEnter: function($state, $stateParams, $modal){
 				$modal.open({
-					controller: 'downloadCtrl',
+					controller: 'downloadModalCtrl',
 					templateUrl: 'views/modal/download/settings.html'
 				}).result.then(function(result){
 					$state.transitionTo('downloads');
@@ -67,34 +67,84 @@ define(['app'], function(nessa){
 	
 	/****** Controllers ******/
 	
-	nessa.controller('downloadsCtrl', function($http, $modal, $rootScope, $scope, $socket){
+	nessa.controller('downloadsCtrl', function($http, $log, $rootScope, $scope, $socket){
 		$scope.predicate = 'name';
 		$scope.reverse = false;
 		$scope.downloads = [];
 		
-		$http.get('/api/downloads').success(function(json, status){
-			$scope.downloads = json;
+		$scope.load = function(){
+			$http.get('/api/downloads').success(function(json, status){
+				$scope.downloads = json;
+			});
+		};
+		$scope.$on('downloadsRefresh', function(){
+			$scope.load();
 		});
+		$scope.load();
 	});
 	
-	nessa.controller('downloadCtrlTest', function($http, $modal, $scope, $socket){
-		$scope.active	= false;
+	nessa.controller('downloadCtrl', function($http, $log, $scope, $socket){
+		$scope.active	= !!$scope.download.status;
 		$scope.selected	= false;
 		
-		$scope.start = function(){
-			$scope.active = true;
+		$scope.startStop = function(){
+			$scope.active = !$scope.active;
+			$http.post('/api/downloads/'+$scope.download.id, {status: $scope.active}).success(function(json, status){
+			//	$scope.download = json;
+			});
 		};
-		$scope.stop = function(){
-			$scope.active = false;
-		};
-		$scope.update = function(){
-			if ($scope.active){
-				/*
-				$http.get('/api/downloads/'+$scope.download.id).success(function(json, status){
-					$scope.downloads = json;
+		$scope.interval = setInterval(function(){
+			if (!$scope.active) return;
+			$http.get('/api/downloads/'+$scope.download.id).success(function(json, status){
+				$scope.active = !!json.status;
+				$scope.download = json;
+			});
+		}, 5000);
+	});
+	
+	nessa.controller('downloadModalCtrl', function($http, $log, $modalInstance, $rootScope, $scope, $state, $stateParams){
+		
+		$scope.download = {};
+		
+		$http.get('/api/downloads/'+$stateParams.id).success(function(json, status){
+			$scope.active = !!json.status;
+			$scope.download = json;
+		}).error(function(){
+			$modalInstance.dismiss();
+		});
+		
+		/*
+		$socket.emit('download.info', $stateParams.id);
+		$socket.on('download.info', function(data){
+			if (data.id != $stateParams.id) return;
+			$scope.torrent = data;
+		});
+		*/
+		$scope.remove = function(){
+			if (confirm('Are you sure you want to delete this torrent?')) {
+				$http.delete('/api/downloads/'+$scope.torrent.id).success(function(json, status){
+					$rootScope.$broadcast('downloadsRefresh');
+					$modalInstance.close('close');
+				}).error(function(json, status){
+					$log.error(json,status);
 				});
-				*/
+			//	$socket.emit('download.remove', {id: $scope.torrent.id, purge: true});
+				$modalInstance.dismiss('close');
 			}
+		};
+		$scope.toggle = function(){
+			$scope.torrent.status = !$scope.torrent.status;
+			if ($scope.torrent.status){
+		//		$socket.emit('download.start', $scope.torrent.id);
+			} else {
+		//		$socket.emit('download.stop', $scope.torrent.id);
+			}
+		};
+		$scope.close = function(){
+			$modalInstance.dismiss('close');
+		};
+		$scope.save = function(){
+			$modalInstance.close();
 		};
 	});
 	
@@ -111,52 +161,20 @@ define(['app'], function(nessa){
 		$scope.close = function(){
 			$modalInstance.dismiss();
 		};
+		
 		$scope.save = function(){
 			$http.post('/api/downloads', {url: $scope.magnet.url}).success(function(json, status){
+				$rootScope.$broadcast('downloadsRefresh');
 				$modalInstance.close();
+			}).error(function(){
+				$modalInstance.dismiss();
 			});
 		};
 	});
 	
 	
 	
-	nessa.controller('downloadCtrl', function($http, $modalInstance, $scope, $socket, $state, $stateParams){
-		$scope.torrent = {};
-		// fetch info
-		
-		$socket.emit('download.info', $stateParams.id);
-		$socket.on('download.info', function(data){
-			if (data.id != $stateParams.id) return;
-			$scope.torrent = data;
-		});
-		$scope.remove = function(){
-			if (confirm('Are you sure you want to delete this torrent?')) {
-				/*
-				$http.delete('/api/downloads/'+$scope.torrent.id).success(function(json, status){
-					$modalInstance.dismiss('close');
-				}).error(function(json, status){
-					console.error(json,status);
-				});
-				*/
-				$socket.emit('download.remove', {id: $scope.torrent.id, purge: true});
-				$modalInstance.dismiss('close');
-			}
-		};
-		$scope.toggle = function(){
-			$scope.torrent.status = !$scope.torrent.status;
-			if ($scope.torrent.status){
-				$socket.emit('download.start', $scope.torrent.id);
-			} else {
-				$socket.emit('download.stop', $scope.torrent.id);
-			}
-		};
-		$scope.close = function(){
-			$modalInstance.dismiss('close');
-		};
-		$scope.save = function(){
-			$modalInstance.close();
-		};
-	});
+	
 	
 	return nessa;
 });

@@ -1,22 +1,13 @@
 <div id="settings">
 	<form name="settingsForm" ng-submit="save()">
 		<tabset>
-			<tab heading="General">
-				<accordion close-others="true">
-					<accordion-group heading="Server" class="panel-info">
-						<div ng-include="'/views/partials/settings/server.html'"></div>
-					</accordion-group>
-					<accordion-group heading="Database" class="panel-info">
-						<div ng-include="'/views/partials/settings/database.html'"></div>
-					</accordion-group>
+			<tab heading="Library">
+				<accordion>
 					<accordion-group heading="Files" class="panel-info">
 						<div ng-include="'/views/partials/settings/files.html'"></div>
 					</accordion-group>
-					<accordion-group heading="Transmission" class="panel-info">
-						<div ng-include="'/views/partials/settings/transmission.html'"></div>
-					</accordion-group>
-					<accordion-group heading="Trakt" class="panel-info">
-						<div ng-include="'/views/partials/settings/trakt.html'"></div>
+					<accordion-group heading="Maintenance" class="panel-warning">
+						<div ng-include="'/views/partials/settings/library.html'"></div>
 					</accordion-group>
 				</accordion>
 			</tab>
@@ -34,19 +25,19 @@
 				</accordion>
 			</tab>
 			
-			<tab heading="Library">
-				
-				Library maintenance functions and settings
-				
-			</tab>
-			
-			<tab heading="System">
+			<tab heading="Advanced">
 				<accordion close-others="true">
-					<accordion-group heading="Updates" class="panel-warning">
-						<div ng-include="'/views/partials/settings/update.html'"></div>
+					<accordion-group heading="Server" class="panel-info">
+						<div ng-include="'/views/partials/settings/server.html'"></div>
 					</accordion-group>
-					<accordion-group heading="Library" class="panel-warning">
-						<div ng-include="'/views/partials/settings/library.html'"></div>
+					<accordion-group heading="Database" class="panel-info">
+						<div ng-include="'/views/partials/settings/database.html'"></div>
+					</accordion-group>
+					<accordion-group heading="Transmission" class="panel-info">
+						<div ng-include="'/views/partials/settings/transmission.html'"></div>
+					</accordion-group>
+					<accordion-group heading="Update NodeTV" class="panel-warning">
+						<div ng-include="'/views/partials/settings/update.html'"></div>
 					</accordion-group>
 				</accordion>
 			</tab>

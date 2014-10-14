@@ -32,6 +32,15 @@ var episodeCollection = db.collection('episode'),
 
 /************************************************************/
 
+/*
+var Transmission = function(settings){
+	
+	
+	return torrent;
+}
+*/
+
+
 var torrent = {
 	rpc: false,
 	connect: function() {
@@ -211,6 +220,15 @@ var torrent = {
 			logger.error('transmission.repacked: %s', e.message);
 		}
 	},
+	
+	setStatus: function(id, status, callback){
+		if (status) {
+			this.rpc.start(id, callback);
+		} else {
+			this.rpc.stop(id, callback);
+		}
+	},
+	
 	start: function(id, callback){
 		this.rpc.start(id, callback);
 	},

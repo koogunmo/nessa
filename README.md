@@ -16,10 +16,10 @@ I tried [SickBeard](http://sickbeard.com/), but it wouldn't easily let me arrang
 	- Windows users: You're on your own for now
 		- Please see the note at the bottom of this document
 - [Node.js](http://nodejs.org) 0.10.x
-- [MongoDB](http://mongodb.org) 2.4.x
+- [MongoDB](http://mongodb.org) 2.6.x
 - [Transmission](http://transmissionbt.com) with RPC Enabled
 - A free [Trakt](http://trakt.tv) account
-
+	- Personally, I recommend getting the VIP account, it's only $15 a year, and hides all the ads
 
 ## Optional Third-party software
 NodeTV doesn't handle uPNP/DLNA (yet), so if you want to stream your content, you'll need a MediaServer. I've used the following, with various degrees of success
@@ -35,7 +35,8 @@ These work reasonably well with VLC and my XBOX 360. Your mileage may vary.
 
 ## Browser Support
 
-NodeTV works in all current browsers. IE 8.0 and earlier are not supported.
+NodeTV works in all current browsers.
+**Note** Internet Explorer 8.0 and earlier is not supported.
 
 
 ## Installing

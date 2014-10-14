@@ -40,7 +40,7 @@
 			<div ng-repeat="day in upcoming" ng-controller="upcomingCtrl">
 				<div class="panel panel-default date" ng-if="visible">
 					<div class="panel-heading">
-						<h4 class="panel-title">{{day.date|moment:'dddd Do MMMM'}}</h4>
+						<h4 class="panel-title">{{day.date|date:'fullDate'}}</h4>
 					</div>
 				</div>
 				<div class="panel panel-info" ng-repeat="episode in day.episodes" ng-controller="episodeCtrl" ng-if="!episode.episode.in_collection">

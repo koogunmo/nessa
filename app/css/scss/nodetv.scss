@@ -662,6 +662,7 @@ input {
 		padding: 10px 5px;
 		&.paused {
 			color: #AAAAAA !important;
+			opacity: 0.7;
 			.progress-bar {
 				background-color: #AAAAAA !important;
 			}

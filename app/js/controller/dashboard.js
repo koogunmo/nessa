@@ -4,7 +4,7 @@ define(['app'], function(nessa){
 		$stateProvider.state('dashboard', {
 			url: '/dashboard',
 			controller: 'dashboardCtrl',
-			templateUrl: 'app/views/partials/dashboard.html',
+			templateUrl: 'app/views/section/dashboard.html',
 			data: {
 				secure: true,
 				title: 'Dashboard'
@@ -53,11 +53,12 @@ define(['app'], function(nessa){
 		});
 		
 		/* Replace with REST */
+		/*
 		$socket.emit('dashboard');
 		$socket.on('dashboard.unmatched', function(data){
 			$scope.unmatched = data.count;
 		});
-		
+		*/
 		
 		$scope.enableAlerts = function(){
 			if (('Notification' in window)){

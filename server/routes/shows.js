@@ -80,8 +80,7 @@ module.exports = function(app, db, socket){
 		shows.settings(req.user, req.body, function(error){
 			if (error){
 				logger.error(error);
-				res.status(400).end();
-				return;
+				return res.status(400).end();
 			}
 			res.status(200).end();
 		});
