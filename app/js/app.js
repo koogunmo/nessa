@@ -1,4 +1,4 @@
-define('app', ['angular','socket.io','moment','ngAnimate','ngMessages','ngResource','ngStorage','ngTouch','ui.bootstrap','ui.router'], function(angular,io,moment){
+define('app', ['angular','moment','ngAnimate','ngMessages','ngResource','ngStorage','ngTouch','ui.bootstrap','ui.router'], function(angular,moment){
 	var nessa = angular.module('nessa', ['ngAnimate','ngMessages','ngResource','ngStorage','ui.bootstrap','ui.router']);
 
 	nessa.config(function($urlRouterProvider){
@@ -90,7 +90,7 @@ define('app', ['angular','socket.io','moment','ngAnimate','ngMessages','ngResour
 	
 	/****** Factory ******/
 	
-	nessa.factory('$auth', function($http, $localStorage, $location, $log, $q, $rootScope, $sessionStorage, $socket){
+	nessa.factory('$auth', function($http, $localStorage, $location, $log, $q, $rootScope, $sessionStorage){
 		
 		$rootScope.$storage = $localStorage;
 		
@@ -177,6 +177,7 @@ define('app', ['angular','socket.io','moment','ngAnimate','ngMessages','ngResour
 		}
 	});
 	
+	/*
 	nessa.factory('$socket', function($rootScope) {
 		
 		// DEPRECATED
@@ -224,7 +225,7 @@ define('app', ['angular','socket.io','moment','ngAnimate','ngMessages','ngResour
 		};
 		return handler;
 	});
-	
+	*/
 	/****** Config ******/
 	
 	nessa.config(function($httpProvider, $locationProvider, $stateProvider){
@@ -249,7 +250,7 @@ define('app', ['angular','socket.io','moment','ngAnimate','ngMessages','ngResour
 		
 	});
 	
-	nessa.run(function($auth, $localStorage, $location, $rootScope, $sessionStorage, $socket, $state, $urlRouter){
+	nessa.run(function($auth, $localStorage, $location, $rootScope, $sessionStorage, $state, $urlRouter){
 		$rootScope.menu = [];
 		
 		$rootScope.$on('$stateChangeStart', function(event, to, toParams, from, fromParams){

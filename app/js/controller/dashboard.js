@@ -24,7 +24,7 @@ define(['app'], function(nessa){
 	
 	/****** Controller ******/
 	
-	nessa.controller('dashboardCtrl', function($http, $log, $scope, $socket){
+	nessa.controller('dashboardCtrl', function($http, $log, $scope){
 		
 		$scope.unmatched = 0;
 		$scope.upcoming = [];
@@ -51,14 +51,6 @@ define(['app'], function(nessa){
 		$http.get('/api/dashboard/upcoming').success(function(json,status){
 			$scope.upcoming = json;
 		});
-		
-		/* Replace with REST */
-		/*
-		$socket.emit('dashboard');
-		$socket.on('dashboard.unmatched', function(data){
-			$scope.unmatched = data.count;
-		});
-		*/
 		
 		$scope.enableAlerts = function(){
 			if (('Notification' in window)){

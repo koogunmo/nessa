@@ -4,7 +4,7 @@ define(['app'], function(nessa){
 		
 	});
 	
-	nessa.controller('alertsCtrl', function($scope, $socket){
+	nessa.controller('alertsCtrl', function($scope){
 		$scope.alerts = [];
 		
 		$scope.$on('alert', function(e,alert){

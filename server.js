@@ -82,11 +82,13 @@ var app		= express(),
 		host: (nconf.get('listen:nginx')) ? '127.0.0.1' : nconf.get('listen:address'),
 		port: (nconf.get('listen:nginx')) ? 6377 : nconf.get('listen:port')
 	},
-	server	= app.listen(listen.port, listen.host),
+	server	= app.listen(listen.port, listen.host)
+	/*,
 	io		= require('socket.io').listen(server, {
 		'browser client': false,
 		'log level': 1
 	});
+	*/
 	
 server.on('listening', function(){
 //	logger.info('Listening on http://' + server.address().address +':'+ server.address().port);
@@ -156,18 +158,19 @@ try {
 				app.use('/media', express.static(nconf.get('media:base')));
 			}
 			
+			
 			var socket = false;
+			/*
 			io.sockets.on('connection', function(s){
 				// Load socket listeners
 				// DEPRECATED
 				socket = s;
 				require('./server/routes/sockets')(app,db,socket);
 			});
-			
+			*/
 			// Load routes
 			require('./server/routes/auth')(app,db);
 			require('./server/routes/dashboard')(app,db);
-			
 			require('./server/routes/default')(app,db,socket);
 			require('./server/routes/downloads')(app,db,socket);
 			require('./server/routes/movies')(app,db,socket);

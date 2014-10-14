@@ -16,7 +16,7 @@ module.exports = function(app,db,socket){
 		});
 	};
 	
-	events.on('system.alert', eventAlerts);
+//	events.on('system.alert', eventAlerts);
 	socket.on('reconnected', function(data) {
 		try {
 			logger.info(data);
@@ -36,6 +36,7 @@ module.exports = function(app,db,socket){
 	/*************** New Socket methods ***************/
 	
 	// System
+	/*
 	socket.on('system.latest', function(){
 		var shows = plugin('showdata');
 		shows.getLatest();
@@ -58,7 +59,7 @@ module.exports = function(app,db,socket){
 	socket.on('media.settings', function(){
 		socket.emit('media.settings', nconf.get('media'));
 	});
-	
+	*/
 	
 	/** Dashboard **/
 	socket.on('dashboard', function(){
@@ -69,6 +70,7 @@ module.exports = function(app,db,socket){
 		});
 	});
 	
+	/*
 	socket.on('download.info', function(id){
 		var showCollection = db.collection('show');
 		var episodeCollection = db.collection('episode');
@@ -126,8 +128,9 @@ module.exports = function(app,db,socket){
 			}
 		});
 	});
-	
+	*/
 	/** Shows **/
+	/*
 	socket.on('shows.unwatched', function(data){
 		var shows = plugin('showdata');
 		shows.getUnwatched(function(error, json){
@@ -135,7 +138,7 @@ module.exports = function(app,db,socket){
 			logger.log(json);
 		});
 	});
-	
+	*/
 	
 	
 	// Trakt 'watched' functionality

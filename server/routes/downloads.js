@@ -48,7 +48,7 @@ module.exports = function(app, db, socket){
 		}
 	}).delete('/api/:session?/downloads/:id', function(req,res){
 		// Remove & delete torrent
-		torrents.remove({id: req.params.id, purge: true}, function(error){
+		torrents.remove({id: parseInt(req.params.id, 10), purge: true}, function(error){
 			if (error) return logger.error(error);
 			res.status(204).send({success: true});
 		});

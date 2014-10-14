@@ -96,7 +96,7 @@ define(['app'], function(nessa){
 	
 	/****** Controller ******/
 	
-	nessa.controller('showsCtrl', function($http, $log, $rootScope, $scope, $socket){
+	nessa.controller('showsCtrl', function($http, $log, $rootScope, $scope){
 		
 		// TO DO: improve and tidy
 		
@@ -153,7 +153,7 @@ define(['app'], function(nessa){
 		};
 	});
 	
-	nessa.controller('showModalCtrl', function($http, $log, $modalInstance, $rootScope, $scope, $socket, $stateParams){
+	nessa.controller('showModalCtrl', function($http, $log, $modalInstance, $rootScope, $scope, $stateParams){
 		window.modal = $modalInstance;
 		
 		$scope.settings = {};
@@ -247,7 +247,7 @@ define(['app'], function(nessa){
 	});
 	
 	
-	nessa.controller('seasonCtrl', function($log, $scope, $socket){
+	nessa.controller('seasonCtrl', function($log, $scope){
 		$scope.display = function(){
 			if ($scope.season.season == 0) {
 				return 'Specials';
@@ -319,16 +319,12 @@ define(['app'], function(nessa){
 		*/
 	});
 	
-	nessa.controller('matchCtrl', function($http, $modalInstance, $scope, $socket, $state){
+	nessa.controller('matchCtrl', function($http, $modalInstance, $scope, $state){
 		$scope.unmatched	= [];
 		$scope.matched		= [];
 		
 		$http.get('/api/shows/unmatched').success(function(json,status){
 			$scope.unmatched.push(json);
-		});
-		
-		$socket.on('shows.unmatched', function(data){
-			
 		});
 		
 		$scope.close = function(){
@@ -344,7 +340,7 @@ define(['app'], function(nessa){
 		};
 	});
 	
-	nessa.controller('searchCtrl', function($http, $log, $modalInstance, $rootScope, $scope, $socket){
+	nessa.controller('searchCtrl', function($http, $log, $modalInstance, $rootScope, $scope){
 		$scope.selected = null;
 		$scope.filter = {
 			query: ''

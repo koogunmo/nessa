@@ -16,7 +16,7 @@ define(['app'], function(nessa){
 		$log.info('Module loaded: Installer');
 	});
 	
-	nessa.controller('installCtrl', function($http, $scope, $socket, $state){
+	nessa.controller('installCtrl', function($http, $scope, $state){
 		$scope.settings = {};
 		$scope.save = function(){
 			$http.post('/api/system/settings', $scope.settings);

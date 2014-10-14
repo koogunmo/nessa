@@ -10,7 +10,6 @@ requirejs.config({
 		'ngResource': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0/angular-resource.min',
 		'ngStorage': 'libs/ng-storage.min',
 		'ngTouch': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0/angular-touch.min',
-		'socket.io': 'https://cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min',
 		'ui.bootstrap': 'libs/ui-bootstrap.min',
 		'ui.router': 'libs/ui-router.min',
 		// Application files
@@ -29,7 +28,6 @@ requirejs.config({
 		'ngResource':	{deps: ['angular']},
 		'ngStorage':	{deps: ['angular']},
 		'ngTouch':		{deps: ['angular']},
-		'socket.io':	{exports: 'io'},
 		'ui.bootstrap': {deps: ['angular']},
 		'ui.router':	{deps: ['angular']}
 	},

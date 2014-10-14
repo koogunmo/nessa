@@ -53,7 +53,7 @@ var Scanner = {
 				
 				if (title.match(/\[(\d{4})\]/i)) {
 					year	= title.match(/\[(\d{4})\]/i)[1];
-					title	= title.replace(/\s?\[\d{4}\]/i, '');
+					title	= title.replace(/\s?\[\d{4}\]$/i, '');
 				}
 				
 				var record = {

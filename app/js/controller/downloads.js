@@ -53,7 +53,7 @@ define(['app'], function(nessa){
 		
 	});
 	
-	nessa.run(function($log, $rootScope, $socket){
+	nessa.run(function($log, $rootScope){
 		$log.info('Module loaded: Downloads');
 		$rootScope.downloads = [];
 		
@@ -67,7 +67,7 @@ define(['app'], function(nessa){
 	
 	/****** Controllers ******/
 	
-	nessa.controller('downloadsCtrl', function($http, $log, $rootScope, $scope, $socket){
+	nessa.controller('downloadsCtrl', function($http, $log, $rootScope, $scope){
 		$scope.predicate = 'name';
 		$scope.reverse = false;
 		$scope.downloads = [];
@@ -83,7 +83,7 @@ define(['app'], function(nessa){
 		$scope.load();
 	});
 	
-	nessa.controller('downloadCtrl', function($http, $log, $scope, $socket){
+	nessa.controller('downloadCtrl', function($http, $log, $scope){
 		$scope.active	= !!$scope.download.status;
 		$scope.selected	= false;
 		
@@ -115,8 +115,11 @@ define(['app'], function(nessa){
 		});
 		
 		$scope.remove = function(){
+			
+			console.log($scope.download.id);
+			
 			if (confirm('Are you sure you want to delete this torrent?')) {
-				$http.delete('/api/downloads/'+$scope.torrent.id).success(function(json, status){
+				$http.delete('/api/downloads/'+$scope.download.id).success(function(json, status){
 					$rootScope.$broadcast('alert', {title: $scope.download.name, message: 'Download removed'});
 					$rootScope.$broadcast('downloadsRefresh');
 					$modalInstance.close('close');
@@ -126,6 +129,7 @@ define(['app'], function(nessa){
 				$modalInstance.dismiss('close');
 			}
 		};
+		/*
 		$scope.toggle = function(){
 			$scope.torrent.status = !$scope.torrent.status;
 			if ($scope.torrent.status){
@@ -134,6 +138,7 @@ define(['app'], function(nessa){
 		//		$socket.emit('download.stop', $scope.torrent.id);
 			}
 		};
+		*/
 		$scope.close = function(){
 			$modalInstance.dismiss('close');
 		};
@@ -145,7 +150,7 @@ define(['app'], function(nessa){
 	
 	
 	
-	nessa.controller('downloadAddCtrl', function($modalInstance, $scope, $socket){
+	nessa.controller('downloadAddCtrl', function($modalInstance, $scope){
 		window.modal = $modalInstance;
 
 		$scope.magnet = {
