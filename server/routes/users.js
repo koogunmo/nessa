@@ -17,16 +17,15 @@ module.exports = function(app, db, socket){
 		users.list(function(error, json){
 			res.send(json);
 		});
-		
 	}).post('/api/:session?/users', function(req,res){
 		// Create user
 		res.status(201).end();
-		
 	}).delete('/api/:session?/users', function(req,res){
 		users.remove(req.body.id, function(error, json){
 			res.status(204).end();
 		});
 	});
+	
 	
 	app.get('/api/:session?/user/:id', function(req,res){
 		users.get(req.params.id, function(error, user){

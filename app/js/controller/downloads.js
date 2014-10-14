@@ -90,6 +90,7 @@ define(['app'], function(nessa){
 		$scope.startStop = function(){
 			$scope.active = !$scope.active;
 			$http.post('/api/downloads/'+$scope.download.id, {status: $scope.active}).success(function(json, status){
+				$log.log(json);
 			//	$scope.download = json;
 			});
 		};
@@ -113,22 +114,15 @@ define(['app'], function(nessa){
 			$modalInstance.dismiss();
 		});
 		
-		/*
-		$socket.emit('download.info', $stateParams.id);
-		$socket.on('download.info', function(data){
-			if (data.id != $stateParams.id) return;
-			$scope.torrent = data;
-		});
-		*/
 		$scope.remove = function(){
 			if (confirm('Are you sure you want to delete this torrent?')) {
 				$http.delete('/api/downloads/'+$scope.torrent.id).success(function(json, status){
+					$rootScope.$broadcast('alert', {title: $scope.download.name, message: 'Download removed'});
 					$rootScope.$broadcast('downloadsRefresh');
 					$modalInstance.close('close');
 				}).error(function(json, status){
 					$log.error(json,status);
 				});
-			//	$socket.emit('download.remove', {id: $scope.torrent.id, purge: true});
 				$modalInstance.dismiss('close');
 			}
 		};
@@ -164,6 +158,7 @@ define(['app'], function(nessa){
 		
 		$scope.save = function(){
 			$http.post('/api/downloads', {url: $scope.magnet.url}).success(function(json, status){
+				$rootScope.$broadcast('alert', {message: 'Download Added'});
 				$rootScope.$broadcast('downloadsRefresh');
 				$modalInstance.close();
 			}).error(function(){
@@ -171,10 +166,6 @@ define(['app'], function(nessa){
 			});
 		};
 	});
-	
-	
-	
-	
 	
 	return nessa;
 });

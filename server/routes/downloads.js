@@ -46,17 +46,6 @@ module.exports = function(app, db, socket){
 				res.status(202).send({success: true});
 			});
 		}
-		
-		/*
-		torrents.info(parseInt(req.params.id, 10), function(error, data){
-			if (error) {
-				logger.error(error);
-				return res.status(404).end()
-			}
-			res.send(data.torrents[0]);
-		});
-		*/
-		
 	}).delete('/api/:session?/downloads/:id', function(req,res){
 		// Remove & delete torrent
 		torrents.remove({id: req.params.id, purge: true}, function(error){

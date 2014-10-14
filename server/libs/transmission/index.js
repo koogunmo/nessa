@@ -222,6 +222,7 @@ var torrent = {
 	},
 	
 	setStatus: function(id, status, callback){
+		id = parseInt(id, 10);
 		if (status) {
 			this.rpc.start(id, callback);
 		} else {

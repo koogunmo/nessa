@@ -196,6 +196,7 @@ define(['app'], function(nessa){
 		};
 		$scope.rescan = function(){
 			$http.get('/api/shows/'+tvdb+'/rescan').success(function(json, status){
+				$rootScope.$broadcast('alert', {title: $scope.show.name, message: 'Rescan in progress...'});
 				$scope.close();
 			}).error(function(json, status){
 				$log.error(json, status);
@@ -204,6 +205,7 @@ define(['app'], function(nessa){
 		$scope.remove = function(){
 			if (confirm('Are you sure you want to remove this show?')) {
 				$http.delete('/api/shows/'+tvdb).success(function(){
+					$rootScope.$broadcast('alert', {title: $scope.show.name, message: 'Show removed'});
 					$scope.close();
 				}).error(function(json, status){
 					$log.error(json, status);
@@ -212,13 +214,15 @@ define(['app'], function(nessa){
 		};
 		$scope.save = function(){
 			$http.post('/api/shows/'+tvdb, $scope.show).success(function(json, status){
+				$rootScope.$broadcast('alert', {title: $scope.show.name, message: 'Changes saved'});
 				$scope.close();
 			}).error(function(json, status){
 				$log.error(json, status);
 			});
 		};
 		$scope.update = function(){
-			$http.get('/api/shows/'+tvdb+'/update').success(function(json, status){
+			$http.get('/api/shows/'+tvdb+'/update').success(function(json, status){	
+				$rootScope.$broadcast('alert', {title: $scope.show.name, message: 'Updating listings...'});
 				$scope.close();
 			}).error(function(json, status){
 				$log.error(json, status);

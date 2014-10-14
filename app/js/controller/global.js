@@ -19,6 +19,8 @@ define(['app'], function(nessa){
 						alert.icon = '/assets/gfx/icons/touch-icon.png';
 				}
 			}
+			var timeout = 3000;
+			
 			if (('Notification' in window) && Notification.permission === 'granted'){
 				// Use Notification API
 				var notification = new Notification(alert.title, {body: alert.message, icon: alert.icon});
@@ -26,21 +28,21 @@ define(['app'], function(nessa){
 					if (notification.url) document.location = window.url;
 					notification.close();
 				}
-				if (alert.autoClose){
+			//	if (alert.autoClose){
 					setTimeout(function(){
 						notification.close();
-					}, alert.autoClose);
-				}
+					}, timeout);
+			//	}
 			} else {
 				// Use custom alerts system
 				
 				$scope.alerts.push(alert);
-				if (alert.autoClose) {
+			//	if (alert.autoClose) {
 					setTimeout(function(){
 						$scope.closeAlert($scope.alerts.length-1);
 						$scope.$apply();
-					}, alert.autoClose);
-				}
+					}, timeout);
+			//	}
 			}
 		});
 		
