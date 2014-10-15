@@ -250,13 +250,19 @@ define('app', ['angular','moment','ngAnimate','ngMessages','ngResource','ngStora
 		
 	});
 	
-	nessa.run(function($auth, $localStorage, $location, $rootScope, $sessionStorage, $state, $urlRouter){
+	nessa.run(function($auth, $http, $localStorage, $log, $rootScope, $sessionStorage, $state){
 		$rootScope.menu = [];
 		
 		$rootScope.$on('$stateChangeStart', function(event, to, toParams, from, fromParams){
 			if (to.data) $rootScope.pagetitle = to.data.title;
 			$rootScope.stateTo = to;
 			$rootScope.stateFrom = from;
+		});
+		
+		$rootScope.$on('$stateChangeSuccess', function(){
+			$http.get('/api/system/settings').success(function(json, status){
+				$rootScope.settings = json;
+			});
 		});
 	});
 	

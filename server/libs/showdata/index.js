@@ -413,13 +413,15 @@ var ShowData = {
 	/******************************************************/
 	
 	getArtwork: function(tvdb, callback){
-		var self = this;
-		tvdb = parseInt(tvdb, 10);
+		var self = this, tvdb = parseInt(tvdb, 10);
+		
+		logger.info('Fetching artwork');
+		
 		var http = require('http');
 		showCollection.findOne({tvdb: tvdb}, function(error, show){
 			if (error || !show) return;
 			userCollection.findOne({admin: true}, {trakt:1}, function(error, admin){
-				if (error || !admin) return;
+				if (error || !admin) return logger.error(error);
 				trakt(admin.trakt).show.summary(show.tvdb, function(error, json){
 					if (json.images.banner){
 						var banner = fs.createWriteStream(nconf.get('media:base') + nconf.get('media:shows:directory') + '/' + show.directory + '/banner.jpg', {flags: 'w', mode: 0644});
@@ -648,29 +650,32 @@ var ShowData = {
 	
 	getSummary: function(tvdb, callback){
 		var tvdb = parseInt(tvdb, 10);
-		userCollection.findOne({admin: true}, function(error, admin){
+		userCollection.findOne({admin: true}, {trakt:1}, function(error, admin){
 			trakt(admin.trakt).show.summary(tvdb, function(error, json){
 				if (error) {
 					logger.error(error);
 					return;
 				}
 				showCollection.findOne({tvdb: tvdb}, function(error, show){
-					show.name = json.title;
-					show.imdb = json.imdb_id;
-					show.genres = json.genres;
-					show.synopsis = json.overview;
-					
-					switch (json.status){
-						case 'Ended':
-							show.ended = true;
-							break;
-						case 'Continuing':
-						default:
-							show.ended = false;
+					if (error) logger.error(error);
+					if (show){
+						show.name = json.title;
+						show.imdb = json.imdb_id;
+						show.genres = json.genres;
+						show.synopsis = json.overview;
+						
+						switch (json.status){
+							case 'Ended':
+								show.ended = true;
+								break;
+							case 'Continuing':
+							default:
+								show.ended = false;
+						}
+						showCollection.save(show, function(error, result){
+							if (typeof(callback) == 'function') callback(error, tvdb);
+						});
 					}
-					showCollection.save(show, function(error, result){
-						if (typeof(callback) == 'function') callback(error, tvdb);
-					});
 				});
 			});
 		});

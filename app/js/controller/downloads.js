@@ -83,7 +83,7 @@ define(['app'], function(nessa){
 		$scope.load();
 	});
 	
-	nessa.controller('downloadCtrl', function($http, $log, $scope){
+	nessa.controller('downloadCtrl', function($http, $interval, $log, $scope){
 		$scope.active	= !!$scope.download.status;
 		$scope.selected	= false;
 		
@@ -94,13 +94,17 @@ define(['app'], function(nessa){
 			//	$scope.download = json;
 			});
 		};
-		$scope.interval = setInterval(function(){
+		$scope.polling = $interval(function(){
 			if (!$scope.active) return;
 			$http.get('/api/downloads/'+$scope.download.id).success(function(json, status){
 				$scope.active = !!json.status;
 				$scope.download = json;
 			});
 		}, 5000);
+		
+		$scope.$on('$destroy', function(){
+			$interval.cancel($scope.polling);
+		});
 	});
 	
 	nessa.controller('downloadModalCtrl', function($http, $log, $modalInstance, $rootScope, $scope, $state, $stateParams){

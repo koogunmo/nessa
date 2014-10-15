@@ -20,7 +20,7 @@ try {
 				if (results){
 					results.forEach(function(show){
 						shows.getArtwork(admin, show.tvdb);
-						shows.getSummary(admin, show.tvdb, function(error, tvdb){
+						shows.getSummary(show.tvdb, function(error, tvdb){
 							shows.getFullListings(admin, tvdb);
 							shows.getHashes(tvdb);
 						});

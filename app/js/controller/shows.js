@@ -100,7 +100,6 @@ define(['app'], function(nessa){
 		
 		// TO DO: improve and tidy
 		
-		$scope.settings = {};
 		$scope.shows	= [];
 		
 		$scope.filters	= {
@@ -119,11 +118,6 @@ define(['app'], function(nessa){
 			$scope.filters.name = '';
 			$(document).trigger('lazyload');
 		};
-		
-		$http.get('/api/system/settings').success(function(json,status){
-			$rootScope.settings = json.media;
-			$scope.settings = json.media;
-		});
 		
 		$scope.load = function(){
 			$http.get('/api/shows').success(function(json, status){
@@ -155,8 +149,6 @@ define(['app'], function(nessa){
 	
 	nessa.controller('showModalCtrl', function($http, $log, $modalInstance, $rootScope, $scope, $stateParams){
 		window.modal = $modalInstance;
-		
-		$scope.settings = {};
 		
 		$scope.close = function(){
 			$rootScope.$broadcast('showsRefresh', true);
