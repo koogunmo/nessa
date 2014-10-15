@@ -20,10 +20,6 @@ module.exports = function(app, db, socket){
 	}).post('/api/:session?/users', function(req,res){
 		// Create user
 		res.status(201).end();
-	}).delete('/api/:session?/users', function(req,res){
-		users.remove(req.body.id, function(error, json){
-			res.status(204).end();
-		});
 	});
 	
 	
@@ -35,14 +31,13 @@ module.exports = function(app, db, socket){
 		});
 	}).post('/api/:session?/user/:id', function(req,res){
 		// Update user
-		users.update(req.params.id, req.body, function(error, json){
+		users.update(req.body, function(error, json){
 			if (error) logger.error(error);
 			res.status(200).end();
 		});
 	}).delete('/api/:session?/user/:id', function(req,res){
 		// Remove user
-		users.remove(req.params.id, function(error){
-			if (error) logger.error(error);
+		users.remove(req.params.id, function(error, json){
 			res.status(204).end();
 		});
 	});

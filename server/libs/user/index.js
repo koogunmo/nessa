@@ -36,46 +36,34 @@ var users = {
 		});
 	},
 	remove: function(id, callback){
-		// Remove a user
 		userCollection.findOne({_id: ObjectID(id)}, function(error, user){
 			if (error) return logger.error(error);
-			if (user.shows.length) {
-				user.shows.forEach(function(show){
-					// remove from show record
-					showCollection.findOne({tvdb: show.tvdb}, function(error, show){
-						var update = {
-							$pull: {users: {_id: ObjectID(user._id)}}
-						};
-						if (show.users.length == 1) update.$set = {status: false};
-						showCollection.update({tvdb: tvdb}, update, {w:0});
-					});
-				});
-			}
+			showCollection.update({'users._id': ObjectID(id)}, {$pull: {users: {_id: ObjectID(id)}}}, {multi:true, w:0});
 			userCollection.remove({_id: ObjectID(id)}, function(error, json){
 				if (typeof(callback) == 'function') callback(error, json);
 			});
 		});
 	},
-	update: function(id, data, callback){
-		var update = {};
-		if (data.username) update.username = data.username;
-		if (data.password && data.passconf && data.password == data.passconf) {
-			update.password = crypto.createHash('sha256').update(data.password).digest('hex');
+	update: function(data, callback){
+		if (data._id) {
+			var id = data._id;
+			delete data._id;
+		} else {
+			var id = new ObjectID();
 		}
-		if (data.phone) update.phone = data.phone;
-		if (data.email) update.email = data.email;
+		if (data.password && data.passconf){
+			if (data.password == data.passconf) {
+				data.password = crypto.createHash('sha256').update(data.password).digest('hex');
+			}
+			delete data.passconf;
+		}
 		if (data.trakt) {
 			if (data.hash) data.trakt.password = crypto.createHash('sha256').update(data.trakt.password).digest('hex');
-			update.trakt = data.trakt;
+			data.trakt = data.trakt;
 		}
-		console.log(update);
-		return;
-		/*
-		userCollection.update({_id: ObjectID(id)}, {$set: update}, {upsert: true}, function(error, count, json){
-		//	if (!error && !json.updatedExisting) {}
+		userCollection.update({_id: ObjectID(id)}, {$set: data}, {upsert: true}, function(error, count, json){
 			if (typeof(callback) == 'function') callback(error, json);
 		});
-		*/
 	}
 };
 exports = module.exports = users;

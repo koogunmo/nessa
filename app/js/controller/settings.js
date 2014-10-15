@@ -109,14 +109,8 @@ define(['app'], function(nessa){
 			$log.error(json,status);
 		});
 		
-		$http.get('/api/users').success(function(json,status){
-			$scope.users = json;
-		}).error(function(json,status){
-			$log.error(json,status);
-		});
-		
 		$scope.latest = function(){
-			if (confirm('A. This will update all show listings and artwork. NodeTV may become VERY laggy. Continue anyway?')) {
+			if (confirm('This does nothing.')) {
 		//		$http.post('/api/system', {action: 'latest'});
 			}
 		};
@@ -124,6 +118,13 @@ define(['app'], function(nessa){
 			if (confirm('This will update all show listings and artwork. NodeTV may become VERY laggy. Continue anyway?')) {
 				$http.post('/api/system', {action: 'listings'});
 			}
+		};
+		$scope.loadUsers = function(){
+			$http.get('/api/users').success(function(json,status){
+				$scope.users = json;
+			}).error(function(json,status){
+				$log.error(json,status);
+			});
 		};
 		$scope.reboot = function(){
 			if (confirm('This will restart NodeTV. Are you sure?')) {
@@ -151,6 +152,11 @@ define(['app'], function(nessa){
 				});
 			}
 		};
+		
+		$scope.$on('usersRefresh', function(){
+			$scope.loadUsers();
+		});
+		$scope.loadUsers();
 	});
 	
 	
@@ -164,25 +170,21 @@ define(['app'], function(nessa){
 		};
 		$scope.load = function(id){
 			$http.get('/api/user/'+id).success(function(json, status){
-				
-				$log.info(json);
-				
 				$scope.user = json;
 			});
 		};
-		
 		$scope.remove = function(){
 			if (confirm('Are you sure you want to delete this user?')){
 				$http.delete('/api/user/'+id).success(function(json, status){
+					$rootScope.$broadcast('userRefresh');
 					$modalInstance.close();
 				});
 			}
 		};
-		
 		$scope.save = function(){
 			$http.post('/api/user/'+id, $scope.user).success(function(json, status){
-				$log.log(json, status);
-		//		$modalInstance.close();
+				$rootScope.$broadcast('usersRefresh');
+				$modalInstance.close();
 			});
 		};
 		if ($state.current.name != 'settings.user.add'){

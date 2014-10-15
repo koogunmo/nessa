@@ -22,7 +22,7 @@ define('app', ['angular','moment','ngAnimate','ngMessages','ngResource','ngStora
 					if ($element.offset().top >= scrollY && $element.offset().top < bottom){
 						if (typeof($scope.progress) == 'function') $scope.progress();
 						var image = $element.find('img[data-src]');
-						image.one('load', function(){
+						image.on('load', function(){
 							$(this).addClass('lazy-loaded');
 						}).attr('src', image.data('src'));
 						$element.addClass('lazyLoaded');
@@ -94,6 +94,8 @@ define('app', ['angular','moment','ngAnimate','ngMessages','ngResource','ngStora
 		
 		$rootScope.$storage = $localStorage;
 		
+		if ($rootScope.$storage.session) $http.defaults.headers.common['session'] = $rootScope.$storage.session;
+		
 		var auth = {
 			check: function(){
 				var deferred = $q.defer();
@@ -117,12 +119,14 @@ define('app', ['angular','moment','ngAnimate','ngMessages','ngResource','ngStora
 			clear: function(){
 				$http.defaults.headers.common['session'] = null;
 				$rootScope.$storage.session = null;
+				$rootScope.$storage.user = {};
 				$rootScope.user = {};
 				$rootScope.$broadcast('authenticated', false);
 			},
 			login: function(username, password, remember){
 				var deferred = $q.defer();
 				$http.post('/auth/login', {username: username, password: password}).success(function(json){
+				//	if (!remember) $rootScope.$session = $sessionStorage;
 					if (json.success){
 						auth.update(json);
 						deferred.resolve(json);
@@ -151,7 +155,8 @@ define('app', ['angular','moment','ngAnimate','ngMessages','ngResource','ngStora
 				$http.defaults.headers.common['session'] = json.session;
 				$rootScope.$storage.lastTime = json.lastTime;
 				$rootScope.$storage.session = json.session;
-				$rootScope.user = json.user;
+				$rootScope.$storage.user = json.user;
+				$rootScope.user = $rootScope.$storage.user;
 				$rootScope.$broadcast('authenticated', true);
 			}
 		};
