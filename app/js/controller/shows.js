@@ -174,13 +174,6 @@ define(['app'], function(nessa){
 					$scope.listing	= json.listing;
 					$scope.progress	= json.progress;
 					$scope.seasons	= json.seasons;
-					$scope.seasons.forEach(function(season){
-						if ($scope.listing[season.season]){
-							$scope.listing[season.season].episodes.forEach(function(v,k){
-								$scope.listing[season.season].episodes[k].watched = season.episodes[v.episode];
-							});
-						}
-					});
 				}
 			}).error(function(json, status){
 				$scope.dismiss();
@@ -247,7 +240,6 @@ define(['app'], function(nessa){
 				return 'Season '+$scope.season.season;
 			}
 		};
-		
 		$scope.watched = function(){
 			var payload = {
 				tvdb: $scope.episode.tvdb,
@@ -275,7 +267,6 @@ define(['app'], function(nessa){
 		};
 		
 		$scope.download = function(){
-			
 			var payload = {
 				tvdb: $scope.episode.tvdb,
 				season: $scope.episode.season,

@@ -11,7 +11,11 @@ var logger = log4js.getLogger('routes:system');
 
 module.exports = function(app,db,socket){
 	
-	var system	= require('nodetv-system');
+	var system	= require('nodetv-system'),
+		scanner	= plugin('scanner'),
+		shows	= plugin('showdata');
+	
+	var showCollection = db.collection('show');
 	
 	app.get('/api/:session?/system/settings', function(req,res){
 		res.send(nconf.get());
@@ -29,17 +33,17 @@ module.exports = function(app,db,socket){
 		});
 		*/
 	}).post('/api/:session?/system', function(req,res){
-		var scanner	= plugin('scanner'),
-			shows	= plugin('showdata');
 		
 		if (req.body.action){
 			switch (req.body.action){
+				case 'clean':
+					shows.sanitize();
+					break;
 				case 'latest':
 					// Check for new downloads
 					break;
 				case 'listings':
 					// Update all show listings
-					var showCollection = db.collection('show');
 					showCollection.find({status: true}).toArray(function(error, results){
 						if (error) return logger.error(error);
 						if (results.length >= 1){

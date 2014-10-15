@@ -143,17 +143,17 @@ var torrent = {
 							};
 							helper.fileCopy(file, showdir + '/' + target, function(){
 								episodeCollection.update({hash: hash}, {$set: record}, {w:0});
-								userCollection.find({shows: {$elemMatch: {tvdb: tvdb}}}, {trakt:1}).toArray(function(error, users){
-									if (error || !users) return logger.error(error);
-									users.forEach(function(user){
-										if (!user.trakt) return;
-										trakt(user.trakt).show.episode.library(tvdb, library);
+								show.users.forEach(function(u){
+									userCollection.findOne({_id: ObjectID(i._id)}, {trakt: 1}, function(error, user){
+										if (error) logger.error(error)
+										if (user) trakt(user.trakt).show.episode.library(tvdb, library);
 									});
 								});
 							});
 						});
 					});
-					/* Remove if seeding is completed */
+					
+					// Remove if seeding is completed
 					if (item.isFinished) {
 						episodeCollection.count({hash: hash}, function(error, count){
 							if (error) return;

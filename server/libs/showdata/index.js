@@ -70,22 +70,20 @@ var ShowData = {
 				}
 				
 				// Add user to show.users
-				if (record.users.length){
+				if (record.users){
 					var found = false;
 					record.users.forEach(function(u){
 						if (ObjectID(u._id) == ObjectID(user._id)) found = true;
 					});
-					if (found) {
-						record.users.push({_id: ObjectID(user._id), username: user.username});
-					} else {
-						self.getProgress(user, tvdb);
+					if (!found) {
+						record.users.push({_id: ObjectID(user._id), username: user.username, progress: {}, seasons: []});
 					}
 				}
 				// Save show record
 				showCollection.save(record, {safe: true}, function(error, result){
 					if (error) return logger.error(error);
-					trakt(user.trakt).show.library(tvdb, function(error, json){
-						userCollection.update({_id: ObjectID(user._id)}, {$push: {shows: {trakt: true, tvdb: tvdb, progress: []}}}, {w:0});
+					trakt(user.trakt).show.library(tvdb, function(){
+						self.getProgress(user, tvdb);
 					});
 					if (typeof(callback) == 'function') callback(error, tvdb);
 				});
@@ -153,8 +151,10 @@ var ShowData = {
 	},
 	
 	episodes: function(tvdb, callback){
-		tvdb = parseInt(tvdb, 10);
-		episodeCollection.find({tvdb: tvdb}).toArray(function(error, results){
+		var tvdb = parseInt(tvdb, 10);
+		
+		episodeCollection.find({tvdb: tvdb}).sort({season:1,episode:1}).toArray(function(error, results){
+			
 			var seasons = [], episodes = [], response = [];
 			results.forEach(function(result){
 				if (seasons.indexOf(result.season) == -1) seasons.push(result.season);
@@ -237,15 +237,15 @@ var ShowData = {
 	progress: function(user, tvdb, callback){
 		// Get user progress for a specific show
 		try {
-			userCollection.findOne({"_id": ObjectID(user._id), "shows.tvdb": tvdb}, function(error, json){
+			showCollection.findOne({tvdb: parseInt(tvdb, 10), 'users._id': ObjectID(user._id)}, function(error, show){
 				if (error) logger.error(error);
-				if (json && json.shows.length){
+				if (show) {
 					var progress = {};
-					json.shows.forEach(function(show){
-						if (show.tvdb != tvdb) return;
-						progress = show.progress;
+					show.users.forEach(function(u){
+						if (!user._id.equals(u._id)) return;
+						if (u.progress) progress = u.progress;
 					});
-					callback(null, progress);
+					if (typeof(callback) == 'function') callback(null, progress);
 				}
 			});
 		} catch(e){
@@ -264,7 +264,6 @@ var ShowData = {
 				};
 				if (show.users.length == 1) update.$set = {status: false};
 				showCollection.update({tvdb: tvdb}, update, {w:0});
-				userCollection.update({_id: ObjectID(user._id)}, {$pull: {shows: {tvdb: tvdb}}}, callback);
 			});
 		} catch(e){
 			logger.error(e.message);
@@ -293,24 +292,53 @@ var ShowData = {
 	summary: function(user, tvdb, callback){
 		tvdb = parseInt(tvdb, 10);
 		var self = this;
-		showCollection.findOne({tvdb: tvdb}, function(error, show){
+		showCollection.findOne({tvdb: tvdb, 'users._id': ObjectID(user._id)}, function(error, show){
 			if (error || !show) return;
-			self.episodes(show.tvdb, function(error, episodes){
+			self.episodes(show.tvdb, function(error, seasons){
 				var response = {
-					displaypath: nconf.get('media:base') + nconf.get('media:shows:directory') + '/' +show.directory,
+					show: show,
+					listing: seasons
+				};
+				show.users.forEach(function(u){
+					if (!user._id.equals(u._id)) return;
+					if (u.progress) response.progress = u.progress;
+					if (u.seasons) response.seasons = u.seasons;
+				});
+				if (typeof(callback) == 'function') callback(null, response);
+				
+				/*
+				seasons.forEach(function(season){
+					season.episodes.forEach(function(episode){
+						
+						if (response.seasons){
+							response.seasons.forEach(function(s){
+								console.log(s.episodes);
+							});
+							
+						}
+					});
+				});
+				
+				/*
+				var response = {
 					show: show,
 					listing: episodes,
 					progress: {},
 					seasons: []
 				};
-				if (show.users) {
-					show.users.forEach(function(u){
-						if (user.username != u.username) return;
-						if (u.progress) response.progress = u.progress;
-						if (u.seasons) response.seasons = u.seasons;
-					});
-				}
+				
+				// merge episode with user's watched status
+				
+				
+				
+				episodes.forEach(function(seasons){
+				//	console.log(seasons.episodes);
+					
+				});
+				
+				
 				if (typeof(callback) == 'function') callback(null, response);
+				*/
 			});
 		});
 	},
@@ -350,7 +378,7 @@ var ShowData = {
 	unmatched: function(callback){
 		
 		return;
-		// rethink how this works
+		// TODO: Rethink how this should work
 		
 		unmatchedCollection.find().toArray(function(error, shows){
 			userCollection.findOne({admin: true}, {trakt:1}, function(error, user){
@@ -589,8 +617,7 @@ var ShowData = {
 		trakt(user.trakt).user.progress.watched(tvdb, function(error, response){
 			if (error) return logger.error(error);
 			if (response.length){
-				showCollection.update({tvdb: tvdb, "users._id": ObjectID(user._id)}, {$set: {"users.$.progress": response[0].progress, "users.$.seasons": response[0].seasons}}, {w:0});
-				userCollection.update({_id: ObjectID(user._id), "shows.tvdb": tvdb}, {$set: {"shows.$.progress": response[0].progress, "shows.$.seasons": response[0].seasons}}, {w:0});
+				showCollection.update({tvdb: tvdb, 'users._id': ObjectID(user._id)}, {$set: {'users.$.progress': response[0].progress, 'users.$.seasons': response[0].seasons}}, {w:0});
 			}
 			if (typeof(callback) == 'function') callback();
 		});
