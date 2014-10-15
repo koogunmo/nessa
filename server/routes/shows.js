@@ -151,12 +151,14 @@ module.exports = function(app, db, socket){
 	// Downloads (Manual)
 	app.post('/api/:session?/shows/:id/download', function(req,res){
 		var status = 400;
+		
 		if (req.body.tvdb){
 			var tvdb = parseInt(req.body.tvdb, 10);
 			if (req.body.season) {
 				if (req.body.episode) {
 					// Download selected episode
 					status = 202;
+					shows.download(tvdb, req.body);
 				} else {
 					// Download entire season
 					status = 202;
