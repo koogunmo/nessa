@@ -150,26 +150,53 @@ var ShowData = {
 		});
 	},
 	
-	episodes: function(tvdb, callback){
+	episodes: function(user, tvdb, callback){
 		var tvdb = parseInt(tvdb, 10);
 		
-		episodeCollection.find({tvdb: tvdb}).sort({season:1,episode:1}).toArray(function(error, results){
-			
-			var seasons = [], episodes = [], response = [];
-			results.forEach(function(result){
-				if (seasons.indexOf(result.season) == -1) seasons.push(result.season);
-				if (!episodes[result.season]) episodes[result.season] = [];
-				result.watched = false;
-				episodes[result.season].push(result);
-			});
-			seasons.forEach(function(season){
-				var record = {
-					season: season,
-					episodes: episodes[season]
-				}
-				response.push(record);
-			});
-			if (typeof(callback) == 'function') callback(null, response);
+		showCollection.findOne({tvdb: tvdb, 'users._id': ObjectID(user._id)}, function(error, show){
+			if (error) return logger.error(error);
+			if (show){
+				var listings = [], progress = {}, response = [], seasons = [], viewed = [];
+				
+				episodeCollection.find({tvdb: show.tvdb}).sort({season:1,episode:1}).toArray(function(error, episodes){
+					if (error) return logger.error(error);
+					
+					show.users.forEach(function(u){
+						if (!user._id.equals(u._id)) return;
+						if (u.progress) progress = u.progress;
+						if (u.seasons) viewed = u.seasons;
+					});
+					
+					if (episodes.length){
+						episodes.forEach(function(episode){
+							episode.watched = false;
+							if (progress){
+								if (progress.percentage == 100){
+									episode.watched = true;
+								} else {
+									if (viewed) {
+										viewed.forEach(function(view){
+											if (view.season != episode.season) return;
+											episode.watched = !!view.episodes[episode.episode];
+										});
+									}
+								}
+							}
+							if (seasons.indexOf(episode.season) == -1) seasons.push(episode.season);
+							if (!listings[episode.season]) listings[episode.season] = [];
+							listings[episode.season].push(episode);
+						});
+						seasons.forEach(function(season){
+							var record = {
+								season: season,
+								episodes: listings[season]
+							}
+							response.push(record);
+						});
+					}
+					if (typeof(callback) == 'function') callback(null, response);
+				});
+			}
 		});
 	},
 		
@@ -177,58 +204,61 @@ var ShowData = {
 		var self = this;
 		var lastweek = Math.round(new Date()/1000) - (7*24*60*60);
 		
-		var list = [], shows = [];
-		userCollection.findOne({_id: ObjectID(user._id)}, function(error, result){
+		var count = 0, list = [];
+		
+		showCollection.find({'users._id': ObjectID(user._id)},{progress:0,seasons:0,synopsis:0}).toArray(function(error, shows){
 			if (error) logger.error(error);
-			if (!result.shows) return;
-			result.shows.forEach(function(show){
-				shows.push(show.tvdb);
-			});
+			if (!shows) return;
 			
-			episodeCollection.find({
-				file: {$exists: true},
-				airdate: {$gt: lastweek-1},
-				tvdb: {$in: shows}
-				
-			}).toArray(function(error, episodes){
-				if (error){
-					logger.error(error);
-					return;
-				}
-				var count = 0;
-				if (episodes.length){
-					episodes.forEach(function(episode){
-						showCollection.findOne({tvdb: episode.tvdb}, function(error, show){
-							count++;
-							var item = episode;
-							item.show_name = show.name;
-							item.tvdb = show.tvdb;
-							
-							result.shows.forEach(function(show){
-								if (show.tvdb != episode.tvdb) return;
-								if (show.progress == 100) {
-									item.watched = true;
-								} else {
-									// loop
-									if (!show.seasons) return;
-									show.seasons.forEach(function(season){
-										if (season.season != item.season) return;
-										item.watched = !!season.episodes[item.episode];
-									});
-								}
-							});
-							list.push(item);
-							if (episodes.length == count && typeof(callback) == 'function') callback(null, list);
-						});
+			shows.forEach(function(show){
+				episodeCollection.find({
+					file: {$exists: true},
+					airdate: {$gt: lastweek-1},
+					tvdb: show.tvdb
+				}).toArray(function(error, episodes){
+					count++;
+					if (error) return logger.error(error);
+					var seasons = [], progress = {};
+					
+					// Get user progress
+					show.users.forEach(function(u){
+						if (!user._id.equals(u._id)) return;
+						if (u.progress) progress = u.progress;
+						if (u.seasons) seasons = u.seasons;
 					});
-				}
+					
+					if (episodes.length){
+						episodes.forEach(function(episode){
+							try {
+								episode.show_name = show.name;
+								episode.watched = false;
+								if (progress) {
+									if (progress.percentage == 100) {
+										episode.watched = true;
+									} else {
+										if (seasons){
+											seasons.forEach(function(season){
+												if (season.season != episode.season) return;
+												episode.watched = !!season.episodes[episode.episode];
+											});
+										}
+									}
+								}
+							} catch(e){
+								logger.error(e.message);
+							}
+							list.push(episode);
+						});
+					}
+					if (count == shows.length && typeof(callback) == 'function') callback(null, list);
+				});
 			});
 		});
 	},
 	
 	list: function(user, callback){
 		try {
-			showCollection.find({users: {$elemMatch: {_id: ObjectID(user._id)}}}).toArray(callback);
+			showCollection.find({'users._id': ObjectID(user._id)}).toArray(callback);
 		} catch(e){
 			logger.error(e.message);
 		}
@@ -294,7 +324,7 @@ var ShowData = {
 		var self = this;
 		showCollection.findOne({tvdb: tvdb, 'users._id': ObjectID(user._id)}, function(error, show){
 			if (error || !show) return;
-			self.episodes(show.tvdb, function(error, seasons){
+			self.episodes(user, show.tvdb, function(error, seasons){
 				var response = {
 					show: show,
 					listing: seasons
@@ -442,9 +472,6 @@ var ShowData = {
 	
 	getArtwork: function(tvdb, callback){
 		var self = this, tvdb = parseInt(tvdb, 10);
-		
-		logger.info('Fetching artwork');
-		
 		var http = require('http');
 		showCollection.findOne({tvdb: tvdb}, function(error, show){
 			if (error || !show) return;
