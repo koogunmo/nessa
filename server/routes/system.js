@@ -15,7 +15,9 @@ module.exports = function(app,db,socket){
 		scanner	= plugin('scanner'),
 		shows	= plugin('showdata');
 	
-	var showCollection = db.collection('show');
+	var episodeCollection = db.collection('episode'),
+		showCollection = db.collection('show'),
+		userCollection = db.collection('user');
 	
 	app.get('/api/:session?/system/settings', function(req,res){
 		res.send(nconf.get());
@@ -46,7 +48,7 @@ module.exports = function(app,db,socket){
 					// Update all show listings
 					showCollection.find({status: true}).toArray(function(error, results){
 						if (error) return logger.error(error);
-						if (results.length >= 1){
+						if (results.length){
 							results.forEach(function(show){
 								shows.getArtwork(show.tvdb);
 								shows.getProgress(req.user, show.tvdb); // Only updates for the current user
@@ -71,6 +73,18 @@ module.exports = function(app,db,socket){
 					break;
 				case 'update':
 					system.update();
+					break;
+					
+				case 'upgrade':
+					// Update DB to 0.8 format
+					episodeCollection.update({}, {$unset: {watched: true}}, {multi:true, w:0});
+					showCollection.update({}, {$unset: {seasons:true, progress:true}}, {multi:true, w:0});
+					userCollection.update({}, {$unset: {session: true, lastTime: true}}, {multi:true, w:0});
+					// Add users to all enabled shows
+					userCollection.findOne({_id: ObjectID(req.user._id)}, {_id:1,username:1}, function(error, user){
+						if (error) return logger.error(error);
+						if (user) showCollection.update({status: {$exists: true}, users: {$exists: false}}, {$push: {users: user}}, {multi:true, w:0});
+					});
 					break;
 			}
 		}

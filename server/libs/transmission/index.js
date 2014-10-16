@@ -3,7 +3,8 @@ var fs		= require('fs'),
 	path	= require('path'),
 	rpc		= require('transmission'),
 	trakt	= require('nodetv-trakt'),
-	uuid	= require('node-uuid');
+	uuid	= require('node-uuid'),
+	ObjectID = require('mongodb').ObjectID;
 	
 
 log4js.configure({
@@ -144,7 +145,7 @@ var torrent = {
 							helper.fileCopy(file, showdir + '/' + target, function(){
 								episodeCollection.update({hash: hash}, {$set: record}, {w:0});
 								show.users.forEach(function(u){
-									userCollection.findOne({_id: ObjectID(i._id)}, {trakt: 1}, function(error, user){
+									userCollection.findOne({_id: ObjectID(u._id)}, {trakt: 1}, function(error, user){
 										if (error) logger.error(error)
 										if (user) trakt(user.trakt).show.episode.library(tvdb, library);
 									});

@@ -78,10 +78,9 @@ module.exports = function(app, db){
 	}).post('/auth/logout', function(req,res){
 		var response = {success: true, user: {}, session: false, lastTime: Date.now()};
 		if (req.body.session){
-			userCollection.findOne({sessions: {$elemMatch: {session: req.body.session}}}, function(error, result){
-				userCollection.update({_id: ObjectID(result._id)}, {$pull: {sessions: {session: req.body.session}}}, {w:0});
-				res.send(response);
-			});
+			var update = (req.body.all) ? {$set: {sessions:[]}} : {$pull: {sessions: {session: req.body.session}}};
+			userCollection.update({sessions: {$elemMatch: {session: req.body.session}}}, update, {w:0});
+			res.send(response);
 		}
 	});
 }

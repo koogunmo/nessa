@@ -454,15 +454,28 @@ var ShowData = {
 		var tvdb = parseInt(tvdb, 10);
 		if (json.season) {
 			if (json.episode) {
-				// Flag episode as watched
-				trakt(user.trakt).show.episode.seen(tvdb, json.season, json.episode, function(error, data){
-					self.getProgress(user, tvdb);
-				});
+				if (json.watched){
+					// Flag episode as seen
+					trakt(user.trakt).show.episode.seen(tvdb, json.season, json.episode, function(error, data){
+						self.getProgress(user, tvdb);
+					});
+				} else {
+					// Flag episode as seen
+					trakt(user.trakt).show.episode.unseen(tvdb, json.season, json.episode, function(error, data){
+						self.getProgress(user, tvdb);
+					});
+				}
 			} else {
-				// Flag season as watched
-				trakt(user.trakt).show.season.seen(tvdb, json.season, function(){
-					shows.getProgress(user, tvdb);
-				});
+				// Flag season as seen
+				if (json.watched){
+					trakt(user.trakt).show.season.seen(tvdb, json.season, function(){
+						shows.getProgress(user, tvdb);
+					});
+				} else {
+					trakt(user.trakt).show.season.unseen(tvdb, json.season, function(){
+						shows.getProgress(user, tvdb);
+					});
+				}
 			}
 		}
 	//	if (typeof(callback) == 'function') callback(null, status);

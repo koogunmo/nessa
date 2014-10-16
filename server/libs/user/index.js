@@ -1,8 +1,9 @@
 'use strict';
 
-var crypto	= require('crypto'),
-	log4js	= require('log4js'),
-	ObjectID = require('mongodb').ObjectID;
+var crypto		= require('crypto'),
+	log4js		= require('log4js'),
+	notp		= require('notp'),
+	ObjectID	= require('mongodb').ObjectID;
 
 log4js.configure({
 	appenders: [{
@@ -25,7 +26,23 @@ var users = {
 	get: function(id, callback){
 		// Get a user
 		userCollection.findOne({_id: ObjectID(id)}, {password:0}, function(error, json){
+			if (error) return logger.error(error);
 			if (!json) json = {_id: null};
+			/*
+			if (!json.mfa) {
+				var secret = notp.totp.gen();
+				json.mfa = {
+					confirmed: false,
+					enabled: false,
+					secret: {
+						ascii: secret,
+						base32: ''
+					}
+				}
+			} else if (!json.mfa.secret){
+				json.mfa.secret.ascii = notp.totp.gen()
+			}
+			*/
 			if (typeof(callback) == 'function') callback(error, json);
 		});
 	},
@@ -60,6 +77,18 @@ var users = {
 		if (data.trakt) {
 			if (data.hash) data.trakt.password = crypto.createHash('sha256').update(data.trakt.password).digest('hex');
 			data.trakt = data.trakt;
+		}
+		if (data.mfa) {
+			if (data.mfa.enabled){
+				if (notp.totp.verify(data.mfa.confirm, data.mfa.secret.ascii)) {
+					data.mfa.confirmed = true;
+				} else {
+					data.mfa.enabled = false;
+				}
+			} else {
+				delete data.mfa.secret;
+			}
+			delete data.mfa.confirm;
 		}
 		userCollection.update({_id: ObjectID(id)}, {$set: data}, {upsert: true}, function(error, count, json){
 			if (typeof(callback) == 'function') callback(error, json);
