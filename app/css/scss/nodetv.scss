@@ -105,27 +105,32 @@ body {
 
 /* Form elements */
 
+form {
+	&.form-error {
+		border-color: red;
+	}
+}
+
 input {
 	&.form-control {
 		background-color: #F0F0F0;
 		transition: background-color 0.5s;
 		&:focus {
-			background-color: #FFFFFF;
+			background-color: #FFFFFF !important;
 		}
 		
 		&[type="search"], &input.search {
 			text-transform: capitalize;
 		}
 	}
-	&.ng-invalid {
-		border: 1px solid #E9322D;
-		box-shadow: 0 0 6px #f8b9b7;
-		-webkit-box-shadow: 0 0 6px #f8b9b7;
+	&.ng-dirty.ng-invalid {
+		background-color: #F2DEDE;
 	}
 }
 
 .form-group {
 	input {
+		border-color: #CCCCCC !important;
 		border-bottom-style: none;
 		border-radius: 0px;
 		border-top-style: none;

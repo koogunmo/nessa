@@ -40,21 +40,31 @@ module.exports = function(app, db, socket){
 		}
 	});
 	
+	app.get('/api/:session?/shows/random', function(req,res){
+		// randomly pick something to watch
+		// - the first unwatched episode of a subscribed show
+		shows.random(req.user, function(error,json){
+			res.status(200).send(json);
+		});
+	})
+	
 	app.get('/api/:session?/shows/unmatched', function(req,res){
 		shows.unmatched(function(error, json){
 			res.send(json);
 		});
 		
 	}).post('/api/:session?/shows/match', function(req,res){
+		/*
 		shows.match(req.body.matched, function(error, tvdb){
 			shows.getSummary(tvdb, function(error, tvdb){
 				shows.getArtwork(tvdb);
 				shows.getFullListings(tvdb, function(error, tvdb){
 					shows.getHashes(tvdb)
-					scanner.episodes(tvdb);
+					scanner.episodes(req.user, tvdb);
 				});
 			});
 		});
+		*/
 	});
 	
 	app.post('/api/:session?/shows/search', function(req,res){
@@ -132,7 +142,7 @@ module.exports = function(app, db, socket){
 		// Rescan local files
 		if (req.params.id){
 			var tvdb = parseInt(req.params.id, 10);
-			scanner.episodes(tvdb);
+			scanner.episodes(req.user, tvdb);
 			res.status(202).end();
 		} else {
 			res.status(400).end();
@@ -151,22 +161,10 @@ module.exports = function(app, db, socket){
 	// Downloads (Manual)
 	app.post('/api/:session?/shows/:id/download', function(req,res){
 		var status = 400;
-		
 		if (req.body.tvdb){
 			var tvdb = parseInt(req.body.tvdb, 10);
-			if (req.body.season) {
-				if (req.body.episode) {
-					// Download selected episode
-					status = 202;
-					shows.download(tvdb, req.body);
-				} else {
-					// Download entire season
-					status = 202;
-				}
-			} else {
-				// Download all available episodes
-				status = 202;
-			}
+			status = 202;
+			shows.download(tvdb, req.body);
 		}
 		res.status(status).end();
 	});

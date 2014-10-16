@@ -2,7 +2,7 @@
 	<div class="row search">
 		<div class="col-sm-12">
 			<div class="input-group">
-				<span class="input-group-addon btn btn-primary"><span class="fa fa-filter"></span></span>
+				<span class="input-group-addon btn btn-info" ui-sref="shows.random"><span class="fa fa-random"></span></span>
 				<input type="text" class="form-control search" placeholder="Search library..." ng-model="filters.name" />
 				
 				<span class="input-group-addon btn btn-success" ui-sref="shows.add"><span class="fa fa-plus"></span></span>
@@ -19,7 +19,7 @@
 	
 	
 	<div class="row">
-		<div class="show col-sm-2" ng-show="results.length" ng-repeat="show in results = (shows | filter:filters) | orderBy:'name'" ng-controller="showCtrl" lazy-load>
+		<div class="show col-sm-2" ng-show="results.length" ng-repeat="show in results = (shows | filter:filters) | orderBy:definiteArticle" ng-controller="showCtrl" lazy-load>
 			<div class="image" ng-class="{'ended': show.ended}">
 				<span class="badge unwatched" ng-if="show.progress.left>0">{{show.progress.left}}</span>
 				<div class="corner"></div>

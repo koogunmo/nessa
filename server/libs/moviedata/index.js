@@ -16,9 +16,12 @@ var MovieData = {
 	},
 	
 	scan: function(){
-		
+		// Read movies directory, add to DB
 	},
 	
+	sync: function(user, callback){
+		// Pull movie list from 
+	},
 	
 	unmatched: function(){},
 	match: function(){},

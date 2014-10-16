@@ -37,17 +37,21 @@ module.exports = function(app, db){
 	});
 	
 	app.post('/auth/check', function(req, res){
+		// Remove all sessions older than 1 week
+		userCollection.update({}, {$pull: {sessions: {timestamp: {$lte: Date.now()-(1000*60*60*24*7)}}}}, {multi:true,w:0});
+		
 		var response = {success: false, user: {}, session: null, lastAccess: Date.now()};
-		userCollection.findOne({sessions: {$elemMatch: {session: req.body.session}}}, {password:0,sessions:0,shows:0,trakt:0}, function(error, result){
+		userCollection.findOne({'sessions.session': req.body.session}, {password:0,sessions:0,shows:0,trakt:0}, function(error, result){
 			if (error) logger.error(error);
 			if (result) {
 				response.user = result;
 				response.session = req.body.session;
 				response.success = true;
 				var update = {
-					lastAccess: response.lastAccess
+					lastAccess: response.lastAccess,
+					'sessions.$.timestamp': response.lastAccess
 				};
-				userCollection.update({_id: ObjectID(result._id)}, {$set: update}, {w:0});
+				userCollection.update({_id: ObjectID(result._id), 'sessions.session': req.body.session}, {$set: update}, {w:0});
 			}
 			return res.send(response);
 		});

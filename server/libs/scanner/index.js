@@ -39,7 +39,7 @@ function listDirectory(path, callback) {
 
 var Scanner = {
 	
-	movies: function(callback){
+	movies: function(user, callback){
 		var self = this;
 		var movieCollection = db.collection('movie');
 		
@@ -62,7 +62,7 @@ var Scanner = {
 					year: parseInt(year, 10),
 					file: file.replace(base + '/', '')
 				};
-				trakt.search('movies', record.title, function(error, response){
+				trakt(user.trakt).search('movies', record.title, function(error, response){
 					if (response.length) {
 						response.forEach(function(result){
 							if (record.year && result.year == record.year) {
@@ -85,7 +85,7 @@ var Scanner = {
 		}
 	},
 	
-	shows: function(callback){
+	shows: function(user, callback){
 		var showCollection = db.collection('show');
 		var unmatched = db.collection('unmatched');
 		
@@ -110,7 +110,7 @@ var Scanner = {
 									showCollection.update({tvdb: result.tvdb}, {$set: record}, {upsert: true}, function(error, affected){
 										if (typeof(callback) == 'function') callback(null, result.tvdb);
 									});
-									trakt.show.library(result.tvdb);
+									trakt(user.trakt).show.library(result.tvdb);
 								} else {
 									unmatched.update({directory: dir}, {$set: record}, {upsert: true}, function(error, result){
 										logger.log('Unmatched: '+dir);
@@ -124,7 +124,7 @@ var Scanner = {
 		}
 	},
 	
-	episodes: function(tvdb, callback){
+	episodes: function(user, tvdb, callback){
 		var self = this;
 		tvdb = parseInt(tvdb, 10);
 		if (base = nconf.get('media:base') + nconf.get('media:shows:directory')) {
@@ -180,7 +180,7 @@ var Scanner = {
 									episode: episode
 								});
 							});
-							trakt.show.episode.library(tvdb, library);
+							trakt(user.trakt).show.episode.library(tvdb, library);
 						});
 					});
 				} catch(e) {

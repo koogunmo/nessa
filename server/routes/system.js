@@ -61,10 +61,10 @@ module.exports = function(app,db,socket){
 					break;
 				case 'rescan':
 					// Rescan media
-					scanner.shows(function(error, tvdb){
+					scanner.shows(req.user, function(error, tvdb){
 						shows.getFullListings(tvdb, function(error, tvdb){
 							shows.getHashes(tvdb);
-							scanner.episodes(tvdb);
+							scanner.episodes(req.user, tvdb);
 						});
 					});
 					break;

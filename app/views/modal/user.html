@@ -1,6 +1,6 @@
 <form name="userForm" autocomplete="off">
 	<div class="modal-header">
-		<h4 class="modal-title">User</h4>
+		<h4 class="modal-title">User settings</h4>
 	</div>
 	<div class="modal-body">
 		<tabset type="pills">
@@ -34,13 +34,14 @@
 					<input id="ipt_trakt_api" type="text" class="form-control" ng-model="user.trakt.apikey" />
 				</div>
 			</tab>
-			<tab heading="Security">
+			<!--tab heading="Security">
 				<div class="checkbox">
 					<label>
-						<input type="checkbox" name="googleauth" ng-model="user.mfa.enabled" ng-checked="show.mfa.enabled" />
+						<input type="checkbox" name="googleauth" ng-model="user.mfa.enabled" ng-checked="user.mfa.enabled" />
 						Enable Multi-factor authentication<br /><span class="small">Requires the Google Authenticator app</span>
 					</label>
 				</div>
+				
 				<div ng-if="user.mfa.enabled" class="row">
 					
 					<div class="col-sm-6" style="text-align: center;">
@@ -55,7 +56,7 @@
 					</div>
 					
 				</div>
-			</tab>
+			</tab-->
 		</tabset>
 	</div>
 	<div class="modal-footer">

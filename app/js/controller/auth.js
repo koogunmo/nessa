@@ -29,14 +29,16 @@ define(['app'], function(nessa){
 	
 	nessa.controller('loginCtrl', function($auth, $log, $rootScope, $scope, $state, $window){
 		$scope.user = {};
-		$scope.error = null;
 		$scope.login = function(){
-			$auth.login($scope.user.username, $scope.user.password, !!$scope.user.remember).then(function(success){
-				$log.info('Authentication: Success');
-				$state.transitionTo('dashboard');
-			}, function(error){
+			$auth.login($scope.user.username, $scope.user.password, !!$scope.user.remember).then(function(json){
+				if (json.success){
+					$log.info('Authentication: Success');
+					$state.transitionTo('dashboard');
+				}
+			}, function(json,status){
+				// Form feedback
+				$rootScope.$broadcast('alert', {message: 'Login failed. Please try again'})
 				$log.warn('Authentication: Failed');
-				$scope.error = true;
 			});
 		};
 		$scope.reset = function(){

@@ -283,6 +283,33 @@ var ShowData = {
 		}
 	},
 	
+	random: function(user, callback){
+		try {
+			showCollection.find({"users._id": ObjectID(user._id), "users.progress.percentage": {$lt: 100}, "users.progress.next": {$exists: true}}).toArray(function(error, shows){
+				if (error) return logger.error(error);
+				if (shows.length){
+					var rand = Math.round(Math.random()*shows.length), show = shows[rand];
+					if (show) {
+						var response = {show: show, episode: {}, progress: {}};
+						show.users.forEach(function(u){
+							if (!user._id.equals(u._id)) return
+							response.progress = u.progress;
+						});
+						if (response.progress.next){
+							episodeCollection.findOne({tvdb: show.tvdb, season:response.progress.next.season, episode:response.progress.next.number}, function(error, episode){
+								if (error) return console.error(error)
+								response.episode = episode;
+								if (typeof(callback) == 'function') callback(null, response);
+							});
+						}
+					}
+				}
+			});
+		} catch(e){
+			logger.error(e.message);
+		}
+	},
+	
 	remove: function(user, tvdb, callback){
 		// Remove a show from your library
 		var tvdb = parseInt(tvdb, 10);
@@ -538,20 +565,24 @@ var ShowData = {
 		
 		userCollection.findOne({admin: true}, {trakt:1}, function(error, user){
 			trakt(user.trakt).show.seasons(tvdb, function(error, seasons){
-				var count = 0;
-				var total = seasons.length;
-				seasons.forEach(function(season){
-					trakt(user.trakt).show.season.info(tvdb, season.season, function(error, episodes){
-						count++;
-						episodes.forEach(function(episode){
-							episode.tvdb = tvdb;
-							self.setEpisode(episode);
+				if (seasons.length){
+					var count = 0;
+					var total = seasons.length;
+					seasons.forEach(function(season){
+						trakt(user.trakt).show.season.info(tvdb, season.season, function(error, episodes){
+							count++;
+							if (episodes.length){
+								episodes.forEach(function(episode){
+									episode.tvdb = tvdb;
+									self.setEpisode(episode);
+								});
+							}
+							if (count == total) {
+								if (typeof(callback) == 'function') callback(null, tvdb);
+							}
 						});
-						if (count == total) {
-							if (typeof(callback) == 'function') callback(null, tvdb);
-						}
 					});
-				});
+				}
 			});
 		});
 	},
@@ -657,6 +688,7 @@ var ShowData = {
 		trakt(user.trakt).user.progress.watched(tvdb, function(error, response){
 			if (error) return logger.error(error);
 			if (response.length){
+				response[0].progress.next = response[0].next_episode;
 				showCollection.update({tvdb: tvdb, 'users._id': ObjectID(user._id)}, {$set: {'users.$.progress': response[0].progress, 'users.$.seasons': response[0].seasons}}, {w:0});
 			}
 			if (typeof(callback) == 'function') callback();

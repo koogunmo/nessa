@@ -34,6 +34,28 @@ define(['app'], function(nessa){
 				if (window.modal) window.modal.dismiss()
 				window.modal = null;
 			}
+		}).state('shows.random', {
+			url: '/random',
+			data: {
+				title: 'Randomizer'
+			},
+			onEnter: function($modal, $state, $stateParams){
+				$modal.open({
+					templateUrl: 'views/modal/show/random.html',
+					controller: 'showRandomCtrl',
+					backdrop: true
+				}).result.then(function(result){
+					$state.transitionTo('shows.index');
+					window.modal = null;
+				}, function(result){
+					$state.transitionTo('shows.index');
+					window.modal = null;
+				});
+			},
+			onExit: function(){
+				if (window.modal) window.modal.dismiss()
+				window.modal = null;
+			}
 			
 		}).state('shows.detail', {
 			url: '/{showid:[0-9]+}',
@@ -59,6 +81,7 @@ define(['app'], function(nessa){
 				window.modal = null;
 			}
 		}).state('shows.match', {
+
 			url: '/match',
 			data: {
 				secure: true,
@@ -97,10 +120,24 @@ define(['app'], function(nessa){
 	/****** Controller ******/
 	
 	nessa.controller('showsCtrl', function($http, $log, $rootScope, $scope){
-		
-		// TO DO: improve and tidy
-		
 		$scope.shows	= [];
+		
+		$scope.definiteArticle = function(show){
+			return show.name.replace(/^The\s/i, '');
+		};
+		$scope.load = function(){
+			$http.get('/api/shows').success(function(json, status){
+				if (status == 200 && json) {
+					$scope.shows = json;
+					$(document).trigger('lazyload');
+				}
+			}).error(function(json, status){
+				$log.error(json, status);
+			});
+		};
+		
+		// TODO: Rebuild show filtering
+		
 		
 		$scope.filters	= {
 			name: ''
@@ -119,21 +156,11 @@ define(['app'], function(nessa){
 			$(document).trigger('lazyload');
 		};
 		
-		$scope.load = function(){
-			$http.get('/api/shows').success(function(json, status){
-				if (status == 200 && json) {
-					$scope.shows = json;
-					$(document).trigger('lazyload');
-				}
-			}).error(function(json, status){
-				$log.error(json, status);
-			});
-		};
-		$scope.load();
 		
 		$scope.$on('showsRefresh', function(event, tvdb){
 			$scope.load()
 		});
+		$scope.load();
 	});
 	
 	nessa.controller('showCtrl', function($http, $log, $scope){
@@ -355,6 +382,22 @@ define(['app'], function(nessa){
 		$scope.select = function(tvdb) {
 			$scope.selected = tvdb;
 		};
+	});
+	
+	nessa.controller('showRandomCtrl', function($http, $log, $modalInstance, $rootScope, $scope){
+		$scope.random = null;
+		
+		$scope.close = function(){
+			$modalInstance.dismiss();
+		};
+		$scope.load = function(){
+			$http.get('/api/shows/random').success(function(json, status){
+				$scope.random = json;
+			}).error(function(json, status){
+				$log.error(json, status);	
+			});
+		};
+		$scope.load();
 	});
 
 	return nessa;
