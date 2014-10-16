@@ -2,7 +2,8 @@
 
 var fs		= require('fs'),
 	log4js	= require('log4js'),
-	path	= require('path');
+	path	= require('path'),
+	trakt	= require('nodetv-trakt');
 
 log4js.configure({
 	appenders: [{
