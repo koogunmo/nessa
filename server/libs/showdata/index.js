@@ -82,7 +82,7 @@ var ShowData = {
 				// Save show record
 				showCollection.save(record, {safe: true}, function(error, result){
 					if (error) return logger.error(error);
-					trakt(user.trakt).show.library(tvdb, function(){
+					trakt(user.trakt).show.watchlist(tvdb, function(){
 						self.getProgress(user, tvdb);
 					});
 					if (typeof(callback) == 'function') callback(error, tvdb);
@@ -93,32 +93,33 @@ var ShowData = {
 	},
 	
 	download: function(tvdb, data, callback){
-		tvdb = parseInt(tvdb, 10);
-		
-		var search = {tvdb: tvdb};
-		if (data.season) search.season = data.season;
-		if (data.episode) search.episode = data.episode;
-		
-		episodeCollection.find(search, {hash:1}).toArray(function(error, results){
-			if (error) return logger.error(error);
-			results.forEach(function(result){
-				if (!result.hash) return;
-				var magnet = helper.createMagnet(result.hash);
-				if (magnet) {
-					torrent.add(magnet, function(error, args){
-						if (error) {
-							console.error(error);
-							return;
-						}
-						if (args){
-							episodeCollection.update({hash: result.hash}, {
-								$set: {hash: args.hashString.toUpperCase(), status: false}
-							}, {w: 0});
-						}
-					});
-				}
+		var self = this, tvdb = parseInt(tvdb, 10);
+//		self.getHashes(tvdb, function(error, tvdb){
+			var search = {tvdb: tvdb};
+			if (data.season) search.season = data.season;
+			if (data.episode) search.episode = data.episode;
+			
+			episodeCollection.find(search, {hash:1}).toArray(function(error, results){
+				if (error) return logger.error(error);
+				results.forEach(function(result){
+					if (!result.hash) return;
+					var magnet = helper.createMagnet(result.hash);
+					if (magnet) {
+						torrent.add(magnet, function(error, args){
+							if (error) {
+								console.error(error);
+								return;
+							}
+							if (args){
+								episodeCollection.update({hash: result.hash}, {
+									$set: {hash: args.hashString.toUpperCase(), status: false}
+								}, {w: 0});
+							}
+						});
+					}
+				});
 			});
-		});
+//		});
 	},
 	
 	downloadAll: function(tvdb, callback){
@@ -588,7 +589,7 @@ var ShowData = {
 	},
 	
 	getHashes: function(tvdb, callback){
-		tvdb = parseInt(tvdb, 10);
+		var tvdb = parseInt(tvdb, 10);
 		// Get all the hashes we can find, and add them to the database
 		
 		showCollection.findOne({tvdb: tvdb}, function(error, show){

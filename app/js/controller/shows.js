@@ -152,7 +152,7 @@ define(['app'], function(nessa){
 		};
 		
 		$scope.clearFilter = function(){
-			$scope.filters.name = '';
+			$scope.filters = {name:''};
 			$(document).trigger('lazyload');
 		};
 		
