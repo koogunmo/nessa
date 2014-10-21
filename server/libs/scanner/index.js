@@ -47,6 +47,8 @@ var Scanner = {
 		
 		if (base = nconf.get('media:base') + nconf.get('media:movies:directory')) {
 			
+			console.log(base);
+			
 			listDirectory(base, function(file){
 				var ext		= path.extname(file),
 					title	= path.basename(file, ext);
@@ -64,6 +66,8 @@ var Scanner = {
 					year: parseInt(year, 10),
 					file: file.replace(base + '/', '')
 				};
+				
+				console.log(record);
 				
 				trakt(user.trakt).search('movies', record.title, function(error, response){
 					if (error) return logger.error(error);
