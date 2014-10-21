@@ -22,8 +22,7 @@
 	</div>
 	
 	<div class="row">
-		<div class="show col-sm-2" ng-repeat="movie in results = (movies | filter:filter.string) | orderBy:definiteArticle">
-			
+		<div class="show col-sm-2" ng-repeat="movie in results = (movies | filter:filter.string) | orderBy:definiteArticle" lazy-load>
 			<div class="image">
 				<div class="corner"></div>
 				<a ui-sref="movie.detail({movie: movie.tmdb})">
@@ -34,12 +33,7 @@
 						<div class="hud"></div>
 					</div>
 				</a>
-				<div class="actions">
-					<!--
-					<span class="fa fa-cloud-download" title="Download all available episodes"></span>
-					<span class="fa fa-eye" title="Mark entire series as watched"></span>
-					-->
-				</div>				
+				<div class="actions"></div>				
 			</div>
 			<div class="title"><a ui-sref="movie.detail({movieid: movie.tmdb})">{{movie.title}}</a></div>
 		</div>
