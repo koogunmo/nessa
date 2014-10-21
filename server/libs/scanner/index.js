@@ -78,7 +78,7 @@ var Scanner = {
 						});
 					}
 					movieCollection.update({file: record.file}, {$set: record}, {upsert: true}, function(error, affected){
-				//		if (typeof(callback) == 'function') callback(null, record);
+						if (typeof(callback) == 'function') callback(null, record);
 					});
 				});
 			});

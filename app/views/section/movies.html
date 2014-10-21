@@ -27,13 +27,11 @@
 			<div class="image">
 				<div class="corner"></div>
 				<a ui-sref="movie.detail({movie: movie.tmdb})">
-					<img data-src="/media/{{settings.movies.directory}}/{{movie.title}}.jpg" alt="" class="img-responsive" />
+					<img data-src="/media/{{settings.movies.directory}}/.artwork/{{movie.tmdb}}.jpg" alt="" class="img-responsive" />
 					<h6>{{movie.title}}</h6>
 					<div class="overlay">
 						<div class="title">{{movie.title}}</div>
-						<div class="hud">
-							<!-- <span class="fa fa-exchange" ng-if="!!show.trakt" title="Synchronized with Trakt"></span> -->
-						</div>
+						<div class="hud"></div>
 					</div>
 				</a>
 				<div class="actions">

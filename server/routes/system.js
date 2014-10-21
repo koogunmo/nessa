@@ -11,7 +11,8 @@ var logger = log4js.getLogger('routes:system');
 
 module.exports = function(app,db,socket){
 	
-	var system	= require('nodetv-system'),
+	var movies	= plugin('moviedata'),
+		system	= require('nodetv-system'),
 		scanner	= plugin('scanner'),
 		shows	= plugin('showdata');
 	
@@ -43,7 +44,7 @@ module.exports = function(app,db,socket){
 			switch (req.body.type){
 				case 'movies':
 					scanner.movies(req.user, function(error, json){
-						logger.log(error, json)
+						if (json.tmdb) movies.getArtwork(json.tmdb);
 					});
 					break;
 				case 'shows':
