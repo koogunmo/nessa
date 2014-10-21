@@ -133,9 +133,10 @@ define(['app'], function(nessa){
 				});
 			}
 		};
-		$scope.rescan = function(){
+		$scope.rescan = function(type){
+			if (!type) return;
 			if (confirm('WARNING: NodeTV will probably become VERY laggy during a full rescan. Continue anyway?')) {
-				$http.post('/api/system', {action: 'rescan'}).success(function(){
+				$http.post('/api/rescan', {type: type}).success(function(){
 					$rootScope.$broadcast('alert', {message: 'Full rescan in progress'});
 				});
 			}

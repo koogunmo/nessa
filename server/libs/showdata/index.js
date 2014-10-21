@@ -171,17 +171,11 @@ var ShowData = {
 					if (episodes.length){
 						episodes.forEach(function(episode){
 							episode.watched = false;
-							if (progress){
-								if (progress.percentage == 100){
-									episode.watched = true;
-								} else {
-									if (viewed) {
-										viewed.forEach(function(view){
-											if (view.season != episode.season) return;
-											episode.watched = !!view.episodes[episode.episode];
-										});
-									}
-								}
+							if (viewed) {
+								viewed.forEach(function(view){
+									if (view.season != episode.season) return;
+									episode.watched = !!view.episodes[episode.episode];
+								});
 							}
 							if (seasons.indexOf(episode.season) == -1) seasons.push(episode.season);
 							if (!listings[episode.season]) listings[episode.season] = [];
@@ -225,7 +219,7 @@ var ShowData = {
 					show.users.forEach(function(u){
 						if (!user._id.equals(u._id)) return;
 						if (u.progress) progress = u.progress;
-						if (u.seasons) seasons = u.seasons;
+						if (u.seasons) viewed = u.seasons;
 					});
 					
 					if (episodes.length){
@@ -233,17 +227,11 @@ var ShowData = {
 							try {
 								episode.show_name = show.name;
 								episode.watched = false;
-								if (progress) {
-									if (progress.percentage == 100) {
-										episode.watched = true;
-									} else {
-										if (seasons){
-											seasons.forEach(function(season){
-												if (season.season != episode.season) return;
-												episode.watched = !!season.episodes[episode.episode];
-											});
-										}
-									}
+								if (viewed){
+									viewed.forEach(function(season){
+										if (season.season != episode.season) return;
+										episode.watched = !!season.episodes[episode.episode];
+									});
 								}
 							} catch(e){
 								logger.error(e.message);
@@ -477,9 +465,8 @@ var ShowData = {
 		});
 	},
 	
-	watched: function(user, tvdb, json){
-		var self = this;
-		var tvdb = parseInt(tvdb, 10);
+	watched: function(user, tvdb, json, callback){
+		var self = this, tvdb = parseInt(tvdb, 10);
 		if (json.season) {
 			if (json.episode) {
 				if (json.watched){
@@ -488,18 +475,19 @@ var ShowData = {
 						self.getProgress(user, tvdb);
 					});
 				} else {
-					// Flag episode as seen
+					// Flag episode as unseen
 					trakt(user.trakt).show.episode.unseen(tvdb, json.season, json.episode, function(error, data){
 						self.getProgress(user, tvdb);
 					});
 				}
 			} else {
-				// Flag season as seen
 				if (json.watched){
+					// Flag season as seen
 					trakt(user.trakt).show.season.seen(tvdb, json.season, function(){
 						shows.getProgress(user, tvdb);
 					});
 				} else {
+					// Flag season as unseen
 					trakt(user.trakt).show.season.unseen(tvdb, json.season, function(){
 						shows.getProgress(user, tvdb);
 					});

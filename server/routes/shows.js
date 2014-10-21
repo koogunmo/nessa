@@ -153,9 +153,10 @@ module.exports = function(app, db, socket){
 	app.post('/api/:session?/shows/:id/watched', function(req,res){
 		if (req.params.id){
 			var tvdb = parseInt(req.params.id, 10);
-			shows.watched(req.user, tvdb, req.body);
+			shows.watched(req.user, tvdb, req.body, function(){
+				res.status(204).end();
+			});
 		}
-		res.status(204).end();
 	});
 	
 	// Downloads (Manual)

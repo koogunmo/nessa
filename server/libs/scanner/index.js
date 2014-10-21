@@ -2,6 +2,7 @@
 
 var fs		= require('fs'),
 	log4js	= require('log4js'),
+	mime	= require('mime'),
 	path	= require('path'),
 	trakt	= require('nodetv-trakt');
 
@@ -63,11 +64,15 @@ var Scanner = {
 					year: parseInt(year, 10),
 					file: file.replace(base + '/', '')
 				};
+				
 				trakt(user.trakt).search('movies', record.title, function(error, response){
+					if (error) return logger.error(error);
+					
+					console.log(response.length);
+					
 					if (response.length) {
 						response.forEach(function(result){
 							if (record.year && result.year == record.year) {
-								
 								record.title	= result.title;
 								record.year		= result.year;
 								record.synopsis	= result.overview;
@@ -77,8 +82,9 @@ var Scanner = {
 							}
 						});
 					}
+					
 					movieCollection.update({file: record.file}, {$set: record}, {upsert: true}, function(error, affected){
-						if (typeof(callback) == 'function') callback(null, record);
+				//		if (typeof(callback) == 'function') callback(null, record);
 					});
 				});
 			});
@@ -107,7 +113,6 @@ var Scanner = {
 								};
 								if (results.length == 1) {
 									var result = results[0];
-									showCollection.ensureIndex('tvdb', function(error, index){});
 									showCollection.update({tvdb: result.tvdb}, {$set: record}, {upsert: true}, function(error, affected){
 										if (typeof(callback) == 'function') callback(null, result.tvdb);
 									});
@@ -143,7 +148,6 @@ var Scanner = {
 						if (!data || !data.episodes) return;
 						
 						// Title formatting
-						episodeCollection.ensureIndex({tvdb: 1, season: 1}, function(error, index){});
 						episodeCollection.find({tvdb: tvdb, season: data.season}).toArray(function(error, rows){
 							if (error) return;
 							var episodes = [];
@@ -166,16 +170,15 @@ var Scanner = {
 							
 							if (file != target) helper.fileMove(showdir + '/' + file, showdir + '/' + target);
 							
-							// Update Database records
+							// Update episode documents
+							var record = {
+								status: true,
+								file: target,
+								mime: mime.lookup(target)
+							};
+							episodeCollection.update({tvdb: tvdb, season: data.season, episode: {$in: data.episodes}}, {$set: record}, {w:0})
+							
 							data.episodes.forEach(function(episode){
-								var record = {
-									status: true,
-									file: target
-								};
-								episodeCollection.ensureIndex({tvdb: 1, season: 1, episode: 1}, function(error, index){});
-								episodeCollection.update({tvdb: tvdb, season: data.season, episode: episode}, {$set: record}, function(error, affected){
-								//	logger.log(error, affected);
-								});
 								library.push({
 									season: data.season,
 									episode: episode

@@ -23,6 +23,9 @@ module.exports = function(app,db,socket){
 		res.send(nconf.get());
 		
 	}).post('/api/:session?/system/settings', function(req,res){
+		
+		logger.log(req.body);
+		
 		/*
 		for (var i in json) nconf.set(i, json[i]);
 		
@@ -34,6 +37,25 @@ module.exports = function(app,db,socket){
 			res.status(200).end();
 		});
 		*/
+	
+	}).post('/api/:session?/rescan', function(req,res){
+		if (req.body.type){
+			switch (req.body.type){
+				case 'movies':
+					scanner.movies(req.user, function(error, json){
+						logger.log(error, json)
+					});
+					break;
+				case 'shows':
+				default:
+					scanner.shows(req.user, function(error, tvdb){
+						shows.getFullListings(tvdb, function(error, tvdb){
+							shows.getHashes(tvdb);
+							scanner.episodes(req.user, tvdb);
+						});
+					});
+			}
+		}
 	}).post('/api/:session?/system', function(req,res){
 		
 		if (req.body.action){
