@@ -5,7 +5,7 @@ var MovieData = {
 	
 	list: function(callback){
 		var movieCollection = db.collection('movie');
-		movieCollection.find({}).toArray(callback);
+		movieCollection.find({tmdb: {$exists: true}}).toArray(callback);
 		
 	},	
 	

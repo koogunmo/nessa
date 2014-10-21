@@ -5,7 +5,7 @@ define(['app'], function(nessa){
 			abstract: true,
 			url: '/movies',
 			controller: 'moviesCtrl',
-			templateUrl: 'views/partials/movies.html',
+			templateUrl: 'views/section/movies.html',
 			data: {
 				secure: true,
 				title: 'Movies'
@@ -42,6 +42,9 @@ define(['app'], function(nessa){
 		$scope.clearFilter = function(){
 			$scope.filter.string.name = '';
 			$(document).trigger('lazyload');
+		};
+		$scope.definiteArticle = function(movie){
+			return movie.title.replace(/^The\s/i, '');
 		};
 		
 		$http.get('/api/system/settings').success(function(json,status){

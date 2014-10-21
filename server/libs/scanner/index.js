@@ -46,37 +46,28 @@ var Scanner = {
 		var movieCollection = db.collection('movie');
 		
 		if (base = nconf.get('media:base') + nconf.get('media:movies:directory')) {
-			
-			console.log(base);
-			
 			listDirectory(base, function(file){
 				var ext		= path.extname(file),
 					title	= path.basename(file, ext);
 				
 				if (ext.match(/(:?jpe?g|png)$/i)) return;
-				
 				if (title.match(/\[(\d{4})\]/i)) {
 					year	= title.match(/\[(\d{4})\]/i)[1];
 					title	= title.replace(/\s?\[\d{4}\]$/i, '');
 				}
-				
 				var record = {
 					status: true,
 					title: title,
 					year: parseInt(year, 10),
 					file: file.replace(base + '/', '')
 				};
-				
-				console.log(record);
-				
 				trakt(user.trakt).search('movies', record.title, function(error, response){
 					if (error) return logger.error(error);
 					
-					console.log(response.length);
-					
 					if (response.length) {
 						response.forEach(function(result){
-							if (record.year && result.year == record.year) {
+							// TODO: Better matching
+							if ((record.title == result.title) && (record.year && result.year == record.year)) {
 								record.title	= result.title;
 								record.year		= result.year;
 								record.synopsis	= result.overview;
@@ -86,7 +77,6 @@ var Scanner = {
 							}
 						});
 					}
-					
 					movieCollection.update({file: record.file}, {$set: record}, {upsert: true}, function(error, affected){
 				//		if (typeof(callback) == 'function') callback(null, record);
 					});
