@@ -3,7 +3,8 @@ var http	= require('http'),
 	trakt	= require('nodetv-trakt');
 
 
-var movieCollection = db.collection('movie');
+var movieCollection = db.collection('movie'),
+	userCollection = db.collection('user');
 
 var MovieData = {
 	add: function(tmdb, callback){
