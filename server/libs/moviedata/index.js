@@ -1,6 +1,15 @@
-var http	= require('http'),
-	fs		= require('fs'),
+var fs		= require('fs'),
+	http	= require('http'),
+	log4js	= require('log4js'),
 	trakt	= require('nodetv-trakt');
+
+log4js.configure({
+	appenders: [{
+		type: 'console'
+	}],
+	replaceConsole: true
+});
+var logger = log4js.getLogger('nodetv-moviedata');
 
 
 var movieCollection = db.collection('movie'),
@@ -12,11 +21,11 @@ var MovieData = {
 	},
 	
 	list: function(callback){
-		movieCollection.find({tmdb: {$exists: true}}).toArray(callback);
+		movieCollection.find({status: true, tmdb: {$exists: true}}).toArray(callback);
 	},	
 	
 	remove: function(tmdb, callback){
-		movieCollection.update({tmdb: tmdb}, {$unset: {status: true}}, {upsert: true}, callback);
+		movieCollection.update({tmdb: tmdb}, {$set: {status: false}}, {upsert: true}, callback);
 	},
 	
 	scan: function(){
@@ -53,6 +62,11 @@ var MovieData = {
 			});
 		});
 	},
-	getUnmatched: function(){},
+	
+	getUnmatched: function(callback){
+		movieCollection.find({unmatched: {$exists: true}}).toArray(function(error, movies){
+			if (typeof(callback) == 'function') callback(error, movies);
+		});
+	},
 };
 exports = module.exports = MovieData;

@@ -44,7 +44,7 @@ define(['app'], function(nessa){
 			$(document).trigger('lazyload');
 		};
 		$scope.definiteArticle = function(movie){
-			return movie.title.replace(/^The\s/i, '');
+			return [movie.title.replace(/^The\s/i, ''), movie.year];
 		};
 		
 		$http.get('/api/system/settings').success(function(json,status){

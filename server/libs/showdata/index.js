@@ -309,7 +309,10 @@ var ShowData = {
 					$pull: {users: {_id: ObjectID(user._id)}}
 				};
 				if (show.users.length == 1) update.$set = {status: false};
-				showCollection.update({tvdb: tvdb}, update, {w:0});
+				showCollection.update({tvdb: tvdb}, update, function(error){
+					if (error) logger.error(error);
+					if (typeof(callback) == 'function') callback(error);
+				});
 			});
 		} catch(e){
 			logger.error(e.message);

@@ -83,7 +83,7 @@ module.exports = function(app, db, socket){
 				res.send(json);
 			});
 		} else {
-			res.send(404);
+			res.status(404).end();
 		}
 	}).post('/api/:session?/shows/:id', function(req,res){
 		// Update show
@@ -98,7 +98,7 @@ module.exports = function(app, db, socket){
 		// Delete show
 		if (req.params.id){
 			var tvdb = parseInt(req.params.id, 10);
-			shows.remove(req.user, tvdb, function(error, response){
+			shows.remove(req.user, tvdb, function(error){
 				if (error){
 					logger.error(error);
 					res.status(400).end();
@@ -118,7 +118,7 @@ module.exports = function(app, db, socket){
 				res.send(json);
 			});
 		} else {
-			res.send(404);
+			res.status(404).end();
 		}
 	});
 	

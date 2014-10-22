@@ -39,11 +39,15 @@ function listDirectory(path, callback) {
 	});
 }
 
+var episodeCollection = db.collection('episode'),
+	movieCollection = db.collection('movie'),
+	showCollection = db.collection('show');
+
 var Scanner = {
 	
 	movies: function(user, callback){
 		var self = this;
-		var movieCollection = db.collection('movie');
+		
 		
 		if (base = nconf.get('media:base') + nconf.get('media:movies:directory')) {
 			listDirectory(base, function(file){
@@ -61,21 +65,20 @@ var Scanner = {
 					year: parseInt(year, 10),
 					file: file.replace(base + '/', '')
 				};
-				trakt(user.trakt).search('movies', record.title, function(error, response){
+				trakt(user.trakt).search('movies', record.title, function(error, results){
 					if (error) return logger.error(error);
-					
-					if (response.length) {
-						response.forEach(function(result){
-							// TODO: Better matching
-							if ((record.title == result.title) && (record.year && result.year == record.year)) {
-								record.title	= result.title;
-								record.year		= result.year;
-								record.synopsis	= result.overview;
-								record.tmdb		= result.tmdb_id;
-								record.imdb		= result.imdb_id;
-								record.genre	= result.genres;
-							}
-						});
+					if (results.length) {
+						if (results.length == 1){
+							var result = results[0];
+							record.title	= result.title;
+							record.year		= result.year;
+							record.synopsis	= result.overview;
+							record.tmdb		= result.tmdb_id;
+							record.imdb		= result.imdb_id;
+							record.genre	= result.genres;
+						} else {
+							record.unmatched = results;
+						}
 					}
 					movieCollection.update({file: record.file}, {$set: record}, {upsert: true}, function(error, affected){
 						if (typeof(callback) == 'function') callback(null, record);
@@ -87,7 +90,7 @@ var Scanner = {
 	},
 	
 	shows: function(user, callback){
-		var showCollection = db.collection('show');
+		
 		var unmatched = db.collection('unmatched');
 		
 		// Scan media directory for folders - calback is called for each item found
@@ -128,9 +131,6 @@ var Scanner = {
 		var self = this;
 		tvdb = parseInt(tvdb, 10);
 		if (base = nconf.get('media:base') + nconf.get('media:shows:directory')) {
-			var showCollection = db.collection('show');
-			var episodeCollection = db.collection('episode');
-			
 			showCollection.findOne({tvdb: tvdb, status: {$exists: true}}, function(error, show){
 				if (error || !show) return;
 				try {
