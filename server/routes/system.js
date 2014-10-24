@@ -24,20 +24,20 @@ module.exports = function(app,db,socket){
 		res.send(nconf.get());
 		
 	}).post('/api/:session?/system/settings', function(req,res){
+		// TO DO: Fix settings
 		
-		logger.log(req.body);
+		for (var i in req.body){
+			nconf.set(i, req.body[i]);
+		}
+		return;
 		
-		/*
-		for (var i in json) nconf.set(i, json[i]);
+		logger.info(req.body);
+//		nconf.set('', req.body);
 		
 		nconf.save(function(error){
-			if (error) {
-				res.status(400).end();
-				return;
-			}
+			if (error) return res.status(400).end();
 			res.status(200).end();
 		});
-		*/
 	
 	}).post('/api/:session?/rescan', function(req,res){
 		if (req.body.type){

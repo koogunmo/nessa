@@ -48,7 +48,6 @@ var Scanner = {
 	movies: function(user, callback){
 		var self = this;
 		
-		
 		if (base = nconf.get('media:base') + nconf.get('media:movies:directory')) {
 			listDirectory(base, function(file){
 				var ext		= path.extname(file),
@@ -58,10 +57,11 @@ var Scanner = {
 				if (title.match(/\[(\d{4})\]/i)) {
 					year	= title.match(/\[(\d{4})\]/i)[1];
 					title	= title.replace(/\s?\[\d{4}\]$/i, '');
+				//'	title	= title.replace(/, The$/, '');
 				}
 				var record = {
 					status: true,
-					title: title,
+					title: title.trim(),
 					year: parseInt(year, 10),
 					file: file.replace(base + '/', '')
 				};
