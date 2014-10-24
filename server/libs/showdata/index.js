@@ -747,15 +747,15 @@ var ShowData = {
 					logger.error(error);
 					return;
 				}
-				showCollection.findOne({tvdb: tvdb}, function(error, show){
+				showCollection.findOne({tvdb: tvdb}, function(error, result){
 					if (error) logger.error(error);
-					if (show){
-						show.name = json.title;
-						show.imdb = json.imdb_id;
-						show.genres = json.genres;
-						show.synopsis = json.overview;
+					if (result){
+						show.name = result.title;
+						show.imdb = result.imdb_id;
+						show.genres = result.genres;
+						show.synopsis = result.overview;
 						
-						switch (json.status){
+						switch (result.status){
 							case 'Ended':
 								show.ended = true;
 								break;
