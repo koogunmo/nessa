@@ -23,6 +23,7 @@ module.exports = function(app,db,socket){
 	app.get('/api/:session?/system/settings', function(req,res){
 		res.send(nconf.get());
 		
+	/*	
 	}).post('/api/:session?/system/settings', function(req,res){
 		// TO DO: Fix settings
 		
@@ -38,7 +39,7 @@ module.exports = function(app,db,socket){
 			if (error) return res.status(400).end();
 			res.status(200).end();
 		});
-	
+	*/
 	}).post('/api/:session?/rescan', function(req,res){
 		if (req.body.type){
 			switch (req.body.type){
@@ -57,9 +58,13 @@ module.exports = function(app,db,socket){
 					});
 			}
 		}
+		res.status(202).end();
 	}).post('/api/:session?/system', function(req,res){
 		
 		if (req.body.action){
+			
+			console.log(req.body.action);
+			
 			switch (req.body.action){
 				case 'clean':
 					shows.sanitize();
@@ -69,16 +74,19 @@ module.exports = function(app,db,socket){
 					break;
 				case 'listings':
 					// Update all show listings
-					showCollection.find({status: true}).toArray(function(error, results){
+					showCollection.find({status: true}, {tvdb:1}).toArray(function(error, results){
 						if (error) return logger.error(error);
 						if (results.length){
 							results.forEach(function(show){
-								shows.getArtwork(show.tvdb);
-								shows.getProgress(req.user, show.tvdb); // Only updates for the current user
-								shows.getFullListings(show.tvdb, function(error, tvdb){
-									shows.getHashes(show.tvdb);
-								});
+								shows.getSummary(show.tvdb, function(error){
+									shows.getFullListings(show.tvdb, function(error, tvdb){
+										shows.getHashes(show.tvdb);
+									});
+									shows.getArtwork(show.tvdb);
+									shows.getProgress(req.user, show.tvdb); // Only updates for the current user
+								})
 							});
+							
 						}
 					});
 					break;
@@ -111,6 +119,7 @@ module.exports = function(app,db,socket){
 					break;
 			}
 		}
+		res.status(202).end();
 	});
 	
 	app.get('/api/:session?/system/status', function(req,res){
