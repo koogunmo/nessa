@@ -746,7 +746,7 @@ var ShowData = {
 				if (error) return logger.error(error);
 				showCollection.findOne({tvdb: tvdb}, function(error, show){
 					if (error) return logger.error(error);
-					if (json){
+					if (show && json){
 						show.name = json.title;
 						show.imdb = json.imdb_id;
 						show.genres = json.genres;
@@ -763,29 +763,6 @@ var ShowData = {
 						showCollection.save(show, function(error, result){
 							if (typeof(callback) == 'function') callback(error, tvdb);
 						});
-						/*
-						if (json.images.banner){
-							var banner = fs.createWriteStream(nconf.get('media:base') + nconf.get('media:shows:directory') + '/' + show.directory + '/banner.jpg', {flags: 'w', mode: 0644});
-							banner.on('error', function(e){
-								logger.error(e);
-							});
-							var request = http.get(json.images.banner, function(response){
-								response.pipe(banner);
-							});
-						}
-						if (json.images.poster) {
-							var src = json.images.poster.replace('.jpg', '-138.jpg');
-							var poster = fs.createWriteStream(nconf.get('media:base') + nconf.get('media:shows:directory') + '/' + show.directory + '/poster.jpg', {flags: 'w', mode: 0644});
-							poster.on('error', function(e){
-								logger.error(e);
-							});
-							var request = http.get(src, function(response){
-								response.pipe(poster);
-							});
-						}
-						if (typeof(callback) == 'function') callback(null, show.tvdb);
-						show = null;
-						*/
 					}
 				});
 			});
