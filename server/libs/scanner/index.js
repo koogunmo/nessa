@@ -71,8 +71,16 @@ var Scanner = {
 				trakt(user.trakt).search('movies', record.title, function(error, results){
 					if (error) return logger.error(error);
 					if (results.length) {
-						if (results.length == 1){
-							var result = results[0];
+						var shortlist = [];
+						if (year){
+							results.forEach(function(result){
+								if (result.year == year) shortlist.push(result);
+							})
+						} else {
+							shortlist = results;
+						}
+						if (shortlist.length == 1){
+							var result		= shortlist[0];
 							record.title	= result.title;
 							record.year		= result.year;
 							record.synopsis	= result.overview;
@@ -81,11 +89,7 @@ var Scanner = {
 							record.genre	= result.genres;
 						} else {
 							// Filter the results
-							var shortlist = [];
-							results.forEach(function(result){
-								if (result.year == year) shortlist.push(result);
-							})
-							record.unmatched = (shortlist.length) ? shortlist :results;
+							record.unmatched = shortlist;
 						}
 					}
 					movieCollection.update({file: record.file}, {$set: record}, {upsert: true}, function(error, affected){

@@ -4,7 +4,9 @@
 	</div>
 	<div class="modal-body">
 		<accordion close-others="true">
-			<accordion-group heading="{{movie.title}}" ng-repeat="movie in unmatched | orderBy:'title'">
+			
+			<accordion-group heading="{{movie.title}} [{{movie.year}}]" ng-repeat="movie in unmatched | orderBy:'title'">
+				
 				<div class="checkbox" ng-repeat="match in movie.unmatched" match-movie>
 					<img ng-src="{{match.images.poster}}" alt="match.title" class="cover" />
 					<label>
@@ -12,11 +14,11 @@
 						{{match.title}} [{{match.year}}]
 					</label>
 				</div>
+				
 			</accordion-group>
 		</accordion>
 	</div>
 	<div class="modal-footer">
-		
 		<button type="submit" class="btn btn-success" ng-show="matched">Save</button>
 		<button type="button" class="btn btn-default" ng-click="dismiss()">Close</button>
 	</div>
