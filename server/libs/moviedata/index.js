@@ -1,7 +1,8 @@
-var fs		= require('fs'),
-	http	= require('http'),
-	log4js	= require('log4js'),
-	trakt	= require('nodetv-trakt');
+var fs			= require('fs'),
+	http		= require('http'),
+	log4js		= require('log4js'),
+	ObjectID	= require('mongodb').ObjectID,
+	trakt		= require('nodetv-trakt');
 
 log4js.configure({
 	appenders: [{
@@ -36,8 +37,40 @@ var MovieData = {
 		// Pull movie list from 
 	},
 	
-	unmatched: function(){},
-	match: function(){},
+	unmatched: function(callback){
+		if (!callback) return;
+		movieCollection.find({tmdb: {$exists: false}, unmatched: {$exists: true}}).toArray(callback);
+	},
+	match: function(matched, callback){
+		var self = this;
+		try {
+			for (var id in matched){
+				movieCollection.findOne({'_id': ObjectID(id)}, function(error, movie){
+					if (movie){
+						var match = matched[movie._id];
+						var record = {
+							$set: {
+								tmdb: parseInt(match.tmdb_id,10),
+								imdb: match.imdb_id,
+								year: parseInt(match.year,10),
+								title: match.title,
+								synopsis: match.overview,
+								genres: match.genres							
+							},
+							$unset: {unmatched: true}
+						};
+						movieCollection.update({_id: ObjectID(movie._id)}, record, function(error, result){
+							if (error) return logger.error(error);
+							self.getArtwork(record.tmdb);
+						});
+					}
+				});
+			}
+			if (typeof(callback) == 'function') callback(null);
+		} catch(e){
+			logger.error(e.message);
+		}
+	},
 	watched: function(){},
 	
 	getArtwork: function(tmdb, callback){

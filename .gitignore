@@ -20,7 +20,6 @@ docs/*.md
 settings.json
 
 test_data/*
-test.*
 
 *.service
 *.copy.*

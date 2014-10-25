@@ -4,17 +4,39 @@ define(['app'], function(nessa){
 		$stateProvider.state('movies', {
 			abstract: true,
 			url: '/movies',
-			controller: 'moviesCtrl',
+			controller: 'MovieListCtrl',
 			templateUrl: 'views/section/movies.html',
 			data: {
 				secure: true,
 				title: 'Movies'
 			}
-		}).state('movies.index', {
+		})
+		.state('movies.index', {
 			url: ''
-		}).state('movies.add', {
+		})
+		.state('movies.add', {
 			url: '/add'
-		});
+		})
+		.state('movies.match', {
+			url: '/match',
+			onEnter: function($modal, $state, $stateParams){
+				$modal.open({
+					controller: 'MovieMatchCtrl',
+					templateUrl: 'views/modal/movie/match.html'
+				}).result.then(function(result){
+					$state.transitionTo('movies.index');
+					window.modal = null;
+				}, function(result){
+					$state.transitionTo('movies.index');
+					window.modal = null;
+				});
+			},
+			onExit: function(){
+				if (window.modal) window.modal.dismiss()
+				window.modal = null;
+			}
+		})
+		
 	});
 	
 	nessa.run(function($log, $rootScope){
@@ -29,7 +51,7 @@ define(['app'], function(nessa){
 	
 	/****** Controller ******/
 	
-	nessa.controller('moviesCtrl', function($http, $rootScope, $scope){
+	nessa.controller('MovieListCtrl', function($http, $rootScope, $scope){
 		$scope.settings	= {};
 		$scope.movies	= [];
 		
@@ -65,6 +87,28 @@ define(['app'], function(nessa){
 		});
 		
 	});
+	
+	nessa.controller('MovieMatchCtrl', function($http, $log, $modalInstance, $scope){
+		window.modal = $modalInstance;
+		
+		$scope.matched		= {};
+		$scope.unmatched	= [];
+		
+		$scope.dismiss = function(){
+			$modalInstance.dismiss();
+		}
+		$scope.save = function(){
+			$http.post('/api/movies/unmatched', $scope.matched).success(function(json){
+				$modalInstance.close();
+			})
+		};
+		
+		$http.get('/api/movies/unmatched').success(function(json){
+			$scope.unmatched = json;
+		})
+		
+	})
+	
 	
 	return nessa;
 })

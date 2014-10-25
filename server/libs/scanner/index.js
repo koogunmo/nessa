@@ -48,6 +48,8 @@ var Scanner = {
 	movies: function(user, callback){
 		var self = this;
 		
+		logger.debug('Movies: Scanning...')
+		
 		if (base = nconf.get('media:base') + nconf.get('media:movies:directory')) {
 			listDirectory(base, function(file){
 				var ext		= path.extname(file),
@@ -56,8 +58,7 @@ var Scanner = {
 				if (ext.match(/(:?jpe?g|png)$/i)) return;
 				if (title.match(/\[(\d{4})\]/i)) {
 					year	= title.match(/\[(\d{4})\]/i)[1];
-					title	= title.replace(/\s?\[\d{4}\]$/i, '');
-				//'	title	= title.replace(/, The$/, '');
+					title	= title.replace(/\s?\[\d{4}\]$/i, '').replace(/, The$/, '');
 				}
 				var record = {
 					status: true,
@@ -116,7 +117,7 @@ var Scanner = {
 									trakt(user.trakt).show.library(result.tvdb);
 								} else {
 									unmatched.update({directory: dir}, {$set: record}, {upsert: true}, function(error, result){
-										logger.log('Unmatched: '+dir);
+										logger.debug('Unmatched: '+dir);
 									});
 								}
 							});

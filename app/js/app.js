@@ -1,11 +1,12 @@
 define('app', ['angular','moment','ngAnimate','ngMessages','ngResource','ngStorage','ngTouch','ui.bootstrap','ui.router'], function(angular,moment){
 	var nessa = angular.module('nessa', ['ngAnimate','ngMessages','ngResource','ngStorage','ui.bootstrap','ui.router']);
 
-	nessa.config(function($urlRouterProvider){
+	nessa.config(function($compileProvider, $urlRouterProvider){
 		$urlRouterProvider.when('/', function($state){
 			$state.transitionTo('dashboard');
 		});
-	});
+		$compileProvider.debugInfoEnabled(false);
+	})
 	
 	/****** Directives ******/
 	
