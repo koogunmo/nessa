@@ -204,6 +204,10 @@ input {
 	.modal-body {
 		overflow-y: auto;
 		-webkit-overflow-scrolling: touch;
+		
+		img.cover {
+			width: 60px
+		}
 	}
 }
 

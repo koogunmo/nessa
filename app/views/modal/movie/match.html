@@ -5,8 +5,8 @@
 	<div class="modal-body">
 		<accordion close-others="true">
 			<accordion-group heading="{{movie.title}}" ng-repeat="movie in unmatched | orderBy:'title'">
-				<div class="checkbox" ng-repeat="match in movie.unmatched | orderBy:['title','year']">
-					<!-- <img ng-src="{{match.images.poster}}" alt="match.title" /> -->
+				<div class="checkbox" ng-repeat="match in movie.unmatched | orderBy:['title','year']" match-movie>
+					<img ng-src="{{match.images.poster}}" alt="match.title" class="cover" />
 					<label>
 						<input type="radio" name="{{movie._id}}" ng-model="matched[movie._id]" ng-value="match" /> 
 						{{match.title}} [{{match.year}}]

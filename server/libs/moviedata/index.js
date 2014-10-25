@@ -34,12 +34,14 @@ var MovieData = {
 	},
 	
 	sync: function(user, callback){
-		// Pull movie list from 
+		// Retrive movie list from trakt
 	},
 	
 	unmatched: function(callback){
 		if (!callback) return;
-		movieCollection.find({tmdb: {$exists: false}, unmatched: {$exists: true}}).toArray(callback);
+	//	movieCollection.update({tmdb:{$exists:true},unmatched:{$exists:true}}, {$unset:{unmatched:true}}, {multi:true}, function(){
+			movieCollection.find({tmdb: {$exists: false}, unmatched: {$exists: true}}).toArray(callback);
+	//	});
 	},
 	match: function(matched, callback){
 		var self = this;

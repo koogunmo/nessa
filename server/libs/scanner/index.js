@@ -94,6 +94,8 @@ var Scanner = {
 		
 		var unmatched = db.collection('unmatched');
 		
+		logger.debug('Movies: Scanning...')
+		
 		// Scan media directory for folders - calback is called for each item found
 		var self = this;
 		if (base = nconf.get('media:base') + nconf.get('media:shows:directory')) {
