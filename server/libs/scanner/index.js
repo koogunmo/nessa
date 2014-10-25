@@ -53,12 +53,14 @@ var Scanner = {
 		if (base = nconf.get('media:base') + nconf.get('media:movies:directory')) {
 			listDirectory(base, function(file){
 				var ext		= path.extname(file),
-					title	= path.basename(file, ext);
+					title	= path.basename(file, ext),
+					year	= null;
 				
 				if (ext.match(/(:?jpe?g|png)$/i)) return;
 				if (title.match(/\[(\d{4})\]/i)) {
 					year	= title.match(/\[(\d{4})\]/i)[1];
-					title	= title.replace(/\s?\[\d{4}\]$/i, '').replace(/, The$/, '');
+					if (title.match(/, The$/)) title = 'The '+title.replace(/, The$/, '')
+					title	= title.replace(/\s?\[\d{4}\]$/i, '');
 				}
 				var record = {
 					status: true,
@@ -78,7 +80,12 @@ var Scanner = {
 							record.imdb		= result.imdb_id;
 							record.genre	= result.genres;
 						} else {
-							record.unmatched = results;
+							// Filter the results
+							var shortlist = [];
+							results.forEach(function(result){
+								if (result.year == year) shortlist.push(result);
+							})
+							record.unmatched = (shortlist.length) ? shortlist :results;
 						}
 					}
 					movieCollection.update({file: record.file}, {$set: record}, {upsert: true}, function(error, affected){

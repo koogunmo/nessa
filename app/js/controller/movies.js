@@ -21,7 +21,7 @@ define(['app'], function(nessa){
 			url: '/match',
 			onEnter: function($modal, $state, $stateParams){
 				$modal.open({
-					controller: 'MovieMatchCtrl',
+					controller: 'MovieUnmatchedCtrl',
 					templateUrl: 'views/modal/movie/match.html'
 				}).result.then(function(result){
 					$state.transitionTo('movies.index');
@@ -88,7 +88,7 @@ define(['app'], function(nessa){
 		
 	});
 	
-	nessa.controller('MovieMatchCtrl', function($http, $log, $modalInstance, $scope){
+	nessa.controller('MovieUnmatchedCtrl', function($http, $log, $modalInstance, $scope){
 		window.modal = $modalInstance;
 		
 		$scope.matched		= {};
