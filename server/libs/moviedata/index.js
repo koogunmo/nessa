@@ -40,7 +40,7 @@ var MovieData = {
 	unmatched: function(callback){
 		if (!callback) return;
 	//	movieCollection.update({tmdb:{$exists:true},unmatched:{$exists:true}}, {$unset:{unmatched:true}}, {multi:true}, function(){
-			movieCollection.find({tmdb: {$exists: false}, unmatched: {$exists: true}}).toArray(callback);
+			movieCollection.find({tmdb: {$exists: false}, unmatched: {$exists: true}}).sort({title:1}).limit(50).toArray(callback);
 	//	});
 	},
 	match: function(matched, callback){
