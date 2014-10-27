@@ -331,7 +331,8 @@ var ShowData = {
 	settings: function(user, data, callback){
 		var record = {
 			feed: data.feed,
-			hd: !!data.hd
+			hd: !!data.hd,
+			status: !!data.status
 		};
 		showCollection.update({_id: ObjectID(data._id), 'users._id': ObjectID(user._id)}, {$set: record}, {upsert: true}, function(error, affected){
 			if (typeof(callback) == 'function') callback(error, !!affected);
