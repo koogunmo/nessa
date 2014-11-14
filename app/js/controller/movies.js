@@ -66,7 +66,8 @@ define(['app'], function(nessa){
 			$(document).trigger('lazyload');
 		};
 		$scope.definiteArticle = function(movie){
-			return [movie.title.replace(/^The\s/i, ''), movie.year];
+			var title = movie.title.split(':')[0].replace(/^The\s/i, '');
+			return [title, movie.year];
 		};
 		
 		$http.get('/api/system/settings').success(function(json,status){
@@ -75,9 +76,6 @@ define(['app'], function(nessa){
 		});
 		
 		$http.get('/api/movies').success(function(json, status){
-			
-		//	console.log(json, status);
-			
 			if (status == 200 && json) {
 				$scope.movies = json;
 				$(document).trigger('lazyload');
@@ -108,6 +106,10 @@ define(['app'], function(nessa){
 		})
 		
 	})
+	
+	nessa.controller('MovieMatchCtrl', function($http,$log,$scope){
+		
+	});
 	
 	
 	return nessa;

@@ -129,7 +129,9 @@ define(['app'], function(nessa){
 			$http.get('/api/shows').success(function(json, status){
 				if (status == 200 && json) {
 					$scope.shows = json;
-					$(document).trigger('lazyload');
+					$log.debug(json);
+					
+				//	$(document).trigger('lazyload');
 				}
 			}).error(function(json, status){
 				$log.error(json, status);
@@ -144,10 +146,20 @@ define(['app'], function(nessa){
 		};
 		
 		$scope.reduce = {
-			watched: false
+			watched: false,
+			unstarted: false
 		};
 		
-		$scope.filterShows = function(show){
+		$scope.reduceShows = function(show){
+			if ($scope.reduce.watched){
+				if (!show.progress) return false;
+				if (show.progress && (show.progress.percentage == 100 || show.progress.left == 0)) return false;
+			}
+			
+			if ($scope.reduce.unstarted) {
+				if (typeof(show.progress) == 'undefined') return false;
+				if (typeof(show.progress.completed) == 'undefined') return false;
+			}
 			return true;
 		};
 		
