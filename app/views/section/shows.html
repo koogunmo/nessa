@@ -9,6 +9,12 @@
 				<span class="input-group-addon btn btn-danger" ng-click="clearFilter()"><span class="fa fa-times"></span></span>
 			</div>
 		</div>
+		<!--
+		<div class="col-sm-12" style="text-align: right;">
+			<div class="checkbox-inline"><label><input type="checkbox" ng-model="reduce.unstarted" /> Hide Unstarted</label></div>
+			<div class="checkbox-inline"><label><input type="checkbox" ng-model="reduce.watched" /> Hide Watched</label></div>
+		</div>
+		-->
 	</div>
 	
 	<div class="row">
@@ -19,7 +25,7 @@
 	
 	
 	<div class="row">
-		<div class="show col-sm-2" ng-show="results.length" ng-repeat="show in results = (shows | filter:filters) | orderBy:definiteArticle" ng-controller="showCtrl" lazy-load>
+		<div class="show col-sm-2" ng-show="results.length" ng-repeat="show in results = (shows | filter:filters | filter:reduceShows) | orderBy:definiteArticle" ng-controller="showCtrl" lazy-load>
 			<div class="image" ng-class="{'ended': show.ended}">
 				<span class="badge unwatched" ng-if="show.progress.left>0">{{show.progress.left}}</span>
 				<div class="corner"></div>
@@ -44,7 +50,12 @@
 					<span class="fa fa-eye" title="Mark entire series as watched"></span>
 				</div>				
 			</div>
-			<div class="title"><a ui-sref="shows.detail({showid: show.tvdb})">{{show.name}}</a></div>
+			<div class="title">
+				<a ui-sref="shows.detail({showid: show.tvdb})">
+					{{show.name}}
+					<span class="badge pull-right" ng-if="show.progress && show.progress.left>0">{{show.progress.left}}</span>
+				</a>
+			</div>
 		</div>
 		<div class="col-sm-12" ng-show="!results.length" style="text-align: center;">
 			No matches found

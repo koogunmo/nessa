@@ -2,6 +2,7 @@ var fs			= require('fs'),
 	http		= require('http'),
 	log4js		= require('log4js'),
 	ObjectID	= require('mongodb').ObjectID,
+	request		= require('request'),
 	trakt		= require('nodetv-trakt');
 
 log4js.configure({
@@ -17,20 +18,90 @@ var movieCollection = db.collection('movie'),
 	userCollection = db.collection('user');
 
 var MovieData = {
-	add: function(tmdb, callback){
-		
+	add: function(user, tmdb, callback){
+		var self = this, tmdb = parseInt(tmdb, 10);
+		trakt(user.trakt).movie.summary(tmdb, function(error, json){
+			var record = {
+				title: json.title,
+				synopsis: json.overview,
+				year: json.year,
+				imdb: json.imdb_id,
+				tmdb: json.tmdb_id,
+				genres: json.genres
+			};
+			movieCollection.update({tmdb: record.tmdb}, {$set: record}, {upsert:true}, function(error, affected, status){
+				if (typeof(callback) == 'function') callback(error, record);
+				self.getArtwork(record.tmdb);
+			})
+		});
 	},
-	
+	download: function(user, tmdb, data, callback){
+		var self = this, tmdb = parseInt(tmdb, 10);
+		movieCollection.findOne({tmdb:tmdb}, function(error, movie){
+			
+		});
+	},
+	get: function(user, tmdb, callback){
+		var self = this, tmdb = parseInt(tmdb, 10);
+		movieCollection.findOne({tmdb: tmdb}, callback);
+	},
+	link: function(tmdb, callback){
+		var self = this, tmdb = parseInt(tmdb, 10);
+		movieCollection.findOne({tmdb: tmdb}, function(error, result){
+			if (error) return logger.error(error);
+			
+			var basedir = nconf.get('media:base') + nconf.get('media:movies:directory'),
+				folder	= result.file.substring(0,1).toUpperCase();
+			
+			if (folder.match(/[1-9]/)) folder = '#';
+			var source	= basedir +'/A-Z/'+folder+'/';
+			
+			result.genres.forEach(function(genre){
+				var path = basedir +'/Genres/'+genre+'/';
+				fs.symlink(source+result.file, path+result.file, 'file', function(error){
+					if (error) logger.error(error);
+				});
+			});
+		});
+	},
 	list: function(callback){
-		movieCollection.find({status: true, tmdb: {$exists: true}}).toArray(callback);
+		movieCollection.find({tmdb: {$exists: true}}).toArray(callback);
 	},	
 	
-	remove: function(tmdb, callback){
-		movieCollection.update({tmdb: tmdb}, {$set: {status: false}}, {upsert: true}, callback);
+	rename: function(){
+		// rename & move the file
+		/*
+		var title = record.title.split(':', 2)
+		
+		logger.debug(title);
+		
+		
+		var elements = [record.title,'('+record.year+')'];
+		if (record.quality) elements.push('['+record.quality+']');
+		
+		var filename = elements.join(' ')+ext;
+		var folder = record.title.substring(0,1).toUpperCase();
+		
+		var target = folder+'/'+filename;
+		
+		logger.debug(record, target)
+		*/
 	},
 	
-	scan: function(){
-		// Read movies directory, add to DB
+	
+	
+	remove: function(tmdb, callback){
+		var self = this, tmdb = parseInt(tmdb, 10);
+		movieCollection.update({tmdb: tmdb}, {$set: {status: false}}, {upsert: true}, callback);
+	},
+		
+	search: function(user, query, callback){
+		if (!user.trakt) return;
+		try {
+			trakt(user.trakt).search('movies', query, callback);
+		} catch(e){
+			logger.error(e.message);
+		}
 	},
 	
 	sync: function(user, callback){
@@ -73,8 +144,11 @@ var MovieData = {
 			logger.error(e.message);
 		}
 	},
+	
 	watched: function(){},
 	
+	
+	/*****  *****/
 	getArtwork: function(tmdb, callback){
 		var self = this, tmdb = parseInt(tmdb, 10);
 		movieCollection.findOne({tmdb: tmdb}, function(error, movie){
@@ -97,11 +171,57 @@ var MovieData = {
 			});
 		});
 	},
-	
+	getHashes: function(tmdb, callback){
+		var self = this, tmdb = parseInt(tmdb, 10);
+		movieCollection.findOne({tmdb: tmdb}, function(error, movie){
+			if (error) {
+				if (typeof(callback) == 'function') callback(error);
+				return logger.error(error);
+			}
+			if (movie){
+				request({
+					'url': 'https://yts.re/api/list.json',
+					'method': 'GET',
+					'json': true,
+					'proxy': 'http://proxy.silico.media:8888',
+					'tunnel': true,
+					'qs': {
+						'keywords': movie.imdb
+					}
+				}, function(error, res, json){
+					if (error) {
+						if (typeof(callback) == 'function') callback(error);
+						return logger.error(error);
+					}
+					if (typeof(json) != 'object') json = JSON.parse(json);
+					
+					var torrents = [];
+					if (json.status == 'fail'){
+						if (typeof(callback) == 'function') callback(json.error, torrents);
+					} else if (json.MovieCount){
+						json.MovieList.forEach(function(result){
+							var object = {
+								imdb: result.ImdbCode,
+								hash: result.TorrentHash.toUpperCase(),
+								magnet: result.TorrentMagnetUrl,
+								quality: result.Quality,
+								size: result.SizeByte,
+								title: result.MovieTitleClean,
+								year: result.MovieYear
+							};
+							torrents.push(object);
+						});
+						if (torrents.length) movieCollection.update({_id: ObjectID(movie._id)}, {$set: {hashes: torrents}}, {w:0});
+						if (typeof(callback) == 'function') callback(null, torrents);
+					}
+				})
+			}
+		});
+	},
 	getUnmatched: function(callback){
 		movieCollection.find({unmatched: {$exists: true}}).toArray(function(error, movies){
 			if (typeof(callback) == 'function') callback(error, movies);
 		});
-	},
+	}	
 };
 exports = module.exports = MovieData;

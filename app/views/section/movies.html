@@ -1,17 +1,12 @@
 <div id="shows">
 	<div class="row search">
-		
 		<div class="col-sm-12">
-			
 			<div class="input-group">
 				<span class="input-group-addon btn btn-primary"><span class="fa fa-filter"></span></span>
 				<input type="text" class="form-control search" placeholder="Search library..." ng-model="filter.string.title" />
-				<span class="input-group-addon btn btn-success" ui-sref="shows.add"><span class="fa fa-plus"></span></span>
+				<span class="input-group-addon btn btn-success" ui-sref="movies.add"><span class="fa fa-plus"></span></span>
 				<span class="input-group-addon btn btn-danger" ng-click="clearFilter()"><span class="fa fa-times"></span></span>
 			</div>
-			<!--div class="col-sm-12 well filter">
-				<label><input type="checkbox" ng-model="filter.watched" ng-change="update()" /> Hide Watched</label>
-			</div-->
 		</div>
 	</div>
 	
@@ -25,7 +20,7 @@
 		<div class="show col-sm-2" ng-repeat="movie in results = (movies | filter:filter.string) | orderBy:definiteArticle" lazy-load>
 			<div class="image">
 				<div class="corner"></div>
-				<a ui-sref="movie.detail({movie: movie.tmdb})">
+				<a ui-sref="movies.detail({id: movie.tmdb})">
 					<img data-src="/media/{{settings.movies.directory}}/.artwork/{{movie.tmdb}}.jpg" alt="" class="img-responsive" />
 					<h6>{{movie.title}}</h6>
 					<div class="overlay">
@@ -35,7 +30,7 @@
 				</a>
 				<div class="actions"></div>				
 			</div>
-			<div class="title"><a ui-sref="movie.detail({movieid: movie.tmdb})">{{movie.title}}</a></div>
+			<div class="title"><a ui-sref="movies.detail({id: movie.tmdb})">{{movie.title}}</a></div>
 		</div>
 		<div class="col-sm-12" ng-show="!results.length" style="text-align: center;">
 			No matches found

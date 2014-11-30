@@ -25,8 +25,41 @@ module.exports = function(app,db,socket){
 			}
 			if (results) return res.send(results);
 		});
-	});
+	//	movies.getHashes(118340, function(error, results){
+	//		logger.debug(error, results);
+	//	});
+	})
 	
+	app.post('/api/:session?/movies', function(req,res){
+		// Add movie to database
+		movies.add(req.user, req.body.tmdb, function(error, result){
+			movies.getHashes(result.tmdb);
+			return res.status(201).end()
+		});
+	})
+	
+	app.get('/api/:session?/movies/:id', function(req,res){
+		movies.get(req.user, req.params.id, function(error, result){
+			if (error) return res.status(404).send(error);
+			res.send(result);
+		});
+	})
+	
+	app.post('/api/:session?/movies/:id/download', function(req,res){
+		logger.debug(req.body)
+		// Download torrent
+		movies.download(req.user, req.params.id, req.body, function(error,json){
+			
+		})
+		res.status(201).send();
+	})
+	
+	app.post('/api/:session?/movies/search', function(req,res){
+		movies.search(req.user, req.body.q, function(error, results){
+			if (error) return logger.error(error);
+			res.send(results);
+		});
+	})
 	
 	app.get('/api/:session?/movies/unmatched', function(req,res){
 		// Get list of unmatched movies

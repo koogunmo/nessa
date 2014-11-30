@@ -25,13 +25,13 @@ exports = module.exports = {
 	fileCopy: function(from, to, callback) {
 		try {
 			if (!fs.existsSync(path.dirname(to))) {
-				mkdirp.sync(path.dirname(to, 0755));
+				mkdirp.sync(path.dirname(to, 0775));
 			}
 			var rd = fs.createReadStream(from);
 			rd.on('error', function(error) {
 				logger.error('Read Error - %s (%d): %s', error.code, error.errno, from);
 			});
-			var wr = fs.createWriteStream(to, {mode: 0644});
+			var wr = fs.createWriteStream(to, {mode: 0664});
 			wr.on('error', function(error){
 				logger.error('Write Error - %s (%d): %s', error.code, error.errno, to);
 			});
@@ -275,7 +275,8 @@ exports = module.exports = {
 				'udp://tracker.leechers-paradise.org:6969/announce',
 				'udp://tracker.openbittorent.com:80',
 				'udp://tracker.publicbt.com:80',
-				'udp://tracker.trackerfix.com:80'
+				'udp://tracker.trackerfix.com:80',
+				'udp://tracker.yify-torrents.com:80/announce'
 			];
 			var tr = [];
 			trackers.forEach(function(tracker){

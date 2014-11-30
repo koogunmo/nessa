@@ -50,35 +50,55 @@ var Scanner = {
 		
 		logger.debug('Movies: Scanning...')
 		
-		if (base = nconf.get('media:base') + nconf.get('media:movies:directory')) {
+		if (base = nconf.get('media:base') + nconf.get('media:movies:directory') + '/A-Z/') {
 			listDirectory(base, function(file){
-				var ext		= path.extname(file),
-					title	= path.basename(file, ext),
-					year	= null;
+				var ext = path.extname(file), name = path.basename(file, ext);
 				
-				if (ext.match(/(:?jpe?g|png)$/i)) return;
-				if (title.match(/\[(\d{4})\]/i)) {
-					year	= title.match(/\[(\d{4})\]/i)[1];
-					if (title.match(/, The$/)) title = 'The '+title.replace(/, The$/, '')
-					title	= title.replace(/\s?\[\d{4}\]$/i, '');
-				}
+				if (!ext.match(/(avi|mkv|mp4)/i)) return;
+				
 				var record = {
 					status: true,
-					title: title.trim(),
-					year: parseInt(year, 10),
-					file: file.replace(base + '/', '')
+					title: null,
+					year: null,
+					file: file.replace(base+'/', ''),
+					quality: null
 				};
+				
+				if (name.match(/\((\d{4})\)\s?\[(1080p|720p)\]$/i)){
+					var matched = name.match(/^(.+)\s?\((\d{4})\)\s?\[(\d{3,4}p)\]$/i);
+					record.title	= matched[1].trim();
+					record.year		= parseInt(matched[2], 10);
+					record.quality	= matched[3];
+					
+				} else if (name.match(/^(.*)\s?\[(\d{4})\]$/i)){
+					var matched = name.match(/^(.*)\s?\[(\d{4})\]$/i);
+					record.title	= matched[1].trim();
+					record.year		= parseInt(matched[2], 10);
+				} else {
+					// erm?
+				}
+			//	if (record.title.match(/, The/)) record.title = 'The '+record.title.replace(/, The/, '');
+				
+				logger.debug(record)
+				
 				trakt(user.trakt).search('movies', record.title, function(error, results){
 					if (error) return logger.error(error);
 					if (results.length) {
-						var shortlist = [];
-						if (year){
+						var exact = [], shortlist = [];
+						if (record.year){
 							results.forEach(function(result){
-								if (result.year == year) shortlist.push(result);
+								if (result.year == record.year) {
+									shortlist.push(result);
+									if (result.title == record.title) exact.push(result);
+								}
 							})
+							if (exact.length == 1) shortlist = exact;
 						} else {
 							shortlist = results;
 						}
+						
+						logger.debug(shortlist)
+						
 						if (shortlist.length == 1){
 							var result		= shortlist[0];
 							record.title	= result.title;
@@ -92,9 +112,9 @@ var Scanner = {
 							record.unmatched = shortlist;
 						}
 					}
-					movieCollection.update({file: record.file}, {$set: record}, {upsert: true}, function(error, affected){
-						if (typeof(callback) == 'function') callback(null, record);
-					});
+				//	movieCollection.update({file: record.file}, {$set: record}, {upsert: true}, function(error, affected){
+				//		if (typeof(callback) == 'function') callback(null, record);
+				//	});
 				});
 			});
 			
