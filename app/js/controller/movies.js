@@ -13,7 +13,12 @@ define(['app'], function(nessa){
 				}
 			})
 			.state('movies.index', {
-				url: ''
+				url: '',
+				onEnter: function($http,$log){
+			//		$http.get('/api/movies/scan').success(function(success){
+			//			$log.debug(success)
+			//		})
+				}
 			})
 			
 		.state('movies.add', {
@@ -135,11 +140,17 @@ define(['app'], function(nessa){
 		$scope.close = function(){
 			$modalInstance.dismiss();
 		};
+		
 		$scope.download = function(object){
 			$http.post('/api/movies/'+$scope.movie.tmdb+'/download', object).success(function(success){
 				$log.debug(success)
 				$modalInstance.close()
 			})
+		};
+		$scope.hashes = function(){
+			$http.get('/api/movies/'+$scope.movie.tmdb+'/hashes').success(function(success){
+				$scope.movie.hashes = success;
+			});
 		};
 	});
 	

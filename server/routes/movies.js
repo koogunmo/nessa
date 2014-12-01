@@ -35,7 +35,7 @@ module.exports = function(app,db,socket){
 	app.post('/api/:session?/movies', function(req,res){
 		// Add movie to database
 		movies.add(req.user, req.body.tmdb, function(error, result){
-			movies.getHashes(result.tmdb);
+			
 			return res.status(201).end()
 		});
 	})
@@ -76,6 +76,13 @@ module.exports = function(app,db,socket){
 			
 		})
 		res.status(201).send();
+	})
+	
+	app.get('/api/:session?/movies/:id/hashes', function(req,res){
+		movies.getHashes(req.params.id, function(error, hashes){
+			if (error) logger.error(error);
+			res.send(hashes);
+		});
 	})
 	
 	app.post('/api/:session?/movies/search', function(req,res){
