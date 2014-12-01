@@ -25,9 +25,11 @@ module.exports = function(app,db,socket){
 			}
 			if (results) return res.send(results);
 		});
-	//	movies.getHashes(118340, function(error, results){
-	//		logger.debug(error, results);
-	//	});
+		/*
+		movies.getHashes(118340, function(error, results){
+			logger.debug(error, results);
+		});
+		*/
 	})
 	
 	app.post('/api/:session?/movies', function(req,res){
@@ -36,6 +38,22 @@ module.exports = function(app,db,socket){
 			movies.getHashes(result.tmdb);
 			return res.status(201).end()
 		});
+	})
+	
+	
+	app.get('/api/movies/scan', function(req,res){
+		movies.scan(req.user, function(error,results){
+	//		logger.debug(error, results);
+		});
+		res.status(202).end()
+	})
+	
+	app.get('/api/movies/sync', function(req,res){
+		logger.debug('Syncing movies...');
+		movies.sync(req.user, function(error,results){
+			logger.debug(error, results);
+		});
+		res.status(202).end()
 	})
 	
 	app.get('/api/:session?/movies/:id', function(req,res){

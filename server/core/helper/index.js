@@ -69,6 +69,30 @@ exports = module.exports = {
 		return this.fileMove(from, to, callback);
 	},
 	
+	listDirectory: function(path, callback) {
+		var self = this;
+		fs.readdir(path, function(error, list){
+			if (error) {
+				logger.error(error);
+				return;
+			}
+			list.forEach(function(item){
+				var fullpath = path + '/' + item;
+				fs.stat(fullpath, function(error, stat){
+					if (error) {
+						logger.error(error);
+						return;
+					}
+					if (stat.isDirectory()){
+						self.listDirectory(fullpath, callback);
+					} else if (stat.isFile()) {
+						if (item.match(/^\./)) return;
+						if (typeof(callback) == 'function') callback(fullpath);
+					}
+				});
+			});
+		});
+	},
 	
 	// RegExp methods
 	getEpisodeNumbers: function(file) {

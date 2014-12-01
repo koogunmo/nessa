@@ -8,10 +8,9 @@
 <div class="modal-footer">
 	
 	<div class="btn-group pull-left">
-		<button type="button" class="btn btn-default" ng-repeat="dl in movie.hashes" ng-click="download(dl)">
+		<button type="button" class="btn btn-default" ng-repeat="dl in movie.hashes" ng-click="download(dl)" ng-class="{'active': dl.quality == movie.quality}">
 			<span class="fa fa-download"></span> {{dl.quality}}
 		</button>
 	</div>
-
 	<button type="button" class="btn btn-default" ng-click="close()">Close</button>
 </div>

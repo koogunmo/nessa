@@ -20,7 +20,7 @@
 		<div class="show col-sm-2" ng-repeat="movie in results = (movies | filter:filter.string) | orderBy:definiteArticle" lazy-load>
 			<div class="image">
 				<div class="corner"></div>
-				<a ui-sref="movies.detail({id: movie.tmdb})">
+				<a ui-sref="movies.detail({id:movie.tmdb,url:movie.url})">
 					<img data-src="/media/{{settings.movies.directory}}/.artwork/{{movie.tmdb}}.jpg" alt="" class="img-responsive" />
 					<h6>{{movie.title}}</h6>
 					<div class="overlay">
@@ -30,7 +30,7 @@
 				</a>
 				<div class="actions"></div>				
 			</div>
-			<div class="title"><a ui-sref="movies.detail({id: movie.tmdb})">{{movie.title}}</a></div>
+			<div class="title"><a ui-sref="movies.detail({id:movie.tmdb,url:movie.url})">{{movie.title}}</a></div>
 		</div>
 		<div class="col-sm-12" ng-show="!results.length" style="text-align: center;">
 			No matches found
