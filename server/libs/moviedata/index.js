@@ -111,22 +111,28 @@ var MovieData = {
 		logger.debug('Scanning movies...');
 		var base =  nconf.get('media:base') + nconf.get('media:movies:directory') + '/A-Z/'
 		helper.listDirectory(base, function(file){
-			var ext = path.extname(file), name = path.basename(file, ext), quality = null, title = '', year = '';
+			var ext = path.extname(file), name = path.basename(file, ext), quality = '480p', title = '', year = '';
 			
-			if (name.match(/\((\d{4})\)\s?\[(1080p|720p)\]$/i)){
+			// TODO: Improve RegExp
+			
+			if (name.match(/\((\d{4})\)\s?\[(1080p|720p|480p)\]$/i)){
 				var matched = name.match(/^(.+)\s?\((\d{4})\)\s?\[(\d{3,4}p)\]$/i);
 				title = matched[1].trim(), year = parseInt(matched[2],10), quality = matched[3];
+				
 			} else if (name.match(/^(.*)\s?\[(\d{4})\]$/i)){
 				var matched = name.match(/^(.*)\s?\[(\d{4})\]$/i);
 				title = matched[1].trim(), year = parseInt(matched[2],10);
+				
 			} else {
 				title = name.trim();
 			}
-			if (title.match(', The')) title = 'The '+title.replace(', The', '');
 			
+			if (title.match(', The')) title = 'The '+title.replace(', The', '');
 			trakt(user.trakt).search('movies', title, function(error, results){
 				if (error) return logger.error(error);
 				if (results.length){
+					if (results.length > 10) logger.debug(title, results.length, results);
+					
 					results = results.filter(function(result){
 						var include = true;
 						if (year && result.year != year || !result.year) include = false;
@@ -140,6 +146,7 @@ var MovieData = {
 					if (results.length){
 						if (results.length == 1){
 							// Exact match!
+							logger.debug('Adding: '+results[0].title);
 							self.add(user, parseInt(results[0].tmdb_id, 10), function(error, movie){
 								self.rename(movie.tmdb, file, quality);
 							});
@@ -339,8 +346,8 @@ var MovieData = {
 		});
 	},
 	getQuality: function(file){
-		var quality = false;
-		if (file.match(/(1080p|720p)/i)) quality = file.match(/(1080p|720p)/i)[1];
+		var quality = '480p';
+		if (file.match(/(1080p|720p|480p)/i)) quality = file.match(/(1080p|720p|480p)/i)[1];
 		return quality
 	},
 	getUnmatched: function(callback){
