@@ -42,24 +42,36 @@ var MovieData = {
 				self.getArtwork(record.tmdb);
 				self.getHashes(record.tmdb);
 				
-				movieCollection.update({tmdb: record.tmdb}, {$addToSet: {user: {_id: user._id, username: user.username}}}, {w:0})
-				
-				// Add to Watchlist
-			//	trakt(user.trakt).movie.watchlist.movie(record.imdb);
+				movieCollection.update({tmdb: record.tmdb}, {$addToSet: {user: {_id: ObjectID(user._id), username: user.username}}}, {w:0})
+				trakt(user.trakt).movie.watchlist.movie(record.imdb);
 			})
 		});
 	},
 	complete: function(data, callback){
+		var self = this;
 		// Called when download is complete in Transmission
-		movieCollection.findOne({'hashes.$.hash': data.hash.toUpperCase()}, function(error,movie){
+		movieCollection.findOne({'hashes.hash': data.hash.toUpperCase()}, function(error,movie){
 			if (error) logger.error(error);
 			if (movie){
-				var record = {
-					status: true,
-					file: self.getFilename(movie,data.file)
-				};
+				var exts = ['.avi','.mkv','.mp4'], size = 0;
+				
+				var files = data.files.filter(function(file){
+					if (exts.indexOf(path.extname(file.name)) == -1) return false;
+					return true;
+				});
+				if (files.length != 1) return;
+				
+				var record = self.getFilename(movie,files[0].name);
+				record.size = files[0].length;
+				record.added = new Date();
+					
 				var basedir = nconf.get('media:base')+nconf.get('media:movies:directory');
-				helper.fileCopy(file, basedir+'/A-Z/'+record.file, function(error){
+				var source = data.dir+'/'+files[0].name,
+					target = basedir+'/A-Z/'+record.file;
+				
+				if (movie.file && movie.file == record.file) return;
+				
+				helper.fileCopy(record.file, basedir+'/A-Z/'+record.file, function(error){
 					self.link(movie.tmdb);
 					movieCollection.update({tmdb:movie.tmdb}, {$set:record}, {w:0});
 					// Add to library
@@ -165,7 +177,7 @@ var MovieData = {
 				var matched = name.match(/^(.+)\s?(\([\d]{4}\)|\[[\d]{4}\])/i);
 				title = matched[1].trim(), year = parseInt(matched[2].replace(/\D/, ''));
 			} else {
-				// guesswork time...
+				// Guesswork time...
 				name = name.replace(/\./g, ' ');
 				var numbers = name.match(/(\d{4})/g);
 				if (numbers){
@@ -264,10 +276,8 @@ var MovieData = {
 						movieCollection.update({tmdb: record.tmdb}, {$set: record}, {upsert:true}, function(error,affected,status){
 							if (error) return logger.error(error);
 							
-						//	if (affected)
+							movieCollection.update({tmdb: record.tmdb}, {$addToSet: {user: {_id: user._id, username: user.username}}}, {w:0})
 							
-							logger.debug(affected, status)
-						//	if (status.updatedExisting)
 							if (affected) self.getArtwork(record.tmdb);
 						});
 					});
@@ -304,6 +314,7 @@ var MovieData = {
 		}
 	},
 	
+	/*
 	unmatched: function(callback){
 		if (!callback) return;
 		unmatchedCollection.find({type: 'movie', tmdb: {$exists: false}, unmatched: {$exists: true}}).sort({title:1}).limit(50).toArray(callback);
@@ -340,7 +351,7 @@ var MovieData = {
 	},
 	
 	watched: function(user, tmdb){},
-	
+	*/
 	
 	/*****  *****/
 	getAlpha: function(name){
@@ -433,9 +444,11 @@ var MovieData = {
 		return quality;
 	},
 	getUnmatched: function(callback){
+		/*
 		movieCollection.find({unmatched: {$exists: true}}).toArray(function(error, movies){
 			if (typeof(callback) == 'function') callback(error, movies);
 		});
+		*/
 	}	
 };
 exports = module.exports = MovieData;

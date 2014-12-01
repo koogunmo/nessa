@@ -136,11 +136,9 @@ define(['app'], function(nessa){
 			$scope.movie = success;
 			$log.debug(success);
 		});
-		
 		$scope.close = function(){
 			$modalInstance.dismiss();
 		};
-		
 		$scope.download = function(object){
 			$http.post('/api/movies/'+$scope.movie.tmdb+'/download', object).success(function(success){
 				$log.debug(success)
@@ -191,13 +189,11 @@ define(['app'], function(nessa){
 		};
 		$scope.save = function(){
 			$http.post('/api/movies', {tmdb: $scope.selected}).success(function(json){
-				$log.debug(json);
 				$modalInstance.close();
 			});
 		};
 		$scope.search = function(){
 			$http.post('/api/movies/search', {q: $scope.filter.query}).success(function(json){
-				$log.debug(json);
 				$scope.results = json
 			});
 		};

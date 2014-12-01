@@ -236,6 +236,30 @@ var torrent = {
 	},
 	stop: function(id, callback){
 		this.rpc.stop(id, callback);
+	},
+	
+	
+	getComplete: function(callback){
+		// Get a list of completed torrents
+		this.rpc.get(function(error, data){
+			if (error) logger.error(error);
+			var list = [];
+			
+			if (data.torrents){
+				data.torrents.forEach(function(torrent){
+					if (torrent.percentDone != 1) return;
+					var object = {
+						dir: torrent.downloadDir,
+						title: torrent.name,
+						files: torrent.files,
+						hash: torrent.hashString.toUpperCase(),
+						bytes: torrent.totalSize
+					};
+					list.push(object);
+				});
+			}
+			if (typeof(callback) == 'function') callback(error, list);
+		});
 	}
 };
 
