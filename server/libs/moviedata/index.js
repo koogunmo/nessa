@@ -62,8 +62,8 @@ var MovieData = {
 				if (files.length != 1) return;
 				
 				var record = self.getFilename(movie,files[0].name);
-				record.size = files[0].length;
 				record.added = new Date();
+				record.size = files[0].length;
 					
 				var basedir = nconf.get('media:base')+nconf.get('media:movies:directory');
 				var source = data.dir+'/'+files[0].name,
@@ -71,7 +71,7 @@ var MovieData = {
 				
 				if (movie.file && movie.file == record.file) return;
 				
-				helper.fileCopy(record.file, basedir+'/A-Z/'+record.file, function(error){
+				helper.fileCopy(source, target, function(error){
 					self.link(movie.tmdb);
 					movieCollection.update({tmdb:movie.tmdb}, {$set:record}, {w:0});
 					// Add to library
