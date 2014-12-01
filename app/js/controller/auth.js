@@ -1,5 +1,7 @@
 define(['app'], function(nessa){
 	
+//	angular.module('tvAuth',['ui.router'])
+	
 	nessa.config(function($stateProvider){
 		$stateProvider.state('login', {
 			url: '/login',

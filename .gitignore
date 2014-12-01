@@ -10,6 +10,7 @@ lib-cov
 
 .sass-cache
 newrelic.js
+proxy.pac
 node_modules/*
 !node_modules/nodetv-*
 
