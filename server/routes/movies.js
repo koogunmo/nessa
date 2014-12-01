@@ -49,9 +49,15 @@ module.exports = function(app,db,socket){
 	})
 	
 	app.get('/api/movies/sync', function(req,res){
-		logger.debug('Syncing movies...');
 		movies.sync(req.user, function(error,results){
-			logger.debug(error, results);
+			if (error) return logger.error(error);
+			logger.debug(results);
+			
+			return;
+			movies.scan(req.user, function(error, results){
+				if (error) return logger.error(error);
+				logger.debug(results);
+			});
 		});
 		res.status(202).end()
 	})

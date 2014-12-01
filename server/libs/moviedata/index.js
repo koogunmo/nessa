@@ -1,6 +1,7 @@
 var fs			= require('fs'),
 	http		= require('http'),
 	log4js		= require('log4js'),
+	mkdirp		= require('mkdirp'),
 	ObjectID	= require('mongodb').ObjectID,
 	path		= require('path'),
 	request		= require('request'),
@@ -16,6 +17,7 @@ var logger = log4js.getLogger('nodetv-moviedata');
 
 
 var movieCollection = db.collection('movie'),
+	unmatchedCollection = db.collection('unmatched'),
 	userCollection = db.collection('user');
 
 var MovieData = {
@@ -54,27 +56,25 @@ var MovieData = {
 	},
 	link: function(tmdb, callback){
 		var self = this, tmdb = parseInt(tmdb, 10);
-		movieCollection.findOne({tmdb: tmdb}, function(error, result){
+		movieCollection.findOne({tmdb: tmdb}, function(error, movie){
 			if (error) return logger.error(error);
+			var basedir = nconf.get('media:base')+nconf.get('media:movies:directory'),
+				alpha	= self.getAlpha(movie.file);
 			
-			var basedir = nconf.get('media:base') + nconf.get('media:movies:directory'),
-				folder	= result.file.substring(0,1).toUpperCase();
-			
-			if (folder.match(/[1-9]/)) folder = '#';
-			var source	= basedir +'/A-Z/'+folder+'/';
-			
-			result.genres.forEach(function(genre){
-				var pathname = basedir +'/Genres/'+genre+'/';
-				fs.symlink(source+result.file, pathname+result.file, 'file', function(error){
+			movie.genres.forEach(function(genre){
+				var folder = basedir +'/Genres/'+genre, symlink = path.basename(movie.file);
+				
+				if (!fs.existsSync(folder)) mkdirp.sync(folder, 0775);
+				fs.symlink(basedir+'/A-Z/'+movie.file, folder+'/'+symlink, 'file', function(error){
 					if (error) logger.error(error);
 				});
 			});
+			if (typeof(callback) == 'function') callback();
 		});
 	},
 	list: function(callback){
 		movieCollection.find({tmdb: {$exists: true}}).sort({name:1}).toArray(callback);
-	},	
-	
+	},
 	rename: function(tmdb, file, quality, callback){
 		var self = this, tmdb = parseInt(tmdb,10);
 		var basedir = nconf.get('media:base') + nconf.get('media:movies:directory');
@@ -82,17 +82,16 @@ var MovieData = {
 			if (error) return logger.error(error);
 			if (movie){
 				var record = self.getFilename(movie,file);
-				helper.fileMove(file, basedir+record.file, function(error){
+				helper.fileMove(file, basedir+'/A-Z/'+record.file, function(error){
 					if (error) return logger.error(error);
 					movieCollection.update({tmdb: tmdb}, {$set: record}, {w:0});
+					self.link(movie.tmdb);
 				});
 			}
 		})
 	},
 	
-	
-	
-	remove: function(tmdb, callback){
+	remove: function(tmdb, physical, callback){
 		var self = this, tmdb = parseInt(tmdb, 10);
 		movieCollection.update({tmdb: tmdb}, {$set: {status: false}}, {upsert: true}, callback);
 	},
@@ -108,32 +107,46 @@ var MovieData = {
 	
 	scan: function(user, callback){
 		var self = this;
-		logger.debug('Scanning movies...');
-		var base =  nconf.get('media:base') + nconf.get('media:movies:directory') + '/A-Z/'
+		logger.debug('Scanning movie library...');
+		var base =  nconf.get('media:base') + nconf.get('media:movies:directory') + '/A-Z'
 		helper.listDirectory(base, function(file){
-			var ext = path.extname(file), name = path.basename(file, ext), quality = '480p', title = '', year = '';
+			var ext = path.extname(file), name = path.basename(file, ext), offset = 0, quality = '480p', title = '', year = 0;
 			
-			// TODO: Improve RegExp
-			
-			if (name.match(/\((\d{4})\)\s?\[(1080p|720p|480p)\]$/i)){
-				var matched = name.match(/^(.+)\s?\((\d{4})\)\s?\[(\d{3,4}p)\]$/i);
-				title = matched[1].trim(), year = parseInt(matched[2],10), quality = matched[3];
-				
-			} else if (name.match(/^(.*)\s?\[(\d{4})\]$/i)){
-				var matched = name.match(/^(.*)\s?\[(\d{4})\]$/i);
-				title = matched[1].trim(), year = parseInt(matched[2],10);
-				
+			if (name.match(/^(.+)\s?(\([\d]{4}\)|\[[\d]{4}\])/i)){
+				var matched = name.match(/^(.+)\s?(\([\d]{4}\)|\[[\d]{4}\])/i);
+				title = matched[1].trim(), year = parseInt(matched[2].replace(/\D/, ''));
 			} else {
-				title = name.trim();
+				// guesswork time...
+				name = name.replace(/\./g, ' ');
+				var numbers = name.match(/(\d{4})/g);
+				if (numbers){
+					numbers.forEach(function(number){
+						if (parseInt(number,10) >= 1887){
+							// If you're wondering 'Why 1887?': (http://www.imdb.com/title/tt2075247/)
+							year = parseInt(number, 10);
+							offset = name.indexOf(number);
+						}
+					});
+					if (offset > 0) title = name.substring(0, offset).trim();
+				} else {
+					title = name.trim();
+				}
 			}
+			quality = self.getQuality(name);
 			
 			if (title.match(', The')) title = 'The '+title.replace(', The', '');
 			trakt(user.trakt).search('movies', title, function(error, results){
 				if (error) return logger.error(error);
-				if (results.length){
-					if (results.length > 10) logger.debug(title, results.length, results);
+				if (results.length == 1){
+					self.add(user, parseInt(results[0].tmdb_id,10), function(error, movie){
+						self.rename(movie.tmdb, file, quality);
+						if (typeof(callback) == 'function') callback(null, movie.tmdb);
+					});
+					return;
+				} else {
+					var unmatched = [];
 					
-					results = results.filter(function(result){
+					var filtered = results.filter(function(result){
 						var include = true;
 						if (year && result.year != year || !result.year) include = false;
 						if (title) {
@@ -143,23 +156,39 @@ var MovieData = {
 						}
 						return include;
 					});
-					if (results.length){
-						if (results.length == 1){
-							// Exact match!
-							logger.debug('Adding: '+results[0].title);
-							self.add(user, parseInt(results[0].tmdb_id, 10), function(error, movie){
-								self.rename(movie.tmdb, file, quality);
-							});
-						} else {
-							// Store matches - Human intervention required
-						}
+					
+					if (filtered.length == 1){
+						// Exact match!
+						logger.debug('Adding: '+filtered[0].title);
+						self.add(user, parseInt(filtered[0].tmdb_id,10), function(error, movie){
+							self.rename(movie.tmdb, file, quality);
+							if (typeof(callback) == 'function') callback(null, movie.tmdb);
+						});
+						return;
 					} else {
-						// No match - Human intervention required
+						unmatched = (filtered.length) ? filtered : results;
+					}
+					
+					if (unmatched.length){
+						movieCollection.findOne({title:title}, function(error,movie){
+							if (error) logger.error(error);
+							if (movie){
+								self.rename(movie.tmdb, file, quality);
+								if (typeof(callback) == 'function') callback(null, movie.tmdb);
+							} else {
+								logger.debug('Unmatched: %s (%d)', title, unmatched.length);
+								var record = {
+									type: 'movie',
+									file: file,
+									unmatched: unmatched
+								};
+								unmatchedCollection.update({file: file}, record, {upsert:true, w:0});
+							}
+						});
 					}
 				}
 			});
 		});
-		
 	},
 	
 	sync: function(user, callback){
@@ -167,6 +196,7 @@ var MovieData = {
 		var self = this;
 		try {
 			trakt(user.trakt).user.library.movies.all(function(error, results){
+				logger.debug('Syncing library...');
 				if (error) logger.error(error);
 				if (results){
 					logger.debug('Movie Library: '+results.length);
@@ -182,14 +212,21 @@ var MovieData = {
 							tmdb: parseInt(result.tmdb_id,10),
 							genres: result.genres
 						};
-						movieCollection.update({tmdb: record.tmdb}, {$set: record}, {upsert:true}, function(error,affected){
-							self.getArtwork(record.tmdb);
+						movieCollection.update({tmdb: record.tmdb}, {$set: record}, {upsert:true}, function(error,affected,status){
+							if (error) return logger.error(error);
+							
+						//	if (affected)
+							
+							logger.debug(affected, status)
+						//	if (status.updatedExisting)
+							if (affected) self.getArtwork(record.tmdb);
 						});
 					});
 				}
 			//	if (typeof(callback) == 'function') callback(null, results.length);
 			});
 			trakt(user.trakt).user.watchlist.movies(function(error, results){
+				logger.debug('Syncing watchlist...');
 				if (error) logger.error(error);
 				if (results){
 					logger.debug('Movie Watchlist: '+results.length);
@@ -220,9 +257,7 @@ var MovieData = {
 	
 	unmatched: function(callback){
 		if (!callback) return;
-	//	movieCollection.update({tmdb:{$exists:true},unmatched:{$exists:true}}, {$unset:{unmatched:true}}, {multi:true}, function(){
-			movieCollection.find({tmdb: {$exists: false}, unmatched: {$exists: true}}).sort({title:1}).limit(50).toArray(callback);
-	//	});
+		unmatchedCollection.find({type: 'movie', tmdb: {$exists: false}, unmatched: {$exists: true}}).sort({title:1}).limit(50).toArray(callback);
 	},
 	match: function(matched, callback){
 		var self = this;
@@ -260,9 +295,11 @@ var MovieData = {
 	
 	/*****  *****/
 	getAlpha: function(name){
-		var title = name.replace(/^The\s/, '').trim();
+		var title = name.replace(/^The\s/, '').trim(),
+			alpha = title.substr(0,1).toUpperCase();
 		
-		return title.substr(0,1).toUpperCase();
+		if (alpha.match(/\d/)) alpha = '#';
+		return alpha; 
 	},
 	getArtwork: function(tmdb, callback){
 		var self = this, tmdb = parseInt(tmdb, 10);
@@ -295,7 +332,7 @@ var MovieData = {
 			record.quality = movie.quality || quality;
 			blocks.push('['+record.quality+']')
 		}
-		record.file = '/A-Z/'+alpha+'/'+blocks.join(' ')+ext;
+		record.file = alpha+'/'+blocks.join(' ')+ext;
 		return record;
 	},
 	getHashes: function(tmdb, callback){
@@ -306,16 +343,15 @@ var MovieData = {
 				return logger.error(error);
 			}
 			if (movie){
-				request({
-					'url': 'https://yts.re/api/list.json',
+				var req = {
+					'url': 'https://yts.re/api/listimdb.json',
 					'method': 'GET',
 					'json': true,
-					'proxy': 'http://proxy.silico.media:8888',
 					'tunnel': true,
-					'qs': {
-						'keywords': movie.imdb
-					}
-				}, function(error, res, json){
+					'qs': {'imdb_id': movie.imdb}
+				};
+				if (nconf.get('system:proxy')) req.proxy = nconf.get('system:proxy')
+				request(req, function(error, res, json){
 					if (error) {
 						if (typeof(callback) == 'function') callback(error);
 						return logger.error(error);
@@ -328,13 +364,10 @@ var MovieData = {
 					} else if (json.MovieCount){
 						json.MovieList.forEach(function(result){
 							var object = {
-								imdb: result.ImdbCode,
 								hash: result.TorrentHash.toUpperCase(),
 								magnet: result.TorrentMagnetUrl,
 								quality: result.Quality,
-								size: result.SizeByte,
-								title: result.MovieTitleClean,
-								year: result.MovieYear
+								size: result.SizeByte
 							};
 							torrents.push(object);
 						});
@@ -348,7 +381,7 @@ var MovieData = {
 	getQuality: function(file){
 		var quality = '480p';
 		if (file.match(/(1080p|720p|480p)/i)) quality = file.match(/(1080p|720p|480p)/i)[1];
-		return quality
+		return quality;
 	},
 	getUnmatched: function(callback){
 		movieCollection.find({unmatched: {$exists: true}}).toArray(function(error, movies){
