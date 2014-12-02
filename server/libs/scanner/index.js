@@ -41,91 +41,21 @@ function listDirectory(path, callback) {
 
 var episodeCollection = db.collection('episode'),
 	movieCollection = db.collection('movie'),
-	showCollection = db.collection('show');
+	showCollection = db.collection('show'),
+	unmatchedCollection = db.collection('unmatched');
 
 var Scanner = {
 	
 	movies: function(user, callback){
-		var self = this;
-		
-		logger.debug('Movies: Scanning...')
-		
-		if (base = nconf.get('media:base') + nconf.get('media:movies:directory') + '/A-Z/') {
-			listDirectory(base, function(file){
-				var ext = path.extname(file), name = path.basename(file, ext);
-				
-				if (!ext.match(/(avi|mkv|mp4)/i)) return;
-				
-				var record = {
-					status: true,
-					title: null,
-					year: null,
-					file: file.replace(base+'/', ''),
-					quality: null
-				};
-				
-				if (name.match(/\((\d{4})\)\s?\[(1080p|720p)\]$/i)){
-					var matched = name.match(/^(.+)\s?\((\d{4})\)\s?\[(\d{3,4}p)\]$/i);
-					record.title	= matched[1].trim();
-					record.year		= parseInt(matched[2], 10);
-					record.quality	= matched[3];
-					
-				} else if (name.match(/^(.*)\s?\[(\d{4})\]$/i)){
-					var matched = name.match(/^(.*)\s?\[(\d{4})\]$/i);
-					record.title	= matched[1].trim();
-					record.year		= parseInt(matched[2], 10);
-				} else {
-					// erm?
-				}
-			//	if (record.title.match(/, The/)) record.title = 'The '+record.title.replace(/, The/, '');
-				
-				logger.debug(record)
-				
-				trakt(user.trakt).search('movies', record.title, function(error, results){
-					if (error) return logger.error(error);
-					if (results.length) {
-						var exact = [], shortlist = [];
-						if (record.year){
-							results.forEach(function(result){
-								if (result.year == record.year) {
-									shortlist.push(result);
-									if (result.title == record.title) exact.push(result);
-								}
-							})
-							if (exact.length == 1) shortlist = exact;
-						} else {
-							shortlist = results;
-						}
-						
-						logger.debug(shortlist)
-						
-						if (shortlist.length == 1){
-							var result		= shortlist[0];
-							record.title	= result.title;
-							record.year		= result.year;
-							record.synopsis	= result.overview;
-							record.tmdb		= result.tmdb_id;
-							record.imdb		= result.imdb_id;
-							record.genre	= result.genres;
-						} else {
-							// Filter the results
-							record.unmatched = shortlist;
-						}
-					}
-				//	movieCollection.update({file: record.file}, {$set: record}, {upsert: true}, function(error, affected){
-				//		if (typeof(callback) == 'function') callback(null, record);
-				//	});
-				});
-			});
-			
-		}
+		logger.info('Scanner.movies has been deprecated. Use movies.scan instead');
+		return false;
 	},
 	
 	shows: function(user, callback){
 		
 		var unmatched = db.collection('unmatched');
 		
-		logger.debug('Movies: Scanning...')
+		logger.debug('Shows: Scanning...')
 		
 		// Scan media directory for folders - calback is called for each item found
 		var self = this;

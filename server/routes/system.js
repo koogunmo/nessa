@@ -44,12 +44,20 @@ module.exports = function(app,db,socket){
 		if (req.body.type){
 			switch (req.body.type){
 				case 'movies':
-					scanner.movies(req.user, function(error, json){
-						if (json.tmdb) movies.getArtwork(json.tmdb);
+					movies.sync(req.user, function(error, count){
+						if (error) logger.error(error);
+						movies.scan(req.user);
 					});
 					break;
 				case 'shows':
 				default:
+					/*
+					shows.sync(req.user, function(error, count){
+						shows.scan(req.user, function(error, tvdb){
+							shows.getHashes();
+						});
+					})
+					*/
 					scanner.shows(req.user, function(error, tvdb){
 						shows.getFullListings(tvdb, function(error, tvdb){
 							shows.getHashes(tvdb);

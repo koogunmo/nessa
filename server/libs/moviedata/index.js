@@ -63,8 +63,8 @@ var MovieData = {
 				
 				var record = self.getFilename(movie,files[0].name);
 				record.added = new Date();
-				record.size = files[0].length;
-					
+				record.size = files[0].bytesCompleted;
+				
 				var basedir = nconf.get('media:base')+nconf.get('media:movies:directory');
 				var source = data.dir+'/'+files[0].name,
 					target = basedir+'/A-Z/'+record.file;
@@ -72,14 +72,17 @@ var MovieData = {
 				if (movie.file && movie.file == record.file) return;
 				
 				helper.fileCopy(source, target, function(error){
-					self.link(movie.tmdb);
 					movieCollection.update({tmdb:movie.tmdb}, {$set:record}, {w:0});
+					self.link(movie.tmdb);
+					
 					// Add to library
-					movie.users.forEach(function(u){
-						userCollection.findOne({_id: ObjectID(u._id)}, {trakt:1}, function(error,user){
-							trakt(user.trakt).movie.library(movie.imdb);
+					if (movie.users){
+						movie.users.forEach(function(u){
+							userCollection.findOne({_id: ObjectID(u._id)}, {trakt:1}, function(error,user){
+								trakt(user.trakt).movie.library(movie.imdb);
+							});
 						});
-					});
+					}
 				});
 			}
 		});
@@ -229,7 +232,6 @@ var MovieData = {
 					} else {
 						unmatched = (filtered.length) ? filtered : results;
 					}
-					
 					if (unmatched.length){
 						movieCollection.findOne({title:title}, function(error,movie){
 							if (error) logger.error(error);
@@ -256,34 +258,33 @@ var MovieData = {
 		// Retrive movie list from trakt
 		var self = this;
 		try {
-			trakt(user.trakt).user.library.movies.all(function(error, results){
-				logger.debug('Syncing library...');
+			trakt(user.trakt).user.library.movies.all(function(error, movies){
+				logger.debug('Syncing movie library...');
 				if (error) logger.error(error);
-				if (results){
-					logger.debug('Movie Library: '+results.length);
-					results.forEach(function(result){
-						var title = result.url.split('/');
+				if (movies){
+					logger.debug('Movie Library: ', movies.length);
+					movies.forEach(function(movie){
+						var url = movie.url.split('/');
 						var record = {
-							title: result.title,
-							year: parseInt(result.year,10),
-							url: title.pop(),
-							synopsis: result.overview,
-							runtime: parseInt(result.runtime,10),
-							imdb: result.imdb_id,
-							tmdb: parseInt(result.tmdb_id,10),
-							genres: result.genres
+							title: movie.title,
+							year: parseInt(movie.year,10),
+							url: url.pop(),
+							synopsis: movie.overview,
+							runtime: parseInt(movie.runtime,10),
+							imdb: movie.imdb_id,
+							tmdb: parseInt(movie.tmdb_id,10),
+							genres: movie.genres
 						};
 						movieCollection.update({tmdb: record.tmdb}, {$set: record}, {upsert:true}, function(error,affected,status){
 							if (error) return logger.error(error);
-							
 							movieCollection.update({tmdb: record.tmdb}, {$addToSet: {user: {_id: user._id, username: user.username}}}, {w:0})
-							
-							if (affected) self.getArtwork(record.tmdb);
+							self.getArtwork(movie.tmdb);
 						});
 					});
 				}
-			//	if (typeof(callback) == 'function') callback(null, results.length);
+				if (typeof(callback) == 'function') callback(null, movie.length);
 			});
+			
 			trakt(user.trakt).user.watchlist.movies(function(error, results){
 				logger.debug('Syncing watchlist...');
 				if (error) logger.error(error);
@@ -307,10 +308,9 @@ var MovieData = {
 						});
 					});
 				}
-			})
-			
+			});
 		} catch(e){
-			logger.error(e.message)
+			logger.error('Movie sync: ', e.message);
 		}
 	},
 	

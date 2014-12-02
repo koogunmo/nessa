@@ -355,58 +355,42 @@ var ShowData = {
 					if (u.seasons) response.seasons = u.seasons;
 				});
 				if (typeof(callback) == 'function') callback(null, response);
-				
-				/*
-				seasons.forEach(function(season){
-					season.episodes.forEach(function(episode){
-						
-						if (response.seasons){
-							response.seasons.forEach(function(s){
-								console.log(s.episodes);
-							});
-							
-						}
-					});
-				});
-				
-				/*
-				var response = {
-					show: show,
-					listing: episodes,
-					progress: {},
-					seasons: []
-				};
-				
-				// merge episode with user's watched status
-				
-				
-				
-				episodes.forEach(function(seasons){
-				//	console.log(seasons.episodes);
-					
-				});
-				
-				
-				if (typeof(callback) == 'function') callback(null, response);
-				*/
 			});
 		});
 	},
 	
 	sync: function(user, callback){
 		var self = this;
-		// Synchronise all show data from trakt to local db
 		try {
+			logger.debug('Scanning shows...');
 			trakt(user.trakt).user.library.shows.all(function(error, shows){
-				shows.forEach(function(show){
-					self.add(user, show.tvdb_id, function(error, tvdb){
-						if (error) return logger.error(error);
-						self.getProgress(user, tvdb);
+				logger.debug('Show Library: ', shows.length);
+				if (error) logger.error(error);
+				if (shows){
+					shows.forEach(function(show){
+						var url = show.url.split('/');
+						var record = {
+							title: show.title,
+							year: parseInt(show.year,10),
+							url: url.pop(),
+							status: (show.status == 'Ended') ? false:true,
+							synopsis: show.overview,
+							imdb: show.imdb_id,
+							tvdb: parseInt(show.tvdb_id,10),
+							genres: show.genres
+						};
+						showCollection.update({tvdb: record.tvdb}, {$set: record}, {upsert:true}, function(error,affected,status){
+							if (error) return logger.error(error);
+							
+							// TODO: Need to handle this magically...
+						//	showCollection.update({tvdb: record.tvdb}, {$addToSet: {user: {_id: user._id, username: user.username}}}, {w:0})
+							self.getArtwork(show.tmdb);
+						});
 					});
-				});
+				}
 			});
 		} catch(e){
-			logger.error('sync: ', e.message);
+			logger.error('Show sync: ', e.message);
 		}
 	},
 	
@@ -430,7 +414,7 @@ var ShowData = {
 		return;
 		// TODO: Rethink how this should work
 		
-		unmatchedCollection.find().toArray(function(error, shows){
+		unmatchedCollection.find({type:'show'}).toArray(function(error, shows){
 			userCollection.findOne({admin: true}, {trakt:1}, function(error, user){
 				shows.forEach(function(show){
 					trakt(user.trakt).search('shows', show.directory, function(error, json){
@@ -771,7 +755,7 @@ var ShowData = {
 	},
 	
 	getUnmatched: function(callback){
-		unmatchedCollection.find().toArray(callback);
+		unmatchedCollection.find({type:'show'}).toArray(callback);
 	},
 	
 	getUnwatched: function(callback){
