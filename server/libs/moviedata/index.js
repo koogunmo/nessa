@@ -43,7 +43,7 @@ var MovieData = {
 				self.getHashes(record.tmdb);
 				
 				movieCollection.update({tmdb: record.tmdb}, {$addToSet: {user: {_id: ObjectID(user._id), username: user.username}}}, {w:0})
-				trakt(user.trakt).movie.watchlist.movie(record.imdb);
+				trakt(user.trakt).movie.watchlist(record.imdb);
 			})
 		});
 	},
@@ -203,8 +203,11 @@ var MovieData = {
 				if (error) return logger.error(error);
 				if (results.length == 1){
 					self.add(user, parseInt(results[0].tmdb_id,10), function(error, movie){
-						self.rename(movie.tmdb, file, quality);
-						if (typeof(callback) == 'function') callback(null, movie.tmdb);
+						if (error) logger.error(error);
+						if (movie){
+							self.rename(movie.tmdb, file, quality);
+							if (typeof(callback) == 'function') callback(null, movie.tmdb);
+						}
 					});
 					return;
 				} else {
@@ -225,8 +228,11 @@ var MovieData = {
 						// Exact match!
 						logger.debug('Adding: '+filtered[0].title);
 						self.add(user, parseInt(filtered[0].tmdb_id,10), function(error, movie){
-							self.rename(movie.tmdb, file, quality);
-							if (typeof(callback) == 'function') callback(null, movie.tmdb);
+							if (error) logger.error(error);
+							if (movie){
+								self.rename(movie.tmdb, file, quality);
+								if (typeof(callback) == 'function') callback(null, movie.tmdb);
+							}
 						});
 						return;
 					} else {
@@ -282,7 +288,7 @@ var MovieData = {
 						});
 					});
 				}
-				if (typeof(callback) == 'function') callback(null, movie.length);
+				if (typeof(callback) == 'function') callback(null, movies.length);
 			});
 			
 			trakt(user.trakt).user.watchlist.movies(function(error, results){
@@ -314,11 +320,28 @@ var MovieData = {
 		}
 	},
 	
-	/*
-	unmatched: function(callback){
-		if (!callback) return;
-		unmatchedCollection.find({type: 'movie', tmdb: {$exists: false}, unmatched: {$exists: true}}).sort({title:1}).limit(50).toArray(callback);
+	match: function(user, matched, callback){
+		var self = this;
+		try {
+			
+			return;
+			
+			var record = {
+				file: match.file
+			};
+			
+			/*
+			movieCollection.update({tmdb:tmdb}, {$set: record}, {upsert:true}, function(error,affected){
+				
+			});
+			*/
+		//	if (typeof(callback) == 'function') callback()
+		} catch(e){
+			logger.error('Movie match: ', e.message);
+		}
 	},
+	
+	/*
 	match: function(matched, callback){
 		var self = this;
 		try {
@@ -444,11 +467,7 @@ var MovieData = {
 		return quality;
 	},
 	getUnmatched: function(callback){
-		/*
-		movieCollection.find({unmatched: {$exists: true}}).toArray(function(error, movies){
-			if (typeof(callback) == 'function') callback(error, movies);
-		});
-		*/
+		unmatchedCollection.find({type: 'movie'}).sort({title:1}).limit(20).toArray(callback);
 	}	
 };
 exports = module.exports = MovieData;
