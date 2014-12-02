@@ -144,14 +144,12 @@ define(['app'], function(nessa){
 		$scope.movie = null
 		$http.get('/api/movies/'+$stateParams.id).success(function(success){
 			$scope.movie = success;
-			$log.debug(success);
 		});
 		$scope.close = function(){
 			$modalInstance.dismiss();
 		};
 		$scope.download = function(object){
 			$http.post('/api/movies/'+$scope.movie.tmdb+'/download', object).success(function(success){
-				$log.debug(success)
 				$modalInstance.close()
 			})
 		};

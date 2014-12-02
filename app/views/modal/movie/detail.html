@@ -1,9 +1,14 @@
 <div class="modal-header">
-	<h3 class="modal-title">{{movie.title}} ({{movie.year}})</h3>
+	<h3 class="modal-title">{{movie.title}} <span class="small">{{movie.year}}</span></h3>
+	<div class="small">
+		<span ng-if="movie.runtime"><strong>{{movie.runtime}} mins</strong></span>
+		&nbsp;
+		<span class="pull-right" ng-if="movie.quality"><strong>{{movie.quality}}</strong></span>
+	</div>
 </div>
+
 <div class="modal-body">
 	<div class="well">{{movie.synopsis}}</div>
-	<!-- <img ng-src="/media/Movies/.artwork/{{movie.tmdb}}.jpg" /> -->
 </div>
 <div class="modal-footer">
 	
