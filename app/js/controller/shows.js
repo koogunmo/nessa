@@ -144,6 +144,15 @@ define(['app'], function(nessa){
 		$scope.filters	= {
 			name: ''
 		};
+		$scope.paginate = {
+			items: 24,
+			page: 1
+		};
+		
+		$scope.$watch('filters', function(){
+			if ($scope.filters.name != '') $page = 1;
+		},true)
+		
 		
 		$scope.reduce = {
 			watched: false,

@@ -10,14 +10,14 @@
 		</div>
 	</div>
 	
-	<div class="row">
+	<!--div class="row">
 		<div ng-show="movies.length" class="col-sm-12" style="text-align: right;">
 			Showing {{results.length}} of {{movies.length}} movies
 		</div>
-	</div>
+	</div-->
 	
 	<div class="row">
-		<div class="show col-sm-2" ng-repeat="movie in results = (movies | filter:filter.string) | orderBy:definiteArticle" lazy-load>
+		<div class="show col-sm-2" ng-repeat="movie in results = (movies | filter:filter.string) | orderBy:definiteArticle | offset:(paginate.page-1)*paginate.items | limitTo:paginate.items" lazy-load>
 			<div class="image">
 				<div class="corner"></div>
 				<a ui-sref="movies.detail({id:movie.tmdb,url:movie.url})">
@@ -35,5 +35,8 @@
 		<div class="col-sm-12" ng-show="!results.length" style="text-align: center;">
 			No matches found
 		</div>
+	</div>
+	<div class="text-center" ng-show="results.length>=paginate.items" ng-cloak>
+		<pagination class="pagination-sm" items-per-page="paginate.items" total-items="results.length" ng-model="paginate.page" max-size="5" boundary-links="true"></pagination>
 	</div>
 </div>

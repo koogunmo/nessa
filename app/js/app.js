@@ -72,6 +72,13 @@ define('app', ['angular','moment','ngAnimate','ngMessages','ngResource','ngStora
 		};
 	});
 	
+	nessa.filter('offset', function(){
+		return function(input, start){
+			start = parseInt(start, 10);
+			return input.slice(start);
+		};
+	});
+	
 	nessa.filter('traktPoster', function(){
 		return function(string){
 			return string.replace(/\.jpg$/ig, '-138.jpg');

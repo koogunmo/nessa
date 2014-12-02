@@ -99,12 +99,22 @@ define(['app'], function(nessa){
 	nessa.controller('MovieListCtrl', function($log,$http,$rootScope,$scope){
 		$scope.settings	= {};
 		$scope.movies	= [];
+		$scope.page 	= 1;
 		
 		$scope.filter	= {
 			string: {
 				title: ''
 			}
 		};
+		$scope.paginate = {
+			items: 24,
+			page: 1
+		};
+		
+		$scope.$watch('filter', function(){
+			if ($scope.filter.string.title != '') $scope.paginate.page = 1;
+		},true);
+		
 		$scope.clearFilter = function(){
 			$scope.filter.string.name = '';
 			$(document).trigger('lazyload');

@@ -245,7 +245,7 @@ var torrent = {
 			if (error) logger.error(error);
 			var list = [];
 			
-			if (data.torrents){
+			if (data && data.torrents){
 				data.torrents.forEach(function(torrent){
 					if (torrent.percentDone != 1) return;
 					var object = {

@@ -17,15 +17,14 @@
 		-->
 	</div>
 	
-	<div class="row">
+	<!--div class="row">
 		<div ng-show="shows.length" class="col-sm-12" style="text-align: right;">
 			Showing {{results.length}} of {{shows.length}} shows
 		</div>
-	</div>
-	
+	</div-->
 	
 	<div class="row">
-		<div class="show col-sm-2" ng-show="results.length" ng-repeat="show in results = (shows | filter:filters | filter:reduceShows) | orderBy:definiteArticle" ng-controller="showCtrl" lazy-load>
+		<div class="show col-sm-2" ng-show="results.length" ng-repeat="show in results = (shows | filter:filters | filter:reduceShows) | orderBy:definiteArticle | offset:(paginate.page-1)*paginate.items | limitTo:paginate.items" ng-controller="showCtrl" lazy-load>
 			<div class="image" ng-class="{'ended': show.ended}">
 				<span class="badge unwatched" ng-if="show.progress.left>0">{{show.progress.left}}</span>
 				<div class="corner"></div>
@@ -60,5 +59,9 @@
 		<div class="col-sm-12" ng-show="!results.length" style="text-align: center;">
 			No matches found
 		</div>
+	</div>
+	
+	<div class="text-center" ng-show="results.length>=paginate.items" ng-cloak>
+		<pagination class="pagination-sm" items-per-page="paginate.items" total-items="results.length" ng-model="paginate.page" max-size="5" boundary-links="true"></pagination>
 	</div>
 </div>
