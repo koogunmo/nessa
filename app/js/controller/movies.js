@@ -126,7 +126,7 @@ define(['app'], function(nessa){
 			if ($scope.filter.title != '') $scope.paginate.page = 1;
 		},true);
 		
-		$scope.movieFilter = function(item){
+		$scope.filterList = function(item){
 			if (!item.title.toLowerCase().match($scope.filter.title.toLowerCase())) return false;
 			if ($scope.filter.active){
 				if ($scope.filter.genre && item.genres.indexOf($scope.filter.genre) == -1) return false;
@@ -137,7 +137,7 @@ define(['app'], function(nessa){
 		};
 		
 		$scope.clearFilter = function(){
-			$scope.filter.string.title = '';
+			$scope.filter.title = '';
 			$(document).trigger('lazyload');
 		};
 		$scope.definiteArticle = function(movie){

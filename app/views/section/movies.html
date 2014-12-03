@@ -33,7 +33,7 @@
 	</div-->
 	
 	<div class="row">
-		<div class="show col-sm-2" ng-repeat="movie in results = (movies | filter:movieFilter) | orderBy:definiteArticle | offset:(paginate.page-1)*paginate.items | limitTo:paginate.items" lazy-load>
+		<div class="show col-sm-2" ng-repeat="movie in results = (movies | filter:filterList) | orderBy:definiteArticle | offset:(paginate.page-1)*paginate.items | limitTo:paginate.items" lazy-load>
 			<div class="image">
 				<div class="corner"></div>
 				<a ui-sref="movies.detail({id:movie.tmdb,url:movie.url})">

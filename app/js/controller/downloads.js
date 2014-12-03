@@ -63,6 +63,7 @@ define(['app'], function(nessa){
 			icon: 'download',
 			order: 40
 		});
+		
 	});
 	
 	/****** Controllers ******/
@@ -71,6 +72,25 @@ define(['app'], function(nessa){
 		$scope.predicate = 'name';
 		$scope.reverse = false;
 		$scope.downloads = [];
+		
+		$scope.filter = {
+			active: false,
+			title: '',
+			status: ''
+		};
+		
+		$scope.filterList = function(item){
+			if (!item.name.toLowerCase().match($scope.filter.title.toLowerCase())) return false;
+			if ($scope.filter.active){
+				if ($scope.filter.status != '' && item.status != $scope.filter.status) return false;
+			}
+			return true;
+		}
+		
+		$scope.clearFilter = function(){
+			$scope.filter.title = '';
+		};
+		
 		
 		$scope.load = function(){
 			$http.get('/api/downloads').success(function(json, status){

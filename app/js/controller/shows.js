@@ -159,7 +159,12 @@ define(['app'], function(nessa){
 			if ($scope.filter.title != '') $page = 1;
 		});
 		
-		$scope.showFilter = function(item){
+		$scope.clearFilter = function(){
+			$scope.filter.title = '';
+			$(document).trigger('lazyload');
+		};
+		
+		$scope.filterList = function(item){
 			if (!item.name.toLowerCase().match($scope.filter.title.toLowerCase())) return false;
 			if ($scope.filter.active){
 				if ($scope.filter.genre && item.genres.indexOf($scope.filter.genre) == -1) return false;
@@ -167,32 +172,6 @@ define(['app'], function(nessa){
 			}
 			return true;
 		};
-		
-		
-		$scope.reduce = {
-			watched: false,
-			unstarted: false
-		};
-		
-		$scope.reduceShows = function(show){
-			if ($scope.reduce.watched){
-				if (!show.progress) return false;
-				if (show.progress && (show.progress.percentage == 100 || show.progress.left == 0)) return false;
-			}
-			
-			if ($scope.reduce.unstarted) {
-				if (typeof(show.progress) == 'undefined') return false;
-				if (typeof(show.progress.completed) == 'undefined') return false;
-			}
-			return true;
-		};
-		
-		$scope.clearFilter = function(){
-			$scope.filters = {name:''};
-			$(document).trigger('lazyload');
-		};
-		
-		
 		$scope.$on('showsRefresh', function(event, tvdb){
 			$scope.load()
 		});
