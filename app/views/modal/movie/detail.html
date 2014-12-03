@@ -31,7 +31,7 @@
 </div>
 <div class="modal-footer">
 	<div class="btn-group pull-left" ng-if="movie.hashes">
-		<button type="button" class="btn btn-default" ng-repeat="dl in movie.hashes" ng-click="download(dl)" ng-class="{'active': dl.quality == movie.quality}">
+		<button type="button" class="btn btn-default" ng-repeat="dl in movie.hashes" ng-click="download(dl)" ng-class="{'active': dl.quality == movie.quality}" tooltip="{{dl.size|formatBytes}}">
 			<span class="fa fa-download"></span> {{dl.quality}}
 		</button>
 	</div>

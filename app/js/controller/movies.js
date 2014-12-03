@@ -141,7 +141,7 @@ define(['app'], function(nessa){
 			$(document).trigger('lazyload');
 		};
 		$scope.definiteArticle = function(movie){
-			var title = movie.title.split(':')[0].replace(/^The\s/i, '');
+			var title = movie.title.split(':')[0].replace(/^The\s/i, '').replace(/\W/, '');
 			return [title, movie.year];
 		};
 		
