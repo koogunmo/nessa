@@ -137,8 +137,6 @@ define(['app'], function(nessa){
 			$http.get('/api/shows').success(function(json, status){
 				if (status == 200 && json) {
 					$scope.shows = json;
-					$log.debug(json);
-					
 				//	$(document).trigger('lazyload');
 				}
 			}).error(function(json, status){
