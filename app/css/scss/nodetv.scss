@@ -35,6 +35,9 @@ body {
 .ui-view-container {
 	position: relative;
 }
+.modal-backdrop {
+	bottom: 0px;
+}
 
 [ui-view] {
 	left: 0px;

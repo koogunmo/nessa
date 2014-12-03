@@ -72,25 +72,26 @@ exports = module.exports = {
 	listDirectory: function(path, callback) {
 		var self = this;
 		fs.readdir(path, function(error, list){
-			if (error) {
-				logger.error(error);
-				return;
-			}
-			list.forEach(function(item){
-				var fullpath = path + '/' + item;
-				fs.stat(fullpath, function(error, stat){
-					if (error) {
-						logger.error(error);
-						return;
-					}
-					if (stat.isDirectory()){
-						self.listDirectory(fullpath, callback);
-					} else if (stat.isFile()) {
+			if (error) logger.error(error);
+			if (list){
+				list.forEach(function(item){
+					var fullpath = path + '/' + item;
+					fs.lstat(fullpath, function(error, stats){
+						if (error) logger.error(error);
+						
 						if (item.match(/^\./)) return;
-						if (typeof(callback) == 'function') callback(fullpath);
-					}
+						if (stats.isDirectory()){
+							return self.listDirectory(fullpath, callback);
+						} else if (stats.isFile() || stats.isSymbolicLink()) {
+							var record = {
+								path: fullpath,
+								stat: stats
+							};
+							if (typeof(callback) == 'function') callback(error, record);
+						}
+					});
 				});
-			});
+			}
 		});
 	},
 	

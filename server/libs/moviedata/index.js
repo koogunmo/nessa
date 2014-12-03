@@ -30,11 +30,13 @@ var MovieData = {
 				year: parseInt(json.year,10),
 				url: url.pop(),
 				synopsis: json.overview,
+				released: new Date(movie.released*1000),
 				runtime: parseInt(json.runtime,10),
 				imdb: json.imdb_id,
 				tmdb: parseInt(json.tmdb_id,10),
 				genres: json.genres,
-				watchlist: true
+				added: new Date(),
+				updated: new Date()
 			};
 			movieCollection.update({tmdb: record.tmdb}, {$set: record}, {upsert:true}, function(error, affected, status){
 				if (typeof(callback) == 'function') callback(error, record);
@@ -43,8 +45,8 @@ var MovieData = {
 				self.getHashes(record.tmdb);
 				
 				movieCollection.update({tmdb: record.tmdb}, {$addToSet: {user: {_id: ObjectID(user._id), username: user.username}}}, {w:0})
-				trakt(user.trakt).movie.watchlist(record.imdb);
-			})
+			//	trakt(user.trakt).movie.watchlist(record.imdb);
+			});
 		});
 	},
 	complete: function(data, callback){
@@ -62,8 +64,9 @@ var MovieData = {
 				if (files.length != 1) return;
 				
 				var record = self.getFilename(movie,files[0].name);
-				record.added = new Date();
 				record.size = files[0].bytesCompleted;
+				record.added = new Date();
+				record.updated = new Date();
 				
 				var basedir = nconf.get('media:base')+nconf.get('media:movies:directory');
 				var source = data.dir+'/'+files[0].name,
@@ -72,8 +75,10 @@ var MovieData = {
 				if (movie.file && movie.file == record.file) return;
 				
 				helper.fileCopy(source, target, function(error){
-					movieCollection.update({tmdb:movie.tmdb}, {$set:record}, {w:0});
-					self.link(movie.tmdb);
+					movieCollection.update({tmdb:movie.tmdb}, {$set:record}, function(error, affected){
+						if (error) logger.error(error);
+						if (!error) self.link(movie.tmdb);
+					});
 					
 					// Add to library
 					if (movie.users){
@@ -105,10 +110,14 @@ var MovieData = {
 		var self = this, tmdb = parseInt(tmdb, 10);
 		movieCollection.findOne({tmdb: tmdb}, function(error, movie){
 			if (error) return logger.error(error);
+			
 			var basedir = nconf.get('media:base')+nconf.get('media:movies:directory');
 			movie.genres.forEach(function(genre){
 				var folder = basedir +'/Genres/'+genre, symlink = path.basename(movie.file);
 				if (!fs.existsSync(folder)) mkdirp.sync(folder, 0775);
+				
+				if (!symlink) return;
+				
 				fs.symlink(basedir+'/A-Z/'+movie.file, folder+'/'+symlink, 'file', function(error){
 					if (error) logger.error(error);
 				});
@@ -125,11 +134,16 @@ var MovieData = {
 		movieCollection.findOne({tmdb: tmdb}, function(error, movie){
 			if (error) return logger.error(error);
 			if (movie){
-				var record = self.getFilename(movie,file);
-				helper.fileMove(file, basedir+'/A-Z/'+record.file, function(error){
+				var record = self.getFilename(movie,file),
+					target = basedir+'/A-Z/'+record.file;
+				if (fs.existsSync(path.dirname(target))) mkdirp.sync(path.dirname(target));
+				helper.fileMove(file, target, function(error){
 					if (error) return logger.error(error);
-					movieCollection.update({tmdb: tmdb}, {$set: record}, {w:0});
-					self.link(movie.tmdb);
+					movieCollection.update({tmdb: tmdb}, {$set: record}, function(error, affected){
+						if (error) logger.error(error);
+						if (affected) self.link(movie.tmdb);
+					});
+					trakt(user.trakt).movie.library(movie.imdb);
 				});
 			}
 		})
@@ -142,11 +156,8 @@ var MovieData = {
 			movieCollection.find({tmdb: tmdb}, function(error,movie){
 				if (error) logger.error(error);
 				if (movie){
+					self.unlink(movie.tmdb);
 					var basedir = nconf.get('media:base') + nconf.get('media:movies:directory');
-					var file = path.basename(movie.file);
-					movie.genres.forEach(function(genre){
-						fs.unlink(basedir+'/Genres/'+genre+'/'+file);
-					});
 					fs.unlink(basedir+'/A-Z/'+movie.file);
 					movieCollection.remove({tmdb: tmdb}, {w:0});
 				}
@@ -156,7 +167,7 @@ var MovieData = {
 			
 		}
 		*/
-		movieCollection.update({tmdb: tmdb}, {$set: {status: false}}, {upsert: true, w:0});
+	//	movieCollection.update({tmdb: tmdb}, {$set: {status: false}}, {upsert: true, w:0});
 		// Remove from library
 	},
 		
@@ -173,15 +184,20 @@ var MovieData = {
 		var self = this;
 		logger.debug('Scanning movie library...');
 		var base =  nconf.get('media:base') + nconf.get('media:movies:directory') + '/A-Z'
-		helper.listDirectory(base, function(file){
-			var ext = path.extname(file), name = path.basename(file, ext), offset = 0, quality = '480p', title = '', year = 0;
+		helper.listDirectory(base, function(error, file){
+			if (error) logger.error(error);
+			
+			if (file.stat.isSymbolicLink()) return;
+			
+			var ext = path.extname(file.path), name = path.basename(file.path, ext),
+				offset = 0, quality = '480p', title = '', year = 0;
 			
 			if (name.match(/^(.+)\s?(\([\d]{4}\)|\[[\d]{4}\])/i)){
 				var matched = name.match(/^(.+)\s?(\([\d]{4}\)|\[[\d]{4}\])/i);
 				title = matched[1].trim(), year = parseInt(matched[2].replace(/\D/, ''));
 			} else {
 				// Guesswork time...
-				name = name.replace(/\./g, ' ');
+				name = name.replace(/\W/g, ' ');
 				var numbers = name.match(/(\d{4})/g);
 				if (numbers){
 					numbers.forEach(function(number){
@@ -198,21 +214,26 @@ var MovieData = {
 			}
 			quality = self.getQuality(name);
 			
+			var stats = {
+				added: file.stat.mtime,
+				size: parseInt(file.stat.size,10)
+			};
+			
 			if (title.match(', The')) title = 'The '+title.replace(', The', '');
 			trakt(user.trakt).search('movies', title, function(error, results){
 				if (error) return logger.error(error);
+				var resolved = false, unmatched = [];
+				
 				if (results.length == 1){
 					self.add(user, parseInt(results[0].tmdb_id,10), function(error, movie){
 						if (error) logger.error(error);
 						if (movie){
-							self.rename(movie.tmdb, file, quality);
+							self.rename(movie.tmdb, file.path, quality);
+							movieCollection.update({tmdb: movie.tmdb}, {$set: stats}, {w:0});
 							if (typeof(callback) == 'function') callback(null, movie.tmdb);
 						}
 					});
-					return;
 				} else {
-					var unmatched = [];
-					
 					var filtered = results.filter(function(result){
 						var include = true;
 						if (year && result.year != year || !result.year) include = false;
@@ -230,7 +251,8 @@ var MovieData = {
 						self.add(user, parseInt(filtered[0].tmdb_id,10), function(error, movie){
 							if (error) logger.error(error);
 							if (movie){
-								self.rename(movie.tmdb, file, quality);
+								self.rename(movie.tmdb, file.path, quality);
+								movieCollection.update({tmdb: movie.tmdb}, {$set: stats}, {w:0});
 								if (typeof(callback) == 'function') callback(null, movie.tmdb);
 							}
 						});
@@ -242,16 +264,18 @@ var MovieData = {
 						movieCollection.findOne({title:title}, function(error,movie){
 							if (error) logger.error(error);
 							if (movie){
-								self.rename(movie.tmdb, file, quality);
+								self.rename(movie.tmdb, file.path, quality);
+								movieCollection.update({tmdb: movie.tmdb}, {$set: {size: size}}, {w:0});
 								if (typeof(callback) == 'function') callback(null, movie.tmdb);
 							} else {
 								logger.debug('Unmatched: %s (%d)', title, unmatched.length);
 								var record = {
 									type: 'movie',
-									file: file,
+									file: file.path,
+									size: stats.size,
 									unmatched: unmatched
 								};
-								unmatchedCollection.update({file: file}, record, {upsert:true, w:0});
+								unmatchedCollection.update({file: file.path}, record, {upsert:true, w:0});
 							}
 						});
 					}
@@ -276,10 +300,12 @@ var MovieData = {
 							year: parseInt(movie.year,10),
 							url: url.pop(),
 							synopsis: movie.overview,
+							released: new Date(movie.released*1000),
 							runtime: parseInt(movie.runtime,10),
 							imdb: movie.imdb_id,
 							tmdb: parseInt(movie.tmdb_id,10),
-							genres: movie.genres
+							genres: movie.genres,
+							updated: new Date()
 						};
 						movieCollection.update({tmdb: record.tmdb}, {$set: record}, {upsert:true}, function(error,affected,status){
 							if (error) return logger.error(error);
@@ -288,37 +314,58 @@ var MovieData = {
 						});
 					});
 				}
-				if (typeof(callback) == 'function') callback(null, movies.length);
+				if (typeof(callback) == 'function') callback(error, {library: true, count: movies.length});
 			});
 			
-			trakt(user.trakt).user.watchlist.movies(function(error, results){
+			trakt(user.trakt).user.watchlist.movies(function(error, movies){
 				logger.debug('Syncing watchlist...');
 				if (error) logger.error(error);
-				if (results){
-					logger.debug('Movie Watchlist: '+results.length);
-					results.forEach(function(result){
-						var title = result.url.split('/');
+				if (movies){
+					logger.debug('Movie Watchlist: ', movies.length);
+					movies.forEach(function(movie){
+						var title = movie.url.split('/');
 						var record = {
-							title: result.title,
-							year: parseInt(result.year,10),
+							title: movie.title,
+							year: parseInt(movie.year,10),
 							url: title.pop(),
-							synopsis: result.overview,
-							runtime: result.runtime,
-							imdb: result.imdb_id,
-							tmdb: parseInt(result.tmdb_id,10),
-							genres: result.genres,
-							watchlist: true
+							synopsis: movie.overview,
+							released: new Date(movie.released*1000),
+							runtime: movie.runtime,
+							imdb: movie.imdb_id,
+							tmdb: parseInt(movie.tmdb_id,10),
+							genres: movie.genres,
+							watchlist: true,
+							updated: new Date()
 						};
 						movieCollection.update({tmdb: record.tmdb}, {$set: record}, {upsert:true}, function(error,affected){
 							self.getArtwork(record.tmdb);
 						});
 					});
 				}
+				if (typeof(callback) == 'function') callback(error, {watchlist: true, count: movies.length});
 			});
 		} catch(e){
 			logger.error('Movie sync: ', e.message);
 		}
 	},
+	
+	unlink: function(tmdb,callback){
+		var self = this, tmdb = parseInt(tmdb,10);
+		movieCollection.findOne({tmdb:tmdb}, function(error, movie){
+			if (error) logger.error(error);
+			if (movie){
+				var basedir = nconf.get('media:base')+nconf.get('media:movies:directory')+'/Genres/';
+				if (movie.file && movie.genres){
+					var filename = path.basename(movie.file);
+					movies.genres.forEach(function(genre){
+						fs.unlink(basedir+genre+'/'+filename);
+					});
+				}
+			}
+			if (typeof(callback) == 'function') callback(error);
+		})
+	},
+	
 	
 	match: function(user, matched, callback){
 		var self = this;
@@ -377,6 +424,26 @@ var MovieData = {
 	*/
 	
 	/*****  *****/
+	
+	
+	
+	clearSymlinks: function(callback){
+		var self = this;
+		var directory = nconf.get('media:base')+nconf.get('media:movies:directory')+'/Genres';
+		
+		helper.listDirectory(directory, function(error, file){
+			if (error) logger.error(error);
+			if (file.stat){
+				if (file.stat.isSymbolicLink()){
+					logger.debug('Unlink: ', file.path);
+				//	fs.unlink(file.path);
+				}
+			}
+		});
+		if (typeof(callback) == 'function') callback();
+	},
+	
+	/*****  *****/
 	getAlpha: function(name){
 		var title = name.replace(/^The\s/, '').trim(),
 			alpha = title.substr(0,1).toUpperCase();
@@ -387,23 +454,25 @@ var MovieData = {
 	getArtwork: function(tmdb, callback){
 		var self = this, tmdb = parseInt(tmdb, 10);
 		movieCollection.findOne({tmdb: tmdb}, function(error, movie){
-			if (error || !movie) return;
-			userCollection.findOne({admin: true}, {trakt:1}, function(error, admin){
-				if (error || !admin) return logger.error(error);
-				trakt(admin.trakt).movie.summary(movie.tmdb, function(error, json){
-					if (json.images.poster) {
-						var src = json.images.poster.replace('.jpg', '-138.jpg');
-						var poster = fs.createWriteStream(nconf.get('media:base') + nconf.get('media:movies:directory') + '/.artwork/' + movie.tmdb + '.jpg', {flags: 'w', mode: 0644});
-						poster.on('error', function(e){
-							logger.error(e);
-						});
-						var request = http.get(src, function(response){
-							response.pipe(poster);
-						});
-					}
-					if (typeof(callback) == 'function') callback(null, movie.tmdb);
+			if (error) logger.error(error);
+			if (movie){
+				userCollection.findOne({admin: true}, {trakt:1}, function(error, admin){
+					if (error || !admin) return logger.error(error);
+					trakt(admin.trakt).movie.summary(movie.tmdb, function(error, json){
+						if (json.images.poster) {
+							var src = json.images.poster.replace('.jpg', '-138.jpg');
+							var poster = fs.createWriteStream(nconf.get('media:base') + nconf.get('media:movies:directory') + '/.artwork/' + movie.tmdb + '.jpg', {flags: 'w', mode: 0644});
+							poster.on('error', function(e){
+								logger.error(e);
+							});
+							var request = http.get(src, function(response){
+								response.pipe(poster);
+							});
+						}
+						if (typeof(callback) == 'function') callback(null, movie.tmdb);
+					});
 				});
-			});
+			}
 		});
 	},
 	getFilename: function(movie,file){
@@ -415,6 +484,9 @@ var MovieData = {
 			record.quality = movie.quality || quality;
 			blocks.push('['+record.quality+']')
 		}
+	//	var stats = fs.statSync()
+		
+		
 		record.file = alpha+'/'+blocks.join(' ')+ext;
 		return record;
 	},
@@ -430,10 +502,12 @@ var MovieData = {
 					'url': 'https://yts.re/api/listimdb.json',
 					'method': 'GET',
 					'json': true,
-					'tunnel': true,
 					'qs': {'imdb_id': movie.imdb}
 				};
-				if (nconf.get('system:proxy')) req.proxy = nconf.get('system:proxy')
+				if (nconf.get('system:proxy')) {
+					req.tunnel = true;
+					req.proxy = nconf.get('system:proxy');
+				}
 				request(req, function(error, res, json){
 					if (error) {
 						if (typeof(callback) == 'function') callback(error);
@@ -454,17 +528,69 @@ var MovieData = {
 							};
 							torrents.push(object);
 						});
-						if (torrents.length) movieCollection.update({_id: ObjectID(movie._id)}, {$set: {hashes: torrents}}, {w:0});
+						if (torrents.length) movieCollection.update({_id: ObjectID(movie._id)}, {$set: {hashes: torrents, updated: new Date()}}, {w:0});
 						if (typeof(callback) == 'function') callback(null, torrents);
 					}
 				})
 			}
 		});
 	},
+	getLatest: function(){
+		// Get latest hashes from YIFY, add to db IF that show is logged
+		/*
+		try {
+			var req = {
+				'url': 'https://yts.re/api/list.json',
+				'method': 'GET',
+				'json': true
+			};
+			if (nconf.get('system:proxy')) {
+				req.tunnel = true;
+				req.proxy = nconf.get('system:proxy');
+			}
+			request(req, function(error, res, json){
+				if (error) {
+					if (typeof(callback) == 'function') callback(error);
+					return logger.error(error);
+				}
+				if (typeof(json) != 'object') json = JSON.parse(json);
+				var torrents = [];
+				if (json.status == 'fail'){
+					if (typeof(callback) == 'function') callback(json.error, torrents);
+				} else if (json.MovieCount){
+					json.MovieList.forEach(function(result){
+						var object = {
+							hash: result.TorrentHash.toUpperCase(),
+							magnet: result.TorrentMagnetUrl,
+							quality: result.Quality,
+							size: result.SizeByte
+						};
+						torrents.push(object);
+					});
+					if (torrents.length) movieCollection.update({imdb: ObjectID(movie._id)}, {$set: {hashes: torrents}}, {w:0});
+					if (typeof(callback) == 'function') callback(null, torrents);
+				}
+			});
+		} catch(e){
+			logger.error(e.message);
+		}
+		*/
+	},
 	getQuality: function(file){
 		var quality = '480p';
 		if (file.match(/(1080p|720p|480p)/i)) quality = file.match(/(1080p|720p|480p)/i)[1];
 		return quality;
+	},
+	getUnhashed: function(){
+		var self = this;
+		movieCollection.find({hashes: {$exists: false}},{tmdb:1}).toArray(function(error, movies){
+			if (error) logger.error(error);
+			if (movies){
+				movies.forEach(function(movie){
+					self.getHashes(movie.tmdb);
+				});
+			}
+		})
 	},
 	getUnmatched: function(callback){
 		unmatchedCollection.find({type: 'movie'}).sort({title:1}).limit(20).toArray(callback);

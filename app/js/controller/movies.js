@@ -44,7 +44,6 @@ define(['app'], function(nessa){
 		.state('movies.detail', {
 			url: '/info/{id:[0-9]+}',
 			onEnter: function($log,$modal,$state,$stateParams){
-				$log.debug($stateParams.id);
 				$modal.open({
 					controller: 'MovieDetailCtrl',
 					templateUrl: 'views/modal/movie/detail.html'
@@ -92,6 +91,16 @@ define(['app'], function(nessa){
 			icon: 'film',
 			order: 30
 		});
+		$rootScope.genres.movies = [
+			'Action','Adventure','Animation',
+			'Comedy','Crime','Documentary','Drama',
+			'Family','Fantasy','Film Noir',
+			'History','Horror','Indie',
+			'Music','Musical','Mystery','Romance',
+			'Science Fiction','Sport','Suspense',
+			'Thriller','War','Western'
+		];
+		$rootScope.quality = ['480p','720p','1080p'];
 	});
 	
 	/****** Controller ******/
@@ -102,9 +111,11 @@ define(['app'], function(nessa){
 		$scope.page 	= 1;
 		
 		$scope.filter	= {
-			string: {
-				title: ''
-			}
+			active: false,
+			downloaded: true,
+			genre: '',
+			quality: '',
+			title: ''
 		};
 		$scope.paginate = {
 			items: 24,
@@ -112,11 +123,21 @@ define(['app'], function(nessa){
 		};
 		
 		$scope.$watch('filter', function(){
-			if ($scope.filter.string.title != '') $scope.paginate.page = 1;
+			if ($scope.filter.title != '') $scope.paginate.page = 1;
 		},true);
 		
+		$scope.movieFilter = function(item){
+			if (!item.title.toLowerCase().match($scope.filter.title.toLowerCase())) return false;
+			if ($scope.filter.active){
+				if ($scope.filter.genre && item.genres.indexOf($scope.filter.genre) == -1) return false;
+				if ($scope.filter.quality && item.quality != $scope.filter.quality) return false;
+			}
+			if ($scope.filter.downloaded && !item.file) return false;
+			return true;
+		};
+		
 		$scope.clearFilter = function(){
-			$scope.filter.string.name = '';
+			$scope.filter.string.title = '';
 			$(document).trigger('lazyload');
 		};
 		$scope.definiteArticle = function(movie){

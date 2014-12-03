@@ -2,29 +2,28 @@
 	<div class="row search">
 		<div class="col-sm-12">
 			<div class="input-group">
-				<span class="input-group-addon btn btn-info" ui-sref="shows.random"><span class="fa fa-random"></span></span>
-				<input type="text" class="form-control search" placeholder="Search library..." ng-model="filters.name" />
+				<span class="input-group-addon btn btn-primary" ng-click="filter.active=!filter.active" ng-class="{'active':filter.active}"><span class="fa fa-filter"></span></span>
+				<input type="text" class="form-control search" placeholder="Search library..." ng-model="filters.title" />
 				
+				<span class="input-group-addon btn btn-info" ui-sref="shows.random"><span class="fa fa-random"></span></span>
 				<span class="input-group-addon btn btn-success" ui-sref="shows.add"><span class="fa fa-plus"></span></span>
 				<span class="input-group-addon btn btn-danger" ng-click="clearFilter()"><span class="fa fa-times"></span></span>
 			</div>
 		</div>
-		<!--
-		<div class="col-sm-12" style="text-align: right;">
-			<div class="checkbox-inline"><label><input type="checkbox" ng-model="reduce.unstarted" /> Hide Unstarted</label></div>
-			<div class="checkbox-inline"><label><input type="checkbox" ng-model="reduce.watched" /> Hide Watched</label></div>
+	</div>
+	<div class="row" ng-if="filter.active">
+		<div class="col-sm-2">
+			<select class="form-control" ng-model="filter.genre" ng-options="value for value in genres.shows">
+				<option value="">&raquo; All Genres</option>
+			</select>
 		</div>
-		-->
+		<div class="col-sm-2">
+			<div class="checkbox"><label><input type="checkbox" ng-model="filter.watched" /> Hide watched</label></div>
+		</div>
 	</div>
 	
-	<!--div class="row">
-		<div ng-show="shows.length" class="col-sm-12" style="text-align: right;">
-			Showing {{results.length}} of {{shows.length}} shows
-		</div>
-	</div-->
-	
 	<div class="row">
-		<div class="show col-sm-2" ng-show="results.length" ng-repeat="show in results = (shows | filter:filters | filter:reduceShows) | orderBy:definiteArticle | offset:(paginate.page-1)*paginate.items | limitTo:paginate.items" ng-controller="showCtrl" lazy-load>
+		<div class="show col-sm-2" ng-show="results.length" ng-repeat="show in results = (shows | filter:showFilter) | orderBy:definiteArticle | offset:(paginate.page-1)*paginate.items | limitTo:paginate.items" ng-controller="showCtrl" lazy-load>
 			<div class="image" ng-class="{'ended': show.ended}">
 				<span class="badge unwatched" ng-if="show.progress.left>0">{{show.progress.left}}</span>
 				<div class="corner"></div>
@@ -62,6 +61,7 @@
 	</div>
 	
 	<div class="text-center" ng-show="results.length>=paginate.items" ng-cloak>
-		<pagination class="pagination-sm" items-per-page="paginate.items" total-items="results.length" ng-model="paginate.page" max-size="5" boundary-links="true"></pagination>
+		<pagination class="hidden-xs pagination-sm" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;" items-per-page="paginate.items" total-items="results.length" ng-model="paginate.page" max-size="5" boundary-links="true"></pagination>
+		<pager class="visible-xs pagination-sm" items-per-page="paginate.items" total-items="results.length" ng-model="paginate.page"></pager>
 	</div>
 </div>

@@ -115,6 +115,14 @@ define(['app'], function(nessa){
 			icon: 'th',
 			order: 20
 		});
+		$rootScope.genres.shows = [
+			'Action','Adventure','Animation',
+			'Children','Comedy','Documentary','Drama',
+			'Fantasy','Game Show','Home and Garden',
+			'Mini Series','News','Reality',
+			'Science Fiction','Soap','Special Interest',
+			'Sport','Talk Show','Western'
+		];
 	});
 	
 	/****** Controller ******/
@@ -139,19 +147,28 @@ define(['app'], function(nessa){
 		};
 		
 		// TODO: Rebuild show filtering
-		
-		
-		$scope.filters	= {
-			name: ''
+		$scope.filter = {
+			active: false,
+			genre: '',
+			title: '',
+			watched: false
 		};
 		$scope.paginate = {
 			items: 24,
 			page: 1
 		};
-		
 		$scope.$watch('filters', function(){
-			if ($scope.filters.name != '') $page = 1;
-		},true)
+			if ($scope.filter.title != '') $page = 1;
+		});
+		
+		$scope.showFilter = function(item){
+			if (!item.name.toLowerCase().match($scope.filter.title.toLowerCase())) return false;
+			if ($scope.filter.active){
+				if ($scope.filter.genre && item.genres.indexOf($scope.filter.genre) == -1) return false;
+				if ($scope.filter.watched && item.progress && item.progress.left == 0) return false;
+			}
+			return true;
+		};
 		
 		
 		$scope.reduce = {

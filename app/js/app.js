@@ -265,6 +265,7 @@ define('app', ['angular','moment','ngAnimate','ngMessages','ngResource','ngStora
 	
 	nessa.run(function($auth, $http, $localStorage, $log, $rootScope, $sessionStorage, $state){
 		$rootScope.menu = [];
+		$rootScope.genres = {};
 		
 		$rootScope.$on('$stateChangeStart', function(event, to, toParams, from, fromParams){
 			if (to.data) $rootScope.pagetitle = to.data.title;

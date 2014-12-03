@@ -2,11 +2,27 @@
 	<div class="row search">
 		<div class="col-sm-12">
 			<div class="input-group">
-				<span class="input-group-addon btn btn-primary"><span class="fa fa-filter"></span></span>
-				<input type="text" class="form-control search" placeholder="Search library..." ng-model="filter.string.title" />
+				<span class="input-group-addon btn btn-primary" ng-click="filter.active=!filter.active" ng-class="{'active':filter.active}"><span class="fa fa-filter"></span></span>
+				<input type="text" class="form-control search" placeholder="Search library..." ng-model="filter.title" />
 				<span class="input-group-addon btn btn-success" ui-sref="movies.add"><span class="fa fa-plus"></span></span>
 				<span class="input-group-addon btn btn-danger" ng-click="clearFilter()"><span class="fa fa-times"></span></span>
 			</div>
+		</div>
+	</div>
+	
+	<div class="row" ng-if="filter.active">
+		<div class="col-sm-2">
+			<select class="form-control" ng-model="filter.genre" ng-options="value for value in genres.movies">
+				<option value="">&raquo; All Genres</option>
+			</select>
+		</div>
+		<div class="col-sm-2">
+			<select class="form-control" ng-model="filter.quality" ng-options="value for value in quality">
+				<option value="">&raquo; All Resolutions</option>
+			</select>
+		</div>
+		<div class="col-sm-2">
+			<div class="checkbox"><label><input type="checkbox" ng-model="filter.downloaded" /> Hide unavailable</label></div>
 		</div>
 	</div>
 	
@@ -17,7 +33,7 @@
 	</div-->
 	
 	<div class="row">
-		<div class="show col-sm-2" ng-repeat="movie in results = (movies | filter:filter.string) | orderBy:definiteArticle | offset:(paginate.page-1)*paginate.items | limitTo:paginate.items" lazy-load>
+		<div class="show col-sm-2" ng-repeat="movie in results = (movies | filter:movieFilter) | orderBy:definiteArticle | offset:(paginate.page-1)*paginate.items | limitTo:paginate.items" lazy-load>
 			<div class="image">
 				<div class="corner"></div>
 				<a ui-sref="movies.detail({id:movie.tmdb,url:movie.url})">
@@ -25,7 +41,10 @@
 					<h6>{{movie.title}}</h6>
 					<div class="overlay">
 						<div class="title">{{movie.title}}</div>
-						<div class="hud"></div>
+						<div class="hud">
+							<span class="fa fa-hdd-o" ng-if="movie.file"></span>
+							<span class="fa fa-magnet" ng-if="movie.hashes"></span>
+						</div>
 					</div>
 				</a>
 				<div class="actions"></div>				
@@ -37,6 +56,6 @@
 		</div>
 	</div>
 	<div class="text-center" ng-show="results.length>=paginate.items" ng-cloak>
-		<pagination class="pagination-sm" items-per-page="paginate.items" total-items="results.length" ng-model="paginate.page" max-size="5" boundary-links="true"></pagination>
+		<pagination class="pagination-sm" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;" items-per-page="paginate.items" total-items="results.length" ng-model="paginate.page" max-size="5" boundary-links="true"></pagination>
 	</div>
 </div>

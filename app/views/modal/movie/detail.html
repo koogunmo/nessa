@@ -1,17 +1,35 @@
 <div class="modal-header">
 	<h3 class="modal-title">{{movie.title}} <span class="small">{{movie.year}}</span></h3>
-	<div class="small">
-		<span ng-if="movie.runtime"><strong>{{movie.runtime}} mins</strong></span>
-		&nbsp;
-		<span class="pull-right" ng-if="movie.quality"><strong>{{movie.quality}}</strong></span>
 	</div>
 </div>
 
 <div class="modal-body">
-	<div class="well">{{movie.synopsis}}</div>
+	<tabset type="pills">
+		<tab heading="Overview">
+			<div class="row">
+				<div class="col-sm-3 hidden-xs">
+					<img class="img-thumbnail" ng-src="/media/Movies/.artwork/{{movie.tmdb}}.jpg" alt="{{movie.title}}" />
+				</div>
+				<div class="col-sm-9">
+					<div class="well">{{movie.synopsis}}</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12 small">
+					<div ng-if="movie.added"><strong>Added</strong> {{movie.added|date:'longDate'}}</div>
+					<div ng-if="movie.runtime"><strong>Runtime</strong> {{movie.runtime}} mins</div>
+					<div ng-if="movie.quality"><strong>Quality</strong> {{movie.quality}}</div>
+					<div ng-if="movie.size"><strong>Size</strong> {{movie.size|formatBytes}}</div>
+				</div>
+			</div>
+		</tab>
+		<tab heading="Settings">
+			<button type="button" class="btn btn-danger"><span class="fa fa-trash"></span> Remove</button>
+			<button type="button" class="btn btn-info"><span class="fa fa-file-image-o"></span> Get artwork</button>
+		</tab>
+	</tabset>
 </div>
 <div class="modal-footer">
-	
 	<div class="btn-group pull-left" ng-if="movie.hashes">
 		<button type="button" class="btn btn-default" ng-repeat="dl in movie.hashes" ng-click="download(dl)" ng-class="{'active': dl.quality == movie.quality}">
 			<span class="fa fa-download"></span> {{dl.quality}}

@@ -40,18 +40,49 @@ module.exports = function(app,db,socket){
 			res.status(200).end();
 		});
 	*/
+	}).post('/api/:session?/rebuild', function(req,res){
+		if (req.body.type){
+			switch(req.body.type){
+				case 'movies':
+					movies.clearSymlinks(function(){
+						movies.sync(req.user, function(error, result){
+							if (result.library) {
+								movies.scan(req.user, function(error, tmdb){
+									if (error) logger.error(error);
+									if (tmdb){
+										movies.getArtwork(tmdb);
+										movies.getHashes(tmdb);
+									}
+								});
+							}
+						});
+					});
+					break;
+				case 'shows':
+					break;
+			}
+		}
+		res.status(202).end();
 	}).post('/api/:session?/rescan', function(req,res){
 		if (req.body.type){
 			switch (req.body.type){
 				case 'movies':
-					movies.sync(req.user, function(error, count){
+					movies.sync(req.user, function(error, result){
 						if (error) logger.error(error);
-						movies.scan(req.user);
+						if (result.library) {
+							movies.scan(req.user, function(error, tmdb){
+								if (error) logger.error(error)
+								if (tmdb){
+									movies.getArtwork(tmdb);
+									movies.getHashes(tmdb);
+								}
+							});
+						}
 					});
 					break;
 				case 'shows':
 				default:
-					/*
+					/* TODO
 					shows.sync(req.user, function(error, count){
 						shows.scan(req.user, function(error, tvdb){
 							shows.getHashes();
