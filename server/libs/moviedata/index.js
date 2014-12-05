@@ -520,21 +520,25 @@ var MovieData = {
 					}
 					if (json){
 						var torrents = [];
-						if (typeof(json) != 'object') json = JSON.parse(json);
-						if (json.status == 'fail'){
-							if (typeof(callback) == 'function') callback(json.error, torrents);
-						} else if (json.MovieCount){
-							json.MovieList.forEach(function(result){
-								var object = {
-									hash: result.TorrentHash.toUpperCase(),
-									magnet: result.TorrentMagnetUrl,
-									quality: result.Quality,
-									size: result.SizeByte
-								};
-								torrents.push(object);
-							});
-							if (torrents.length) movieCollection.update({_id: ObjectID(movie._id)}, {$set: {hashes: torrents, updated: new Date()}}, {w:0});
-							if (typeof(callback) == 'function') callback(null, torrents);
+						try {
+							if (typeof(json) != 'object') json = JSON.parse(json);
+							if (json.status == 'fail'){
+								if (typeof(callback) == 'function') callback(json.error, torrents);
+							} else if (json.MovieCount){
+								json.MovieList.forEach(function(result){
+									var object = {
+										hash: result.TorrentHash.toUpperCase(),
+										magnet: result.TorrentMagnetUrl,
+										quality: result.Quality,
+										size: result.SizeByte
+									};
+									torrents.push(object);
+								});
+								if (torrents.length) movieCollection.update({_id: ObjectID(movie._id)}, {$set: {hashes: torrents, updated: new Date()}}, {w:0});
+								if (typeof(callback) == 'function') callback(null, torrents);
+							}
+						} catch(e){
+							logger.error(e.message)
 						}
 					}
 				})
