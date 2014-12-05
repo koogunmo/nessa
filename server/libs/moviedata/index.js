@@ -14,8 +14,6 @@ log4js.configure({
 	replaceConsole: true
 });
 var logger = log4js.getLogger('nodetv-moviedata');
-
-
 var movieCollection = db.collection('movie'),
 	unmatchedCollection = db.collection('unmatched'),
 	userCollection = db.collection('user');
@@ -24,31 +22,37 @@ var MovieData = {
 	add: function(user, tmdb, callback){
 		var self = this, tmdb = parseInt(tmdb, 10);
 		trakt(user.trakt).movie.summary(tmdb, function(error, json){
-			if (error) logger.debug(error);
-			var url = json.url.split('/');
-			var record = {
-				title: json.title,
-				year: parseInt(json.year,10),
-				url: url.pop(),
-				synopsis: json.overview,
-				released: new Date(json.released*1000),
-				runtime: parseInt(json.runtime,10),
-				imdb: json.imdb_id,
-				tmdb: parseInt(json.tmdb_id,10),
-				genres: json.genres,
-				added: new Date(),
-				updated: new Date()
-			};
-			movieCollection.update({tmdb:record.tmdb}, {$set:record}, {upsert:true}, function(error, affected, status){
-				if (error) logger.error(error);
-				if (affected){
-					self.getArtwork(record.tmdb);
-					self.getHashes(record.tmdb);
-					movieCollection.update({tmdb: record.tmdb}, {$addToSet: {user: {_id: ObjectID(user._id), username: user.username}}}, {w:0})
-				//	trakt(user.trakt).movie.watchlist(record.imdb);
+			if (error) logger.debug('movie.add:', error);
+			if (json){
+				try {
+					var url = json.url.split('/');
+					var record = {
+						title: json.title,
+						year: parseInt(json.year,10),
+						url: url.pop(),
+						synopsis: json.overview,
+						released: new Date(json.released*1000),
+						runtime: parseInt(json.runtime,10),
+						imdb: json.imdb_id,
+						tmdb: parseInt(json.tmdb_id,10),
+						genres: json.genres,
+						added: new Date(),
+						updated: new Date()
+					};
+					movieCollection.update({tmdb:record.tmdb}, {$set:record}, {upsert:true}, function(error, affected, status){
+						if (error) logger.error(error);
+						if (affected){
+							self.getArtwork(record.tmdb);
+							self.getHashes(record.tmdb);
+							movieCollection.update({tmdb: record.tmdb}, {$addToSet: {user: {_id: ObjectID(user._id), username: user.username}}}, {w:0})
+						//	trakt(user.trakt).movie.watchlist(record.imdb);
+						}
+						if (typeof(callback) == 'function') callback(error, record);
+					});
+				} catch(e){
+					logger.error('movie.add:', e.message);
 				}
-				if (typeof(callback) == 'function') callback(error, record);
-			});
+			}
 		});
 	},
 	complete: function(data, callback){
@@ -538,7 +542,7 @@ var MovieData = {
 								if (typeof(callback) == 'function') callback(null, torrents);
 							}
 						} catch(e){
-							logger.error(e.message)
+							logger.error('YTS: ', e.message);
 						}
 					}
 				})
@@ -594,7 +598,7 @@ var MovieData = {
 	getUnhashed: function(){
 		var self = this;
 		movieCollection.find({hashes: {$exists: false}},{tmdb:1}).toArray(function(error, movies){
-			if (error) logger.error(error);
+			if (error) logger.error('getUnhashed:', error);
 			if (movies){
 				movies.forEach(function(movie){
 					self.getHashes(movie.tmdb);
