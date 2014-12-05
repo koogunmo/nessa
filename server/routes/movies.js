@@ -18,7 +18,7 @@ module.exports = function(app,db,socket){
 
 	app.get('/api/:session?/movies', function(req,res){
 		// Get show list
-		movies.list(function(error,results){
+		movies.list(req,user, function(error,results){
 			if (error) {
 				logger.error(error);
 				return res.status(404).end();
@@ -36,8 +36,9 @@ module.exports = function(app,db,socket){
 		// Add movie to database
 		movies.add(req.user, req.body.tmdb, function(error, result){
 			
-			return res.status(201).end()
+			
 		});
+		return res.status(202).end()
 	})
 	
 	
