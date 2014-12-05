@@ -117,9 +117,7 @@ var MovieData = {
 			movie.genres.forEach(function(genre){
 				var folder = basedir +'/Genres/'+genre, symlink = path.basename(movie.file);
 				if (!fs.existsSync(folder)) mkdirp.sync(folder, 0775);
-				
-				if (!symlink) return;
-				
+				if (!symlink || fs.existsSync(folder+'/'+symlink)) return;
 				fs.symlink(basedir+'/A-Z/'+movie.file, folder+'/'+symlink, 'file', function(error){
 					if (error) logger.error(error);
 				});
@@ -517,26 +515,27 @@ var MovieData = {
 				}
 				request(req, function(error, res, json){
 					if (error) {
-						if (typeof(callback) == 'function') callback(error);
-						return logger.error(error);
+						if (typeof(callback) == 'function') return callback(error, null);
+						return;
 					}
-					if (typeof(json) != 'object') json = JSON.parse(json);
-					
-					var torrents = [];
-					if (json.status == 'fail'){
-						if (typeof(callback) == 'function') callback(json.error, torrents);
-					} else if (json.MovieCount){
-						json.MovieList.forEach(function(result){
-							var object = {
-								hash: result.TorrentHash.toUpperCase(),
-								magnet: result.TorrentMagnetUrl,
-								quality: result.Quality,
-								size: result.SizeByte
-							};
-							torrents.push(object);
-						});
-						if (torrents.length) movieCollection.update({_id: ObjectID(movie._id)}, {$set: {hashes: torrents, updated: new Date()}}, {w:0});
-						if (typeof(callback) == 'function') callback(null, torrents);
+					if (json){
+						var torrents = [];
+						if (typeof(json) != 'object') json = JSON.parse(json);
+						if (json.status == 'fail'){
+							if (typeof(callback) == 'function') callback(json.error, torrents);
+						} else if (json.MovieCount){
+							json.MovieList.forEach(function(result){
+								var object = {
+									hash: result.TorrentHash.toUpperCase(),
+									magnet: result.TorrentMagnetUrl,
+									quality: result.Quality,
+									size: result.SizeByte
+								};
+								torrents.push(object);
+							});
+							if (torrents.length) movieCollection.update({_id: ObjectID(movie._id)}, {$set: {hashes: torrents, updated: new Date()}}, {w:0});
+							if (typeof(callback) == 'function') callback(null, torrents);
+						}
 					}
 				})
 			}
