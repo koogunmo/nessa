@@ -71,7 +71,6 @@ module.exports = function(app,db,socket){
 	})
 	
 	app.post('/api/:session?/movies/:id/download', function(req,res){
-		logger.debug(req.body)
 		// Download torrent
 		movies.download(req.user, req.params.id, req.body, function(error,json){
 			

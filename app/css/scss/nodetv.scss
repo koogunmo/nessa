@@ -37,6 +37,7 @@ body {
 }
 .modal-backdrop {
 	bottom: 0px;
+	position: fixed;
 }
 
 [ui-view] {

@@ -151,16 +151,10 @@ var MovieData = {
 		var self = this, tmdb = parseInt(tmdb, 10);
 		/*
 		if (physical){
-			movieCollection.find({'tmdb':tmdb}, function(error,movie){
-				if (error) logger.error(error);
-				if (movie){
-					self.unlink(movie.tmdb);
-					var basedir = nconf.get('media:base') + nconf.get('media:movies:directory');
-					fs.unlink(basedir+'/A-Z/'+movie.file);
-					movieCollection.remove({'tmdb':tmdb}, {w:0});
-				}
+			self.unlink(tmdb, function(error){
+				movieCollection.remove({'tmdb':tmdb}, {w:0});
 				if (typeof(callback) == 'function') callback(error, true);
-			})
+			});
 		} else {
 			
 		}
@@ -385,17 +379,20 @@ var MovieData = {
 				if (movie.file && movie.genres){
 					var filename = path.basename(movie.file);
 					movie.genres.forEach(function(genre){
-						logger.debug('Removing: %s/%s', genre, filename)
-						fs.unlink(basedir+'/Genres/'+genre+'/'+filename);
+						fs.unlink(basedir+'/Genres/'+genre+'/'+filename, function(error){
+							if (error) return logger.error(error);
+							logger.debug('Removed: %s/%s', genre, filename)
+						});
 					});
-					logger.debug('Removing: A-Z/%s', movie.file);
-					fs.unlink(basedir+'/A-Z/'+movie.file);
+					fs.unlink(basedir+'/A-Z/'+movie.file, function(error){
+						if (error) return logger.error(error);
+						logger.debug('Removed: A-Z/%s', movie.file);
+					});
 				}
 			}
 			if (typeof(callback) == 'function') callback(error);
 		})
 	},
-	
 	
 	match: function(user, matched, callback){
 		var self = this;
