@@ -85,7 +85,7 @@ var MovieData = {
 				record.updated = new Date();
 				
 				if (movie.file && movie.file == record.file) return;
-				if (record.quality != movie.quality) self.unlink(movie.tmdb);
+				if (movie.file && movie.file != record.file) self.unlink(movie.tmdb);
 				
 				var basedir = nconf.get('media:base')+nconf.get('media:movies:directory');
 				var source = data.dir+'/'+files[0].name,
