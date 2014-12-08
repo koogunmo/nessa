@@ -382,13 +382,12 @@ var MovieData = {
 			if (error) logger.error(error);
 			if (movie){
 				var basedir = nconf.get('media:base')+nconf.get('media:movies:directory');
-				
 				if (movie.file && movie.genres){
 					var filename = path.basename(movie.file);
-					movies.genres.forEach(function(genre){
+					movie.genres.forEach(function(genre){
 						fs.unlink(basedir+'/Genres/'+genre+'/'+filename);
 					});
-					fs.unlink(basedir+'/A-Z/'+moveie.file);
+					fs.unlink(basedir+'/A-Z/'+movie.file);
 				}
 			}
 			if (typeof(callback) == 'function') callback(error);
