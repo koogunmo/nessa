@@ -385,8 +385,10 @@ var MovieData = {
 				if (movie.file && movie.genres){
 					var filename = path.basename(movie.file);
 					movie.genres.forEach(function(genre){
+						logger.debug('Removing: %s/%s', genre, filename)
 						fs.unlink(basedir+'/Genres/'+genre+'/'+filename);
 					});
+					logger.debug('Removing: A-Z/%s', movie.file);
 					fs.unlink(basedir+'/A-Z/'+movie.file);
 				}
 			}
