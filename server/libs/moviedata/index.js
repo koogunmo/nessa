@@ -507,15 +507,12 @@ var MovieData = {
 	getFilename: function(movie,file){
 		var self = this;
 		var alpha = self.getAlpha(movie.title), blocks = [], ext = path.extname(file), quality = self.getQuality(file), record = {status: true};
-		blocks.push(movie.title);
+		blocks.push(movie.title.replace(/[\\\/\[\]]/ig, ''));
 		blocks.push('('+movie.year+')');
 		if (movie.quality || quality) {
 			record.quality = movie.quality || quality;
 			blocks.push('['+record.quality+']')
 		}
-	//	var stats = fs.statSync()
-		
-		
 		record.file = alpha+'/'+blocks.join(' ')+ext;
 		return record;
 	},
