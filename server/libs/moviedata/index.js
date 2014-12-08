@@ -125,7 +125,7 @@ var MovieData = {
 	latest: function(user, callback){
 		// List the most recently added movies
 		movieCollection.find({'file':{$exists:true},'added':{$exists:true}}).sort({'added':-1}).toArray(callback);
-	}
+	},
 	link: function(tmdb, callback){
 		var self = this, tmdb = parseInt(tmdb, 10);
 		movieCollection.findOne({'tmdb':tmdb}, function(error, movie){
