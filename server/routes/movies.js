@@ -18,7 +18,7 @@ module.exports = function(app,db,socket){
 
 	app.get('/api/:session?/movies', function(req,res){
 		// Get show list
-		movies.list(req,user, function(error,results){
+		movies.list(req.user, function(error,results){
 			if (error) {
 				logger.error(error);
 				return res.status(404).end();
