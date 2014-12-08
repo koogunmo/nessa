@@ -81,9 +81,11 @@ var MovieData = {
 				var record = self.getFilename(movie,files[0].name);
 				record.size = files[0].bytesCompleted;
 				record.added = new Date();
+				record.downloading = false;
 				record.updated = new Date();
 				
 				if (movie.file && movie.file == record.file) return;
+				if (record.quality != movie.quality) self.unlink(movie.tmdb);
 				
 				var basedir = nconf.get('media:base')+nconf.get('media:movies:directory');
 				var source = data.dir+'/'+files[0].name,
@@ -111,7 +113,7 @@ var MovieData = {
 		torrent.add(data.magnet, function(error, args){
 			if (error) logger.error(error);
 			if (args.hashString){
-				movieCollection.update({'tmdb':tmdb},{$set:{'quality':data.quality}}, {w:0});
+				movieCollection.update({'tmdb':tmdb},{$set:{'downloading':true,'quality':data.quality}}, {w:0});
 			}
 			if (typeof(callback) == 'function') callback(error, !!args.hashString);
 		});
@@ -145,6 +147,27 @@ var MovieData = {
 		// List all movies
 		movieCollection.find({tmdb: {$exists: true}}).sort({name:1}).toArray(callback);
 	},
+	remove: function(user, tmdb, callback){
+		var self = this, tmdb = parseInt(tmdb, 10);
+		/*
+		if (physical){
+			movieCollection.find({'tmdb':tmdb}, function(error,movie){
+				if (error) logger.error(error);
+				if (movie){
+					self.unlink(movie.tmdb);
+					var basedir = nconf.get('media:base') + nconf.get('media:movies:directory');
+					fs.unlink(basedir+'/A-Z/'+movie.file);
+					movieCollection.remove({'tmdb':tmdb}, {w:0});
+				}
+				if (typeof(callback) == 'function') callback(error, true);
+			})
+		} else {
+			
+		}
+		*/
+	//	movieCollection.update({'tmdb':tmdb}, {$set: {status: false}}, {upsert: true, w:0});
+		// Remove from library
+	},
 	rename: function(user, tmdb, file, quality, callback){
 		var self = this, tmdb = parseInt(tmdb,10);
 		var basedir = nconf.get('media:base') + nconf.get('media:movies:directory');
@@ -169,28 +192,6 @@ var MovieData = {
 			}
 			if (typeof(callback) == 'function') callback(error);
 		})
-	},
-	
-	remove: function(user, tmdb, callback){
-		var self = this, tmdb = parseInt(tmdb, 10);
-		/*
-		if (physical){
-			movieCollection.find({'tmdb':tmdb}, function(error,movie){
-				if (error) logger.error(error);
-				if (movie){
-					self.unlink(movie.tmdb);
-					var basedir = nconf.get('media:base') + nconf.get('media:movies:directory');
-					fs.unlink(basedir+'/A-Z/'+movie.file);
-					movieCollection.remove({'tmdb':tmdb}, {w:0});
-				}
-				if (typeof(callback) == 'function') callback(error, true);
-			})
-		} else {
-			
-		}
-		*/
-	//	movieCollection.update({'tmdb':tmdb}, {$set: {status: false}}, {upsert: true, w:0});
-		// Remove from library
 	},
 		
 	search: function(user, query, callback){
@@ -380,12 +381,14 @@ var MovieData = {
 		movieCollection.findOne({tmdb:tmdb}, function(error, movie){
 			if (error) logger.error(error);
 			if (movie){
-				var basedir = nconf.get('media:base')+nconf.get('media:movies:directory')+'/Genres/';
+				var basedir = nconf.get('media:base')+nconf.get('media:movies:directory');
+				
 				if (movie.file && movie.genres){
 					var filename = path.basename(movie.file);
 					movies.genres.forEach(function(genre){
-						fs.unlink(basedir+genre+'/'+filename);
+						fs.unlink(basedir+'/Genres/'+genre+'/'+filename);
 					});
+					fs.unlink(basedir+'/A-Z/'+moveie.file);
 				}
 			}
 			if (typeof(callback) == 'function') callback(error);
