@@ -249,6 +249,7 @@ var torrent = {
 				data.torrents.forEach(function(torrent){
 					if (torrent.percentDone != 1) return;
 					var object = {
+						id: parseInt(torrent.id,10),
 						dir: torrent.downloadDir,
 						title: torrent.name,
 						files: torrent.files,

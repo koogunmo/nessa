@@ -6,8 +6,14 @@ try {
 	var checkDownloads = function(){
 		torrent.getComplete(function(error, torrents){
 			torrents.forEach(function(torrent){
-				if (movies.complete) movies.complete(torrent);
-				if (shows.complete) shows.complete(torrent);
+				if (movies.complete) {
+					movies.complete(torrent, function(error, data){
+						if (data.trash) torrent.remove({id: torrent.id, purge: true});
+					});
+				}
+				if (shows.complete) {
+					shows.complete(torrent);
+				}
 			});
 		});
 	}
@@ -18,6 +24,7 @@ try {
 	}, 300000);
 	
 	checkDownloads();
+	
 	torrent.complete();
 } catch(e){
 	console.error(e.message);

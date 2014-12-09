@@ -92,6 +92,7 @@ var MovieData = {
 					target = basedir+'/A-Z/'+record.file;
 				
 				helper.fileCopy(source, target, function(error){
+					if (error) return logger.error(error);
 					movieCollection.update({'tmdb':movie.tmdb},{$set:record},function(error, affected){
 						if (error) logger.error(error);
 						if (!error) self.link(movie.tmdb);
@@ -104,6 +105,7 @@ var MovieData = {
 							});
 						});
 					}
+					if (typeof(callback) = 'function') callback(error, {trash: nconf.get('media:movies:autoclean')})
 				});
 			}
 		});

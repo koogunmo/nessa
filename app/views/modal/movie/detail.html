@@ -20,6 +20,7 @@
 					<div ng-if="movie.runtime"><strong>Runtime</strong> {{movie.runtime}} mins</div>
 					<div ng-if="movie.quality"><strong>Quality</strong> {{movie.quality}}</div>
 					<div ng-if="movie.size"><strong>Size</strong> {{movie.size|formatBytes}}</div>
+					<div ng-if="movie.genres"><strong>Genres</strong> {{movie.genres.join(', ')}}</div>
 				</div>
 			</div>
 		</tab>
