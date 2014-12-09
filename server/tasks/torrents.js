@@ -5,10 +5,10 @@ var movies	= plugin('moviedata'),
 try {
 	var checkDownloads = function(){
 		torrent.getComplete(function(error, torrents){
-			torrents.forEach(function(torrent){
+			torrents.forEach(function(transfer){
 				if (movies.complete) {
-					movies.complete(torrent, function(error, data){
-						if (data.trash) torrent.remove({id: torrent.id, purge: true});
+					movies.complete(transfer, function(error, data){
+						if (data.trash) torrent.remove({id: transfer.id, purge: true});
 					});
 				}
 				if (shows.complete) {
