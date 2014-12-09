@@ -18,19 +18,21 @@ var logger = global.logger = log4js.getLogger('nodetv-server');
 //logger.setLevel((process.env.NODE_ENV == 'production') ? 'WARN' : 'ALL');
 
 /***********************************************************************/
-/* Global Configuration */
-global.pkg = require('./package.json');
-global.plugin = function(name){
-	try {
-		return require(__dirname + '/server/libs/' + name);
-	} catch(e) {
-		logger.error(e.message);
-	}
-	return false;
-}
 
-/* Load Settings */
 try {
+	/* Global Configuration */
+	global.pkg = require('./package.json');
+	global.plugin = function(name){
+		try {
+			return require(__dirname + '/server/libs/' + name);
+		} catch(e) {
+			logger.error(e.message);
+		}
+		return false;
+	};
+	global.helper	= require('./server/core/helper');
+	
+	/* Load Settings */
 	global.nconf = require('nconf');
 	global.nconf.file({
 		file: __dirname + '/settings.json'
@@ -65,8 +67,7 @@ try {
 /***********************************************************************/
 /* Load dependencies */
 
-var	crypto	= require('crypto'),
-	express	= require('express'),
+var	express	= require('express'),
 	fs		= require('fs'),
 	path	= require('path');
 
@@ -75,34 +76,17 @@ global.events = new (require('events')).EventEmitter;
 
 logger.info(process.title + ' v'+pkg.version);
 
-global.helper	= require('./server/core/helper');
-
+/***********************************************************************/
+/* Create server */
 
 var app		= require('express')(),
 	server	= require('http').Server(app),
-	io		= require('socket.io')(server);
-
-var host	= (nconf.get('listen:nginx')) ? '127.0.0.1' : nconf.get('listen:address'),
+	io		= require('socket.io')(server),
 	port	= (nconf.get('listen:nginx')) ? 6377 : nconf.get('listen:port');
-	
+
 server.listen(port);
 
-/*
-var app		= express(),
-	listen	= {
-		host: (nconf.get('listen:nginx')) ? '127.0.0.1' : nconf.get('listen:address'),
-		port: (nconf.get('listen:nginx')) ? 6377 : nconf.get('listen:port')
-	},
-	server	= app.listen(listen.port, listen.host)
-	/*,
-	io		= require('socket.io').listen(server, {
-		'browser client': false,
-		'log level': 1
-	});
-	*/
-	
 server.on('listening', function(){
-//	logger.info('Listening on http://' + server.address().address +':'+ server.address().port);
 	logger.info('Listening on port '+ server.address().port);
 });
 	
@@ -117,18 +101,20 @@ if (process.getuid) {
 	}
 }
 
+/***********************************************************************/
 /* Set up Express */
-var bodyParser	= require('body-parser');
-	
+app.enable('trust proxy');
 app.use(require('compression')());
 app.use(require('cookie-parser')());
+app.use(require('body-parser').json());
+app.use(require('body-parser').urlencoded({extended: true}));
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
+app.enable('trust proxy');
+app.disable('view cache');
+app.disable('x-powered-by');
 
-app.set('trust proxy', true);
-app.set('view cache', false);
 
+/***********************************************************************/
 
 // Move this
 if (!nconf.get('listen:nginx')){
@@ -169,16 +155,8 @@ try {
 				app.use('/media', express.static(nconf.get('media:base')));
 			}
 			
-			
 			var socket = false;
-			/*
-			io.sockets.on('connection', function(s){
-				// Load socket listeners
-				// DEPRECATED
-				socket = s;
-				require('./server/routes/sockets')(app,db,socket);
-			});
-			*/
+			
 			// Load routes
 			require('./server/routes/auth')(app,db);
 			require('./server/routes/dashboard')(app,db);
