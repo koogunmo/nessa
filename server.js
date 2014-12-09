@@ -77,6 +77,17 @@ logger.info(process.title + ' v'+pkg.version);
 
 global.helper	= require('./server/core/helper');
 
+
+var app		= require('express')(),
+	server	= require('http').Server(app),
+	io		= require('socket.io')(server);
+
+var host	= (nconf.get('listen:nginx')) ? '127.0.0.1' : nconf.get('listen:address'),
+	port	= (nconf.get('listen:nginx')) ? 6377 : nconf.get('listen:port');
+	
+server.listen(port);
+
+/*
 var app		= express(),
 	listen	= {
 		host: (nconf.get('listen:nginx')) ? '127.0.0.1' : nconf.get('listen:address'),

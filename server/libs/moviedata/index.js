@@ -105,7 +105,7 @@ var MovieData = {
 							});
 						});
 					}
-					if (typeof(callback) = 'function') callback(error, {trash: nconf.get('media:movies:autoclean')})
+					if (typeof(callback) == 'function') callback(error, {trash: nconf.get('media:movies:autoclean')})
 				});
 			}
 		});
