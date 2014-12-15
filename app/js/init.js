@@ -11,8 +11,10 @@ requirejs.config({
 		'ngMessages': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.3.5/angular-messages.min',
 		'ngResource': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.3.5/angular-resource.min',
 		'ngSanitize': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.3.5/angular-sanitize.min',
+		'ngSocketIO': 'libs/ngSocketIO.min',
 		'ngStorage': 'libs/ng-storage.min',
 		'ngTouch': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.3.5/angular-touch.min',
+		'socket.io': '/socket.io/socket.io',
 		'ui.bootstrap': 'libs/ui-bootstrap-0.12.0.min',
 		'ui.router': 'libs/ui-router-0.2.13.min',
 		// Application files
@@ -32,8 +34,10 @@ requirejs.config({
 		'ngMessages':	{deps: ['angular']},
 		'ngResource':	{deps: ['angular']},
 		'ngSanitize':	{deps: ['angular']},
+		'ngSocketIO':	{deps: ['angular','socket.io']},
 		'ngStorage':	{deps: ['angular']},
 		'ngTouch':		{deps: ['angular']},
+		'socket.io':	{exports: 'io'},
 		'ui.bootstrap': {deps: ['angular','ngAnimate']},
 		'ui.router':	{deps: ['angular','ngAnimate']}
 	},

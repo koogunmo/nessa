@@ -1,5 +1,7 @@
-# NodeTV
+# NodeTV 
 Automated TV Torrenting acquisition
+
+[ ![Codeship Status for greebowarrior/nessa](https://codeship.io/projects/dc9bec00-3cd7-0132-2ca6-12c33aebd1cb/status)](https://codeship.io/projects/43087)
 
 ## Project Goal
 
@@ -27,10 +29,8 @@ NodeTV doesn't handle uPNP/DLNA (yet), so if you want to stream your content, yo
 
 [ReadyMedia](minidlna.sourceforge.net) - ** Recommended **  
 A simple uPNP/DLNA compatible MediaServer (Open Source)  
-[Twonky 7](http://twonky.com/downloads)  
-Commercial uPNP/DLNA server with companion app for mobile devices
   
-These work reasonably well with VLC and my XBOX 360. Your mileage may vary.
+This has been tested on VLC for iOS, Xbox 360, and a Samsung HT-F4550 Blu-ray player. 
 
 
 ## Browser Support
@@ -145,7 +145,7 @@ NodeTV utilises the following third-party data sources:
 
 ## Licence
 
-This software is distributed under a Modified BSD License. Please see LICENCE.txt for full details
+This software is distributed under a Modified BSD License. Please see the [LICENCE](docs/LICENCE.md).
 
 
 

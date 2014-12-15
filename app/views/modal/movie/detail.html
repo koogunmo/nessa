@@ -31,7 +31,11 @@
 	</tabset>
 </div>
 <div class="modal-footer">
+	
 	<div class="btn-group pull-left" ng-if="movie.hashes">
+		<button class="btn btn-default pull-left" ng-click="hashes()">
+			<span class="fa fa-refresh"></span>
+		</button>
 		<button type="button" class="btn btn-default" ng-repeat="dl in movie.hashes" ng-click="download(dl)" ng-class="{'active': dl.quality == movie.quality}" tooltip="{{dl.size|formatBytes}}">
 			<span class="fa fa-download"></span> {{dl.quality}}
 		</button>
@@ -40,6 +44,7 @@
 	<button class="btn btn-default pull-left" ng-if="!movie.hashes" ng-click="hashes()">
 		<span class="fa fa-refresh"></span> Check availability
 	</button>
+
 	
 	<button type="button" class="btn btn-default" ng-click="close()">Close</button>
 </div>
