@@ -4,47 +4,46 @@ define(['app'], function(nessa){
 		
 	});
 	
-	nessa.controller('alertsCtrl', function($scope){
+	nessa.controller('alertsCtrl', function($log,$scope,$socket){
 		$scope.alerts = [];
 		
-		$scope.$on('alert', function(e,alert){
-			if (!alert.title) alert.title = 'NodeTV';
-			if (!alert.icon) {
-				switch (alert.type){
-					case 'danger':
-					case 'info':
-					case 'success':
-					case 'warning':
-					default:
-						alert.icon = '/assets/gfx/icons/touch-icon.png';
-				}
-			}
-			var timeout = 3000;
-			
+		var alertHandler = function(e,alert){
+			var defaults = {
+				icon: '/assets/gfx/icons/touch-icon.png',
+				message: '',
+				timeout: 3000,
+				title: 'NodeTV',
+				type: 'info',
+				url: false
+			};
+			var alert = angular.extend({}, defaults, alert);
 			if (('Notification' in window) && Notification.permission === 'granted'){
 				// Use Notification API
 				var notification = new Notification(alert.title, {body: alert.message, icon: alert.icon});
 				notification.onclick = function(e){
-					if (notification.url) document.location = window.url;
+					if (alert.url) document.location = alert.url;
 					notification.close();
-				}
-			//	if (alert.autoClose){
+				};
+				if (alert.timeout){
 					setTimeout(function(){
 						notification.close();
-					}, timeout);
-			//	}
+					}, alert.timeout);
+				}
 			} else {
-				// Use custom alerts system
-				
+				// Use bootstrap alerts system
 				$scope.alerts.push(alert);
-			//	if (alert.autoClose) {
+				if (alert.timeout) {
 					setTimeout(function(){
 						$scope.closeAlert($scope.alerts.length-1);
 						$scope.$apply();
-					}, timeout);
-			//	}
+					}, alert.timeout);
+				}
 			}
-		});
+		};
+		
+		$scope.$on('socket:alert', alertHandler);
+		$scope.$on('alert', alertHandler);
+		
 		
 		$scope.closeAlert = function(index){
 			$scope.alerts.splice(index, 1);

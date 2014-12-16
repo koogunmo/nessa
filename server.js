@@ -103,6 +103,7 @@ if (process.getuid) {
 
 /***********************************************************************/
 /* Set up Express */
+
 app.enable('trust proxy');
 app.use(require('compression')());
 app.use(require('cookie-parser')());
@@ -113,8 +114,9 @@ app.enable('trust proxy');
 app.disable('view cache');
 app.disable('x-powered-by');
 
-
 /***********************************************************************/
+/* TODO: rebuild the following to allow for the installer */
+
 
 // Move this
 if (!nconf.get('listen:nginx')){
@@ -135,13 +137,13 @@ try {
 		var mongo = require('mongodb').MongoClient;
 		mongo.connect(dsn, {w:1}, function(error, db){
 			if (error) {
-				console.error('Unable to connect to MongoDB');
+				logger.error('Unable to connect to MongoDB');
 				process.kill();
 				return;
 			}
 			logger.info('MongoDB: Connected to '+nconf.get('mongo:host'));
-			global.db = db;
 			
+			global.db = db;
 			global.torrent	= plugin('transmission');
 			
 			/*
@@ -155,38 +157,38 @@ try {
 				app.use('/media', express.static(nconf.get('media:base')));
 			}
 			
-			var socket = false;
-			
 			// Load routes
 			require('./server/routes/auth')(app,db);
-			require('./server/routes/dashboard')(app,db);
-			require('./server/routes/default')(app,db,socket);
-			require('./server/routes/downloads')(app,db,socket);
-			require('./server/routes/movies')(app,db,socket);
-			require('./server/routes/shows')(app,db,socket);
-			require('./server/routes/system')(app,db,socket);
-			require('./server/routes/users')(app,db,socket);
+			require('./server/routes/dashboard')(app,db,io);
+			require('./server/routes/default')(app,db,io);
+			require('./server/routes/downloads')(app,db,io);
+			require('./server/routes/movies')(app,db,io);
+			require('./server/routes/shows')(app,db,io);
+			require('./server/routes/system')(app,db,io);
+			require('./server/routes/users')(app,db,io);
 			
-			// Default to sending the index.html
+			// Default route: Send index.html
 			app.use(function(req, res) {	
 				res.sendFile(process.cwd() + '/app/views/index.html');
 			});
 			
 			// Load tasks
-			if (nconf.get('installed')) {
-				fs.readdir(process.cwd() + '/server/tasks', function(error, files){
-					if (error) {
-						logger.error(error);
-						return;
-					}
-					if (files === undefined) return;
-					files.filter(function(file){
-						return (file.substr(-3) == '.js');
-					}).forEach(function(file){
-						require(process.cwd() + '/server/tasks/' + file);
+			setTimeout(function(){
+				if (nconf.get('installed')) {
+					fs.readdir(process.cwd() + '/server/tasks', function(error, files){
+						if (error) {
+							logger.error(error);
+							return;
+						}
+						if (files === undefined) return;
+						files.filter(function(file){
+							return (file.substr(-3) == '.js');
+						}).forEach(function(file){
+							require(process.cwd() + '/server/tasks/' + file)(app,db,io);
+						});
 					});
-				});
-			}
+				}
+			},1000);
 		});
 	} else {
 		nconf.set('installed', false);

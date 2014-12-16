@@ -128,9 +128,7 @@ define(['app'], function(nessa){
 		};
 		$scope.reboot = function(){
 			if (confirm('This will restart NodeTV. Are you sure?')) {
-				$http.post('/api/system', {action: 'restart'}).success(function(){
-					$rootScope.$broadcast('alert', {message: 'Restarting...'});
-				});
+				$http.post('/api/system/restart');
 			}
 		};
 		$scope.rescan = function(type){
@@ -148,9 +146,7 @@ define(['app'], function(nessa){
 		};
 		$scope.update = function(){
 			if (confirm('This will force NodeTV to update to the latest version. Are you sure?')) {
-				$http.post('/api/system', {action: 'update'}).success(function(){
-					$rootScope.$broadcast('alert', {message: 'Update in progress'});
-				});
+				$http.post('/api/system/update');
 			}
 		};
 		

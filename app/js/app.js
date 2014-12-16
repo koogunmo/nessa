@@ -1,5 +1,5 @@
-define('app', ['angular','moment','ngAnimate','ngMessages','ngResource','ngStorage','ngTouch','ui.bootstrap','ui.router'], function(angular,moment){
-	var nessa = angular.module('nessa', ['ngAnimate','ngMessages','ngResource','ngStorage','ui.bootstrap','ui.router']);
+define('app', ['angular','moment','ngAnimate','ngMessages','ngResource','ngSocketIO','ngStorage','ngTouch','ui.bootstrap','ui.router'], function(angular,moment){
+	var nessa = angular.module('nessa', ['ngAnimate','ngMessages','ngResource','ngSocketIO','ngStorage','ui.bootstrap','ui.router']);
 
 	nessa.config(function($compileProvider,$tooltipProvider,$urlRouterProvider){
 		$urlRouterProvider.when('/', function($state){
@@ -8,6 +8,12 @@ define('app', ['angular','moment','ngAnimate','ngMessages','ngResource','ngStora
 		$compileProvider.debugInfoEnabled(false);
 		$tooltipProvider.options({appendToBody:true})
 	})
+	
+	nessa.factory('$socket', function(socketFactory){
+		var socket = socketFactory();
+		socket.forward('alert');
+		return socket;
+	});
 	
 	/****** Directives ******/
 	

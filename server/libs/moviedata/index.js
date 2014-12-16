@@ -248,8 +248,11 @@ var MovieData = {
 					self.add(user, parseInt(results[0].tmdb_id,10), function(error, movie){
 						if (error) logger.error(error);
 						if (movie){
+							trakt(user.trakt).movie.library(movie.tmdb);
+							
 							self.rename(user, movie.tmdb, file.path, quality);
 							movieCollection.update({tmdb: movie.tmdb}, {$set: stats}, {w:0});
+							
 							if (typeof(callback) == 'function') callback(null, movie.tmdb);
 						}
 					});
@@ -271,8 +274,11 @@ var MovieData = {
 						self.add(user, parseInt(filtered[0].tmdb_id,10), function(error, movie){
 							if (error) logger.error(error);
 							if (movie){
+								trakt(user.trakt).movie.library(movie.tmdb);
+								
 								self.rename(user, movie.tmdb, file.path, quality);
 								movieCollection.update({tmdb: movie.tmdb}, {$set: stats}, {w:0});
+								
 								if (typeof(callback) == 'function') callback(null, movie.tmdb);
 							}
 						});
@@ -285,6 +291,8 @@ var MovieData = {
 							if (error) logger.error(error);
 							if (movie){
 								self.rename(user, movie.tmdb, file.path, quality, function(error){
+									trakt(user.trakt).movie.library(movie.tmdb);
+									
 									if (error) logger.error(error);
 									if (!error) movieCollection.update({tmdb: movie.tmdb}, {$set: {size: stats.size}}, {w:0});
 									
@@ -555,9 +563,16 @@ var MovieData = {
 									};
 									torrents.push(object);
 								});
-								if (torrents.length) movieCollection.update({_id: ObjectID(movie._id)}, {$set: {hashes: torrents, updated: new Date()}}, {w:0});
-								if (typeof(callback) == 'function') callback(null, torrents);
+								if (torrents.length) {
+									var update = {
+										hashes: torrents,
+										updated: new Date()
+									};
+									movieCollection.update({_id: ObjectID(movie._id)},{$set:update},{w:0});
+								}
+								
 							}
+							if (typeof(callback) == 'function') callback(json.error, torrents);
 						} catch(e){
 							logger.error('YTS: ', e.message);
 						}

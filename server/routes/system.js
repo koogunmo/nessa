@@ -22,25 +22,52 @@ module.exports = function(app,db,socket){
 	
 	app.get('/api/:session?/system/settings', function(req,res){
 		res.send(nconf.get());
-		
-	/*	
-	}).post('/api/:session?/system/settings', function(req,res){
-		// TO DO: Fix settings
-		
+	}).get('/api/:session?/system/status', function(req,res){
+		var df = require('node-df');
+		df(function(error, disks){
+			var usage = [];
+			var ignore = ['/boot','/dev','/net','/var','/Volumes/MobileBackups']
+			disks.forEach(function(disk){
+				// Hide filesystems smaller than 2GB, and volatile filesystems
+				if (ignore.indexOf(disk.mount) >= 0 || disk.size <= 2097152) return;
+				usage.push(disk);
+			});
+			res.send({
+				disks: usage,
+				system: {
+					arch: process.arch,
+					node: process.version,
+					platform: process.platform
+				},
+				uptime: process.uptime(),
+				version: pkg.version
+			});
+		});
+	})
+	
+	app.post('/api/:session?/system/settings', function(req,res){
 		for (var i in req.body){
 			nconf.set(i, req.body[i]);
 		}
-		return;
-		
-		logger.info(req.body);
-//		nconf.set('', req.body);
-		
 		nconf.save(function(error){
-			if (error) return res.status(400).end();
-			res.status(200).end();
+			if (error){
+				res.status(400).end()
+			} else {
+				res.status(200).end()
+			}
 		});
-	*/
-	}).post('/api/:session?/rebuild', function(req,res){
+	}).post('/api/:session?/system/restart', function(req,res){
+		socket.emit('alert', {message:'Restarting...',type:'warn'});
+		system.restart();
+	}).post('/api/:session?/system/update', function(req,res){
+		socket.emit('alert', {message:'Updating...',type:'warn'});
+		system.update();
+	})
+	
+	
+	/* These should be moved to their related route files */
+	
+	app.post('/api/:session?/rebuild', function(req,res){
 		if (req.body.type){
 			switch(req.body.type){
 				case 'movies':
@@ -98,11 +125,12 @@ module.exports = function(app,db,socket){
 			}
 		}
 		res.status(202).end();
+		
 	}).post('/api/:session?/system', function(req,res){
 		
+		// TODO: this is horrific... What the hell was I thinking!
+		
 		if (req.body.action){
-			
-			console.log(req.body.action);
 			
 			switch (req.body.action){
 				case 'clean':
@@ -138,13 +166,6 @@ module.exports = function(app,db,socket){
 						});
 					});
 					break;
-				case 'restart':
-					system.restart();
-					break;
-				case 'update':
-					system.update();
-					break;
-					
 				case 'upgrade':
 					// Update DB to 0.8 format
 					episodeCollection.update({}, {$unset: {watched: true}}, {multi:true, w:0});
