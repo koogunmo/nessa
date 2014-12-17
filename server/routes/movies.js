@@ -60,9 +60,17 @@ module.exports = function(app,db,socket){
 			socket.emit('alert', {'title':'Movies','message':'Genres rebuilt'});
 		});
 		res.status(202).send({status:true,message:'Rebuilding genres'});
-	});
+		
+	})
 	
-	
+	app.post('/api/:session?/movies/:id/download', function(req,res){
+		// Download torrent
+		movies.download(req.user, req.params.id, req.body, function(error,movie){
+			var message = movie.title+' ('+movie.year+')';
+			socket.emit('alert', {'title':'Download added','icon':'/media/'+nconf.get('media:movies:directory')+'/.artwork/'+movie.tmdb+'.jpg','message':message});
+		})
+		res.status(201).send({status:true,message:'Download added'});
+	})
 	
 	
 	app.get('/api/:session?/movies/:id', function(req,res){
@@ -72,13 +80,6 @@ module.exports = function(app,db,socket){
 		});
 	})
 	
-	app.post('/api/:session?/movies/:id/download', function(req,res){
-		// Download torrent
-		movies.download(req.user, req.params.id, req.body, function(error,json){
-			socket.emit('alert', {message: 'Download added'});
-		})
-		res.status(201).send();
-	})
 	
 	app.get('/api/:session?/movies/:id/hashes', function(req,res){
 		movies.getHashes(req.params.id, function(error, hashes){

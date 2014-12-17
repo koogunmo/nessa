@@ -112,12 +112,18 @@ var MovieData = {
 	},
 	download: function(user, tmdb, data, callback){
 		var self = this, tmdb = parseInt(tmdb, 10);
-		torrent.add(data.magnet, function(error, args){
+		
+		movieCollection.findOne({'tmdb':tmdb}, function(error, movie){
 			if (error) logger.error(error);
-			if (args.hashString){
-				movieCollection.update({'tmdb':tmdb},{$set:{'downloading':data.quality}}, {w:0});
+			if (movie){
+				torrent.add(data.magnet, function(error, args){
+					if (error) logger.error(error);
+					if (args.hashString){
+						movieCollection.update({'tmdb':tmdb},{$set:{'downloading':data.quality}}, {w:0});
+					}
+					if (typeof(callback) == 'function') callback(error, movie);
+				});
 			}
-			if (typeof(callback) == 'function') callback(error, !!args.hashString);
 		});
 	},
 	get: function(user, tmdb, callback){
@@ -394,10 +400,10 @@ var MovieData = {
 							logger.debug('Removed: %s/%s', genre, filename)
 						});
 					});
-					fs.unlink(basedir+'/A-Z/'+movie.file, function(error){
-						if (error) return logger.error(error);
-						logger.debug('Removed: A-Z/%s', movie.file);
-					});
+			//		fs.unlink(basedir+'/A-Z/'+movie.file, function(error){
+			//			if (error) return logger.error(error);
+			//			logger.debug('Removed: A-Z/%s', movie.file);
+			//		});
 				}
 			}
 			if (typeof(callback) == 'function') callback(error);
@@ -484,12 +490,14 @@ var MovieData = {
 			if (error) return logger.error(error);
 			// Delete all existing symlinks
 			self.clearSymlinks(function(){
-				if (movies.length){
-					movies.forEach(function(movie){
-						self.link(movie.tmdb);
-					});
-				}
-				if (typeof(callback) == 'function') callback();
+				setTimeout(function(){
+					if (movies.length){
+						movies.forEach(function(movie){
+							self.link(movie.tmdb);
+						});
+					}
+					if (typeof(callback) == 'function') callback();
+				}, 10000);
 			});
 		});
 	},

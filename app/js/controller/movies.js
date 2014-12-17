@@ -172,6 +172,7 @@ define(['app'], function(nessa){
 			$modalInstance.dismiss();
 		};
 		$scope.download = function(object){
+			$scope.movie.downloading = object.quality;
 			$http.post('/api/movies/'+$scope.movie.tmdb+'/download', object).success(function(success){
 				$modalInstance.close()
 			})

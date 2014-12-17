@@ -1,5 +1,5 @@
 <div class="modal-header">
-	<h3 class="modal-title">{{movie.title}} <span class="small">{{movie.year}}</span></h3>
+	<h3 class="modal-title" ng-cloak>{{movie.title}} <span class="small">{{movie.year}}</span></h3>
 	</div>
 </div>
 
@@ -31,20 +31,21 @@
 	</tabset>
 </div>
 <div class="modal-footer">
-	
-	<div class="btn-group pull-left" ng-if="movie.hashes">
-		<button class="btn btn-default pull-left" ng-click="hashes()">
+	<div class="btn-group pull-left" ng-cloak>
+		<button class="btn btn-default" disabled="disabled" ng-if="movie.downloading">
+			<span class="fa fa-cloud-download"></span> Downloading {{movie.downloading}}
+		</button>
+		<button class="btn btn-default pull-left" ng-if="movie.hashes && !movie.downloading" ng-click="hashes()">
 			<span class="fa fa-refresh"></span>
 		</button>
-		<button type="button" class="btn btn-default" ng-repeat="dl in movie.hashes" ng-click="download(dl)" ng-class="{'active': dl.quality == movie.quality}" tooltip="{{dl.size|formatBytes}}">
-			<span class="fa fa-download"></span> {{dl.quality}}
+		
+		<button type="button" class="btn btn-default" ng-if="movie.hashes && !movie.downloading" ng-repeat="dl in movie.hashes" ng-click="download(dl)" ng-class="{'active': dl.quality == movie.quality}" tooltip="{{dl.size|formatBytes}}">
+			<span class="fa" ng-class="{'fa-download': dl.quality == movie.quality,'fa-cloud-download': dl.quality != movie.quality}"></span> {{dl.quality}}
+		</button>
+		
+		<button class="btn btn-default pull-left" ng-if="!movie.hashes" ng-click="hashes()">
+			<span class="fa fa-refresh"></span> Check availability
 		</button>
 	</div>
-	
-	<button class="btn btn-default pull-left" ng-if="!movie.hashes" ng-click="hashes()">
-		<span class="fa fa-refresh"></span> Check availability
-	</button>
-
-	
 	<button type="button" class="btn btn-default" ng-click="close()">Close</button>
 </div>

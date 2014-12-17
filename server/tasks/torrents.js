@@ -11,8 +11,8 @@ module.exports = function(app,db,socket){
 					if (movies.complete) {
 						movies.complete(transfer, function(error, data){
 							if (error) return logger.error(error);
-					//		socket.emit('alert', {title: 'Download Complete', message: data.title});
-					//		if (data.trash) torrent.remove({id: transfer.id, purge: true});
+							socket.emit('alert', {'title':'Download Complete','message':data.movie.title});
+							if (data.trash) torrent.remove({'id':transfer.id,'purge':true});
 						});
 					}
 					/*
