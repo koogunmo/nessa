@@ -27,13 +27,6 @@ module.exports = function(app,db,socket){
 				});
 			});
 		};
-		/*
-		var downloadComplete = function(error,transfer){
-			if (error) return logger.error(error);
-			socket.emit('alert', {title: 'Download Complete', message: transfer.title});
-			if (data.trash) torrent.remove({id: transfer.id, purge: true});
-		};
-		*/
 		
 		setInterval(function(){
 			checkDownloads();

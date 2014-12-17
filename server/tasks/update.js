@@ -1,11 +1,14 @@
-/* Check for software updates on Github */
+'use strict';
 
+/* Check for software updates from GitHub */
 module.exports = function(app,db,socket){
+	/*
 	try {
 		var schedule = require('node-schedule');
 		var rule = new schedule.RecurrenceRule();
 			rule.hour	= 3;
 			rule.minute = 0;
+		
 		schedule.scheduleJob(rule, function(){
 			try {
 				var system = require('nodetv-system');
@@ -17,4 +20,5 @@ module.exports = function(app,db,socket){
 	} catch(e){
 		logger.error(e.message)
 	}
+	*/
 }
