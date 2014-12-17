@@ -20,40 +20,50 @@ module.exports = function(app,db,socket){
 		movies.list(req.user, function(error,results){
 			if (error) {
 				logger.error(error);
-				return res.status(404).end();
+				return res.status(404).send({status:false,message:error});
 			}
 			if (results) return res.send(results);
 		});
 	}).post('/api/movies', function(req,res){
 		// Add movie to database
 		movies.add(req.user, req.body.tmdb, function(error, result){
-	//		socket.emit('alert', {title: 'Movies', message: 'Movie added'});
+			socket.emit('alert', {'title':'Movie added','message':result.title});
 		});
-		return res.status(202).end()
-	})
+		return res.status(202).send({status:true,message:'Movie added'});
+	});
 	
-	
-	app.get('/api/movies/scan', function(req,res){
-		socket.emit('alert', {title: 'Movies', message: 'Rescanning library...'});
+	app.post('/api/movies/scan', function(req,res){
+		socket.emit('alert', {'title':'Movies','message':'Scanning library...'});
 		movies.scan(req.user, function(error,results){
-	//		logger.debug(error, results);
-	//		socket.emit('alert', {title: 'Movies', message: 'Rescan complete'});
-		});
-		res.status(202).end()
-		
-	}).get('/api/movies/sync', function(req,res){
-		movies.sync(req.user, function(error,results){
-			if (error) return logger.error(error);
+			if (error) logger.error(error);
 			logger.debug(results);
-			
-			return;
-			movies.scan(req.user, function(error, results){
-				if (error) return logger.error(error);
-				logger.debug(results);
-			});
+			socket.emit('alert', {'title':'Movies','message':'Scan complete'});
 		});
-		res.status(202).end()
-	})
+		res.status(202).send({status:true,message:'Scanning movie library'});
+		
+	}).post('/api/movies/sync', function(req,res){
+		socket.emit('alert', {title:'Movies', message:'Syncing library...'});
+		movies.sync(req.user, function(error,results){
+			if (error) logger.error(error);
+			if (results.library){
+				var message = 'Library: '+results.count+' movies synced';
+			} else if (results.watchlist){
+				var message = 'Watchlist: '+results.count+' movies synced';
+			}
+			if (message) socket.emit('alert', {'title':'Movies','message':message});
+		});
+		res.status(202).send({status:true,message:'Syncing movie library'});
+		
+	}).post('/api/movies/genres', function(req,res){
+		socket.emit('alert', {title:'Movies', message:'Rebuilding genres...'});
+		movies.rebuildGenres(function(){
+			socket.emit('alert', {'title':'Movies','message':'Genres rebuilt'});
+		});
+		res.status(202).send({status:true,message:'Rebuilding genres'});
+	});
+	
+	
+	
 	
 	app.get('/api/:session?/movies/:id', function(req,res){
 		movies.get(req.user, req.params.id, function(error, result){

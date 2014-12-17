@@ -481,7 +481,7 @@ var MovieData = {
 	rebuildGenres: function(callback){
 		var self = this;
 		movieCollection.find({file:{$exists:true},genres:{$exists:true}},{tmdb:1}).toArray(function(error,movies){
-			if (error) logger.error(error);
+			if (error) return logger.error(error);
 			// Delete all existing symlinks
 			self.clearSymlinks(function(){
 				if (movies.length){

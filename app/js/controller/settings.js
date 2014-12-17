@@ -99,21 +99,60 @@ define(['app'], function(nessa){
 	/****** Controller ******/
 	
 	nessa.controller('settingsCtrl', function($http, $log, $modal, $rootScope, $scope){
-		$scope.settings = {}
+		
 		$scope.branches = [{name: 'master'},{name: 'nightly'}];
+		$scope.settings = {}
 		$scope.users = [];
 		
 		$http.get('/api/system/settings').success(function(json,status){
 			$scope.settings = json;
 		}).error(function(json,status){
-			$log.error(json,status);
+			$log.error(json);
 		});
 		
-		$scope.latest = function(){
-			if (confirm('This does nothing.')) {
-		//		$http.post('/api/system', {action: 'latest'});
+		$scope.library = {
+			movies: {
+				genres: function(){
+					$http.post('/api/movies/genres');
+				},
+				rescan: function(){
+					$http.post('/api/movies/scan');
+				},
+				resync: function(){
+					$http.post('/api/movies/sync');
+				}
+			},
+			shows: {
+				listings: function(){
+					$http.post('/api/shows/listings');
+				},
+				rescan: function(){
+					$http.post('/api/shows/scan');
+				},
+				resync: function(){
+					$http.post('/api/shows/sync');
+				}
 			}
 		};
+		
+		$scope.actions = {
+			reboot: function(){
+				if (confirm('This will restart NodeTV. Are you sure?')) {
+					$http.post('/api/system/restart');
+				}
+			},
+			update: function(){
+				if (confirm('This will update NodeTV to the latest version. Are you sure?')) {
+					$http.post('/api/system/update');
+				}
+			}
+		};
+		
+		
+		
+		
+		
+		
 		$scope.listings = function(){
 			if (confirm('This will update all show listings and artwork. NodeTV may become VERY laggy. Continue anyway?')) {
 				$http.post('/api/system', {action: 'listings'});
@@ -131,23 +170,10 @@ define(['app'], function(nessa){
 				$http.post('/api/system/restart');
 			}
 		};
-		$scope.rescan = function(type){
-			if (!type) return;
-			if (confirm('WARNING: NodeTV will probably become VERY laggy during a full rescan. Continue anyway?')) {
-				$http.post('/api/rescan', {type: type}).success(function(){
-					$rootScope.$broadcast('alert', {message: 'Full rescan in progress'});
-				});
-			}
-		};
 		$scope.save = function(){
 			$http.post('/api/system/settings', $scope.settings).success(function(){
 				$rootScope.$broadcast('alert', {message: 'Settings saved'});
 			});
-		};
-		$scope.update = function(){
-			if (confirm('This will force NodeTV to update to the latest version. Are you sure?')) {
-				$http.post('/api/system/update');
-			}
 		};
 		
 		$scope.$on('usersRefresh', function(){

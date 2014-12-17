@@ -1,14 +1,30 @@
-<div class="form-group">
-	<button type="button" class="btn btn-primary" ng-click="rescan('shows')">Rescan TV Shows</button>
-	<button type="button" class="btn btn-info" ng-click="listings()">Update listings</button>
+<div class="row">
+	<div class="col-sm-12">
+		<h4>Shows</h4>
+		<div class="form-group">
+			<button type="button" class="btn btn-primary" ng-click="library.shows.resync()">
+				<span class="fa fa-refresh"></span> Resync library from Trakt
+			</button>
+			<button type="button" class="btn btn-info" ng-click="library.shows.rescan()">
+				<span class="fa fa-wrench"></span> Rescan local files
+			</button>
+			<button type="button" class="btn btn-warning" ng-click="library.shows.listings()">
+				<span class="fa fa-list"></span> Update listings
+			</button>
+		</div>
+	</div>
+	<div class="col-sm-12">
+		<h4>Movies</h4>
+		<div class="form-group">
+			<button type="button" class="btn btn-primary" ng-click="library.movies.resync()">
+				<span class="fa fa-refresh"></span> Resync library from Trakt
+			</button>
+			<button type="button" class="btn btn-info" ng-click="library.movies.rescan()">
+				<span class="fa fa-wrench"></span> Rescan local files
+			</button>
+			<button type="button" class="btn btn-warning" ng-click="library.movies.genres()">
+				<span class="fa fa-list"></span> Update genres
+			</button>
+		</div>
+	</div>
 </div>
-<div class="form-group">
-	<button type="button" class="btn btn-primary" ng-click="rescan('movies')">Rescan Movies</button>
-</div>
-<div class="well well-sm">NodeTV automatically updates show listings at 1am every Sunday.</div>
-<!--
-<div class="form-group">
-	<button type="button" class="btn btn-info" ng-click="latest()">Check for downloads</button>
-</div>
-<div class="well well-sm">NodeTV automatically checks for new downloads every 30 minutes.</div>
--->
