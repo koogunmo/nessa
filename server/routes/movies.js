@@ -12,11 +12,10 @@ log4js.configure({
 var logger = log4js.getLogger('routes:movies');
 
 module.exports = function(app,db,socket){
-
 	var scanner	= plugin('scanner'),
 		movies	= plugin('moviedata');
-
-	app.get('/api/:session?/movies', function(req,res){
+	
+	app.get('/api/movies', function(req,res){
 		// Get show list
 		movies.list(req.user, function(error,results){
 			if (error) {
@@ -25,31 +24,24 @@ module.exports = function(app,db,socket){
 			}
 			if (results) return res.send(results);
 		});
-		/*
-		movies.getHashes(118340, function(error, results){
-			logger.debug(error, results);
-		});
-		*/
-	})
-	
-	app.post('/api/:session?/movies', function(req,res){
+	}).post('/api/movies', function(req,res){
 		// Add movie to database
 		movies.add(req.user, req.body.tmdb, function(error, result){
-			
-			
+	//		socket.emit('alert', {title: 'Movies', message: 'Movie added'});
 		});
 		return res.status(202).end()
 	})
 	
 	
 	app.get('/api/movies/scan', function(req,res){
+		socket.emit('alert', {title: 'Movies', message: 'Rescanning library...'});
 		movies.scan(req.user, function(error,results){
 	//		logger.debug(error, results);
+	//		socket.emit('alert', {title: 'Movies', message: 'Rescan complete'});
 		});
 		res.status(202).end()
-	})
-	
-	app.get('/api/movies/sync', function(req,res){
+		
+	}).get('/api/movies/sync', function(req,res){
 		movies.sync(req.user, function(error,results){
 			if (error) return logger.error(error);
 			logger.debug(results);
@@ -73,7 +65,7 @@ module.exports = function(app,db,socket){
 	app.post('/api/:session?/movies/:id/download', function(req,res){
 		// Download torrent
 		movies.download(req.user, req.params.id, req.body, function(error,json){
-			
+			socket.emit('alert', {message: 'Download added'});
 		})
 		res.status(201).send();
 	})
@@ -108,4 +100,30 @@ module.exports = function(app,db,socket){
 		movies.match(req.body);
 		return res.status(202).end();
 	})
+	
+	
+	/* Library Maintenance */
+	
+	app.post('/api/movies/rebuild/genres', function(req,res){
+		movies.rebuildGenres();
+		socket.emit('alert', {title: 'Movies', message: 'Rebuilding genres...'});
+		res.status(202).end();
+		
+	}).post('/api/movies/rebuild/library', function(req,res){
+		socket.emit('alert', {title: 'Movies', message: 'Rebuilding library...'});
+		movies.clearSymlinks(function(){
+			movies.sync(req.user, function(error, result){
+				if (result.library) {
+					movies.scan(req.user, function(error, tmdb){
+						if (error) logger.error(error);
+						if (tmdb){
+							movies.getArtwork(tmdb);
+							movies.getHashes(tmdb);
+						}
+					});
+				}
+			});
+		});
+		res.status(202).end();
+	});
 }

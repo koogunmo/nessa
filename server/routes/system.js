@@ -64,6 +64,13 @@ module.exports = function(app,db,socket){
 		system.update();
 	})
 	
+	/*
+	app.post('/api/:session?/rebuild/movies/genres', function(req,res){
+		movies.rebuildGenres();
+		res.status(202).end();
+	})
+	
+	*/
 	
 	/* These should be moved to their related route files */
 	

@@ -114,6 +114,7 @@ define(['app'], function(nessa){
 			active: false,
 			downloaded: true,
 			genre: '',
+			magnets: false,
 			quality: '',
 			title: ''
 		};
@@ -131,6 +132,7 @@ define(['app'], function(nessa){
 			if ($scope.filter.active){
 				if ($scope.filter.genre && item.genres.indexOf($scope.filter.genre) == -1) return false;
 				if ($scope.filter.quality && item.quality != $scope.filter.quality) return false;
+				if ($scope.filter.magnets && (!item.hashes || item.hashes.length == 0)) return false;
 			}
 			if ($scope.filter.downloaded && !item.file) return false;
 			return true;

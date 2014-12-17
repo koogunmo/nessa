@@ -25,26 +25,25 @@ var MovieData = {
 			if (error) logger.debug('movie.add:', error);
 			if (json){
 				try {
-					var url = json.url.split('/');
 					var record = {
-						title: json.title,
-						year: parseInt(json.year,10),
-						url: url.pop(),
-						synopsis: json.overview,
-						released: new Date(json.released*1000),
-						runtime: parseInt(json.runtime,10),
-						imdb: json.imdb_id,
-						tmdb: parseInt(json.tmdb_id,10),
-						genres: json.genres,
-						added: new Date(),
-						updated: new Date()
+						'title': json.title,
+						'year': parseInt(json.year,10),
+						'url': json.url.split('/').pop(),
+						'synopsis': json.overview,
+						'released': new Date(json.released*1000),
+						'runtime': parseInt(json.runtime,10),
+						'imdb': json.imdb_id,
+						'tmdb': parseInt(json.tmdb_id,10),
+						'genres': json.genres,
+						'added': new Date(),
+						'updated': new Date()
 					};
-					movieCollection.update({'tmdb':record.tmdb}, {$set:record}, {'upsert':true}, function(error, affected, status){
+					movieCollection.update({'tmdb':record.tmdb},{$set:record},{'upsert':true}, function(error, affected, status){
 						if (error) logger.error(error);
 						if (affected){
 							self.getArtwork(record.tmdb);
 							self.getHashes(record.tmdb);
-							movieCollection.update({tmdb: record.tmdb}, {$addToSet: {user: {_id: ObjectID(user._id), username: user.username}}}, {w:0})
+							movieCollection.update({'tmdb': record.tmdb}, {$addToSet: {'user':{'_id':ObjectID(user._id),'username':user.username}}},{w:0});
 						//	trakt(user.trakt).movie.watchlist(record.imdb);
 						}
 						if (typeof(callback) == 'function') callback(error, record);
@@ -54,6 +53,7 @@ var MovieData = {
 				}
 			}
 		};
+		
 		if (typeof(tmdb) == 'array'){
 			trakt(user.trakt).movie.summaries(parseInt(tmdb,10),function(error,results){
 				results.forEach(function(result){
@@ -78,34 +78,34 @@ var MovieData = {
 				});
 				if (files.length != 1) return;
 				
-				var record = self.getFilename(movie,files[0].name);
+				var record = self.getFilename(movie, files[0].name);
+				record.quality = movie.downloading;
 				record.size = files[0].bytesCompleted;
 				record.added = new Date();
-				record.downloading = false;
 				record.updated = new Date();
 				
-				if (movie.file && movie.file == record.file) return;
-				if (movie.file && movie.file != record.file) self.unlink(movie.tmdb);
-				
+				if (movie.file){
+					if (movie.file == record.file && !movie.downloading) return false;
+					if (movie.file != record.file) self.unlink(movie.tmdb);
+				}
 				var basedir = nconf.get('media:base')+nconf.get('media:movies:directory');
-				var source = data.dir+'/'+files[0].name,
-					target = basedir+'/A-Z/'+record.file;
+				var source = data.dir+'/'+files[0].name, target = basedir+'/A-Z/'+record.file;
 				
 				helper.fileCopy(source, target, function(error){
 					if (error) return logger.error(error);
-					movieCollection.update({'tmdb':movie.tmdb},{$set:record},function(error, affected){
+					movieCollection.update({'tmdb':movie.tmdb},{$set:record,$unset:{downloading:true}},function(error, affected){
 						if (error) logger.error(error);
 						if (!error) self.link(movie.tmdb);
 					});
-					// Add to library
 					if (movie.users){
 						movie.users.forEach(function(u){
 							userCollection.findOne({_id: ObjectID(u._id)},{trakt:1},function(error,user){
-								trakt(user.trakt).movie.library(movie.imdb);
+								if (error) logger.error(error);
+								if (user.trakt) trakt(user.trakt).movie.library(movie.imdb);
 							});
 						});
 					}
-					if (typeof(callback) == 'function') callback(error, {trash: nconf.get('media:movies:autoclean')})
+					if (typeof(callback) == 'function') callback(error, {movie:movie,trash:nconf.get('media:movies:autoclean')})
 				});
 			}
 		});
@@ -115,7 +115,7 @@ var MovieData = {
 		torrent.add(data.magnet, function(error, args){
 			if (error) logger.error(error);
 			if (args.hashString){
-				movieCollection.update({'tmdb':tmdb},{$set:{'downloading':true,'quality':data.quality}}, {w:0});
+				movieCollection.update({'tmdb':tmdb},{$set:{'downloading':data.quality}}, {w:0});
 			}
 			if (typeof(callback) == 'function') callback(error, !!args.hashString);
 		});
@@ -146,7 +146,7 @@ var MovieData = {
 		});
 	},
 	list: function(user, callback){
-		// List all movies
+		// List all movies (TODO: by user)
 		movieCollection.find({tmdb: {$exists: true}}).sort({name:1}).toArray(callback);
 	},
 	remove: function(user, tmdb, callback){
@@ -462,8 +462,6 @@ var MovieData = {
 	
 	/*****  *****/
 	
-	
-	
 	clearSymlinks: function(callback){
 		var self = this;
 		var directory = nconf.get('media:base')+nconf.get('media:movies:directory')+'/Genres';
@@ -473,13 +471,29 @@ var MovieData = {
 			if (file.stat){
 				if (file.stat.isSymbolicLink()){
 					logger.debug('Unlink: ', file.path);
-				//	fs.unlink(file.path);
+					fs.unlink(file.path);
 				}
 			}
 		});
 		if (typeof(callback) == 'function') callback();
 	},
 	
+	rebuildGenres: function(callback){
+		var self = this;
+		movieCollection.find({file:{$exists:true},genres:{$exists:true}},{tmdb:1}).toArray(function(error,movies){
+			if (error) logger.error(error);
+			// Delete all existing symlinks
+			self.clearSymlinks(function(){
+				if (movies.length){
+					movies.forEach(function(movie){
+						self.link(movie.tmdb);
+					});
+				}
+				if (typeof(callback) == 'function') callback();
+			});
+		});
+	},
+		
 	/*****  *****/
 	getAlpha: function(name){
 		var title = name.replace(/^The\s/, '').trim(),
@@ -512,13 +526,13 @@ var MovieData = {
 			}
 		});
 	},
-	getFilename: function(movie,file){
+	getFilename: function(movie, file){
 		var self = this;
 		var alpha = self.getAlpha(movie.title), blocks = [], ext = path.extname(file), quality = self.getQuality(file), record = {status: true};
 		blocks.push(movie.title.replace(/[\\\/\[\]]/ig, ''));
 		blocks.push('('+movie.year+')');
-		if (movie.quality || quality) {
-			record.quality = movie.quality || quality;
+		if (movie.downloading || movie.quality || quality) {
+			record.quality = movie.downloading || movie.quality || quality;
 			blocks.push('['+record.quality+']')
 		}
 		record.file = alpha+'/'+blocks.join(' ')+ext;
@@ -533,7 +547,7 @@ var MovieData = {
 			}
 			if (movie){
 				var req = {
-					'url': 'https://yts.re/api/listimdb.json',
+					'url': 'https://yts.wf/api/listimdb.json',
 					'method': 'GET',
 					'json': true,
 					'qs': {'imdb_id': movie.imdb}

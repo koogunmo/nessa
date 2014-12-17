@@ -146,13 +146,6 @@ try {
 			global.db = db;
 			global.torrent	= plugin('transmission');
 			
-			/*
-			if (nconf.get('installed') && nconf.get('trakt:username') != 'greebowarrior'){
-				trakt(user.trakt).network.follow('greebowarrior', function(error,json){
-					logger.info(error, json);
-				});
-			}
-			*/
 			if (nconf.get('media:base') && !nconf.get('listen:nginx')){
 				app.use('/media', express.static(nconf.get('media:base')));
 			}
