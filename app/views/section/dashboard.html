@@ -6,57 +6,88 @@
 		<a href="#" ng-click="enableAlerts()" class="alert-link">Enable desktop notifications</a>
 	</div>
 	
-	<div class="row">
-		<div class="col-sm-6" ng-if="latest.length>=1">
-			<div class="page-header">
-				<h3>Last 7 days</h3>
-			</div>
-			<div>
-				<div class="panel" ng-class="{'panel-success': episode.watched, 'panel-warning': !episode.watched}" ng-repeat="episode in latest | orderBy:['airdate','show_name']:true" ng-controller="episodeCtrl">
-					<div class="panel-heading">
-						<span class="fa fa-lg pull-right" ng-class="{'fa-angle-down': collapsed, 'fa-angle-up': !collapsed}" ng-click="collapsed=!collapsed"></span>
-						<h4 class="panel-title">
-							<a href="/shows/{{episode.tvdb}}">{{episode.show_name}}</a> <span class="small">{{episode.title}}</span>
-						</h4>
+	<tabset type="pills">
+		<tab heading="Shows">
+			<div class="row">
+				<div class="col-sm-6" ng-if="latest.length>=1">
+					<div class="page-header">
+						<h3>Last 7 days</h3>
 					</div>
-					<div class="panel-body" collapse="collapsed">
-						<!--div ng-include="'/views/partials/episode.html'"></div-->
-						<div><strong>Season {{episode.season}}, Episode {{episode.episode}}</strong> <span class="small">{{episode.airdate*1000 | date:'mediumDate'}}</span></div>
-						<p>{{episode.synopsis}}</p>
-						<div class="tools">
-							<span class="fa fa-lg fa-eye" title="Episode has been watched" ng-if="episode.watched" ng-click="watched()"></span>
-							<span class="fa fa-lg fa-eye-slash" title="Episode has not been watched" ng-if="!episode.watched" ng-click="watched()"></span>
+					<div>
+						<div class="panel" ng-class="{'panel-success': episode.watched, 'panel-warning': !episode.watched}" ng-repeat="episode in latest | orderBy:['airdate','show_name']:true" ng-controller="episodeCtrl">
+							<div class="panel-heading">
+								<span class="fa fa-lg pull-right" ng-class="{'fa-angle-down': collapsed, 'fa-angle-up': !collapsed}" ng-click="collapsed=!collapsed"></span>
+								<h4 class="panel-title">
+									<a href="/shows/{{episode.tvdb}}">{{episode.show_name}}</a> <span class="small">{{episode.title}}</span>
+								</h4>
+							</div>
+							<div class="panel-body" collapse="collapsed">
+								<!--div ng-include="'/views/partials/episode.html'"></div-->
+								<div><strong>Season {{episode.season}}, Episode {{episode.episode}}</strong> <span class="small">{{episode.airdate*1000 | date:'mediumDate'}}</span></div>
+								<p>{{episode.synopsis}}</p>
+								<div class="tools">
+									<span class="fa fa-lg fa-eye" title="Episode has been watched" ng-if="episode.watched" ng-click="watched()"></span>
+									<span class="fa fa-lg fa-eye-slash" title="Episode has not been watched" ng-if="!episode.watched" ng-click="watched()"></span>
+								</div>
+							</div>
+						</div>
+						
+					</div>
+				</div>
+			
+				<div class="col-sm-6" ng-if="upcoming.length>=1">
+					<div class="page-header">
+						<h3>Next 7 days</h3>
+					</div>
+					<div ng-repeat="day in upcoming" ng-controller="upcomingCtrl">
+						<div class="panel panel-default date" ng-if="visible">
+							<div class="panel-heading">
+								<h4 class="panel-title">{{day.date|date:'fullDate'}}</h4>
+							</div>
+						</div>
+						<div class="panel panel-info" ng-repeat="episode in day.episodes|orderBy:episode.show.first_aired_localized" ng-controller="episodeCtrl" ng-if="!episode.episode.in_collection">
+							<div class="panel-heading">
+								<span class="fa fa-lg pull-right" ng-class="{'fa-angle-down': collapsed, 'fa-angle-up': !collapsed}" ng-click="collapsed=!collapsed"></span>
+								<h4 class="panel-title"><a href="/shows/{{episode.show.tvdb_id}}">{{episode.show.title}}</a> <span class="small">{{episode.episode.title}}</span></h4>
+							</div>
+							<div class="panel-body" collapse="collapsed">
+								<div><strong>Season {{episode.episode.season}}, Episode {{episode.episode.number}}</strong></div>
+								<p>{{episode.episode.overview}}</p>
+							</div>
 						</div>
 					</div>
 				</div>
-				
 			</div>
-		</div>
-	
-		<div class="col-sm-6" ng-if="upcoming.length>=1">
-			<div class="page-header">
-				<h3>Next 7 days</h3>
-			</div>
-			<div ng-repeat="day in upcoming" ng-controller="upcomingCtrl">
-				<div class="panel panel-default date" ng-if="visible">
-					<div class="panel-heading">
-						<h4 class="panel-title">{{day.date|date:'fullDate'}}</h4>
+		</tab>
+		
+		<tab heading="Movies">
+			<div class="row">
+				<div class="col-sm-12" ng-repeat="movie in movies" ng-if="!movie.downloading" ng-controller="DashboardMovieCtrl">
+					<div class="panel panel-default"><!-- ng-class="{'panel-warning': movie.file, 'panel-danger': movie.hashes && !movie.file}"-->
+						<div class="panel-heading">
+							<h4 class="panel-title">
+								{{movie.title}} ({{movie.year}})
+								<span class="small pull-right">{{movie.quality}}</span>
+							</h4>
+						</div>
+						
+						<div class="panel-body">
+							<div class="btn-group">
+								<button class="btn btn-default" disabled="true" ng-if="movie.downloading">
+									<span class="fa fa-cloud-download"></span> Downloading {{movie.downloading}}
+								</button>
+								<button class="btn btn-default" tooltip="{{dl.size|formatBytes}}" ng-repeat="dl in movie.hashes|orderBy:'size'" ng-disabled="dl.quality==movie.quality" ng-click="download(dl)">
+									<span class="fa fa-cloud-download"></span> {{dl.quality}}
+								</button>
+							</div>
+							
+						</div>
 					</div>
 				</div>
-				<div class="panel panel-info" ng-repeat="episode in day.episodes|orderBy:episode.show.first_aired_localized" ng-controller="episodeCtrl" ng-if="!episode.episode.in_collection">
-					<div class="panel-heading">
-						<span class="fa fa-lg pull-right" ng-class="{'fa-angle-down': collapsed, 'fa-angle-up': !collapsed}" ng-click="collapsed=!collapsed"></span>
-						<h4 class="panel-title"><a href="/shows/{{episode.show.tvdb_id}}">{{episode.show.title}}</a> <span class="small">{{episode.episode.title}}</span></h4>
-					</div>
-					<div class="panel-body" collapse="collapsed">
-						<div><strong>Season {{episode.episode.season}}, Episode {{episode.episode.number}}</strong></div>
-						<p>{{episode.episode.overview}}</p>
-					</div>
-				</div>
 			</div>
-		</div>
-	</div>
-	
+		</tab>
+	</tabset>
+	<hr />
 	<div class="panel panel-primary">
 		<div class="panel-heading">
 			<h4 class="panel-title">System Information</h4>

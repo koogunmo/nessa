@@ -31,6 +31,10 @@ define(['app'], function(nessa){
 		$scope.latest = [];
 		$scope.notifications = false;
 		
+		
+		$scope.movies = [];
+		$scope.shows = [];
+		
 		if (('Notification' in window) && Notification.permission === 'granted'){
 			$scope.notifications = true;
 		}
@@ -44,6 +48,10 @@ define(['app'], function(nessa){
 				secs: (($scope.stats.uptime % 86400) % 3600) % 60
 			};			
 		});
+		
+		$http.get('/api/movies/latest').success(function(json,status){
+			$scope.movies = json;
+		})
 		
 		$http.get('/api/dashboard/latest').success(function(json,status){
 			$scope.latest = json;
@@ -73,6 +81,10 @@ define(['app'], function(nessa){
 			}
 		}
 	});
+	
+	nessa.controller('DashboardMovieCtrl', function($http,$log,$scope){
+		
+	})
 	
 	nessa.controller('upcomingCtrl', function($log, $scope){
 		$scope.visible = false;

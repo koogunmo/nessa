@@ -132,7 +132,7 @@ var MovieData = {
 	},
 	latest: function(user, callback){
 		// List the most recently added movies
-		movieCollection.find({'file':{$exists:true},'added':{$exists:true}}).sort({'added':-1}).toArray(callback);
+		movieCollection.find({'hashes':{$exists:true}}).sort({'updated':-1}).limit(20).toArray(callback);
 	},
 	link: function(tmdb, callback){
 		var self = this, tmdb = parseInt(tmdb, 10);
@@ -566,6 +566,7 @@ var MovieData = {
 				}
 				request(req, function(error, res, json){
 					if (error) {
+						logger.error(error)
 						if (typeof(callback) == 'function') return callback(error, null);
 						return;
 					}
@@ -581,7 +582,7 @@ var MovieData = {
 										hash: result.TorrentHash.toUpperCase(),
 										magnet: result.TorrentMagnetUrl,
 										quality: result.Quality,
-										size: result.SizeByte
+										size: parseInt(result.SizeByte,10)
 									};
 									torrents.push(object);
 								});
@@ -619,15 +620,15 @@ var MovieData = {
 				if (error) return logger.error(error);
 				try {
 					if (typeof(json) != 'object') json = JSON.parse(json);
-					if (json.MovieCount.length){
+					if (json.MovieCount){
 						json.MovieList.forEach(function(result){
 							var object = {
 								hash: result.TorrentHash.toUpperCase(),
 								magnet: result.TorrentMagnetUrl,
 								quality: result.Quality,
-								size: result.SizeByte
+								size: parseInt(result.SizeByte,10)
 							};
-							movieCollection.update({'imdb':ObjectID(movie._id)},{'updated': new Date(), $addToSet:{'hashes':object}},{w:0});
+							movieCollection.update({'imdb':result.ImdbCode},{$set:{'updated': new Date()},$addToSet:{'hashes':object}}, {w:0});
 						});
 					}
 				} catch(e){
@@ -656,6 +657,21 @@ var MovieData = {
 	},
 	getUnmatched: function(callback){
 		unmatchedCollection.find({type: 'movie'}).sort({title:1}).limit(20).toArray(callback);
-	}	
+	},
+	
+	cleanHashes: function(){
+		var self = this;
+		movieCollection.find({hashes:{$exists:true}},{tmdb:1}).toArray(function(error,movies){
+			if (error) logger.error(error);
+			if (movies){
+				logger.debug('Updating movie hashes')
+				movies.forEach(function(movie){
+					self.getHashes(movie.tmdb)
+				});
+			}
+		})
+	}
+	
+	
 };
 exports = module.exports = MovieData;

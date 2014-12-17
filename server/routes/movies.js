@@ -32,6 +32,17 @@ module.exports = function(app,db,socket){
 		return res.status(202).send({status:true,message:'Movie added'});
 	});
 	
+	app.get('/api/movies/latest', function(req,res){
+		movies.latest(req.user, function(error,movies){
+			if (error) logger.error(error);
+			if (movies){
+				res.send(movies);
+			} else {
+				res.status(404).end();
+			}
+		});
+	})
+	
 	app.post('/api/movies/scan', function(req,res){
 		socket.emit('alert', {'title':'Movies','message':'Scanning library...'});
 		movies.scan(req.user, function(error,results){

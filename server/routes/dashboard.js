@@ -13,7 +13,15 @@ var logger = log4js.getLogger('routes:dashboard');
 
 module.exports = function(app, db){
 	
-	var shows	= plugin('showdata');
+	var movies = plugin('moviedata'), shows = plugin('showdata');
+	
+	
+	app.get('/api/latest/shows', function(req,res){
+		
+	})
+
+
+	
 	
 	app.get('/api/:session?/dashboard/latest', function(req,res){
 		shows.latest(req.user, function(error, json){
@@ -27,6 +35,9 @@ module.exports = function(app, db){
 			}
 		});
 	});
+	
+	
+	
 
 	app.get('/api/:session?/dashboard/unmatched', function(req,res){
 	//	trakt(req.user.trakt).calendar.shows(function(error, json){
