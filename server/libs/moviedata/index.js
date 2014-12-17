@@ -604,45 +604,39 @@ var MovieData = {
 		});
 	},
 	getLatest: function(){
-		// Get latest hashes from YIFY, add to db IF that show is logged
-		/*
 		try {
 			var req = {
-				'url': 'https://yts.re/api/list.json',
+				'url': 'https://yts.wf/api/list.json',
 				'method': 'GET',
-				'json': true
+				'json': true,
+				'qs': {'limit': 25}
 			};
 			if (nconf.get('system:proxy')) {
 				req.tunnel = true;
 				req.proxy = nconf.get('system:proxy');
 			}
-			request(req, function(error, res, json){
-				if (error) {
-					if (typeof(callback) == 'function') callback(error);
-					return logger.error(error);
-				}
-				if (typeof(json) != 'object') json = JSON.parse(json);
-				var torrents = [];
-				if (json.status == 'fail'){
-					if (typeof(callback) == 'function') callback(json.error, torrents);
-				} else if (json.MovieCount){
-					json.MovieList.forEach(function(result){
-						var object = {
-							hash: result.TorrentHash.toUpperCase(),
-							magnet: result.TorrentMagnetUrl,
-							quality: result.Quality,
-							size: result.SizeByte
-						};
-						torrents.push(object);
-					});
-					if (torrents.length) movieCollection.update({imdb: ObjectID(movie._id)}, {$set: {hashes: torrents}}, {w:0});
-					if (typeof(callback) == 'function') callback(null, torrents);
+			request(req, function(error,res,json){
+				if (error) return logger.error(error);
+				try {
+					if (typeof(json) != 'object') json = JSON.parse(json);
+					if (json.MovieCount.length){
+						json.MovieList.forEach(function(result){
+							var object = {
+								hash: result.TorrentHash.toUpperCase(),
+								magnet: result.TorrentMagnetUrl,
+								quality: result.Quality,
+								size: result.SizeByte
+							};
+							movieCollection.update({'imdb':ObjectID(movie._id)},{'updated': new Date(), $addToSet:{'hashes':object}},{w:0});
+						});
+					}
+				} catch(e){
+					logger.error(e.message);
 				}
 			});
 		} catch(e){
 			logger.error(e.message);
 		}
-		*/
 	},
 	getQuality: function(file){
 		var quality = '480p';
