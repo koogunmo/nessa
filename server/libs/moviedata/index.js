@@ -132,7 +132,7 @@ var MovieData = {
 	},
 	latest: function(user, callback){
 		// List the most recently added movies
-		movieCollection.find({'hashes':{$exists:true}}).sort({'updated':-1}).limit(20).toArray(callback);
+		movieCollection.find({'file':{$exists:true}}).sort({'added':-1}).limit(20).toArray(callback);
 	},
 	link: function(tmdb, callback){
 		var self = this, tmdb = parseInt(tmdb, 10);
@@ -154,6 +154,10 @@ var MovieData = {
 	list: function(user, callback){
 		// List all movies (TODO: by user)
 		movieCollection.find({tmdb: {$exists: true}}).sort({name:1}).toArray(callback);
+	},
+	pending: function(user, callback){
+		// Movies awaiting human intervention
+		movieCollection.find({'file':{$exists:false},'hashes':{$exists:true}}).sort({'updated':-1}).toArray(callback);
 	},
 	remove: function(user, tmdb, callback){
 		var self = this, tmdb = parseInt(tmdb, 10);

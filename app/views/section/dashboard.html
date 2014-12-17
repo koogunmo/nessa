@@ -62,15 +62,33 @@
 		
 		<tab heading="Movies">
 			<div class="row">
-				<div class="col-sm-12" ng-repeat="movie in movies" ng-if="!movie.downloading" ng-controller="DashboardMovieCtrl">
-					<div class="panel panel-default"><!-- ng-class="{'panel-warning': movie.file, 'panel-danger': movie.hashes && !movie.file}"-->
+				<div class="col-sm-12" ng-repeat="movie in movies">
+					<div class="panel panel-success">
 						<div class="panel-heading">
 							<h4 class="panel-title">
 								{{movie.title}} ({{movie.year}})
 								<span class="small pull-right">{{movie.quality}}</span>
 							</h4>
 						</div>
-						
+						<div class="panel-body">
+							<p>{{movie.synopsis}}</p>
+							<div class="small"><strong>Runtime</strong>: {{movie.runtime}} mins</div>
+							<div class="small"><strong>Genres</strong>: {{movie.genres.join(', ')}}</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</tab>
+		
+		<tab heading="Queue">
+			<div class="row">
+				<div class="col-sm-6" ng-repeat="movie in pending" ng-if="!movie.downloading" ng-controller="DashboardMovieCtrl">
+					<div class="panel panel-default"><!-- ng-class="{'panel-warning': movie.file, 'panel-danger': movie.hashes && !movie.file}"-->
+						<div class="panel-heading">
+							<h4 class="panel-title">
+								{{movie.title}} ({{movie.year}})
+							</h4>
+						</div>
 						<div class="panel-body">
 							<div class="btn-group">
 								<button class="btn btn-default" disabled="true" ng-if="movie.downloading">

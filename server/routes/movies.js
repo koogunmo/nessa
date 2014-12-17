@@ -41,6 +41,15 @@ module.exports = function(app,db,socket){
 				res.status(404).end();
 			}
 		});
+	}).get('/api/movies/pending', function(req,res){
+		movies.pending(req.user, function(error,movies){
+			if (error) logger.error(error);
+			if (movies){
+				res.send(movies);
+			} else {
+				res.status(404).end();
+			}
+		});
 	})
 	
 	app.post('/api/movies/scan', function(req,res){

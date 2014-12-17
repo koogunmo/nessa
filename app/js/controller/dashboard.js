@@ -27,13 +27,15 @@ define(['app'], function(nessa){
 	nessa.controller('dashboardCtrl', function($http, $log, $scope){
 		
 		$scope.unmatched = 0;
-		$scope.upcoming = [];
+		
 		$scope.latest = [];
 		$scope.notifications = false;
 		
-		
+		$scope.episodes = [];
 		$scope.movies = [];
+		$scope.pending = [];
 		$scope.shows = [];
+		$scope.upcoming = [];
 		
 		if (('Notification' in window) && Notification.permission === 'granted'){
 			$scope.notifications = true;
@@ -51,7 +53,20 @@ define(['app'], function(nessa){
 		
 		$http.get('/api/movies/latest').success(function(json,status){
 			$scope.movies = json;
-		})
+		});
+		$http.get('/api/movies/pending').success(function(json,status){
+			$scope.pending = json;
+		});
+		$http.get('/api/shows/latest').success(function(json,status){
+			$scope.episodes = json;
+		});
+		$http.get('/api/shows/upcoming').success(function(json,status){
+			$scope.upcoming = json;
+		});
+		
+		
+		
+		
 		
 		$http.get('/api/dashboard/latest').success(function(json,status){
 			$scope.latest = json;
@@ -59,6 +74,7 @@ define(['app'], function(nessa){
 		$http.get('/api/dashboard/upcoming').success(function(json,status){
 			$scope.upcoming = json;
 		});
+		
 		
 		$scope.enableAlerts = function(){
 			if (('Notification' in window)){
@@ -83,7 +99,11 @@ define(['app'], function(nessa){
 	});
 	
 	nessa.controller('DashboardMovieCtrl', function($http,$log,$scope){
-		
+		$scope.download = function(object){
+			$http.post('/api/movies/'+$scope.movie.tmdb+'/download', object).success(function(success){
+				$scope.movie.downloading = object.quality;
+			})
+		};
 	})
 	
 	nessa.controller('upcomingCtrl', function($log, $scope){
