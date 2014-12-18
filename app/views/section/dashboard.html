@@ -66,7 +66,7 @@
 					<div class="panel panel-success">
 						<div class="panel-heading">
 							<h4 class="panel-title">
-								{{movie.title}} ({{movie.year}})
+								{{movie.title}} <span class="badge">{{movie.year}}</span>
 								<span class="small pull-right">{{movie.quality}}</span>
 							</h4>
 						</div>
@@ -82,11 +82,11 @@
 		
 		<tab heading="Queue">
 			<div class="row">
-				<div class="col-sm-6" ng-repeat="movie in pending" ng-if="!movie.downloading" ng-controller="DashboardMovieCtrl">
+				<div class="col-md-6" ng-repeat="movie in pending" ng-if="!movie.downloading" ng-controller="DashboardMovieCtrl">
 					<div class="panel panel-default"><!-- ng-class="{'panel-warning': movie.file, 'panel-danger': movie.hashes && !movie.file}"-->
 						<div class="panel-heading">
 							<h4 class="panel-title">
-								{{movie.title}} ({{movie.year}})
+								{{movie.title}} <span class="badge">{{movie.year}}</span>
 							</h4>
 						</div>
 						<div class="panel-body">
