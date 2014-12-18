@@ -40,6 +40,22 @@ module.exports = function(app, db, socket){
 		}
 	});
 	
+	app.post('/api/shows/scan', function(req,res){
+		shows.scan(req.user);
+		res.status(202).end();
+		
+	}).post('/api/shows/sync', function(req,res){
+		shows.sync(req.user);
+		res.status(202).end();
+		
+	})
+	
+	
+	
+	
+	
+	
+	
 	app.get('/api/:session?/shows/random', function(req,res){
 		// randomly pick something to watch
 		// - the first unwatched episode of a subscribed show

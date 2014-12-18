@@ -25,6 +25,19 @@ var episodeCollection = db.collection('episode'),
 	unmatchedCollection = db.collection('unmatched'),
 	userCollection = db.collection('user');
 
+
+/*
+episodeCollection.find({'airdate':{$exists:true}}).toArray(function(error,episodes){
+	if (error) logger.error(error)
+	if (episodes){
+		episodes.forEach(function(episode){
+			logger.debug(new Date(episode.airdate*1000));
+		//	episodeCollection.update({'_id':ObjectID(episode._id)},{$set:{'airdate':new Date(episode.airdate*1000)}},{w:0});
+		})
+	}
+})
+*/
+
 var ShowData = {
 	
 	/***** Rewritten methods *****/
@@ -32,19 +45,16 @@ var ShowData = {
 	complete: function(data, callback){
 		var self = this, hash = data.hash.toUpperCase();
 		// Called when download is complete in Transmission
-		episodeCollection.findOne({'downloading':true,$or:[{'hashes.hash':hash},{'hash':hash}]}, function(error,episode){
+		episodeCollection.findOne({'downloading':{$exists:true},$or:[{'hashes.hash':hash},{'hash':hash}]}, function(error,episode){
 			if (error) logger.error(error);
-			
 			if (episode){
 				var exts = ['.avi','.mkv','.mp4'], file = null, library = [], size = 0;
-				
 				var files = data.files.filter(function(file){
 					if (exts.indexOf(path.extname(file.name)) == -1) return false;
 					return true;
 				});
 				if (files.length != 1) return;
 				file = files[0];
-				
 				showCollection.findOne({'tvdb': episode.tvdb}, function(error,show){
 					if (error) logger.error(error);
 					if (show){
@@ -87,7 +97,6 @@ var ShowData = {
 		showCollection.find({'tvdb':tvdb}, function(error,show){
 			if (error) logger.error(error);
 			if (show){
-				
 				var addTorrent = function(hash,id){
 					var magnet = helper.createMagnet(hash);
 					torrent.add(magnet, function(error,args){
@@ -95,11 +104,9 @@ var ShowData = {
 						if (args) episodeCollection.update({'_id':ObjectID(id)},{$set:{'downloading':true,'status':false}},{'w':0});
 					});
 				};
-				
 				var search = {'tvdb':show.tvdb,$or:[{'hashes.hash':{$exists:true}},{'hash':{$exists:true}}]};
 				if (filter.season) search.season = parseInt(filter.season,10);
 				if (filter.episode) search.episode = parseInt(filter.episode,10);
-				
 				episodeCollection.find(search).toArray(function(error,episodes){
 					if (error) logger.error(error);
 					if (episodes){
@@ -141,7 +148,7 @@ var ShowData = {
 		
 		var count = 0, list = [];
 		
-		showCollection.find({'users._id': ObjectID(user._id)},{progress:0,seasons:0,synopsis:0}).toArray(function(error, shows){
+		showCollection.find({'users._id': ObjectID(user._id)},{'progress':0,'seasons':0,'synopsis':0}).toArray(function(error, shows){
 			if (error) logger.error(error);
 			if (!shows) return;
 			
@@ -155,7 +162,6 @@ var ShowData = {
 					if (error) return logger.error(error);
 					var seasons = [], progress = {};
 					
-					// Get user progress
 					show.users.forEach(function(u){
 						if (!user._id.equals(u._id)) return;
 						if (u.progress) progress = u.progress;
@@ -184,7 +190,6 @@ var ShowData = {
 			});
 		});
 	},
-
 	list: function(user, callback){
 		try {
 			showCollection.find({'users._id': ObjectID(user._id)}).toArray(callback);
@@ -192,13 +197,43 @@ var ShowData = {
 			logger.error(e.message);
 		}
 	},
-
-
+	random: function(user, callback){
+		var self = this, deferred = Q.defer();
+		try {
+			showCollection.find({'users._id': ObjectID(user._id), 'users.progress.percentage': {$lt: 100}, 'users.progress.next': {$exists: true}}).toArray(function(error, shows){
+				if (error) logger.error(error);
+				if (shows.length){
+					var rand = Math.round(Math.random()*shows.length), show = shows[rand];
+					if (show) {
+						var response = {'show':show,'episode':{},'progress':{}};
+						show.users.forEach(function(u){
+							if (!user._id.equals(u._id)) return
+							response.progress = u.progress;
+						});
+						if (response.progress.next){
+							episodeCollection.findOne({'tvdb':show.tvdb,'season':response.progress.next.season,'episode':response.progress.next.number}, function(error, episode){
+								if (error) return logger.error(error)
+								if (episode) response.episode = episode;
+								deferred.resolve(response);
+							});
+						}
+					}
+				}
+			});
+			deferred.promise.then(function(response){
+				if (typeof(callback) == 'function') callback(null,response);
+			});
+		} catch(e){
+			logger.error(e.message);
+		}
+	},
 	
 	scan: function(user, callback){
 		// TODO
 		var self = this;
 		logger.debug('Scanning show library...');
+		
+		return;
 		var base =  nconf.get('media:base') + nconf.get('media:shows:directory')
 		fs.readdir(base, function(error, dirs){
 			if (error) return;
@@ -206,22 +241,59 @@ var ShowData = {
 				fs.lstat(base + '/' + dir, function(error, stat){
 					if (error) return;
 					if (stat && stat.isDirectory()){
-						showCollection.find({$or: [{name: dir},{directory: dir}]}).toArray(function(error, results){
-							if (error) return;
-							var record = {
-								status: true,
-								directory: dir
-							};
-							if (results.length == 1) {
-								var result = results[0];
-								showCollection.update({tvdb: result.tvdb}, {$set: record}, {upsert: true}, function(error, affected){
-									if (typeof(callback) == 'function') callback(null, result.tvdb);
-								});
-								trakt(user.trakt).show.library(result.tvdb);
-							} else {
-								unmatched.update({directory: dir}, {$set: record}, {upsert: true}, function(error, result){
-									logger.debug('Unmatched: '+dir);
-								});
+						trakt(user.trakt).search('shows', dir, function(error, results){
+							if (error) logger.error(error);
+							if (results){
+								
+								logger.debug(dir, 'results:',results.length);
+								
+								if (results.length == 1){
+									// Exact match!
+									logger.debug(results[0].title);
+									
+									return;
+									self.add(user, parseInt(results[0].tvdb_id,10), function(){
+										
+									});
+								} else {
+									var filtered = results.filter(function(result){
+										var include = true;
+										if (dir) {
+											dir.replace(/[^\w\s]/ig).split(' ').forEach(function(word){
+												if (result.title.indexOf(word.trim()) == -1) include = false;
+											});
+										}
+										return include;
+									});
+									if (filtered.length == 1){
+										logger.warn(dir,filtered[0].title)
+									}
+									
+									
+								}
+							}
+						});
+						return;
+						
+						showCollection.find({$or:[{'name':dir},{'directory':dir}]}).toArray(function(error, results){
+							if (error) logger.error(error);
+							if (results){
+								logger.debug(results);
+								return;
+								
+								var record = {'directory': dir};
+								
+								if (results.length == 1) {
+									var result = results[0];
+						//			showCollection.update({'tvdb':result.tvdb},{$set:{'directory':dir}},{'upsert':true}, function(error, affected){
+						//				if (typeof(callback) == 'function') callback(null, result.tvdb);
+						//			});
+						//			trakt(user.trakt).show.library(result.tvdb);
+								} else {
+						//			unmatched.update({directory: dir}, {$set:{'type':}}, {upsert: true}, function(error, result){
+						//				logger.debug('Unmatched: '+dir);
+						//			});
+								}
 							}
 						});
 					}
@@ -252,7 +324,10 @@ var ShowData = {
 						};
 						showCollection.update({'tvdb':record.tvdb},{$set:record},{'upsert':true},function(error,affected,status){
 							if (error) return logger.error(error);
+							// TODO: add users
 						//	showCollection.update({tvdb: record.tvdb}, {$addToSet: {user: {_id: user._id, username: user.username}}}, {w:0})
+							
+						//	self.getFeed(record.tvdb);
 							self.getArtwork(record.tmdb);
 						});
 					});
@@ -263,8 +338,10 @@ var ShowData = {
 			logger.error('Show sync: ', e.message);
 		}
 	},
-	
-	
+	unmatched: function(callback){
+		unmatchedCollection.find({'type':'show'}).toArray(callback);
+	},
+		
 	
 	getArtwork: function(tvdb, callback){
 		var self = this, tvdb = parseInt(tvdb,10);
@@ -627,33 +704,6 @@ var ShowData = {
 		}
 	},
 	
-	random: function(user, callback){
-		try {
-			showCollection.find({"users._id": ObjectID(user._id), "users.progress.percentage": {$lt: 100}, "users.progress.next": {$exists: true}}).toArray(function(error, shows){
-				if (error) return logger.error(error);
-				if (shows.length){
-					var rand = Math.round(Math.random()*shows.length), show = shows[rand];
-					if (show) {
-						var response = {show: show, episode: {}, progress: {}};
-						show.users.forEach(function(u){
-							if (!user._id.equals(u._id)) return
-							response.progress = u.progress;
-						});
-						if (response.progress.next){
-							episodeCollection.findOne({tvdb: show.tvdb, season:response.progress.next.season, episode:response.progress.next.number}, function(error, episode){
-								if (error) return console.error(error)
-								response.episode = episode;
-								if (typeof(callback) == 'function') callback(null, response);
-							});
-						}
-					}
-				}
-			});
-		} catch(e){
-			logger.error(e.message);
-		}
-	},
-	
 	remove: function(user, tvdb, callback){
 		// Remove a show from your library
 		var tvdb = parseInt(tvdb, 10);
@@ -730,26 +780,6 @@ var ShowData = {
 		*/
 	},
 	
-	unmatched: function(callback){
-		
-		return;
-		// TODO: Rethink how this should work
-		
-		unmatchedCollection.find({type:'show'}).toArray(function(error, shows){
-			userCollection.findOne({admin: true}, {trakt:1}, function(error, user){
-				shows.forEach(function(show){
-					trakt(user.trakt).search('shows', show.directory, function(error, json){
-						var result = {
-							id: show._id,
-							name: show.directory,
-							matches: json
-						};
-						if (typeof(callback) == 'function') callback(null, result);
-					});
-				});
-			});
-		});
-	},
 	
 	match: function(matches, callback){
 		var self = this;
@@ -1066,12 +1096,12 @@ var ShowData = {
 	
 	setEpisode: function(episode, callback) {
 		var record = {
-			tvdb: episode.tvdb,
-			season: episode.season,
-			episode: episode.episode,
+			tvdb: parseInt(episode.tvdb,10),
+			season: parseInt(episode.season,10),
+			episode: parseInt(episode.episode,10),
 			title: episode.title,
 			synopsis: episode.overview,
-			airdate: episode.first_aired,
+			airdate: new Date(episode.first_aired*1000),
 			watched: episode.watched,
 			users: []
 		};
