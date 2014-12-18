@@ -39,7 +39,7 @@
 			<span class="fa fa-refresh"></span>
 		</button>
 		
-		<button type="button" class="btn btn-default" ng-if="movie.hashes && !movie.downloading" ng-repeat="dl in movie.hashes" ng-click="download(dl)" ng-class="{'active': dl.quality == movie.quality}" tooltip="{{dl.size|formatBytes}}">
+		<button type="button" class="btn btn-default" ng-if="movie.hashes && !movie.downloading" ng-repeat="dl in movie.hashes|orderBy:'size'" ng-click="download(dl)" ng-class="{'active': dl.quality == movie.quality}" tooltip="{{dl.size|formatBytes}}">
 			<span class="fa" ng-class="{'fa-download': dl.quality == movie.quality,'fa-cloud-download': dl.quality != movie.quality}"></span> {{dl.quality}}
 		</button>
 		
