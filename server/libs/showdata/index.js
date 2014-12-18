@@ -25,8 +25,156 @@ var episodeCollection = db.collection('episode'),
 
 var ShowData = {
 	
+	/***** Rewritten methods *****/
+	
+	complete: function(data,callback){
+		var self = this;
+		// Called when download is complete in Transmission
+		
+	},
+	
+	scan: function(user, callback){
+		var self = this;
+		logger.debug('Scanning show library...');
+		
+		var base =  nconf.get('media:base') + nconf.get('media:shows:directory')
+		fs.readdir(base, function(error, dirs){
+			if (error) return;
+			dirs.forEach(function(dir){
+				fs.lstat(base + '/' + dir, function(error, stat){
+					if (error) return;
+					if (stat && stat.isDirectory()){
+						showCollection.find({$or: [{name: dir},{directory: dir}]}).toArray(function(error, results){
+							if (error) return;
+							var record = {
+								status: true,
+								directory: dir
+							};
+							if (results.length == 1) {
+								var result = results[0];
+								showCollection.update({tvdb: result.tvdb}, {$set: record}, {upsert: true}, function(error, affected){
+									if (typeof(callback) == 'function') callback(null, result.tvdb);
+								});
+								trakt(user.trakt).show.library(result.tvdb);
+							} else {
+								unmatched.update({directory: dir}, {$set: record}, {upsert: true}, function(error, result){
+									logger.debug('Unmatched: '+dir);
+								});
+							}
+						});
+					}
+				});
+			});
+		});
+		
+	},
+	
+	sync: function(user, callback){
+		var self = this;
+		try {
+			trakt(user.trakt).user.library.shows.all(function(error, shows){
+				logger.debug('Syncing show library...');
+				if (error) logger.error(error);
+				if (shows){
+					logger.debug('Show library: ', shows.length);
+					shows.forEach(function(show){
+						var record = {
+							'name': show.title,
+							'year': parseInt(show.year, 10),
+							'url': show.url.split('/').pop(),
+							'status': (show.status == 'Ended') ? false:true,
+							'synopsis': show.overview,
+							'imdb': show.imdb_id,
+							'tvdb': parseInt(show.tvdb_id,10),
+							'genres': show.genres,
+							'updated': new Date()
+						};
+						showCollection.update({'tvdb':record.tvdb},{$set:record},{'upsert':true},function(error,affected,status){
+							if (error) return logger.error(error);
+						//	showCollection.update({tvdb: record.tvdb}, {$addToSet: {user: {_id: user._id, username: user.username}}}, {w:0})
+							self.getArtwork(record.tmdb);
+						});
+					});
+				}
+				if (typeof(callback) == 'function') callback(error, shows.length);
+			});
+		} catch(e){
+			logger.error('Show sync: ', e.message);
+		}
+	},
+	
+	
+	getFeed: function(tvdb,callback){
+		// Get TVShows feed for newly added shows
+		var self = this;
+		var options = {
+			url: 'http://tvshowsapp.com/showlist/showlist.xml',
+			headers: {
+				'User-Agent': 'TVShows 2 (http://tvshowsapp.com/)'
+			}
+		};
+		request.get(options, function(error, req, xml){
+			if (error) logger.error(error);
+			try {
+				parser.parseString(xml, function(error, json){
+					if (error) return logger.error(error);
+					json.shows.show.forEach(function(show){
+						if (parseInt(show.tvdb,10) != tvdb) return;
+						var record = {
+							'feed': helper.fixFeedUrl(show.mirrors[0].mirror[0])
+						};
+						showCollection.update({'tvdb':tvdb,'feed':{$exists:false}},{$set:record},{w:0});
+					});
+				});
+			} catch(e){
+				logger.error(e.message);
+			}
+		});
+	}
+	
+	/***** Old methods below *****/
+	
 	add: function(user, tvdb, callback){
-		var self = this, tvdb = parseInt(tvdb, 10);
+		var self = this;
+		/*
+		var process = function(error,json){
+			if (error) logger.error('show.add:',error);
+			if (json){
+				try {
+					var record = {
+						'name': json.title,
+						'year': parseInt(json.year,10),
+						'url': json.url.split('/').pop(),
+						'synopsis': json.overview,
+						'imdb': json.imdb_id,
+						'tvdb': parseInt(json.tvdb_id,10),
+						'genres': json.genres,
+						'added': new Date(),
+						'updated': new Date(),
+						'ended': (json.status == 'Ended') ? true : false
+					};
+					showCollection.update({'tvdb':record.tvdb},{$set:record},{'upsert':true}, function(error,affected,status){
+						
+						
+						
+					});
+				} catch(e){
+					logger.error('show.add:',e.message);
+				}
+			}
+		};
+		
+		if (typeof(tvdb) == 'array'){
+			tvdb.forEach(function(id){
+				trakt(user.trakt).show.summary(parseInt(id,10), process);
+			});
+		} else {
+			trakt(user.trakt).show.summary(tvdb, process);
+		}
+		
+		/********************************************/
+		
+		
 		// Get show info from trakt
 		trakt(user.trakt).show.summary(tvdb, function(error, json){
 			// Update shows collection
@@ -359,40 +507,6 @@ var ShowData = {
 		});
 	},
 	
-	sync: function(user, callback){
-		var self = this;
-		try {
-			logger.debug('Scanning shows...');
-			trakt(user.trakt).user.library.shows.all(function(error, shows){
-				logger.debug('Show Library: ', shows.length);
-				if (error) logger.error(error);
-				if (shows){
-					shows.forEach(function(show){
-						var url = show.url.split('/');
-						var record = {
-							title: show.title,
-							year: parseInt(show.year,10),
-							url: url.pop(),
-							status: (show.status == 'Ended') ? false:true,
-							synopsis: show.overview,
-							imdb: show.imdb_id,
-							tvdb: parseInt(show.tvdb_id,10),
-							genres: show.genres
-						};
-						showCollection.update({tvdb: record.tvdb}, {$set: record}, {upsert:true}, function(error,affected,status){
-							if (error) return logger.error(error);
-							
-							// TODO: Need to handle this magically...
-						//	showCollection.update({tvdb: record.tvdb}, {$addToSet: {user: {_id: user._id, username: user.username}}}, {w:0})
-							self.getArtwork(show.tmdb);
-						});
-					});
-				}
-			});
-		} catch(e){
-			logger.error('Show sync: ', e.message);
-		}
-	},
 	
 	update: function(){
 		var self = this;

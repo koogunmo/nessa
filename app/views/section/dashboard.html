@@ -60,7 +60,7 @@
 			</div>
 		</tab>
 		
-		<tab heading="Movies">
+		<tab heading="Movies" ng-if="movies.length">
 			<div class="row">
 				<div class="col-sm-12" ng-repeat="movie in movies">
 					<div class="panel panel-success">
@@ -80,7 +80,7 @@
 			</div>
 		</tab>
 		
-		<tab heading="Queue">
+		<tab heading="Queue" ng-if="pending.length">
 			<div class="row">
 				<div class="col-md-6" ng-repeat="movie in pending" ng-if="!movie.downloading" ng-controller="DashboardMovieCtrl">
 					<div class="panel panel-default"><!-- ng-class="{'panel-warning': movie.file, 'panel-danger': movie.hashes && !movie.file}"-->

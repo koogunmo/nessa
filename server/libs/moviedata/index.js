@@ -55,9 +55,9 @@ var MovieData = {
 		};
 		
 		if (typeof(tmdb) == 'array'){
-			trakt(user.trakt).movie.summaries(parseInt(tmdb,10),function(error,results){
+			trakt(user.trakt).movie.summaries(tmdb,function(error,results){
 				results.forEach(function(result){
-					process(null,result)
+					process(error,result)
 				});
 			});
 		} else {
@@ -335,11 +335,10 @@ var MovieData = {
 				if (movies){
 					logger.debug('Movie Library: ', movies.length);
 					movies.forEach(function(movie){
-						var url = movie.url.split('/');
 						var record = {
 							title: movie.title,
 							year: parseInt(movie.year,10),
-							url: url.pop(),
+							url: movie.url.split('/').pop(),
 							synopsis: movie.overview,
 							released: new Date(movie.released*1000),
 							runtime: parseInt(movie.runtime,10),
@@ -364,11 +363,10 @@ var MovieData = {
 				if (movies){
 					logger.debug('Movie Watchlist: ', movies.length);
 					movies.forEach(function(movie){
-						var title = movie.url.split('/');
 						var record = {
 							title: movie.title,
 							year: parseInt(movie.year,10),
-							url: title.pop(),
+							url: movie.url.split('/').pop(),
 							synopsis: movie.overview,
 							released: new Date(movie.released*1000),
 							runtime: movie.runtime,
