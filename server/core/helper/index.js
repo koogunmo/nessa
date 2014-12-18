@@ -97,7 +97,7 @@ exports = module.exports = {
 	
 	// RegExp methods
 	getEpisodeNumbers: function(file) {
-		
+		// DEPRECATED: use shows.getEpisodeNumbers
 		var file = file.toString();
 		var regexp	= /(?:S|Season)?\s?(\d{1,2})(?:\:[\w\s]+)?[\/\s]?(?:E|Episode|x)\s?([\d]{2,})(?:(?:E|-)\s?([\d]{2,})){0,}/i;
 		var abdexp	= /(\d{4})\D?(\d{2})\D?(\d{2})/i;
@@ -142,6 +142,7 @@ exports = module.exports = {
 	},
 	
 	formatName: function(data){
+		// DEPRECATED: use shows.getFilename
 		try {
 			var defaults = {
 				format: nconf.get('media:shows:format'),

@@ -4,6 +4,8 @@ var extend	= require('xtend'),
 	log4js	= require('log4js'),
 	mkdir	= require('mkdirp'),
 	parser	= new(require('xml2js')).Parser(),
+	path	= require('path'),
+	Q		= require('q'),
 	request	= require('request'),
 	trakt	= require('nodetv-trakt'),
 	util	= require('util');
@@ -27,16 +29,176 @@ var ShowData = {
 	
 	/***** Rewritten methods *****/
 	
-	complete: function(data,callback){
-		var self = this;
+	complete: function(data, callback){
+		var self = this, hash = data.hash.toUpperCase();
 		// Called when download is complete in Transmission
-		
+		episodeCollection.findOne({'downloading':true,$or:[{'hashes.hash':hash},{'hash':hash}]}, function(error,episode){
+			if (error) logger.error(error);
+			
+			if (episode){
+				var exts = ['.avi','.mkv','.mp4'], file = null, library = [], size = 0;
+				
+				var files = data.files.filter(function(file){
+					if (exts.indexOf(path.extname(file.name)) == -1) return false;
+					return true;
+				});
+				if (files.length != 1) return;
+				file = files[0];
+				
+				showCollection.findOne({'tvdb': episode.tvdb}, function(error,show){
+					if (error) logger.error(error);
+					if (show){
+						var basedir = nconf.get('media:base') + nconf.get('media:shows:directory') + '/' + show.directory + '/';
+						
+						self.getFilename(file,show).then(function(filename){
+							var record = {
+								'file': filename,
+								'size': files[0].bytesCompleted,
+								'added': new Date(),
+								'updated': new Date()
+							};
+							if (!record.file) return;
+							var source = data.dir+'/'+file.name, target = basedir+record.file;
+							
+							helper.fileCopy(source, target, function(error){
+								if (error) return logger.error(error);
+								var search = {'tvdb:':show.tvdb,'season':numbers.season,'episode':{$in:numbers.episodes}};
+								
+								episodeCollection.update(search,{$set:record,$unset:{'downloading':true}},{'multi':true,'w':0});
+								showCollection.update({'tvdb':show.tvdb},{$set:{'updated':record.updated}},{w:0});
+								
+								show.users.forEach(function(u){
+									userCollection.findOne({'_id': ObjectID(u._id),'trakt':{$exists:true}},{'trakt':1},function(error,user){
+										if (error) logger.error(error)
+										if (user && library) trakt(user.trakt).show.episode.library(show.tvdb, library);
+									});
+								});
+								if (typeof(callback) == 'function') callback(error, {show:show, trash:nconf.get('media:shows:autoclean')})
+							});
+						});
+					}
+				});
+				
+			}
+		});
 	},
+	download: function(tvdb, filter, callback){
+		var self = this, tvdb = parseInt(tvdb,10);
+		showCollection.find({'tvdb':tvdb}, function(error,show){
+			if (error) logger.error(error);
+			if (show){
+				
+				var addTorrent = function(hash,id){
+					var magnet = helper.createMagnet(hash);
+					torrent.add(magnet, function(error,args){
+						if (error) logger.error(error);
+						if (args) episodeCollection.update({'_id':ObjectID(id)},{$set:{'downloading':true,'status':false}},{'w':0});
+					});
+				};
+				
+				var search = {'tvdb':show.tvdb,$or:[{'hashes.hash':{$exists:true}},{'hash':{$exists:true}}]};
+				if (filter.season) search.season = parseInt(filter.season,10);
+				if (filter.episode) search.episode = parseInt(filter.episode,10);
+				
+				episodeCollection.find(search).toArray(function(error,episodes){
+					if (error) logger.error(error);
+					if (episodes){
+						episode.forEach(function(episode){
+							if (episode.file) return;
+							if (episode.hashes.length){
+								if (episodes.hashes.length == 1){
+									var magnet = helper.createMagnet(episodes.hashes[0].hash);
+									addTorrent(magnet,episode._id);
+								} else {
+									var hd = show.hd || nconf.get('media:shows:hd') || false;
+									var hashes = episode.hashes.filter(function(hash){
+										if (hash.hd == hd) return true;
+										return false;
+									});
+									hashes.forEach(function(hash){
+										addTorrent(hash.hash,episode._id);
+									});
+								}
+							} else if (episode.hash){
+								var magnet = helper.createMagnet(result.hash);
+								addTorrent(magnet,episode._id);
+							}
+						});
+					}
+					if (typeof(callback) == 'function') callback(error, (episodes.length)?show.tvdb:false);
+				});
+			}
+		});
+	},
+	downloadAll: function(tvdb, callback){
+		var self = this, tvdb = parseInt(tvdb, 10);
+		self.download(tvdb, {}, callback);
+	},
+	latest: function(user, callback){
+		var self = this;
+		
+		var lastweek = Math.round(new Date()/1000) - (7*24*60*60);
+		
+		var count = 0, list = [];
+		
+		showCollection.find({'users._id': ObjectID(user._id)},{progress:0,seasons:0,synopsis:0}).toArray(function(error, shows){
+			if (error) logger.error(error);
+			if (!shows) return;
+			
+			shows.forEach(function(show){
+				episodeCollection.find({
+					file: {$exists: true},
+					airdate: {$gt: lastweek-1},
+					tvdb: show.tvdb
+				}).toArray(function(error, episodes){
+					count++;
+					if (error) return logger.error(error);
+					var seasons = [], progress = {};
+					
+					// Get user progress
+					show.users.forEach(function(u){
+						if (!user._id.equals(u._id)) return;
+						if (u.progress) progress = u.progress;
+						if (u.seasons) viewed = u.seasons;
+					});
+					
+					if (episodes.length){
+						episodes.forEach(function(episode){
+							try {
+								episode.show_name = show.name;
+								episode.watched = false;
+								if (viewed){
+									viewed.forEach(function(season){
+										if (season.season != episode.season) return;
+										episode.watched = !!season.episodes[episode.episode];
+									});
+								}
+							} catch(e){
+								logger.error(e.message);
+							}
+							list.push(episode);
+						});
+					}
+					if (count == shows.length && typeof(callback) == 'function') callback(null, list);
+				});
+			});
+		});
+	},
+
+	list: function(user, callback){
+		try {
+			showCollection.find({'users._id': ObjectID(user._id)}).toArray(callback);
+		} catch(e){
+			logger.error(e.message);
+		}
+	},
+
+
 	
 	scan: function(user, callback){
+		// TODO
 		var self = this;
 		logger.debug('Scanning show library...');
-		
 		var base =  nconf.get('media:base') + nconf.get('media:shows:directory')
 		fs.readdir(base, function(error, dirs){
 			if (error) return;
@@ -68,7 +230,6 @@ var ShowData = {
 		});
 		
 	},
-	
 	sync: function(user, callback){
 		var self = this;
 		try {
@@ -104,6 +265,79 @@ var ShowData = {
 	},
 	
 	
+	
+	getArtwork: function(tvdb, callback){
+		var self = this, tvdb = parseInt(tvdb,10);
+		var http = require('http');
+		showCollection.findOne({'tvdb':tvdb}, function(error, show){
+			if (error) logger.error(error);
+			if (show){
+				userCollection.findOne({'admin':true,'trakt':{$exists:true}},{trakt:1},function(error,user){
+					if (error) logger.error(error);
+					if (user){
+						trakt(user.trakt).show.summary(show.tvdb, function(error, json){
+							if (json.images.banner){
+								var banner = fs.createWriteStream(nconf.get('media:base') + nconf.get('media:shows:directory') + '/' + show.directory + '/banner.jpg', {flags: 'w', mode: 0644});
+								banner.on('error', function(e){
+									logger.error(e);
+								});
+								var request = http.get(json.images.banner, function(response){
+									response.pipe(banner);
+								});
+							}
+							if (json.images.poster) {
+								var src = json.images.poster.replace('.jpg', '-138.jpg');
+								var poster = fs.createWriteStream(nconf.get('media:base') + nconf.get('media:shows:directory') + '/' + show.directory + '/poster.jpg', {flags: 'w', mode: 0644});
+								poster.on('error', function(e){
+									logger.error(e);
+								});
+								var request = http.get(src, function(response){
+									response.pipe(poster);
+								});
+							}
+						});
+					}
+				});
+			}
+			if (typeof(callback) == 'function') callback(error, show.tvdb);
+		});
+	},	
+	getEpisodeNumbers: function(file){
+		var file = file.toString();
+		var regexp	= /(?:S|Season)?\s?(\d{1,2})(?:\:[\w\s]+)?[\/\s]?(?:E|Episode|x)\s?([\d]{2,})(?:(?:E|-)\s?([\d]{2,})){0,}/i;
+		var abdexp	= /(\d{4})\D?(\d{2})\D?(\d{2})/i;
+		
+		if (match = file.match(regexp)) {
+			if (match[1] && match[2]) {
+				var response = {
+					type: 'seasons',
+					season: null,
+					episodes: []
+				};
+				var episode	= null;
+				response.season = parseInt(match[1], 10);
+				
+				if (match[3]) {
+					for (i = match[2]; i <= match[3]; i++) {
+						response.episodes.push(parseInt(i, 10));
+					}
+				} else {
+					// Single episode
+					response.episodes.push(parseInt(match[2], 10));
+				}
+			}
+			
+		} else if (match = file.match(abdexp)) {
+			// Air By Date (e.g. Colbert Report, Daily Show, Neighbours, etc)
+			var reponse = {
+				type: 'ABD',
+				year: match[0],
+				month: parseInt(match[1], 10),
+				day: parseInt(match[2], 10)
+			};
+		}
+		return (response !== undefined) ? response : false;		
+	},
 	getFeed: function(tvdb,callback){
 		// Get TVShows feed for newly added shows
 		var self = this;
@@ -130,7 +364,82 @@ var ShowData = {
 				logger.error(e.message);
 			}
 		});
-	}
+	},
+	getFilename: function(file,show){
+		// Generate a friendly filename
+		var deferred = Q.defer(), self = this;
+		
+		var numbers = self.getEpisodeNumbers(file.name);
+		var settings = {
+			'format': show.format || nconf.get('media:shows:format'),
+			'filext': path.extname(file.name).replace(/^\./,'')
+		};
+		var token = {
+			'S': null,
+			'E': null,
+			'T': [],
+			'X': settings.filext,
+		};
+		var values = [];
+		
+		episodeCollection.find({'tvdb':show.tvdb,'season':numbers.season,'episode':{$in:numbers.episodes}}).toArray(function(error,episodes){
+			if (error) logger.error(error);
+			if (episodes){
+				episodes.forEach(function(episode){
+					values.push({'episode':episode.episode,'title':episode.title.trim()});
+				});
+				if (values.length>1){
+					values.sort(function(a,b){
+						if (a.episode < b.episode) return -1;
+						if (a.episode > b.episode) return 1;
+						return 0;
+					});
+					token.E = [helper.zeroPadding(values[0].episode), helper.zeroPadding(values[values.length-1].episode)].join('-');
+					values.forEach(function(value){
+						token.T.push(value.title)
+					})
+					token.T = token.T.join('; ')
+				} else {
+					token.E = helper.zeroPadding(values[0].episode);
+					token.T = values[0].title.trim();
+				}
+				token.S = helper.zeroPadding(numbers.season);
+				token.X = settings.filext;
+				
+				var filename = settings.format.replace(/%(\w)/g, function(match, key){			
+					return token[key];
+				});
+				deferred.resolve(filename);
+			}
+		});
+		return deferred.promise;
+	},
+	getHashes: function(tvdb, callback){
+		var self = this, tvdb = parseInt(tvdb,10);
+		// Get all the hashes we can find, and add them to the database
+		showCollection.findOne({tvdb: tvdb}, function(error, show){
+			if (error || !show || !show.feed) return;
+			show.feed = helper.fixFeedUrl(show.feed, true);
+			helper.parseFeed(show.feed, null, function(error, item){
+				if (error) logger.error(error);
+				if (item){
+					try {
+						var record = {
+							'hd': item.hd,
+							'hash': item.hash,
+							'quality': (item.hd) ? 'HD':'SD',
+							'repack': item.repack
+						};
+						episodeCollection.update({'tvdb':tvdb,'season':item.season,'episode':{$in:item.episodes}}, {$addToSet:{'hashes':record}},{'w':0});
+					} catch(e){
+						logger.error(e.mesage);
+					}
+				}
+			});
+			if (typeof(callback) == 'function') callback(error,tvdb);
+		});
+	},
+	
 	
 	/***** Old methods below *****/
 	
@@ -153,10 +462,23 @@ var ShowData = {
 						'updated': new Date(),
 						'ended': (json.status == 'Ended') ? true : false
 					};
-					showCollection.update({'tvdb':record.tvdb},{$set:record},{'upsert':true}, function(error,affected,status){
-						
-						
-						
+					showCollection.update({'tvdb':record.tvdb},{$set:record},{'upsert':true}, function(error,affected,status){	
+						showCollection.findOne({'tvdb':record.tvdb}, function(error,show){
+							if (error) logger.error(error);
+							if (show){
+								if (!show.directory){
+									// Create directory
+									show.directory = helper.formatDirectory(show.name);
+									var dir = nconf.get('media:base') + nconf.get('media:shows:directory') + '/' + record.directory;
+									mkdir.sync(dir, 0775);
+								}
+								self.getArtwork(show.tvdb);
+								showCollection.save(show, function(error,result){
+									if (error) logger.error(error);
+							//		self.addUser(user,tvdb)
+								});
+							}
+						});
 					});
 				} catch(e){
 					logger.error('show.add:',e.message);
@@ -239,65 +561,7 @@ var ShowData = {
 		});
 		return;
 	},
-	
-	download: function(tvdb, data, callback){
-		var self = this, tvdb = parseInt(tvdb, 10);
-//		self.getHashes(tvdb, function(error, tvdb){
-			var search = {tvdb: tvdb};
-			if (data.season) search.season = data.season;
-			if (data.episode) search.episode = data.episode;
-			
-			episodeCollection.find(search, {hash:1}).toArray(function(error, results){
-				if (error) return logger.error(error);
-				results.forEach(function(result){
-					if (!result.hash) return;
-					var magnet = helper.createMagnet(result.hash);
-					if (magnet) {
-						torrent.add(magnet, function(error, args){
-							if (error) {
-								console.error(error);
-								return;
-							}
-							if (args){
-								episodeCollection.update({hash: result.hash}, {
-									$set: {hash: args.hashString.toUpperCase(), status: false}
-								}, {w: 0});
-							}
-						});
-					}
-				});
-			});
-//		});
-	},
-	
-	downloadAll: function(tvdb, callback){
-		// Download all available episode, except the ones we already have
-		tvdb = parseInt(tvdb, 10);
-		episodeCollection.find({tvdb: tvdb}).toArray(function(error, results){
-			if (error) logger.error(error);
-			results.forEach(function(result){
-				if (!result.hash || result.file) return;
-				var magnet = helper.createMagnet(result.hash);
-				if (magnet) {
-					torrent.add(magnet, function(error, args){
-						if (error) {
-							logger.error(error);
-							return;
-						}
-						if (args){
-							episodeCollection.update({hash: result.hash}, {
-								$set: {
-									hash: args.hashString.toUpperCase(),
-									status: false
-								}
-							}, {w: 0});
-						}
-					});
-				}
-			});
-		//	if (typeof(callback) == 'function') callback()
-		});
-	},
+		
 	
 	episodes: function(user, tvdb, callback){
 		var tvdb = parseInt(tvdb, 10);
@@ -343,63 +607,6 @@ var ShowData = {
 		});
 	},
 		
-	latest: function(user, callback){
-		var self = this;
-		var lastweek = Math.round(new Date()/1000) - (7*24*60*60);
-		
-		var count = 0, list = [];
-		
-		showCollection.find({'users._id': ObjectID(user._id)},{progress:0,seasons:0,synopsis:0}).toArray(function(error, shows){
-			if (error) logger.error(error);
-			if (!shows) return;
-			
-			shows.forEach(function(show){
-				episodeCollection.find({
-					file: {$exists: true},
-					airdate: {$gt: lastweek-1},
-					tvdb: show.tvdb
-				}).toArray(function(error, episodes){
-					count++;
-					if (error) return logger.error(error);
-					var seasons = [], progress = {};
-					
-					// Get user progress
-					show.users.forEach(function(u){
-						if (!user._id.equals(u._id)) return;
-						if (u.progress) progress = u.progress;
-						if (u.seasons) viewed = u.seasons;
-					});
-					
-					if (episodes.length){
-						episodes.forEach(function(episode){
-							try {
-								episode.show_name = show.name;
-								episode.watched = false;
-								if (viewed){
-									viewed.forEach(function(season){
-										if (season.season != episode.season) return;
-										episode.watched = !!season.episodes[episode.episode];
-									});
-								}
-							} catch(e){
-								logger.error(e.message);
-							}
-							list.push(episode);
-						});
-					}
-					if (count == shows.length && typeof(callback) == 'function') callback(null, list);
-				});
-			});
-		});
-	},
-	
-	list: function(user, callback){
-		try {
-			showCollection.find({'users._id': ObjectID(user._id)}).toArray(callback);
-		} catch(e){
-			logger.error(e.message);
-		}
-	},
 	
 	progress: function(user, tvdb, callback){
 		// Get user progress for a specific show
@@ -601,39 +808,6 @@ var ShowData = {
 	
 	/******************************************************/
 	
-	getArtwork: function(tvdb, callback){
-		var self = this, tvdb = parseInt(tvdb, 10);
-		var http = require('http');
-		showCollection.findOne({tvdb: tvdb}, function(error, show){
-			if (error || !show) return;
-			userCollection.findOne({admin: true}, {trakt:1}, function(error, admin){
-				if (error || !admin) return logger.error(error);
-				trakt(admin.trakt).show.summary(show.tvdb, function(error, json){
-					if (json.images.banner){
-						var banner = fs.createWriteStream(nconf.get('media:base') + nconf.get('media:shows:directory') + '/' + show.directory + '/banner.jpg', {flags: 'w', mode: 0644});
-						banner.on('error', function(e){
-							logger.error(e);
-						});
-						var request = http.get(json.images.banner, function(response){
-							response.pipe(banner);
-						});
-					}
-					if (json.images.poster) {
-						var src = json.images.poster.replace('.jpg', '-138.jpg');
-						var poster = fs.createWriteStream(nconf.get('media:base') + nconf.get('media:shows:directory') + '/' + show.directory + '/poster.jpg', {flags: 'w', mode: 0644});
-						poster.on('error', function(e){
-							logger.error(e);
-						});
-						var request = http.get(src, function(response){
-							response.pipe(poster);
-						});
-					}
-					if (typeof(callback) == 'function') callback(null, show.tvdb);
-					show = null;
-				});
-			});
-		});
-	},
 	
 	getCount: function(callback){
 		episodeCollection.count({file: {$exists: true}}, function(error, json){
@@ -677,34 +851,7 @@ var ShowData = {
 			});
 		});
 	},
-	
-	getHashes: function(tvdb, callback){
-		var tvdb = parseInt(tvdb, 10);
-		// Get all the hashes we can find, and add them to the database
 		
-		showCollection.findOne({tvdb: tvdb}, function(error, show){
-			if (error || !show || !show.feed) return;
-			show.feed = helper.fixFeedUrl(show.feed, true);
-			helper.parseFeed(show.feed, null, function(error, item){
-				if (error || !item.hash) return;
-				if (!!show.hd != item.hd) return;
-				var update	= {hash: item.hash};
-				var where	= {
-					tvdb: tvdb,
-					season: item.season,
-					episode: {
-						$in: item.episodes || []
-					}
-				};
-				if (!item.repack) where.hash = {$exists: false};
-				episodeCollection.update(where, {$set: update}, function(error, affected){
-					if (error) logger.error(error);
-				});
-				if (typeof(callback) == 'function') callback(null, tvdb);
-			});
-		});
-	},
-	
 	getLatest: function(){
 		var self = this;
 		// Check each of the feeds for new episodes

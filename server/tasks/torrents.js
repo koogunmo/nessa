@@ -11,34 +11,24 @@ module.exports = function(app,db,socket){
 					if (movies.complete) {
 						movies.complete(transfer, function(error, data){
 							if (error) return logger.error(error);
-							socket.emit('alert', {'title':'Download Complete','message':data.movie.title});
+							socket.emit('alert', {'title':'Movie downloaded','message':data.movie.title});
 							if (data.trash) torrent.remove({'id':transfer.id,'purge':true});
 						});
 					}
-					/*
 					if (shows.complete) {
-						shows.complete(torrent, function(error,data){
+						shows.complete(transfer, function(error,data){
 							if (error) return logger.error(error);
-							socket.emit('alert', {title: 'Download Complete', message: transfer.title});
-							if (data.trash) torrent.remove({id: transfer.id, purge: true});
+							socket.emit('alert', {'title':'Episode downloaded','message':show.name});
+							if (data.trash) torrent.remove({'id':transfer.id,'purge':true});
 						});
 					}
-					*/
 				});
 			});
 		};
-		
 		setInterval(function(){
 			checkDownloads();
-			// Legacy method (for shows)
-			torrent.complete();
 		}, 300000);
-		
 		checkDownloads();
-		
-		// Legacy method (for shows)
-		torrent.complete();
-		
 	} catch(e){
 		logger.error(e.message);
 	}

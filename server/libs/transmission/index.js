@@ -77,6 +77,8 @@ var torrent = {
 	},
 	
 	complete: function() {
+		// DEPRECATED: Use shows.complete instead
+		
 		var self = this;
 		
 		try {
