@@ -232,68 +232,60 @@ var ShowData = {
 		// TODO
 		var self = this;
 		logger.debug('Scanning show library...');
-		
-		return;
 		var base =  nconf.get('media:base') + nconf.get('media:shows:directory')
 		fs.readdir(base, function(error, dirs){
-			if (error) return;
+			if (error) logger.error(error);
 			dirs.forEach(function(dir){
 				fs.lstat(base + '/' + dir, function(error, stat){
 					if (error) return;
 					if (stat && stat.isDirectory()){
-						trakt(user.trakt).search('shows', dir, function(error, results){
+						showCollection.findOne({$or:[{'name':dir},{'directory':dir}],'tvdb':{$exists:true}},function(error,show){
 							if (error) logger.error(error);
-							if (results){
-								
-								logger.debug(dir, 'results:',results.length);
-								
-								if (results.length == 1){
-									// Exact match!
-									logger.debug(results[0].title);
-									
-									return;
-									self.add(user, parseInt(results[0].tvdb_id,10), function(){
-										
-									});
-								} else {
-									var filtered = results.filter(function(result){
-										var include = true;
-										if (dir) {
-											dir.replace(/[^\w\s]/ig).split(' ').forEach(function(word){
-												if (result.title.indexOf(word.trim()) == -1) include = false;
+							if (show){
+								var record = {
+									'status': false,
+									'directory': dir,
+									'updated': new Date()
+								};
+								showCollection.update({'tvdb':show.tvdb},{$set:record},{'w':0})
+								if (typeof(callback) == 'function') callback(error, show.tvdb);
+							} else {
+								trakt(user.trakt).search('shows', dir, function(error, results){
+									if (error) logger.error(error);
+									if (results){
+										if (results.length == 1){
+											self.add(user, parseInt(results[0].tmdb_id,10), function(error, tvdb){
+												if (typeof(callback) == 'function') callback(error, tvdb);
 											});
+										} else {
+											var filtered = results.filter(function(result){
+												var include = true;
+												dir.replace(/[^\w\s]/ig).split(' ').forEach(function(word){
+													if (result.title.indexOf(word.trim()) == -1) include = false;
+												});
+												return include;
+											});
+											if (filtered.length == 1){
+												self.add(user, parseInt(filtered[0].tmdb_id,10), function(error, tvdb){
+													if (typeof(callback) == 'function') callback(error, tvdb);
+												})
+											} else {
+												var record = {
+													'type':'shows',
+													'directory': dir,
+													'matches': filtered
+												};
+												unmatchedCollection.update({'directory':dir},{$set:record},{'upsert':true,'w':0});
+											}
 										}
-										return include;
-									});
-									if (filtered.length == 1){
-										logger.warn(dir,filtered[0].title)
+									} else {
+										var record = {
+											'type':'show',
+											'directory': dir
+										};
+										unmatchedCollection.update({'directory':dir},{$set:record},{'upsert':true,'w':0});
 									}
-									
-									
-								}
-							}
-						});
-						return;
-						
-						showCollection.find({$or:[{'name':dir},{'directory':dir}]}).toArray(function(error, results){
-							if (error) logger.error(error);
-							if (results){
-								logger.debug(results);
-								return;
-								
-								var record = {'directory': dir};
-								
-								if (results.length == 1) {
-									var result = results[0];
-						//			showCollection.update({'tvdb':result.tvdb},{$set:{'directory':dir}},{'upsert':true}, function(error, affected){
-						//				if (typeof(callback) == 'function') callback(null, result.tvdb);
-						//			});
-						//			trakt(user.trakt).show.library(result.tvdb);
-								} else {
-						//			unmatched.update({directory: dir}, {$set:{'type':}}, {upsert: true}, function(error, result){
-						//				logger.debug('Unmatched: '+dir);
-						//			});
-								}
+								});
 							}
 						});
 					}
