@@ -309,7 +309,7 @@ var ShowData = {
 	scan: function(user, callback){
 		var self = this;
 		self.scanShows(user, function(error,tvdb){
-			self.scanEpisodes(tvdb)
+			self.scanEpisodes(tvdb);
 		});
 	},
 	
@@ -332,9 +332,9 @@ var ShowData = {
 								'file': filename,
 								'updated': new Date()
 							};
-							if (!record.file) return;
+							if (!record.file || record.file == file) return;
 							helper.fileMove(result.path, showdir+'/'+record.file, function(){
-							//	episodeCollection.update({'tvdb':show.tvdb,'season':meta.season:'episode':{$in:meta.episodes}},{$set:record},{'w':0});
+								episodeCollection.update({'tvdb':show.tvdb,'season':meta.season,'episode':{$in:meta.episodes}},{$set:record},{'w':0});
 							});
 						});
 					}
