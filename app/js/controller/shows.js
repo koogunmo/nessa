@@ -190,19 +190,21 @@ define(['app'], function(nessa){
 	});
 	
 	nessa.controller('showModalCtrl', function($http, $log, $modalInstance, $rootScope, $scope, $stateParams){
+		var tvdb = parseInt($stateParams.showid, 10);
 		window.modal = $modalInstance;
 		
 		$scope.close = function(){
 			$rootScope.$broadcast('showsRefresh', true);
 			$modalInstance.close();
 		};
+		
 		$scope.dismiss = function(){
 			$modalInstance.dismiss();
 		};
 		
 		$scope.downloadAll = function(){
 			if (confirm('Are you sure you want to download all available episodes?')) {
-				$http.post('/api/shows/'+tvdb+'/download', {tvdb: tvdb}).success(function(){
+				$http.post('/api/shows/'+tvdb+'/download').success(function(){
 					$scope.close();
 				}).error(function(json, status){
 					$log.error(json, status);
@@ -222,7 +224,7 @@ define(['app'], function(nessa){
 			});
 		};
 		$scope.rescan = function(){
-			$http.get('/api/shows/'+tvdb+'/rescan').success(function(json, status){
+			$http.post('/api/shows/'+tvdb+'/scan').success(function(json, status){
 				$rootScope.$broadcast('alert', {title: $scope.show.name, message: 'Rescan in progress...'});
 				$scope.close();
 			}).error(function(json, status){
@@ -248,7 +250,7 @@ define(['app'], function(nessa){
 			});
 		};
 		$scope.update = function(){
-			$http.get('/api/shows/'+tvdb+'/update').success(function(json, status){	
+			$http.post('/api/shows/'+tvdb+'/update').success(function(json, status){	
 				$rootScope.$broadcast('alert', {title: $scope.show.name, message: 'Updating listings...'});
 				$scope.close();
 			}).error(function(json, status){
@@ -269,7 +271,7 @@ define(['app'], function(nessa){
 			$scope.load(tvdb);
 		});
 
-		var tvdb = parseInt($stateParams.showid, 10);
+		
 		$scope.load(tvdb);
 	});
 	
@@ -310,12 +312,11 @@ define(['app'], function(nessa){
 		
 		$scope.download = function(){
 			var payload = {
-				tvdb: $scope.episode.tvdb,
 				season: $scope.episode.season,
 				episode: $scope.episode.episode
 			};
 			$http.post('/api/shows/'+$scope.episode.tvdb+'/download', payload).success(function(json,status){
-				$log.log(json, status);
+				$log.debug(json, status);
 			});
 		};
 		

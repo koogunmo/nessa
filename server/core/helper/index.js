@@ -4,6 +4,7 @@ var extend	= require('xtend'),
 	mkdirp	= require('mkdirp'),
 	parser	= new(require('xml2js')).Parser(),
 	path	= require('path'),
+	Q		= require('q'),
 	qs		= require('querystring'),
 	request	= require('request'),
 	url		= require('url');
@@ -23,6 +24,7 @@ exports = module.exports = {
 	
 	// FS methods
 	fileCopy: function(from, to, callback) {
+		var deferred = Q.defer();
 		try {
 			if (!fs.existsSync(path.dirname(to))) {
 				mkdirp.sync(path.dirname(to, 0775));
@@ -37,15 +39,18 @@ exports = module.exports = {
 			});
 			wr.on('close', function(){
 				if (typeof(callback) == 'function') callback();
+				deferred.resolve()
 			});
 			rd.pipe(wr);
 		} catch(e) {
 			logger.error('helper.fileCopy: %s', e.message);
 		}
+		return deferred.promise;
 	},
 	
 	fileMove: function(from, to, callback) {
 		// Move a file to the correct location
+		var deferred = Q.defer();
 		try {
 			if (!fs.existsSync(path.dirname(to))) {
 				mkdirp.sync(path.dirname(to, 0755));
@@ -53,10 +58,12 @@ exports = module.exports = {
 			fs.rename(from, to, function(error){
 				fs.chmod(to, 0644);
 				if (typeof(callback) == 'function') callback(error);
+				deferred.resolve();
 			});
 		} catch(e) {
 			logger.error('helper.fileMove: %s', e.message);
 		}
+		return deferred.promise();
 	},
 	
 	copyFile: function(from, to, callback) {
@@ -97,41 +104,8 @@ exports = module.exports = {
 	
 	// RegExp methods
 	getEpisodeNumbers: function(file) {
-		// DEPRECATED: use shows.getEpisodeNumbers
-		var file = file.toString();
-		var regexp	= /(?:S|Season)?\s?(\d{1,2})(?:\:[\w\s]+)?[\/\s]?(?:E|Episode|x)\s?([\d]{2,})(?:(?:E|-)\s?([\d]{2,})){0,}/i;
-		var abdexp	= /(\d{4})\D?(\d{2})\D?(\d{2})/i;
-		
-		if (match = file.match(regexp)) {
-			if (match[1] && match[2]) {
-				var response = {
-					type: 'seasons',
-					season: null,
-					episodes: []
-				};
-				var episode	= null;
-				response.season = parseInt(match[1], 10);
-				
-				if (match[3]) {
-					for (i = match[2]; i <= match[3]; i++) {
-						response.episodes.push(parseInt(i, 10));
-					}
-				} else {
-					// Single episode
-					response.episodes.push(parseInt(match[2], 10));
-				}
-			}
-			
-		} else if (match = file.match(abdexp)) {
-			// Air By Date (e.g. Colbert Report, Daily Show, Neighbours, etc)
-			var reponse = {
-				type: 'ABD',
-				year: match[0],
-				month: parseInt(match[1], 10),
-				day: parseInt(match[2], 10)
-			};
-		}
-		return (response !== undefined) ? response : false;
+		logger.warn('`helper.getEpisodeNumbers` has been deprecated. Please use `shows.getEpisodeNumbers` instead');
+		return plugin('showdata').getEpisodeNumbers(file);
 	},
 	
 	// Formatting methods
@@ -142,7 +116,8 @@ exports = module.exports = {
 	},
 	
 	formatName: function(data){
-		// DEPRECATED: use shows.getFilename
+		logger.warn('`helper.formatName` has been deprecated. Please use `shows.getFilename` instead');
+		
 		try {
 			var defaults = {
 				format: nconf.get('media:shows:format'),
@@ -194,6 +169,7 @@ exports = module.exports = {
 		return name.replace(/\/\:/g, '-');
 	},
 	fixFeedUrl: function(url, full){
+		logger.warn('`helper.fixFeedUrl` has been deprecated')
 		var full = (typeof(full) == 'undefined') ? false: true;
 		if (url.indexOf('tvshowsapp.com') >= 0) {
 			var oldurl = decodeURIComponent(url);
@@ -210,7 +186,9 @@ exports = module.exports = {
 		return url;
 	},
 	parseFeed: function(url, since, callback){
-		var helper = this;
+		logger.warn('`helper.parseFeed` has been deprecated')
+		
+		var helper = this, deferred = Q.defer();
 		try {
 			var userAgent = 'NodeTV '+global.pkg.version+' (http://greebowarrior.github.io/nessa/)';
 			if (url.indexOf('tvshowsapp.com') >= 0) {
@@ -259,6 +237,7 @@ exports = module.exports = {
 								hash: helper.getHash(magnet)
 							};
 							if (typeof(callback) == 'function') callback(null, response);
+							deferred.resolve(response);
 						});
 					});
 				} catch(e){
@@ -268,6 +247,7 @@ exports = module.exports = {
 		} catch(e) {
 			logger.error('helper.parseFeed: %s', e.message);
 		}
+		return deferred.promise;
 	},
 	
 	// Torrent methods

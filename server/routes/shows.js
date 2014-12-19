@@ -25,8 +25,7 @@ module.exports = function(app, db, socket){
 	}).post('/api/shows', function(req,res){
 		// Add new show
 		if (req.body.tvdb){
-			var tvdb = parseInt(req.body.tvdb, 10)
-			shows.add(req.user, tvdb, function(error, tvdb){
+			shows.add(req.user, req.body.tvdb, function(error, tvdb){
 				shows.getArtwork(tvdb);
 				shows.getSummary(tvdb);
 				shows.getListings(tvdb, function(error, tvdb){
@@ -37,151 +36,86 @@ module.exports = function(app, db, socket){
 		}
 	});
 	
+	app.get('/api/shows/random', function(req,res){
+		shows.random(req.user, function(error,json){
+			res.send(json);
+		});
+	}).get('/api/shows/unmatched', function(req,res){
+		shows.unmatched(function(error,results){
+			if (error) logger.error(error)
+			res.send(results);
+		});
+	})
 	
-	app.post('/api/shows/scan', function(req,res){
+	
+	app.post('/api/shows/match', function(req,res){
+		shows.match(req.user, req.body, function(error, result){
+			if (error) logger.error(error);
+			if (result) return res.status(201).end();
+			res.status(400).end();
+		});
+	}).post('/api/shows/scan', function(req,res){
 		shows.scan(req.user);
 		res.status(202).end();
-		
+	}).post('/api/shows/search', function(req,res){
+		shows.search(req.user, req.body.q, function(error,results){
+			if (error) logger.error(error);
+			res.send(results);
+		});
 	}).post('/api/shows/sync', function(req,res){
 		shows.sync(req.user);
 		res.status(202).end();
 	})
 	
-	
-	
-	
-	
-	
-	
-	app.get('/api/:session?/shows/random', function(req,res){
-		// randomly pick something to watch
-		// - the first unwatched episode of a subscribed show
-		shows.random(req.user, function(error,json){
-			res.status(200).send(json);
+	app.get('/api/shows/:tvdb([0-9]+)', function(req,res){
+		shows.summary(req.user, req.params.tvdb, function(error, json){
+			if (error) logger.error(error);
+			if (json) return res.send(json);
+			res.status(404).end();
+		});
+	}).post('/api/shows/:tvdb([0-9]+)', function(req,res){
+		shows.settings(req.user,req.body,function(error,status){
+			if (error) logger.error(error);
+			if (status) return res.status(200).end();
+			res.status(400).end();
+		});
+	}).delete('/api/shows/:tvdb([0-9]+)', function(req,res){
+		shows.remove(req.user, req.params.tvdb, function(error,status){
+			if (error) logger.error(error);
+			if (status) return res.status(204).end();
+			res.status(400).end();
 		});
 	})
 	
-	app.get('/api/:session?/shows/unmatched', function(req,res){
-		shows.unmatched(function(error, json){
-			res.send(json);
-		});
-		
-	}).post('/api/:session?/shows/match', function(req,res){
-		/*
-		shows.match(req.body.matched, function(error, tvdb){
-			shows.getSummary(tvdb, function(error, tvdb){
-				shows.getArtwork(tvdb);
-				shows.getFullListings(tvdb, function(error, tvdb){
-					shows.getHashes(tvdb)
-					scanner.episodes(req.user, tvdb);
-				});
-			});
-		});
-		*/
-	});
-	
-	app.post('/api/:session?/shows/search', function(req,res){
-		// Search Trakt for a show
-		shows.search(req.user, req.body.q, function(error, results){
-			res.send(results);
-		});
-	});
-	
-	app.get('/api/:session?/shows/:id', function(req,res){
+	app.get('/api/shows/:tvdb([0-9]+)/progress', function(req,res){
 		// Get show details
-		if (req.params.id){
-			var tvdb = parseInt(req.params.id, 10);
-			shows.summary(req.user, tvdb, function(error, json){
-				if (error) logger.error(error);
-				res.send(json);
-			});
-		} else {
-			res.status(404).end();
-		}
-	}).post('/api/:session?/shows/:id', function(req,res){
-		// Update show
-		shows.settings(req.user, req.body, function(error){
-			if (error){
-				logger.error(error);
-				return res.status(400).end();
-			}
-			res.status(200).end();
+		shows.progress(req.user, req.params.tvdb, function(error, json){
+			if (error) logger.error(error);
+			if (json) return res.send(json);
+			res.status(404).end()
 		});
-	}).delete('/api/:session?/shows/:id', function(req,res){
-		// Delete show
-		if (req.params.id){
-			var tvdb = parseInt(req.params.id, 10);
-			shows.remove(req.user, tvdb, function(error){
-				if (error){
-					logger.error(error);
-					res.status(400).end();
-					return;
-				}
-				res.status(204).end();
-			});
-		}
-	});
-
-	app.get('/api/:session?/shows/:id/progress', function(req,res){
-		// Get show details
-		if (req.params.id){
-			var tvdb = parseInt(req.params.id, 10);
-			shows.progress(req.user, tvdb, function(error, json){
-				if (error) return logger.error(error);
-				res.send(json);
-			});
-		} else {
-			res.status(404).end();
-		}
-	});
+	})
 	
-	app.get('/api/:session?/shows/:id/update', function(req,res){
-		// Update show data
-		if (req.params.id){
-			var tvdb = parseInt(req.params.id, 10);
+	app.post('/api/shows/:tvdb([0-9]+)/download', function(req,res){
+		shows.download(req.params.tvdb, req.body);
+		res.status(202).end()
+	}).post('/api/shows/:tvdb([0-9]+)/scan', function(req,res){
+		// Scan episode files
+		shows.scanEpisodes(req.user, req.params.tvdb,10);
+		res.status(202).end();
+	}).post('/api/shows/:tvdb([0-9]+)/update', function(req,res){
+		// Update show listings
+		shows.getSummary(req.params.tvdb, function(error,tvdb){
 			shows.getArtwork(tvdb);
-			shows.getSummary(tvdb);
-			shows.getProgress(req.user, tvdb);
-			shows.getFullListings(tvdb, function(error, tvdb){
-				if (error) logger.error(error);
+			shows.getFeed(tvdb);
+			shows.getListings(tvdb, function(error,tvdb){
+				if (error) return logger.error(error);
 				shows.getHashes(tvdb);
 			});
-			res.status(202).end();
-		} else {
-			res.status(400).end();
-		}
-		
-	}).get('/api/:session?/shows/:id/rescan', function(req,res){
-		// Rescan local files
-		if (req.params.id){
-			var tvdb = parseInt(req.params.id, 10);
-		//	scanner.episodes(req.user, tvdb);
-			res.status(202).end();
-		} else {
-			res.status(400).end();
-		}
-	});
-	
-	// Watched
-	app.post('/api/:session?/shows/:id/watched', function(req,res){
-		if (req.params.id){
-			var tvdb = parseInt(req.params.id, 10);
-			shows.watched(req.user, tvdb, req.body);
-			res.status(202).end();
-		}
-	});
-	
-	// Downloads (Manual)
-	app.post('/api/:session?/shows/:id/download', function(req,res){
-		var status = 400;
-		if (req.body.tvdb){
-			var tvdb = parseInt(req.body.tvdb, 10);
-			status = 202;
-			shows.download(tvdb, req.body);
-		}
-		res.status(status).end();
-	});
-	
-	// Matching
-	
+		});
+		res.status(202).end();
+	}).post('/api/shows/:tvdb([0-9]+)/watched', function(req,res){
+		shows.watched(req.user, req.params.tvdb, req.body);
+		res.status(202).end();
+	})
 }
