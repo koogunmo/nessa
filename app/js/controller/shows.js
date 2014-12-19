@@ -155,8 +155,8 @@ define(['app'], function(nessa){
 			items: 24,
 			page: 1
 		};
-		$scope.$watch('filters', function(){
-			if ($scope.filter.title != '') $page = 1;
+		$scope.$watch('filter', function(){
+			if ($scope.filter.title != '') $scope.paginate.page = 1;
 		});
 		
 		$scope.clearFilter = function(){

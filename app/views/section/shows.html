@@ -3,7 +3,7 @@
 		<div class="col-sm-12">
 			<div class="input-group">
 				<span class="input-group-addon btn btn-primary" ng-click="filter.active=!filter.active" ng-class="{'active':filter.active}"><span class="fa fa-filter"></span></span>
-				<input type="text" class="form-control search" placeholder="Search library..." ng-model="filters.title" />
+				<input type="text" class="form-control search" placeholder="Search library..." ng-model="filter.title" />
 				
 				<span class="input-group-addon btn btn-info" ui-sref="shows.random"><span class="fa fa-random"></span></span>
 				<span class="input-group-addon btn btn-success" ui-sref="shows.add"><span class="fa fa-plus"></span></span>
@@ -11,6 +11,7 @@
 			</div>
 		</div>
 	</div>
+	
 	<div class="row" ng-if="filter.active">
 		<div class="col-sm-2">
 			<select class="form-control" ng-model="filter.genre" ng-options="value for value in genres.shows">

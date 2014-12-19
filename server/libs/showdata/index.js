@@ -42,55 +42,116 @@ var ShowData = {
 	
 	/***** Rewritten methods *****/
 	
-	complete: function(data, callback){
-		var self = this, hash = data.hash.toUpperCase();
-		// Called when download is complete in Transmission
-		episodeCollection.findOne({'downloading':{$exists:true},$or:[{'hashes.hash':hash},{'hash':hash}]}, function(error,episode){
-			if (error) logger.error(error);
-			if (episode){
-				var exts = ['.avi','.mkv','.mp4'], file = null, library = [], size = 0;
-				var files = data.files.filter(function(file){
-					if (exts.indexOf(path.extname(file.name)) == -1) return false;
-					return true;
-				});
-				if (files.length != 1) return;
-				file = files[0];
-				showCollection.findOne({'tvdb': episode.tvdb}, function(error,show){
-					if (error) logger.error(error);
-					if (show){
-						var basedir = nconf.get('media:base') + nconf.get('media:shows:directory') + '/' + show.directory + '/';
-						
-						self.getFilename(file,show).then(function(filename){
-							var record = {
-								'file': filename,
-								'size': files[0].bytesCompleted,
-								'added': new Date(),
-								'updated': new Date()
-							};
-							if (!record.file) return;
-							var source = data.dir+'/'+file.name, target = basedir+record.file;
-							
-							helper.fileCopy(source, target, function(error){
-								if (error) return logger.error(error);
-								var search = {'tvdb:':show.tvdb,'season':numbers.season,'episode':{$in:numbers.episodes}};
-								
-								episodeCollection.update(search,{$set:record,$unset:{'downloading':true}},{'multi':true,'w':0});
-								showCollection.update({'tvdb':show.tvdb},{$set:{'updated':record.updated}},{w:0});
-								
-								show.users.forEach(function(u){
-									userCollection.findOne({'_id': ObjectID(u._id),'trakt':{$exists:true}},{'trakt':1},function(error,user){
-										if (error) logger.error(error)
-										if (user && library) trakt(user.trakt).show.episode.library(show.tvdb, library);
+	add: function(user, tvdb, callback){
+		var self = this;
+		var process = function(error,json){
+			if (error) logger.error('show.add:',error);
+			if (json){
+				try {
+					var record = {
+						'name': json.title,
+						'year': parseInt(json.year,10),
+						'url': json.url.split('/').pop(),
+						'synopsis': json.overview,
+						'imdb': json.imdb_id,
+						'tvdb': parseInt(json.tvdb_id,10),
+						'genres': json.genres,
+						'added': new Date(),
+						'updated': new Date(),
+						'ended': (json.status == 'Ended') ? true : false
+					};
+					showCollection.update({'tvdb':record.tvdb},{$set:record},{'upsert':true}, function(error,affected,status){
+						if (error) logger.error(error);
+						if (affected){
+							showCollection.findOne({'tvdb':record.tvdb}, function(error,show){
+								if (error) logger.error(error);
+								if (show){
+									if (!show.directory){
+										// Create directory
+										show.directory = helper.formatDirectory(show.name);
+										var dir = nconf.get('media:base') + nconf.get('media:shows:directory') + '/' + record.directory;
+										mkdir.sync(dir, 0775);
+									}
+									showCollection.save(show, function(error,result){
+										if (error) logger.error(error);
+										if (result) {
+											self.addUser(user, show.tvdb);
+											self.getArtwork(show.tvdb);
+											self.getFeed(show.tvdb);
+										}
+										if (typeof(callback) == 'function') callback(error, show.tvdb);
 									});
-								});
-								if (typeof(callback) == 'function') callback(error, {show:show, trash:nconf.get('media:shows:autoclean')})
+								}
 							});
-						});
-					}
-				});
-				
+						}
+					});
+				} catch(e){
+					logger.error('show.add:',e.message);
+				}
 			}
-		});
+		};
+		if (typeof(tvdb) == 'array'){
+			tvdb.forEach(function(id){
+				trakt(user.trakt).show.summary(parseInt(id,10), process);
+			});
+		} else {
+			trakt(user.trakt).show.summary(tvdb, process);
+		}
+	},
+	complete: function(data, callback){
+		try {
+			var self = this, hash = data.hash.toUpperCase();
+			episodeCollection.findOne({'downloading':{$exists:true},$or:[{'hashes.hash':hash},{'hash':hash}]}, function(error,episode){
+				if (error) logger.error(error);
+				if (episode){
+					var exts = ['.avi','.mkv','.mp4'], file = null, library = [], size = 0;
+					var files = data.files.filter(function(file){
+						if (exts.indexOf(path.extname(file.name)) == -1) return false;
+						return true;
+					});
+					if (files.length != 1) return;
+					file = files[0];
+					showCollection.findOne({'tvdb': episode.tvdb}, function(error,show){
+						if (error) logger.error(error);
+						if (show){
+							var basedir = nconf.get('media:base') + nconf.get('media:shows:directory') + '/' + show.directory + '/';
+							
+							self.getFilename(file,show).then(function(filename){
+								var record = {
+									'file': filename,
+									'size': files[0].bytesCompleted,
+									'added': new Date(),
+									'updated': new Date()
+								};
+								if (!record.file) return;
+								var source = data.dir+'/'+file.name, target = basedir+record.file;
+								
+								helper.fileCopy(source, target, function(error){
+									if (error) return logger.error(error);
+									var search = {'tvdb:':show.tvdb,'season':numbers.season,'episode':{$in:numbers.episodes}};
+									
+									episodeCollection.update(search,{$set:record,$unset:{'downloading':true}},{'multi':true,'w':0});
+									showCollection.update({'tvdb':show.tvdb},{$set:{'updated':record.updated}},{w:0});
+									
+									if (show.users){
+										show.users.forEach(function(u){
+											userCollection.findOne({'_id': ObjectID(u._id),'trakt':{$exists:true}},{'trakt':1},function(error,user){
+												if (error) logger.error(error)
+												if (user && library) trakt(user.trakt).show.episode.library(show.tvdb, library);
+											});
+										});
+									}
+									if (typeof(callback) == 'function') callback(error, {show:show, trash:nconf.get('media:shows:autoclean')})
+								});
+							});
+						}
+					});
+					
+				}
+			});
+		} catch(e){
+			logger.error(e.message);
+		}
 	},
 	download: function(tvdb, filter, callback){
 		var self = this, tvdb = parseInt(tvdb,10);
@@ -227,9 +288,24 @@ var ShowData = {
 			logger.error(e.message);
 		}
 	},
-	
+	remove: function(user, tvdb, callback){
+		var self = this, tvdb = parseInt(tvdb, 10);
+		try {
+			showCollection.findOne({'tvdb':tvdb}, function(error, show){
+				if (error) logger.error(error);
+				if (show){
+					trakt(user.trakt).show.unlibrary(show.tvdb);
+					var update = {$pull: {'users':{'_id':ObjectID(user._id)}}};
+					if (show.users.length == 1) update.$set = {status: false};
+					showCollection.update({'tvdb': tvdb}, update, {'w':0});
+				}
+				if (typeof(callback) == 'function') callback(error);
+			});
+		} catch(e){
+			logger.error(e.message);
+		}
+	},
 	scan: function(user, callback){
-		// TODO
 		var self = this;
 		logger.debug('Scanning show library...');
 		var base =  nconf.get('media:base') + nconf.get('media:shows:directory')
@@ -292,7 +368,6 @@ var ShowData = {
 				});
 			});
 		});
-		
 	},
 	sync: function(user, callback){
 		var self = this;
@@ -315,12 +390,12 @@ var ShowData = {
 							'updated': new Date()
 						};
 						showCollection.update({'tvdb':record.tvdb},{$set:record},{'upsert':true},function(error,affected,status){
-							if (error) return logger.error(error);
-							// TODO: add users
-						//	showCollection.update({tvdb: record.tvdb}, {$addToSet: {user: {_id: user._id, username: user.username}}}, {w:0})
-							
-						//	self.getFeed(record.tvdb);
-							self.getArtwork(record.tmdb);
+							if (error) logger.error(error);
+							if (affected){
+								self.addUser(user, record.tvdb);
+								self.getArtwork(record.tvdb);
+								self.getFeed(record.tvdb)
+							}
 						});
 					});
 				}
@@ -333,8 +408,24 @@ var ShowData = {
 	unmatched: function(callback){
 		unmatchedCollection.find({'type':'show'}).toArray(callback);
 	},
-		
 	
+	
+	addUser: function(user,tvdb){
+		var self = this, tvdb = parseInt(tvdb,10);
+		showCollection.find({'tvdb':tvdb,'users._id':ObjectID(user._id)},{'tvdb':1,'users':1},function(error,show){
+			if (error) logger.error(error);
+			if (!show){
+				var record = {
+					'_id': ObjectID(user._id),
+					'username': user.username
+				};
+				showCollection.update({'tvdb':show.tvdb},{$addToSet:record},function(error,affected){
+					if (error) logger.error(error);
+					if (affected) self.getProgress(user, show.tvdb);
+				});
+			}
+		});
+	},
 	getArtwork: function(tvdb, callback){
 		var self = this, tvdb = parseInt(tvdb,10);
 		var http = require('http');
@@ -373,7 +464,7 @@ var ShowData = {
 	},	
 	getEpisodeNumbers: function(file){
 		var file = file.toString();
-		var regexp	= /(?:S|Season)?\s?(\d{1,2})(?:\:[\w\s]+)?[\/\s]?(?:E|Episode|x)\s?([\d]{2,})(?:(?:E|-)\s?([\d]{2,})){0,}/i;
+		var regexp	= /(?:[a-z]+)?\s?(\d{1,2})(?:\:[\w\s]+)?[\/\s]?(?:[a-z]+)?\s?([\d]{2,})(?:(?:E|-)\s?([\d]{2,})){0,}/i;
 		var abdexp	= /(\d{4})\D?(\d{2})\D?(\d{2})/i;
 		
 		if (match = file.match(regexp)) {
@@ -408,8 +499,7 @@ var ShowData = {
 		return (response !== undefined) ? response : false;		
 	},
 	getFeed: function(tvdb,callback){
-		// Get TVShows feed for newly added shows
-		var self = this;
+		var self = this, tvdb = parseInt(tvdb,10);
 		var options = {
 			url: 'http://tvshowsapp.com/showlist/showlist.xml',
 			headers: {
@@ -508,130 +598,39 @@ var ShowData = {
 			if (typeof(callback) == 'function') callback(error,tvdb);
 		});
 	},
+	getListings: function(tvdb, callback){
+		var self = this, tvdb = parseInt(tvdb, 10);
+		userCollection.findOne({'admin':true,'trakt':{$exists:true}},{trakt:1}, function(error, user){
+			if (error) logger.error(error);
+			if (user){
+				trakt(user.trakt).show.seasons(tvdb, function(error, seasons){
+					if (seasons.length){
+						var count = 0;
+						var total = seasons.length;
+						seasons.forEach(function(season){
+							trakt(user.trakt).show.season.info(tvdb, season.season, function(error, episodes){
+								count++;
+								if (episodes.length){
+									episodes.forEach(function(episode){
+										episode.tvdb = tvdb;
+										self.setEpisode(episode);
+									});
+								}
+								if (count == total) {
+									if (typeof(callback) == 'function') callback(null, tvdb);
+								}
+							});
+						});
+					}
+				});
+			}
+		});
+	},
+	
 	
 	
 	/***** Old methods below *****/
-	
-	add: function(user, tvdb, callback){
-		var self = this;
-		/*
-		var process = function(error,json){
-			if (error) logger.error('show.add:',error);
-			if (json){
-				try {
-					var record = {
-						'name': json.title,
-						'year': parseInt(json.year,10),
-						'url': json.url.split('/').pop(),
-						'synopsis': json.overview,
-						'imdb': json.imdb_id,
-						'tvdb': parseInt(json.tvdb_id,10),
-						'genres': json.genres,
-						'added': new Date(),
-						'updated': new Date(),
-						'ended': (json.status == 'Ended') ? true : false
-					};
-					showCollection.update({'tvdb':record.tvdb},{$set:record},{'upsert':true}, function(error,affected,status){	
-						showCollection.findOne({'tvdb':record.tvdb}, function(error,show){
-							if (error) logger.error(error);
-							if (show){
-								if (!show.directory){
-									// Create directory
-									show.directory = helper.formatDirectory(show.name);
-									var dir = nconf.get('media:base') + nconf.get('media:shows:directory') + '/' + record.directory;
-									mkdir.sync(dir, 0775);
-								}
-								self.getArtwork(show.tvdb);
-								showCollection.save(show, function(error,result){
-									if (error) logger.error(error);
-							//		self.addUser(user,tvdb)
-								});
-							}
-						});
-					});
-				} catch(e){
-					logger.error('show.add:',e.message);
-				}
-			}
-		};
 		
-		if (typeof(tvdb) == 'array'){
-			tvdb.forEach(function(id){
-				trakt(user.trakt).show.summary(parseInt(id,10), process);
-			});
-		} else {
-			trakt(user.trakt).show.summary(tvdb, process);
-		}
-		
-		/********************************************/
-		
-		
-		// Get show info from trakt
-		trakt(user.trakt).show.summary(tvdb, function(error, json){
-			// Update shows collection
-			showCollection.findOne({tvdb: tvdb}, function(error, record){
-				if (error) logger.error(error);
-				if (record) {
-					// It is known. Update document
-					if (json.imdb_id) record.imdb = json.imdb_id;
-					if (json.overview) record.synopsis = json.overview;
-					record.name = json.title;
-					record.status = (record.feed) ? true : false;
-					if (!record.users) record.users = [];
-				} else {
-					// New show, create document
-					var record = {
-						ended: false,
-						genres: json.genres,
-						imdb: json.imdb_id,
-						name: json.title,
-						status: false,
-						synopsis: json.overview,
-						tvdb: parseInt(json.tvdb_id, 10),
-						users: []
-					};
-				}
-				var createDir = false;
-				if (record.directory){
-					// Does the directory actually exist?
-					var dir = nconf.get('media:base') + nconf.get('media:shows:directory') + '/' + record.directory;
-					if (!fs.existsSync(dir)) createDir = true
-				} else {
-					// Create directory
-					record.directory = helper.formatDirectory(record.name);
-					createDir = true;
-				}
-				if (createDir){
-					var dir = nconf.get('media:base') + nconf.get('media:shows:directory') + '/' + record.directory;
-					mkdir(dir, 0775, function(error){
-						if (error) logger.error(error);
-					});
-				}
-				
-				// Add user to show.users
-				if (record.users){
-					var found = false;
-					record.users.forEach(function(u){
-						if (ObjectID(u._id) == ObjectID(user._id)) found = true;
-					});
-					if (!found) {
-						record.users.push({_id: ObjectID(user._id), username: user.username, progress: {}, seasons: []});
-					}
-				}
-				// Save show record
-				showCollection.save(record, {safe: true}, function(error, result){
-					if (error) return logger.error(error);
-					trakt(user.trakt).show.watchlist(tvdb, function(){
-						self.getProgress(user, tvdb);
-					});
-					if (typeof(callback) == 'function') callback(error, tvdb);
-				});
-			});
-		});
-		return;
-	},
-		
-	
 	episodes: function(user, tvdb, callback){
 		var tvdb = parseInt(tvdb, 10);
 		
@@ -695,27 +694,7 @@ var ShowData = {
 			logger.error(e.message);
 		}
 	},
-	
-	remove: function(user, tvdb, callback){
-		// Remove a show from your library
-		var tvdb = parseInt(tvdb, 10);
-		try {
-			showCollection.findOne({tvdb: tvdb}, function(error, show){
-				trakt(user.trakt).show.unlibrary(tvdb);
-				var update = {
-					$pull: {users: {_id: ObjectID(user._id)}}
-				};
-				if (show.users.length == 1) update.$set = {status: false};
-				showCollection.update({tvdb: tvdb}, update, function(error){
-					if (error) logger.error(error);
-					if (typeof(callback) == 'function') callback(error);
-				});
-			});
-		} catch(e){
-			logger.error(e.message);
-		}
-	},
-	
+		
 	search: function(user, query, callback){
 		if (!user.trakt) return;
 		try {
@@ -830,7 +809,6 @@ var ShowData = {
 	
 	/******************************************************/
 	
-	
 	getCount: function(callback){
 		episodeCollection.count({file: {$exists: true}}, function(error, json){
 			if (typeof(callback) == 'function') callback(error, json);
@@ -848,30 +826,9 @@ var ShowData = {
 	},
 	
 	getFullListings: function(tvdb, callback){
+		// DEPRECATED
 		var self = this, tvdb = parseInt(tvdb, 10);
-		
-		userCollection.findOne({admin: true}, {trakt:1}, function(error, user){
-			trakt(user.trakt).show.seasons(tvdb, function(error, seasons){
-				if (seasons.length){
-					var count = 0;
-					var total = seasons.length;
-					seasons.forEach(function(season){
-						trakt(user.trakt).show.season.info(tvdb, season.season, function(error, episodes){
-							count++;
-							if (episodes.length){
-								episodes.forEach(function(episode){
-									episode.tvdb = tvdb;
-									self.setEpisode(episode);
-								});
-							}
-							if (count == total) {
-								if (typeof(callback) == 'function') callback(null, tvdb);
-							}
-						});
-					});
-				}
-			});
-		});
+		self.getListings(tvdb, callback);
 	},
 		
 	getLatest: function(){
