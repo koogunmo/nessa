@@ -74,66 +74,7 @@ module.exports = function(app,db,socket){
 	
 	/* These should be moved to their related route files */
 	
-	app.post('/api/:session?/rebuild', function(req,res){
-		if (req.body.type){
-			switch(req.body.type){
-				case 'movies':
-					movies.clearSymlinks(function(){
-						movies.sync(req.user, function(error, result){
-							if (result.library) {
-								movies.scan(req.user, function(error, tmdb){
-									if (error) logger.error(error);
-									if (tmdb){
-										movies.getArtwork(tmdb);
-										movies.getHashes(tmdb);
-									}
-								});
-							}
-						});
-					});
-					break;
-				case 'shows':
-					break;
-			}
-		}
-		res.status(202).end();
-	}).post('/api/:session?/rescan', function(req,res){
-		if (req.body.type){
-			switch (req.body.type){
-				case 'movies':
-					movies.sync(req.user, function(error, result){
-						if (error) logger.error(error);
-						if (result.library) {
-							movies.scan(req.user, function(error, tmdb){
-								if (error) logger.error(error)
-								if (tmdb){
-									movies.getArtwork(tmdb);
-									movies.getHashes(tmdb);
-								}
-							});
-						}
-					});
-					break;
-				case 'shows':
-				default:
-					/* TODO
-					shows.sync(req.user, function(error, count){
-						shows.scan(req.user, function(error, tvdb){
-							shows.getHashes();
-						});
-					})
-					*/
-					scanner.shows(req.user, function(error, tvdb){
-						shows.getFullListings(tvdb, function(error, tvdb){
-							shows.getHashes(tvdb);
-							scanner.episodes(req.user, tvdb);
-						});
-					});
-			}
-		}
-		res.status(202).end();
-		
-	}).post('/api/:session?/system', function(req,res){
+	app.post('/api/:session?/system', function(req,res){
 		
 		// TODO: this is horrific... What the hell was I thinking!
 		
@@ -146,6 +87,7 @@ module.exports = function(app,db,socket){
 				case 'latest':
 					// Check for new downloads
 					break;
+				/*
 				case 'listings':
 					// Update all show listings
 					showCollection.find({status: true}, {tvdb:1}).toArray(function(error, results){
@@ -164,6 +106,7 @@ module.exports = function(app,db,socket){
 						}
 					});
 					break;
+				
 				case 'rescan':
 					// Rescan media
 					scanner.shows(req.user, function(error, tvdb){
@@ -173,6 +116,7 @@ module.exports = function(app,db,socket){
 						});
 					});
 					break;
+				*/
 				case 'upgrade':
 					// Update DB to 0.8 format
 					episodeCollection.update({}, {$unset: {watched: true}}, {multi:true, w:0});

@@ -11,10 +11,9 @@ var logger = log4js.getLogger('routes:shows');
 
 module.exports = function(app, db, socket){
 	
-	var scanner	= plugin('scanner'),
-		shows	= plugin('showdata');
+	var shows	= plugin('showdata');
 		
-	app.get('/api/:session?/shows', function(req,res){
+	app.get('/api/shows', function(req,res){
 		shows.list(req.user, function(error,results){
 			if (error) logger.error(error);
 			if (results){
@@ -23,22 +22,21 @@ module.exports = function(app, db, socket){
 				res.status(404).end();
 			}
 		});
-		
-	}).post('/api/:session?/shows', function(req,res){
+	}).post('/api/shows', function(req,res){
 		// Add new show
 		if (req.body.tvdb){
 			var tvdb = parseInt(req.body.tvdb, 10)
 			shows.add(req.user, tvdb, function(error, tvdb){
 				shows.getArtwork(tvdb);
-				shows.getSummary(tvdb, function(error, tvdb){
-					shows.getFullListings(tvdb, function(error, tvdb){
-						shows.getHashes(tvdb);
-					})
-				});
+				shows.getSummary(tvdb);
+				shows.getListings(tvdb, function(error, tvdb){
+					shows.getHashes(tvdb);
+				})
 				res.status(201).end();
 			});
 		}
 	});
+	
 	
 	app.post('/api/shows/scan', function(req,res){
 		shows.scan(req.user);
@@ -47,7 +45,6 @@ module.exports = function(app, db, socket){
 	}).post('/api/shows/sync', function(req,res){
 		shows.sync(req.user);
 		res.status(202).end();
-		
 	})
 	
 	
@@ -158,7 +155,7 @@ module.exports = function(app, db, socket){
 		// Rescan local files
 		if (req.params.id){
 			var tvdb = parseInt(req.params.id, 10);
-			scanner.episodes(req.user, tvdb);
+		//	scanner.episodes(req.user, tvdb);
 			res.status(202).end();
 		} else {
 			res.status(400).end();

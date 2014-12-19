@@ -1,5 +1,9 @@
 /* Scan local filesystem for shows and episodes */
 
+
+// DEPRECATED! All filescan functions have been moved to the relevant module
+
+
 var fs		= require('fs'),
 	log4js	= require('log4js'),
 	mime	= require('mime'),
@@ -52,9 +56,6 @@ var Scanner = {
 	},
 	
 	shows: function(user, callback){
-		
-		var unmatched = db.collection('unmatched');
-		
 		logger.debug('Shows: Scanning...')
 		
 		// Scan media directory for folders - calback is called for each item found
@@ -79,7 +80,7 @@ var Scanner = {
 									});
 									trakt(user.trakt).show.library(result.tvdb);
 								} else {
-									unmatched.update({directory: dir}, {$set: record}, {upsert: true}, function(error, result){
+									unmatchedCollection.update({directory: dir}, {$set: record}, {upsert: true}, function(error, result){
 										logger.debug('Unmatched: '+dir);
 									});
 								}

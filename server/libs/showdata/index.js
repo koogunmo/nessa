@@ -305,8 +305,46 @@ var ShowData = {
 			logger.error(e.message);
 		}
 	},
+	
 	scan: function(user, callback){
 		var self = this;
+		self.scanShows(user, function(error,tvdb){
+			self.scanEpisodes(tvdb)
+		});
+	},
+	
+	scanEpisodes: function(tvdb,callback){
+		var self = this, tvdb = parseInt(tvdb,10);
+		var exts = ['.avi','.mkv','.mp4'];
+		
+		showCollection.findOne({'tvdb':tvdb,'directory':{$exists:true}}, function(error,show){
+			if (error) logger.error(error);
+			if (show){
+				var showdir = nconf.get('media:base')+nconf.get('media:shows:directory')+'/'+show.directory;
+				helper.listDirectory(showdir, function(error,result){
+					var file = result.path.replace(showdir+'/', '');
+					if (exts.indexOf(path.extname(file)) == -1) return;
+					var meta = self.getEpisodeNumbers(file);
+					if (meta && meta.episodes){
+						self.getFilename(file,show).then(function(filename){
+							var record = {
+								'status': true,
+								'file': filename,
+								'updated': new Date()
+							};
+							if (!record.file) return;
+							helper.fileMove(result.path, showdir+'/'+record.file, function(){
+							//	episodeCollection.update({'tvdb':show.tvdb,'season':meta.season:'episode':{$in:meta.episodes}},{$set:record},{'w':0});
+							});
+						});
+					}
+				});
+			}
+		});
+	},
+	scanShows: function(user, callback){
+		var self = this;
+		
 		logger.debug('Scanning show library...');
 		var base =  nconf.get('media:base') + nconf.get('media:shows:directory')
 		fs.readdir(base, function(error, dirs){
@@ -464,7 +502,7 @@ var ShowData = {
 	},	
 	getEpisodeNumbers: function(file){
 		var file = file.toString();
-		var regexp	= /(?:[a-z]+)?\s?(\d{1,2})(?:\:[\w\s]+)?[\/\s]?(?:[a-z]+)?\s?([\d]{2,})(?:(?:E|-)\s?([\d]{2,})){0,}/i;
+		var regexp	= /(?:[a-z]+)?\s?(\d{1,2})(?:\:[\w\s]+)?[\/\s]?(?:E|x|[a-z]{2,})?\s?([\d]{2,})(?:(?:E|-)\s?([\d]{2,})){0,}/i;
 		var abdexp	= /(\d{4})\D?(\d{2})\D?(\d{2})/i;
 		
 		if (match = file.match(regexp)) {
@@ -528,10 +566,12 @@ var ShowData = {
 		// Generate a friendly filename
 		var deferred = Q.defer(), self = this;
 		
-		var numbers = self.getEpisodeNumbers(file.name);
+		var file = (typeof(file) == 'object' && file.name) ? file.name : file;
+		
+		var numbers = self.getEpisodeNumbers(file);
 		var settings = {
 			'format': show.format || nconf.get('media:shows:format'),
-			'filext': path.extname(file.name).replace(/^\./,'')
+			'filext': path.extname(file).replace(/^\./,'')
 		};
 		var token = {
 			'S': null,
@@ -892,7 +932,7 @@ var ShowData = {
 									}, {w: 0});
 								}
 							});
-							self.getFullListings(show.tvdb);
+							self.getListings(show.tvdb);
 						} 
 					});
 				});
