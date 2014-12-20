@@ -321,7 +321,9 @@ define(['app'], function(nessa){
 		};
 		
 		$scope.canDownload = function(){
-			if ($scope.episode.hash && $scope.episode.status === undefined) {
+			if ($scope.episode.hash || $scope.episode.hashes){
+				if ($scope.episode.downloading) return false;
+				if ($scope.episode.file) return false;
 				return true;
 			}
 			return false;
@@ -329,9 +331,10 @@ define(['app'], function(nessa){
 		
 		$scope.downloadStatus = function(){
 			var status = '';
-			if ($scope.episode.hash) status = 'available';	
-			if ($scope.episode.status && !$scope.episode.file) status = 'downloading'
-			if ($scope.episode.status && $scope.episode.file) status = 'downloaded';
+			if ($scope.episode.hash || $scope.episode.hashes) status = 'available';
+			if ($scope.episode.file) status = 'downloaded';
+			if ($scope.episode.downloading) status = 'downloading';
+			
 			return status;
 		};
 		

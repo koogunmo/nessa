@@ -10,7 +10,6 @@ log4js.configure({
 var logger = log4js.getLogger('routes:system');
 
 module.exports = function(app,db,socket){
-	
 	var movies	= plugin('moviedata'),
 		shows	= plugin('showdata'),
 		system	= require('nodetv-system');
@@ -64,14 +63,32 @@ module.exports = function(app,db,socket){
 		system.update();
 	}).post('/api/system/upgrade', function(req,res){
 		// Update DB to 0.8 format
-		episodeCollection.update({}, {$unset: {watched: true}}, {multi:true, w:0});
-		showCollection.update({}, {$unset: {seasons:true, progress:true}}, {multi:true, w:0});
-		userCollection.update({}, {$unset: {session: true, lastTime: true}}, {multi:true, w:0});
+
+		episodeCollection.find({'airdate':{$exists:true}}).toArray(function(error,episodes){
+			episodes.forEach(function(episode){
+				if (typeof(episode.airdate) == 'number'){
+					var record = {'airdate': new Date(episode.airdate*1000)};
+					episodeCollection.update({'_id':ObjectID(episode._id)},{$set:record},{'w':0});
+				}
+			})
+		})
+
+		return;
+		
+		episodeCollection.update({},{$unset:{'status':true,'watched':true}},{'multi':true,'w':0});
+		
+		showCollection.update({},{$unset:{'seasons':true,'progress':true}},{'multi':true,'w':0});
+		showCollection.remove({'directory':{$exists:false},'status':{$exists:false}});
+		
+		userCollection.update({},{$unset:{'session':true,'lastTime':true}},{'multi':true,'w':0});
+		
+		/*
 		// Add users to all enabled shows
 		userCollection.findOne({_id: ObjectID(req.user._id)}, {_id:1,username:1}, function(error, user){
 			if (error) return logger.error(error);
 			if (user) showCollection.update({status: {$exists: true}, users: {$exists: false}}, {$push: {users: user}}, {multi:true, w:0});
 		});
+		*/
 		
 		res.status(202).end();
 	})

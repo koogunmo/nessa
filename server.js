@@ -67,9 +67,7 @@ try {
 /***********************************************************************/
 /* Load dependencies */
 
-var	express	= require('express'),
-	fs		= require('fs'),
-	path	= require('path');
+var	fs		= require('fs'), path	= require('path');
 
 /* Global methods */
 global.events = new (require('events')).EventEmitter;
@@ -120,10 +118,10 @@ app.disable('x-powered-by');
 
 // Move this
 if (!nconf.get('listen:nginx')){
-	app.use('/app', express.static(process.cwd() + '/app'));
-	app.use('/assets', express.static(process.cwd() + '/app/assets'));
-	app.use('/template', express.static(process.cwd() + '/app/views/ui'));
-	app.use('/views', express.static(process.cwd() + '/app/views'));
+	app.use('/app', require('express').static(process.cwd() + '/app'));
+	app.use('/assets', require('express').static(process.cwd() + '/app/assets'));
+	app.use('/template', require('express').static(process.cwd() + '/app/views/ui'));
+	app.use('/views', require('express').static(process.cwd() + '/app/views'));
 }
 
 try {
@@ -147,7 +145,7 @@ try {
 			global.torrent	= plugin('transmission');
 			
 			if (nconf.get('media:base') && !nconf.get('listen:nginx')){
-				app.use('/media', express.static(nconf.get('media:base')));
+				app.use('/media', require('express').static(nconf.get('media:base')));
 			}
 			
 			// Load routes

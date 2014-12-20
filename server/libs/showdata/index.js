@@ -23,7 +23,7 @@ var episodeCollection = db.collection('episode'),
 	showCollection = db.collection('show'),
 	unmatchedCollection = db.collection('unmatched'),
 	userCollection = db.collection('user');
-	
+
 var ShowData = {
 	
 	/***** Rewritten methods *****/
@@ -104,7 +104,6 @@ var ShowData = {
 							
 							self.getFilename(file,show).then(function(filename){
 								var record = {
-									'status': true,
 									'file': filename,
 									'size': files[0].bytesCompleted,
 									'added': new Date(),
@@ -149,7 +148,7 @@ var ShowData = {
 					var magnet = helper.createMagnet(hash);
 					torrent.add(magnet, function(error,args){
 						if (error) logger.error(error);
-						if (args) episodeCollection.update({'_id':ObjectID(id)},{$set:{'downloading':true,'hash':hash,'status':false}},{'w':0});
+						if (args) episodeCollection.update({'_id':ObjectID(id)},{$set:{'downloading':true,'hash':hash}},{'w':0});
 					});
 				};
 				var search = {'tvdb':show.tvdb,$or:[{'hashes.hash':{$exists:true}},{'hash':{$exists:true}}]};
@@ -188,50 +187,47 @@ var ShowData = {
 	latest: function(user, callback){
 		var self = this;
 		
-		var lastweek = Math.round(new Date()/1000) - (7*24*60*60);
+		var lastweek = new Date()
+		lastweek.setDate(lastweek.getDate()-7);
 		
 		var count = 0, list = [];
 		
 		showCollection.find({'users._id': ObjectID(user._id)},{'progress':0,'seasons':0,'synopsis':0}).toArray(function(error, shows){
 			if (error) logger.error(error);
-			if (!shows) return;
-			
-			shows.forEach(function(show){
-				episodeCollection.find({
-					file: {$exists: true},
-					airdate: {$gt: lastweek-1},
-					tvdb: show.tvdb
-				}).toArray(function(error, episodes){
-					count++;
-					if (error) return logger.error(error);
-					var seasons = [], progress = {};
-					
-					show.users.forEach(function(u){
-						if (!user._id.equals(u._id)) return;
-						if (u.progress) progress = u.progress;
-						if (u.seasons) viewed = u.seasons;
-					});
-					
-					if (episodes.length){
-						episodes.forEach(function(episode){
-							try {
-								episode.show_name = show.name;
-								episode.watched = false;
-								if (viewed){
-									viewed.forEach(function(season){
-										if (season.season != episode.season) return;
-										episode.watched = !!season.episodes[episode.episode];
-									});
-								}
-							} catch(e){
-								logger.error(e.message);
-							}
-							list.push(episode);
+			if (shows) {
+				shows.forEach(function(show){
+					episodeCollection.find({'tvdb':show.tvdb,'file':{$exists:true},'airdate':{$gt:lastweek}}).toArray(function(error, episodes){
+						count++;
+						if (error) return logger.error(error);
+						var seasons = [], progress = {};
+						
+						show.users.forEach(function(u){
+							if (!user._id.equals(u._id)) return;
+							if (u.progress) progress = u.progress;
+							if (u.seasons) viewed = u.seasons;
 						});
-					}
-					if (count == shows.length && typeof(callback) == 'function') callback(null, list);
+						
+						if (episodes.length){
+							episodes.forEach(function(episode){
+								try {
+									episode.show_name = show.name;
+									episode.watched = false;
+									if (viewed){
+										viewed.forEach(function(season){
+											if (season.season != episode.season) return;
+											episode.watched = !!season.episodes[episode.episode];
+										});
+									}
+								} catch(e){
+									logger.error(e.message);
+								}
+								list.push(episode);
+							});
+						}
+						if (count == shows.length && typeof(callback) == 'function') callback(null, list);
+					});
 				});
-			});
+			}
 		});
 	},
 	list: function(user, callback){
@@ -278,8 +274,8 @@ var ShowData = {
 				if (error) logger.error(error);
 				if (show){
 					var update = {$pull:{'users':{'_id':ObjectID(user._id)}}};
-					if (show.users.length == 1) update.$set = {status: false};
-					showCollection.update({'tvdb': tvdb}, update, {'w':0});
+					if (show.users.length == 1) update.$set = {'status': false};
+					showCollection.update({'tvdb':tvdb}, update, {'w':0});
 					trakt(user.trakt).show.unlibrary(show.tvdb);
 				}
 				if (typeof(callback) == 'function') callback(error,!!show);
@@ -309,7 +305,6 @@ var ShowData = {
 					if (meta && meta.episodes){
 						self.getFilename(file,show).then(function(filename){
 							var record = {
-								'status': true,
 								'file': filename,
 								'updated': new Date()
 							};
@@ -902,7 +897,6 @@ var ShowData = {
 					
 					if (episodes.length){
 						episodes.forEach(function(episode){
-							episode.watched = false;
 							if (viewed) {
 								viewed.forEach(function(view){
 									if (view.season != episode.season) return;
@@ -1079,7 +1073,7 @@ var ShowData = {
 	
 	sanitize: function() {
 		// Remove unused values from the show documents - DEPRECATED?
-		showCollection.update({status: {$exists: true}}, {$unset: {seasons: '', progress: '', trakt: ''}}, {w:0, multi: true});
+	//	showCollection.update({status: {$exists: true}}, {$unset: {seasons: '', progress: '', trakt: ''}}, {w:0, multi: true});
 	},
 	
 	getUnmatched: function(callback){
