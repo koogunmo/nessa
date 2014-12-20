@@ -58,6 +58,8 @@ var ShowData = {
 										var dir = nconf.get('media:base') + nconf.get('media:shows:directory') + '/' + record.directory;
 										mkdir.sync(dir, 0775);
 									}
+									if (typeof(show.hd) == 'undefined') show.hd = nconf.get('media:shows:hd') || false;
+									
 									showCollection.save(show, function(error,result){
 										if (error) logger.error(error);
 										if (result) {
