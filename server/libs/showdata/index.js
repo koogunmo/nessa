@@ -101,7 +101,7 @@ var ShowData = {
 	complete: function(data, callback){
 		try {
 			var self = this, hash = data.hash.toUpperCase();
-			episodeCollection.findOne({'downloading':{$exists:true},$or:[{'hashes.hash':hash},{'hash':hash}]}, function(error,episode){
+			episodeCollection.findOne({'downloading':{$exists:true},$or:[{'hash':hash},{'hashes.hash':hash}]}, function(error,episode){
 				if (error) logger.error(error);
 				if (episode){
 					var exts = ['.avi','.mkv','.mp4'], file = null, library = [], size = 0;
@@ -118,6 +118,7 @@ var ShowData = {
 							
 							self.getFilename(file,show).then(function(filename){
 								var record = {
+									'status': true,
 									'file': filename,
 									'size': files[0].bytesCompleted,
 									'added': new Date(),
@@ -162,7 +163,7 @@ var ShowData = {
 					var magnet = helper.createMagnet(hash);
 					torrent.add(magnet, function(error,args){
 						if (error) logger.error(error);
-						if (args) episodeCollection.update({'_id':ObjectID(id)},{$set:{'downloading':true,'status':false}},{'w':0});
+						if (args) episodeCollection.update({'_id':ObjectID(id)},{$set:{'downloading':true,'hash':hash,'status':false}},{'w':0});
 					});
 				};
 				var search = {'tvdb':show.tvdb,$or:[{'hashes.hash':{$exists:true}},{'hash':{$exists:true}}]};
@@ -173,23 +174,19 @@ var ShowData = {
 					if (episodes){
 						episode.forEach(function(episode){
 							if (episode.file) return;
-							if (episode.hashes.length){
-								if (episodes.hashes.length == 1){
-									var magnet = helper.createMagnet(episodes.hashes[0].hash);
-									addTorrent(magnet,episode._id);
-								} else {
-									var hd = show.hd || nconf.get('media:shows:hd') || false;
-									var hashes = episode.hashes.filter(function(hash){
-										if (hash.hd == hd) return true;
-										return false;
-									});
-									hashes.forEach(function(hash){
-										addTorrent(hash.hash,episode._id);
-									});
-								}
-							} else if (episode.hash){
+							
+							if (episode.hash){
 								var magnet = helper.createMagnet(result.hash);
 								addTorrent(magnet,episode._id);
+							} else if (episode.hashes.length){
+								var hashes = episode.hashes.filter(function(hash){
+									if (hash.hd == show.hd) return true;
+									return false;
+								})
+								if (!hashes.length) return;
+								hashes.forEach(function(hash){
+									addTorrent(hash.hash,episode._id);
+								});
 							}
 						});
 					}
@@ -646,13 +643,14 @@ var ShowData = {
 			if (error) logger.error(error);
 			if (show){
 				show.feed = self.fixFeedUrl(show.feed, true);
-				self.parseFeed(show.feed, null, function(error, item){
+				self.parseFeed(show.feed, null, function(error,item){
 					if (error) logger.error(error);
 					if (item){
 						var record = {
 							'hd': item.hd,
 							'hash': item.hash,
 							'quality': (item.hd) ? 'HD':'SD',
+							'published': item.published,
 							'repack': item.repack
 						};
 						episodeCollection.update({'tvdb':show.tvdb,'season':item.season,'episode':{$in:item.episodes}},{$set:{'updated':new Date()},$addToSet:{'hashes':record}},{'w':0});
@@ -667,79 +665,66 @@ var ShowData = {
 		showCollection.find({'status':true,'ended':false,'feed':{$exists:true,$ne:null}}).toArray(function(error, shows){
 			if (error) logger.error(error);
 			if (shows){
+				var limit = new Date();
+				limit.setDate(limit.getDate()-7);
+				
 				shows.forEach(function(show){
-					var limit = new Date() - (1000*7*24*60*60);
-					self.parseFeed(show.feed, limit, function(error, json){
+					if (typeof(show.hd) == 'undefined') show.hd = false;
+					
+					self.parseFeed(show.feed, limit, function(error, hashes){
 						if (error) logger.error(error);
-						if (json){
-							if (!json.hash) return;
+						if (hashes.length){
+							hashes.forEach(function(item){
+								var update = {
+									'tvdb': show.tvdb,
+									'season': item.season,
+									'episode': {$in:item.episodes}
+								};
+								var record = {
+									'hd': item.hd,
+									'hash': item.hash,
+									'quality': (item.hd) ? 'HD':'SD',
+									'published': item.published,
+									'repack': item.repack
+								};
+								episodeCollection.update(update,{$set:{'updated':new Date()},$addToSet:{'hashes':record}},{'w':0});
+							});
 							
-							var record = {
-								'hd': json.hd,
-								'hash': json.hash,
-								'quality': (json.hd) ? 'HD':'SD',
-								'repack': json.repack
-							};
-							episodeCollection.update({'tvdb':show.tvdb,'season':json.season,'episode':{$in:json.episodes}},{$set:{'updated':new Date()},$addToSet:{'hashes':record}},{'w':0});
-							
-							// download?
-							
-							
-						}
-						
-						return;
-						
-						if (error || !json.hash) return;
-						if (!!show.hd != json.hd) return;
-						
-						episodeCollection.find({
-							tvdb: show.tvdb,
-							season: json.season,
-							episode: {$in: json.episodes}
-							
-						}).toArray(function(error, episodes){
-							if (error) return;
-							
-							var insert = false;
-							var obtain = false;
-							
-							episodes.forEach(function(episode){
-								if (!episode.status && !episode.file) obtain = true;
-								if (!episode.hash) insert = true;
-								if (json.repack && json.hash != episode.hash) {
-									try {
-										torrent.repacked(episode.hash);
-										self.deleteEpisode(show.tvdb, json.season, json.episodes);
-										insert = true;
-										obtain = true;
-									} catch(e) {
-										logger.error(e.message);
-									}
+							// Download latest episode(s)
+							episodeCollection.find({'tvdb':show.tvdb,'hashes.published':{$gte:limit}}).toArray(function(error,results){
+								if (error) logger.error(error);
+								if (results){
+									results.forEach(function(episode){
+										var hashes = episode.hashes.filter(function(hash){
+											if (hash.hd == show.hd) return true;
+											return false;
+										});
+										if (!hashes.length) return;
+										
+										hashes.sort(function(a,b){
+											if (a.published > b.published) return -1;
+											if (a.published < b.published) return 1;
+											return 0;
+										});
+										
+										hashes.forEach(function(hash){
+											if (episode.hash){
+												if (episode.hash == hash.hash) return;
+												if (hash.repack == false) return;
+											}
+											var magnet = helper.createMagnet(hash.hash)
+											torrent.add(magnet, function(error,args){
+												if (error) logger.error(error);
+												if (args){
+													episodeCollection.update(update,{$set:{'downloading':true,'hash':hash.hash,'status':false}},{'w':0})
+												}
+											});
+											self.getListings(show.tvdb);
+										});
+									});
 								}
 							});
-							if (insert) {
-								episodeCollection.update({
-									tvdb: show.tvdb,
-									season: json.season,
-									episode: {$in: json.episodes}
-								}, {$set: {hash: json.hash}}, {w: 0});
-							}
-							if (obtain) {
-								var magnet = helper.createMagnet(json.hash);
-								torrent.add(magnet, function(error, args){
-									if (error) return;
-									if (args){
-										episodeCollection.update({hash: json.hash}, {
-											$set: {
-												hash: args.hashString.toUpperCase(),
-												status: false
-											}
-										}, {w: 0});
-									}
-								});
-								self.getListings(show.tvdb);
-							} 
-						});
+						}
 					});
 				});
 			}
@@ -835,7 +820,7 @@ var ShowData = {
 		return url;
 	},
 	parseFeed: function(url, since, callback){
-		var self = this, deferred = Q.defer();
+		var self = this;
 		try {
 			var userAgent = 'NodeTV '+global.pkg.version+' (http://greebowarrior.github.io/nessa/)';
 			if (url.indexOf('tvshowsapp.com') >= 0) {
@@ -851,11 +836,11 @@ var ShowData = {
 							return;
 						}
 						if (!json || !json.rss.channel[0].item) return;
+						
+						var hashes = [];
 						json.rss.channel[0].item.forEach(function(item){
-							if (since) {
-								var published = new Date(item.pubDate[0]).getTime();
-								if (published < since) return;
-							}
+							if (since && new Date(item.pubDate[0]) < since) return;
+							
 							var sources = [];
 							if (item.enclosure) sources.push(item.enclosure[0]['$'].url);
 							if (item.link) sources.push(item.link[0]);
@@ -871,15 +856,17 @@ var ShowData = {
 							});
 							var res = self.getEpisodeNumbers(item.title[0]);
 							var response = {
-								season: res.season,
-								episodes: res.episodes,
-								hd: helper.isHD(item.title[0]),
-								repack: helper.isRepack(item.title[0]),
-								hash: helper.getHash(magnet)
+								'season': res.season,
+								'episodes': res.episodes,
+								'hd': helper.isHD(item.title[0]),
+								'published': new Date(item.pubDate[0]),
+								'repack': helper.isRepack(item.title[0]),
+								'hash': helper.getHash(magnet)
 							};
-							if (typeof(callback) == 'function') callback(null, response);
-							deferred.resolve(response);
+							hashes.push(response);
+						//	if (typeof(callback) == 'function') callback(null, response);
 						});
+						if (typeof(callback) == 'function') callback(null, hashes);
 					});
 				} catch(e){
 					logger.error('XML Parser error', url, e.message);
@@ -888,7 +875,6 @@ var ShowData = {
 		} catch(e) {
 			logger.error('helper.parseFeed: %s', e.message);
 		}
-		return deferred.promise;
 	},
 
 	
