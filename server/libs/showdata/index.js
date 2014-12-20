@@ -643,17 +643,24 @@ var ShowData = {
 			if (error) logger.error(error);
 			if (show){
 				show.feed = self.fixFeedUrl(show.feed, true);
-				self.parseFeed(show.feed, null, function(error,item){
+				self.parseFeed(show.feed, null, function(error,hashes){
 					if (error) logger.error(error);
-					if (item){
-						var record = {
-							'hd': item.hd,
-							'hash': item.hash,
-							'quality': (item.hd) ? 'HD':'SD',
-							'published': item.published,
-							'repack': item.repack
-						};
-						episodeCollection.update({'tvdb':show.tvdb,'season':item.season,'episode':{$in:item.episodes}},{$set:{'updated':new Date()},$addToSet:{'hashes':record}},{'w':0});
+					if (hashes.length){
+						hashes.forEach(function(item){
+							var update = {
+								'tvdb': show.tvdb,
+								'season': item.season,
+								'episode': {$in:item.episodes}
+							};
+							var record = {
+								'hd': item.hd,
+								'hash': item.hash,
+								'quality': (item.hd) ? 'HD':'SD',
+								'published': item.published,
+								'repack': item.repack
+							};
+							episodeCollection.update(update,{$set:{'updated':new Date()},$addToSet:{'hashes':record}},{'w':0});
+						});
 					}
 				});
 				if (typeof(callback) == 'function') callback(error,tvdb);
@@ -662,7 +669,7 @@ var ShowData = {
 	},
 	getLatest: function(){
 		var self = this;
-		showCollection.find({'status':true,'ended':false,'feed':{$exists:true,$ne:null}}).toArray(function(error, shows){
+		showCollection.find({'status':true,'feed':{$exists:true,$ne:null}}).toArray(function(error, shows){
 			if (error) logger.error(error);
 			if (shows){
 				var limit = new Date();
