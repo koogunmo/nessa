@@ -72,13 +72,15 @@ module.exports = function(app,db,socket){
 				}
 			})
 		})
-
-		return;
-		
 		episodeCollection.update({},{$unset:{'status':true,'watched':true}},{'multi':true,'w':0});
 		
 		showCollection.update({},{$unset:{'seasons':true,'progress':true}},{'multi':true,'w':0});
 		showCollection.remove({'directory':{$exists:false},'status':{$exists:false}});
+		
+		return;
+		
+		
+		
 		
 		userCollection.update({},{$unset:{'session':true,'lastTime':true}},{'multi':true,'w':0});
 		
