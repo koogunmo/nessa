@@ -12,8 +12,7 @@ log4js.configure({
 var logger = log4js.getLogger('routes:movies');
 
 module.exports = function(app,db,socket){
-	var scanner	= plugin('scanner'),
-		movies	= plugin('moviedata');
+	var movies	= plugin('moviedata');
 	
 	app.get('/api/movies', function(req,res){
 		// Get show list

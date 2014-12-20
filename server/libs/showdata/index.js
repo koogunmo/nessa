@@ -3,6 +3,7 @@ var extend	= require('xtend'),
 	http	= require('http'),
 	log4js	= require('log4js'),
 	mkdir	= require('mkdirp'),
+	ObjectID = require('mongodb').ObjectID,
 	parser	= new(require('xml2js')).Parser(),
 	path	= require('path'),
 	Q		= require('q'),
@@ -18,26 +19,11 @@ log4js.configure({
 });
 var logger = log4js.getLogger('nodetv-showdata');
 
-
-var ObjectID = require('mongodb').ObjectID;
 var episodeCollection = db.collection('episode'),
 	showCollection = db.collection('show'),
 	unmatchedCollection = db.collection('unmatched'),
 	userCollection = db.collection('user');
-
-
-/*
-episodeCollection.find({'airdate':{$exists:true}}).toArray(function(error,episodes){
-	if (error) logger.error(error)
-	if (episodes){
-		episodes.forEach(function(episode){
-			logger.debug(new Date(episode.airdate*1000));
-		//	episodeCollection.update({'_id':ObjectID(episode._id)},{$set:{'airdate':new Date(episode.airdate*1000)}},{w:0});
-		})
-	}
-})
-*/
-
+	
 var ShowData = {
 	
 	/***** Rewritten methods *****/
@@ -738,6 +724,9 @@ var ShowData = {
 		});
 	},
 	getListings: function(tvdb, callback){
+		
+		// TODO: could this be improved?
+		
 		var self = this, tvdb = parseInt(tvdb,10);
 		userCollection.findOne({'admin':true,'trakt':{$exists:true}},{trakt:1}, function(error, user){
 			if (error) logger.error(error);
@@ -821,7 +810,7 @@ var ShowData = {
 	
 	fixFeedUrl: function(url, full){
 		var full = (typeof(full) == 'undefined') ? false: true;
-		if (url.indexOf('tvshowsapp.com') >= 0 && full) {
+		if (url && url.indexOf('tvshowsapp.com') >= 0 && full) {
 			if (url.indexOf('.full.xml') == -1) url = url.replace(/\.xml$/, '.full.xml');
 		}
 		return url;
@@ -883,10 +872,17 @@ var ShowData = {
 			logger.error('helper.parseFeed: %s', e.message);
 		}
 	},
-
 	
-	/***** Old methods below *****/
-		
+	
+	
+	
+	
+	/****************************** Old methods below ******************************/
+	
+	
+	
+	
+	
 	episodes: function(user, tvdb, callback){
 		var tvdb = parseInt(tvdb, 10);
 		
@@ -1082,7 +1078,7 @@ var ShowData = {
 	
 	
 	sanitize: function() {
-		// Remove unused values from the show documents
+		// Remove unused values from the show documents - DEPRECATED?
 		showCollection.update({status: {$exists: true}}, {$unset: {seasons: '', progress: '', trakt: ''}}, {w:0, multi: true});
 	},
 	
@@ -1091,7 +1087,10 @@ var ShowData = {
 	},
 	
 	getUnwatched: function(callback){
-		// Get a list of all unwatched episodes
+		// Get a list of all unwatched episodes - DEPRECATED?
+		
+		return;
+		
 		var where = {
 			hash: {$exists: true},
 			file: {$exists: true},
@@ -1136,17 +1135,17 @@ var ShowData = {
 	},
 	
 	setEpisode: function(episode, callback) {
+		// What is this even for?
 		var record = {
-			tvdb: parseInt(episode.tvdb,10),
-			season: parseInt(episode.season,10),
-			episode: parseInt(episode.episode,10),
-			title: episode.title,
-			synopsis: episode.overview,
-			airdate: new Date(episode.first_aired*1000),
-			watched: episode.watched,
-			users: []
+			'tvdb': parseInt(episode.tvdb,10),
+			'season': parseInt(episode.season,10),
+			'episode': parseInt(episode.episode,10),
+			'title': episode.title,
+			'synopsis': episode.overview,
+			'airdate': new Date(episode.first_aired*1000),
+			'updated': new Date()
 		};
-		episodeCollection.update({tvdb: record.tvdb, season: record.season, episode: record.episode}, {$set: record}, {upsert: true}, function(error, affected){
+		episodeCollection.update({'tvdb':record.tvdb,'season':record.season,'episode':record.episode},{$set: record},{'upsert': true},function(error, affected){
 			if (typeof(callback) == 'function') callback(error, !!affected)
 		});
 	}
