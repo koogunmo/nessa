@@ -1,6 +1,6 @@
 define(['app'], function(nessa){
 	
-//	angular.module('tvAuth',['ui.router'])
+//	angular.module('tvAuth',['ngAnimate','ui.router'])
 	
 	nessa.config(function($stateProvider){
 		$stateProvider.state('login', {
@@ -49,12 +49,17 @@ define(['app'], function(nessa){
 		if ($rootScope.$storage.session) $state.transitionTo('dashboard');
 	});
 		
-	nessa.run(function($auth, $log, $state){
+	nessa.run(function($auth,$log,$rootScope,$state){
 		$log.info('Module loaded: Authentication');
-		$auth.check().then(function(json){
-		//	$state.transitionTo('dashboard');
-		},function(error){
-			$state.transitionTo('login');
+		
+		$rootScope.$on('$stateChangeStart', function(e, to){
+			if (!to.data.secure) return;
+			$auth.check().then(function(response){
+				// Authorized
+			}, function(error){
+				$log.debug(error);
+				$state.transitionTo('login');
+			});
 		});
 	});
 	

@@ -272,7 +272,7 @@ var MovieData = {
 						if (year && result.year != year || !result.year) include = false;
 						if (title) {
 							title.split(' ').forEach(function(word){
-								if (result.title.indexOf(word) == -1) include = false;
+								if (result.title.toLowerCase().indexOf(word.toLowerCase()) == -1) include = false;
 							});
 						}
 						return include;

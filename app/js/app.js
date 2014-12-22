@@ -9,6 +9,8 @@ define('app', ['angular','moment','ngAnimate','ngMessages','ngResource','ngSocke
 		$tooltipProvider.options({appendToBody:true})
 	})
 	
+	/****** Factory ******/
+	
 	nessa.factory('$socket', function(socketFactory){
 		var socket = socketFactory();
 		socket.forward('alert');
@@ -178,14 +180,14 @@ define('app', ['angular','moment','ngAnimate','ngMessages','ngResource','ngSocke
 		return auth;
 	});
 	
-	nessa.factory('nessaHttp', function($location, $q){
+	nessa.factory('httpIntercept', function($location,$q){
 		return {
 			request: function(config){
 				return config;
 			},
-			requestError: function(rejection){
+			requestError: function(response){
 				if (response.status === 401) $location.url('/login');
-				$q.reject(rejection);
+				$q.reject(response);
 			},
 			response: function(response){
 				return response;
@@ -197,61 +199,12 @@ define('app', ['angular','moment','ngAnimate','ngMessages','ngResource','ngSocke
 		}
 	});
 	
-	/*
-	nessa.factory('$socket', function($rootScope) {
-		
-		// DEPRECATED
-		
-		var port = null;
-		if (window.location.protocol == 'https:'){
-			port = 443;
-		} else {
-			port = (window.location.port) ? window.location.port : 80;
-		}
-		var socket = io.connect(window.location.protocol+'//'+window.location.hostname+':'+port, {
-			'connect timeout': 2000,
-			'max reconnection attempts': 5,
-			'sync disconnect on unload': true
-		});
-		var handler = {
-			events: [],
-			emit: function(eventName, data, callback){	
-				socket.emit(eventName, data, function(){
-					var args = arguments;
-					$rootScope.$apply(function(){
-						if (callback) callback.apply(socket, args);
-					});
-				});
-			},
-			on: function(eventName, callback){
-				socket.on(eventName, function(){  
-					var args = arguments;
-					$rootScope.$apply(function(){
-						if (callback) callback.apply(socket, args);
-					});
-				});
-			},
-			once: function(eventName, callback){
-				socket.once(eventName, function(){  
-					var args = arguments;
-					$rootScope.$apply(function(){
-						if (callback) callback.apply(socket, args);
-					});
-				});
-			},
-			removeAllListeners: function(){
-				return socket.removeAllListeners();
-			}
-		};
-		return handler;
-	});
-	*/
 	/****** Config ******/
 	
 	nessa.config(function($httpProvider, $locationProvider, $stateProvider){
-	//	$httpProvider.interceptors.push('nessaHttp');
 		
 		$locationProvider.html5Mode(true).hashPrefix('!');
+		$httpProvider.interceptors.push('httpIntercept');
 		
 		var checkInstalled = function($q, $timeout, $http, $location, $rootScope){
 			var deferred = $q.defer();

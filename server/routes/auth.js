@@ -18,19 +18,17 @@ module.exports = function(app, db){
 	
 	/* Authentication Middleware */
 	app.all('/api/*', function(req,res,next){
-		var session = (req.params.session) ? req.params.session : req.headers.session;
-		db.collection('user').findOne({sessions: {$elemMatch: {session: session}}}, {_id:1,admin:1,trakt:1,username:1}, function(error, user){
+		db.collection('user').findOne({'sessions.session':req.headers.session},{'_id':1,'admin':1,'trakt':1,'username':1}, function(error, user){
 			if (error) logger.error(error);
-			if (!user){
+			if (user){
+				req.user = user;
+				return next();
+			} else {				
 				var response = {
 					success: false,
 					message: 'Not authorised'
 				};
 				res.status(401).send(response);
-				return false;
-			} else {
-				req.user = user;
-				return next();
 			}
 			return false;
 		});
@@ -38,20 +36,20 @@ module.exports = function(app, db){
 	
 	app.post('/auth/check', function(req, res){
 		// Remove all sessions older than 1 week
-		userCollection.update({}, {$pull: {sessions: {timestamp: {$lte: Date.now()-(1000*60*60*24*7)}}}}, {multi:true,w:0});
-		
-		var response = {success: false, user: {}, session: null, lastAccess: Date.now()};
-		userCollection.findOne({'sessions.session': req.body.session}, {password:0,sessions:0,shows:0,trakt:0}, function(error, result){
+		var limit = new Date();
+		limit.setDate(limit.getDate()-7);
+		userCollection.update({},{$pull:{'sessions':{'timestamp':{$lte:limit}}}},{'multi':true,'w':0});
+		var response = {'success':false,'user':{},'session':null,'lastAccess': new Date()};
+		userCollection.findOne({'sessions.session':req.headers.session},{'password':0,'sessions':0,'shows':0,'trakt':0}, function(error,user){
 			if (error) logger.error(error);
-			if (result) {
-				response.user = result;
-				response.session = req.body.session;
+			if (user){
 				response.success = true;
+				response.user = user;
+				response.session = req.body.session;
 				var update = {
-					lastAccess: response.lastAccess,
-					'sessions.$.timestamp': response.lastAccess
+					'sessions.$.timestamp': new Date()
 				};
-				userCollection.update({_id: ObjectID(result._id), 'sessions.session': req.body.session}, {$set: update}, {w:0});
+				userCollection.update({'_id':ObjectID(user._id),'sessions.session':req.body.session},{$set:update},{'w':0});
 			}
 			return res.send(response);
 		});
@@ -80,10 +78,11 @@ module.exports = function(app, db){
 		});
 		
 	}).post('/auth/logout', function(req,res){
-		var response = {success: true, user: {}, session: false, lastTime: Date.now()};
+		var response = {'success':true,'user':{},'session':false};
 		if (req.body.session){
-			var update = (req.body.all) ? {$set: {sessions:[]}} : {$pull: {sessions: {session: req.body.session}}};
-			userCollection.update({sessions: {$elemMatch: {session: req.body.session}}}, update, {w:0});
+			var update = (req.body.all) ? {$unset:{'sessions':true}} : {$pull:{'sessions':{'session':req.body.session}}};
+			userCollection.update({'sessions.session':req.body.session}, update, {'w':0});
+			
 			res.send(response);
 		}
 	});

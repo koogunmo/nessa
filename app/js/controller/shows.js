@@ -213,12 +213,7 @@ define(['app'], function(nessa){
 		};
 		$scope.load = function(tvdb){
 			$http.get('/api/shows/'+tvdb).success(function(json, status){
-				if (status == 200 && json) {
-					$scope.show		= json.show;
-					$scope.listing	= json.listing;
-					$scope.progress	= json.progress;
-					$scope.seasons	= json.seasons;
-				}
+				if (status == 200 && json) $scope.show = json;
 			}).error(function(json, status){
 				$scope.dismiss();
 			});
@@ -339,8 +334,13 @@ define(['app'], function(nessa){
 		};
 		
 		$scope.hasAired = function(){
-			return ($scope.episode.airdate && $scope.episode.airdate*1000 < new Date().getTime());
+			return true;
+			
+		//	$log.debug($scope.episode.airdate.getTime(), new Date().now())
+			
+		//	return ($scope.episode.airdate && Number($scope.episode.airdate) < Number(new Date()));
 		};
+		
 		/*
 		$scope.hasAired = function(){
 			return (!!$scope.episode.file || !!$scope.episode.hash || $scope.episode.airdate && $scope.episode.airdate*1000 < new Date().getTime());

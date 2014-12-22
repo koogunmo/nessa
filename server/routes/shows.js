@@ -68,9 +68,9 @@ module.exports = function(app, db, socket){
 	})
 	
 	app.get('/api/shows/:tvdb([0-9]+)', function(req,res){
-		shows.summary(req.user, req.params.tvdb, function(error, json){
+		shows.summary(req.user, req.params.tvdb, function(error, show){
 			if (error) logger.error(error);
-			if (json) return res.send(json);
+			if (show) return res.send(show);
 			res.status(404).end();
 		});
 	}).post('/api/shows/:tvdb([0-9]+)', function(req,res){

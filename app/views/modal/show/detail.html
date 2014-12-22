@@ -8,21 +8,21 @@
 				<div class="synopsis well">
 					{{show.synopsis || 'No synopsis available'}}
 				</div>
-				<div ng-if="progress && progress.percentage">
+				<div ng-if="show.progress && show.progress.percentage">
 					<hr />
-					<p>Watched {{progress.completed}} of {{progress.aired}} episodes</p>
+					<p>Watched {{show.progress.completed}} of {{show.progress.aired}} episodes</p>
 					<progress animate="false">
-						<bar type="success" value="progress.percentage">
-							<span ng-hide="progress.percentage<=5">{{progress.percentage}}%</span>
+						<bar type="success" value="show.progress.percentage">
+							<span ng-hide="show.progress.percentage<=5">{{show.progress.percentage}}%</span>
 						</bar>
-						<bar type="danger" value="100-progress.percentage"></bar>
+						<bar type="danger" value="100-show.progress.percentage"></bar>
 					</progress>
 				</div>
 			</tab>
 			
-			<tab heading="Episodes">
+			<tab heading="Episodes" ng-if="show.episodes">
 				<accordion class="seasons">
-					<accordion-group heading="{{display()}}" class="season" ng-repeat="season in listing | orderBy:'season':true" ng-controller="seasonCtrl">
+					<accordion-group heading="{{display()}}" class="season" ng-repeat="season in show.episodes | orderBy:'season':true" ng-controller="seasonCtrl">
 						<div class="episode" ng-repeat="episode in season.episodes | orderBy:'episode'" ng-include="'/views/partials/episode.html'"></div>
 					</accordion-group>
 				</accordion>
@@ -32,7 +32,7 @@
 				<div class="well" ng-switch on="show.status">
 					<div class="form-group">
 						<label for="ipt_format">Filename format</label>
-						<input type="text" id="ipt_format" name="format" class="form-control" placeholder="Season %S/Episode %E - %T.%X" ng-model="show.format" />
+						<input type="text" id="ipt_format" name="format" class="form-control" placeholder="{{settings.media.shows.format}}" ng-model="show.format" />
 						<div class="small text-right">
 							<strong>%S</strong>: Season, <strong>%E</strong>: Episode, <strong>%T</strong>: Title, <strong>%X</strong>: File extension
 						</div>
@@ -46,7 +46,7 @@
 					<div class="checkbox" ng-switch-when="true">
 						<label>
 							<input type="checkbox" name="hd" ng-checked="show.hd" ng-model="show.hd" />
-							Prefer HD video<br /><span class="small">Note: Xbox 360 does not support .mkv files</span>
+							Prefer HD video<br /><span class="small">Note: Some devices may not support High-definition .mkv files</span>
 						</label>
 					</div>
 					<div class="form-group" ng-switch-when="true">

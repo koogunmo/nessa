@@ -219,6 +219,10 @@ define(['app'], function(nessa){
 		$scope.close = function(){
 			$modalInstance.dismiss();
 		};
+		$scope.reset = function(){
+			$scope.filter.query = '';
+			$scope.results = [];
+		}
 		$scope.save = function(){
 			$http.post('/api/movies', {tmdb: $scope.selected}).success(function(json){
 				$modalInstance.close();
