@@ -120,8 +120,8 @@ var ShowData = {
 									if (error) return logger.error(error);
 									
 									var search = {'tvdb':show.tvdb,'season':meta.season,'episode':{$in:meta.episodes}};
-									episodeCollection.update(search,{$set:record,$unset:{'downloading':true}},{'multi':true},{'w':0});
-									showCollection.update({'tvdb':show.tvdb},{$set:{'updated':record.updated}},{w:0});
+									episodeCollection.update(search,{$set:record,$unset:{'downloading':true}},{'multi':true,'w':0});
+									showCollection.update({'tvdb':show.tvdb},{$set:{'updated':record.updated}},{'w':0});
 									if (show.users){
 										var library = [];
 										meta.episodes.forEach(function(episode){
