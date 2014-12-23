@@ -111,16 +111,17 @@ var ShowData = {
 									'added': new Date(),
 									'updated': new Date()
 								};
+								
 								if (!record.file) return;
-								var source = data.dir+'/'+file.name, target = basedir+record.file;
-								var meta = self.getEpisodeNumbers(target);
+								
+								var meta = self.getEpisodeNumbers(file.name),
+									source = data.dir+'/'+file.name, target = basedir+record.file;
+								
 								helper.fileCopy(source, target, function(error){
 									if (error) return logger.error(error);
 									var search = {'tvdb:':show.tvdb,'season':meta.season,'episode':{$in:meta.episodes}};
-									
 									episodeCollection.update(search,{$set:record,$unset:{'downloading':true}},{'multi':true,'w':0});
 									showCollection.update({'tvdb':show.tvdb},{$set:{'updated':record.updated}},{w:0});
-									
 									if (show.users){
 										show.users.forEach(function(u){
 											userCollection.findOne({'_id': ObjectID(u._id),'trakt':{$exists:true}},{'trakt':1},function(error,user){
@@ -150,7 +151,7 @@ var ShowData = {
 					var magnet = helper.createMagnet(hash);
 					torrent.add(magnet, function(error,args){
 						if (error) logger.error(error);
-						if (args) episodeCollection.update({'_id':ObjectID(id)},{$set:{'downloading':true,'hash':hash}},{'w':0});
+						if (args) episodeCollection.update({'_id':ObjectID(id)},{$set:{'downloading':true,'hash':args.hashString.toUpperCase()}},{'w':0});
 					});
 				};
 				var search = {'tvdb':show.tvdb,$or:[{'hashes.hash':{$exists:true}},{'hash':{$exists:true}}]};
