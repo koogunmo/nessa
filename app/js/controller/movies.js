@@ -13,14 +13,8 @@ define(['app'], function(nessa){
 				}
 			})
 			.state('movies.index', {
-				url: '',
-				onEnter: function($http,$log){
-			//		$http.get('/api/movies/scan').success(function(success){
-			//			$log.debug(success)
-			//		})
-				}
+				url: ''
 			})
-			
 		.state('movies.add', {
 			url: '/add',
 			onEnter: function($modal, $state, $stateParams){
@@ -126,6 +120,11 @@ define(['app'], function(nessa){
 		$scope.$watch('filter', function(){
 			if ($scope.filter.title != '') $scope.paginate.page = 1;
 		},true);
+
+		$http.get('/api/system/settings').success(function(json,status){
+			$rootScope.settings = json.media;
+			$scope.settings = json.media;
+		});
 		
 		$scope.filterList = function(item){
 			if (!item.title.toLowerCase().match($scope.filter.title.toLowerCase())) return false;
@@ -147,21 +146,24 @@ define(['app'], function(nessa){
 			return [title, movie.year];
 		};
 		
-		$http.get('/api/system/settings').success(function(json,status){
-			$rootScope.settings = json.media;
-			$scope.settings = json.media;
-		});
 		
-		$http.get('/api/movies').success(function(json, status){
-			if (status == 200 && json) {
-				$scope.movies = json;
-				$(document).trigger('lazyload');
-			}
-		}).error(function(json, status){
-			console.error(json, status);
+		$scope.load = function(){
+			$http.get('/api/movies').success(function(json, status){
+				if (status == 200 && json) {
+					$scope.movies = json;
+					$(document).trigger('lazyload');
+				}
+			}).error(function(json, status){
+				$log.error(json, status);
+			});
+		};
+		$scope.load();
+		$scope.$on('MoviesRefresh', function(){
+			$scope.load();
 		});
-		
 	});
+	
+	
 	
 	nessa.controller('MovieDetailCtrl', function($http,$log,$modalInstance,$scope,$stateParams){
 		$scope.movie = null
@@ -226,6 +228,7 @@ define(['app'], function(nessa){
 		$scope.save = function(){
 			$http.post('/api/movies', {tmdb: $scope.selected}).success(function(json){
 				$modalInstance.close();
+				$rootScope.$broadcast('MoviesRefresh', true);
 			});
 		};
 		$scope.search = function(){

@@ -14,7 +14,7 @@ log4js.configure({
 	}],
 	replaceConsole: true
 });
-var logger = global.logger = log4js.getLogger('nodetv-server');
+var logger = log4js.getLogger('nodetv-server');
 //logger.setLevel((process.env.NODE_ENV == 'production') ? 'WARN' : 'ALL');
 
 /***********************************************************************/
@@ -65,13 +65,6 @@ try {
 }
 
 /***********************************************************************/
-/* Load dependencies */
-
-var	fs		= require('fs'), path	= require('path');
-
-/* Global methods */
-global.events = new (require('events')).EventEmitter;
-
 logger.info(process.title + ' v'+pkg.version);
 
 /***********************************************************************/
@@ -124,8 +117,7 @@ if (!nconf.get('listen:nginx')){
 }
 
 try {
-	var Q = require('q');
-	
+	var	fs = require('fs'), path = require('path'), Q = require('q');
 	var dbConnect = function(msg){
 		try {
 			logger.info('MongoDB: Connecting to '+nconf.get('mongo:host')+'...');

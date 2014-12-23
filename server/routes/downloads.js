@@ -13,7 +13,7 @@ module.exports = function(app, db, socket){
 	
 	var torrents	= require('nodetv-transmission')(nconf.get('transmission'));
 	
-	app.get('/api/:session?/downloads', function(req,res){
+	app.get('/api/downloads', function(req,res){
 		// List torrents
 		torrents.list(function(error, data){
 		//	logger.info(data);
@@ -21,7 +21,7 @@ module.exports = function(app, db, socket){
 			res.send(data.torrents);
 		});
 			
-	}).post('/api/:session?/downloads', function(req,res){
+	}).post('/api/downloads', function(req,res){
 		// Add new manual torrent
 		if (req.body.url){
 			torrents.add(req.body.url, function(error, data){
@@ -31,7 +31,7 @@ module.exports = function(app, db, socket){
 		}
 	});
 	
-	app.get('/api/:session?/downloads/:id', function(req,res){
+	app.get('/api/downloads/:id', function(req,res){
 		// Get torrent data
 		torrents.info(parseInt(req.params.id, 10), function(error, data){
 			if (error) {
@@ -40,13 +40,13 @@ module.exports = function(app, db, socket){
 			}
 			res.send(data.torrents[0]);
 		});
-	}).post('/api/:session?/downloads/:id', function(req,res){
+	}).post('/api/downloads/:id', function(req,res){
 		if (typeof(req.body.status) != 'undefined'){
 			torrents.setStatus(req.params.id, req.body.status, function(error,json){
 				res.status(202).send({success: true});
 			});
 		}
-	}).delete('/api/:session?/downloads/:id', function(req,res){
+	}).delete('/api/downloads/:id', function(req,res){
 		// Remove & delete torrent
 		torrents.remove({id: parseInt(req.params.id, 10), purge: true}, function(error){
 			if (error) return logger.error(error);
