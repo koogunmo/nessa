@@ -35,6 +35,7 @@ var ShowData = {
 			if (json){
 				try {
 					var record = {
+						'status': (json.status == 'Ended') ? false : true,
 						'name': json.title,
 						'year': parseInt(json.year,10),
 						'url': json.url.split('/').pop(),
@@ -52,14 +53,11 @@ var ShowData = {
 							showCollection.findOne({'tvdb':record.tvdb}, function(error,show){
 								if (error) logger.error(error);
 								if (show){
-									if (!show.directory){
-										// Create directory
-										show.directory = helper.formatDirectory(show.name);
-										var dir = nconf.get('media:base') + nconf.get('media:shows:directory') + '/' + record.directory;
-										mkdir.sync(dir, 0775);
-									}
+									// Directory not creating ?
+									show.directory = (show.directory) ? show.directory : helper.formatDirectory(show.name);
+									var dir = nconf.get('media:base') + nconf.get('media:shows:directory') + '/' + show.directory;
+									if (!fs.existsSync(dir)) mkdir.sync(dir, 0775);
 									if (typeof(show.hd) == 'undefined') show.hd = nconf.get('media:shows:hd') || false;
-									
 									showCollection.save(show, function(error,result){
 										if (error) logger.error(error);
 										if (result) {
@@ -145,7 +143,7 @@ var ShowData = {
 	},
 	download: function(tvdb, filter, callback){
 		var self = this, tvdb = parseInt(tvdb,10);
-		showCollection.find({'tvdb':tvdb}, function(error,show){
+		showCollection.findOne({'tvdb':tvdb}, function(error,show){
 			if (error) logger.error(error);
 			if (show){
 				var addTorrent = function(hash,id){
@@ -161,9 +159,8 @@ var ShowData = {
 				episodeCollection.find(search).toArray(function(error,episodes){
 					if (error) logger.error(error);
 					if (episodes){
-						episode.forEach(function(episode){
+						episodes.forEach(function(episode){
 							if (episode.file) return;
-							
 							if (episode.hash){
 								var magnet = helper.createMagnet(result.hash);
 								addTorrent(magnet,episode._id);
@@ -591,17 +588,32 @@ var ShowData = {
 	
 	addUser: function(user,tvdb){
 		var self = this, tvdb = parseInt(tvdb,10);
-		showCollection.find({'tvdb':tvdb,'users._id':ObjectID(user._id)},{'tvdb':1,'users':1},function(error,show){
+		
+		var addUser = function(record){
+			showCollection.update({'tvdb':tvdb},record,function(error,affected){
+				if (error) logger.error(error);
+				if (affected) self.getProgress(user,tvdb);
+			});
+		};
+		
+		showCollection.findOne({'tvdb':tvdb},function(error,show){
 			if (error) logger.error(error);
-			if (!show){
+			if (show){
 				var record = {
 					'_id': ObjectID(user._id),
 					'username': user.username
 				};
-				showCollection.update({'tvdb':show.tvdb},{$addToSet:record},function(error,affected){
-					if (error) logger.error(error);
-					if (affected) self.getProgress(user, show.tvdb);
-				});
+				if (show.users){
+					var users = show.users.filter(function(u){
+						if (ObjectID(user._id).equals(u._id)) return true;
+						return false;
+					});
+					if (!users.length) {
+						addUser({$addToSet:record});
+					}
+				} else {
+					addUser({$set:{'users':[record]}})
+				}
 			}
 		});
 	},
@@ -705,7 +717,7 @@ var ShowData = {
 				parser.parseString(xml, function(error, json){
 					if (error) return logger.error(error);
 					json.shows.show.forEach(function(show){
-						if (parseInt(show.tvdb,10) != tvdb) return;
+						if (parseInt(show.tvdbid,10) != tvdb) return;
 						var record = {
 							'feed': self.fixFeedUrl(show.mirrors[0].mirror[0])
 						};

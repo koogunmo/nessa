@@ -53,7 +53,6 @@ var MovieData = {
 				}
 			}
 		};
-		
 		if (typeof(tmdb) == 'array'){
 			trakt(user.trakt).movie.summaries(tmdb,function(error,results){
 				results.forEach(function(result){
@@ -93,7 +92,7 @@ var MovieData = {
 				
 				helper.fileCopy(source, target, function(error){
 					if (error) return logger.error(error);
-					movieCollection.update({'tmdb':movie.tmdb},{$set:record,$unset:{downloading:true}},function(error, affected){
+					movieCollection.update({'tmdb':movie.tmdb},{$set:record,$unset:{'downloading':true}},function(error, affected){
 						if (error) logger.error(error);
 						if (!error) self.link(movie.tmdb);
 					});
@@ -153,7 +152,7 @@ var MovieData = {
 	},
 	list: function(user, callback){
 		// List all movies (TODO: by user)
-		movieCollection.find({tmdb: {$exists: true}}).sort({name:1}).toArray(callback);
+		movieCollection.find({'tmdb':{$exists: true}}).sort({'name':1}).toArray(callback);
 	},
 	pending: function(user, callback){
 		// Movies awaiting human intervention
@@ -261,7 +260,7 @@ var MovieData = {
 							trakt(user.trakt).movie.library(movie.tmdb);
 							
 							self.rename(user, movie.tmdb, file.path, quality);
-							movieCollection.update({tmdb: movie.tmdb}, {$set: stats}, {w:0});
+							movieCollection.update({'tmdb': movie.tmdb}, {$set: stats}, {w:0});
 							
 							if (typeof(callback) == 'function') callback(null, movie.tmdb);
 						}
@@ -287,7 +286,7 @@ var MovieData = {
 								trakt(user.trakt).movie.library(movie.tmdb);
 								
 								self.rename(user, movie.tmdb, file.path, quality);
-								movieCollection.update({tmdb: movie.tmdb}, {$set: stats}, {w:0});
+								movieCollection.update({'tmdb': movie.tmdb}, {$set: stats}, {w:0});
 								
 								if (typeof(callback) == 'function') callback(null, movie.tmdb);
 							}
@@ -311,10 +310,10 @@ var MovieData = {
 							} else {
 								logger.debug('Unmatched: %s (%d)', title, unmatched.length);
 								var record = {
-									type: 'movie',
-									file: file.path,
-									size: stats.size,
-									unmatched: unmatched
+									'type': 'movie',
+									'file': file.path,
+									'size': stats.size,
+									'unmatched': unmatched
 								};
 								unmatchedCollection.update({file: file.path}, record, {upsert:true, w:0});
 							}
@@ -336,25 +335,25 @@ var MovieData = {
 					logger.debug('Movie Library: ', movies.length);
 					movies.forEach(function(movie){
 						var record = {
-							title: movie.title,
-							year: parseInt(movie.year,10),
-							url: movie.url.split('/').pop(),
-							synopsis: movie.overview,
-							released: new Date(movie.released*1000),
-							runtime: parseInt(movie.runtime,10),
-							imdb: movie.imdb_id,
-							tmdb: parseInt(movie.tmdb_id,10),
-							genres: movie.genres,
-							updated: new Date()
+							'title': movie.title,
+							'year': parseInt(movie.year,10),
+							'url': movie.url.split('/').pop(),
+							'synopsis': movie.overview,
+							'released': new Date(movie.released*1000),
+							'runtime': parseInt(movie.runtime,10),
+							'imdb': movie.imdb_id,
+							'tmdb': parseInt(movie.tmdb_id,10),
+							'genres': movie.genres,
+							'updated': new Date()
 						};
-						movieCollection.update({tmdb: record.tmdb}, {$set: record}, {upsert:true}, function(error,affected,status){
+						movieCollection.update({'tmdb':record.tmdb},{$set:record},{'upsert':true}, function(error,affected,status){
 							if (error) return logger.error(error);
-							movieCollection.update({tmdb: record.tmdb}, {$addToSet: {user: {_id: user._id, username: user.username}}}, {w:0})
+							movieCollection.update({'tmdb': record.tmdb},{$addToSet:{'user':{'_id':user._id,'username':user.username}}},{'w':0})
 							self.getArtwork(movie.tmdb);
 						});
 					});
 				}
-				if (typeof(callback) == 'function') callback(error, {library: true, count: movies.length});
+				if (typeof(callback) == 'function') callback(error, {'library':true,'count':movies.length});
 			});
 			
 			trakt(user.trakt).user.watchlist.movies(function(error, movies){
@@ -364,24 +363,24 @@ var MovieData = {
 					logger.debug('Movie Watchlist: ', movies.length);
 					movies.forEach(function(movie){
 						var record = {
-							title: movie.title,
-							year: parseInt(movie.year,10),
-							url: movie.url.split('/').pop(),
-							synopsis: movie.overview,
-							released: new Date(movie.released*1000),
-							runtime: movie.runtime,
-							imdb: movie.imdb_id,
-							tmdb: parseInt(movie.tmdb_id,10),
-							genres: movie.genres,
-							watchlist: true,
-							updated: new Date()
+							'title': movie.title,
+							'year': parseInt(movie.year,10),
+							'url': movie.url.split('/').pop(),
+							'synopsis': movie.overview,
+							'released': new Date(movie.released*1000),
+							'runtime': movie.runtime,
+							'imdb': movie.imdb_id,
+							'tmdb': parseInt(movie.tmdb_id,10),
+							'genres': movie.genres,
+							'watchlist': true,
+							'updated': new Date()
 						};
-						movieCollection.update({tmdb: record.tmdb}, {$set: record}, {upsert:true}, function(error,affected){
+						movieCollection.update({'tmdb':record.tmdb},{$set:record},{'upsert':true}, function(error,affected){
 							self.getArtwork(record.tmdb);
 						});
 					});
 				}
-				if (typeof(callback) == 'function') callback(error, {watchlist: true, count: movies.length});
+				if (typeof(callback) == 'function') callback(error, {'watchlist':true,'count':movies.length});
 			});
 		} catch(e){
 			logger.error('Movie sync: ', e.message);
@@ -390,7 +389,7 @@ var MovieData = {
 	
 	unlink: function(tmdb,callback){
 		var self = this, tmdb = parseInt(tmdb,10);
-		movieCollection.findOne({tmdb:tmdb}, function(error, movie){
+		movieCollection.findOne({'tmdb':tmdb}, function(error, movie){
 			if (error) logger.error(error);
 			if (movie){
 				var basedir = nconf.get('media:base')+nconf.get('media:movies:directory');
@@ -412,25 +411,18 @@ var MovieData = {
 		})
 	},
 	
-	match: function(user, matched, callback){
-		var self = this;
-		try {
+	match: function(user, matches, callback){
+		var self = this, deferred = Q.defer();
+		
+		matches.forEach(function(match){
+			var tmdb = parseInt(match.tmdb,10);
+			movieCollection.update({'tmdb':tmdb},{'file':match.file},{'upsert':true})
 			
-			return;
-			
-			var record = {
-				file: match.file
-			};
-			
-			/*
-			movieCollection.update({tmdb:tmdb}, {$set: record}, {upsert:true}, function(error,affected){
+			self.add(match.tmdb, function(error,result){
 				
 			});
-			*/
-		//	if (typeof(callback) == 'function') callback()
-		} catch(e){
-			logger.error('Movie match: ', e.message);
-		}
+			
+		});
 	},
 	
 	/*

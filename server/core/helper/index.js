@@ -165,8 +165,8 @@ exports = module.exports = {
 		}
 	},
 	formatDirectory: function(name){
-		// Sanitize the directory names
-		return name.replace(/\/\:/g, '-');
+		// Sanitize the directory names (remove backslash, foreslash and colon)
+		return name.replace(/[\\\:\/]/ig, '-');
 	},
 	fixFeedUrl: function(url, full){
 		logger.warn('`helper.fixFeedUrl` has been deprecated')
