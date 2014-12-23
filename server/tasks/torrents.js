@@ -2,8 +2,8 @@
 
 /* Check for completed downloads every 5 minutes */
 module.exports = function(app,db,socket){
-	var movies	= plugin('moviedata'),
-		shows	= plugin('showdata');
+	var movies	= require('nodetv-movies'),
+		shows	= require('nodetv-shows');
 	try {
 		var checkDownloads = function(){
 			torrent.getComplete(function(error, torrents){

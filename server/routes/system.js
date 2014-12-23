@@ -10,9 +10,9 @@ log4js.configure({
 var logger = log4js.getLogger('routes:system');
 
 module.exports = function(app,db,socket){
-	var movies	= plugin('moviedata'),
+	var movies	= require('nodetv-movies'),
 		ObjectID = require('mongodb').ObjectID,
-		shows	= plugin('showdata'),
+		shows	= require('nodetv-shows'),
 		system	= require('nodetv-system');
 	
 	var episodeCollection = db.collection('episode'),

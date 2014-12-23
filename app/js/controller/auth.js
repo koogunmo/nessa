@@ -52,8 +52,8 @@ define(['app'], function(nessa){
 	nessa.run(function($auth,$log,$rootScope,$state){
 		$log.info('Module loaded: Authentication');
 		
-		$rootScope.$on('$stateChangeStart', function(e, to){
-			if (!to.data.secure) return;
+		$rootScope.$on('$stateChangeStart', function(e,to){
+			if (to.data && !to.data.secure) return;
 			$auth.check().then(function(response){
 				// Authorized
 			}, function(error){

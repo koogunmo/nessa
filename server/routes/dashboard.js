@@ -13,7 +13,7 @@ var logger = log4js.getLogger('routes:dashboard');
 
 module.exports = function(app, db){
 	
-	var movies = plugin('moviedata'), shows = plugin('showdata');
+	var movies = require('nodetv-movies'), shows = require('nodetv-shows');
 	
 	
 	app.get('/api/latest/shows', function(req,res){

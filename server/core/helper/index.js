@@ -105,7 +105,7 @@ exports = module.exports = {
 	// RegExp methods
 	getEpisodeNumbers: function(file) {
 		logger.warn('`helper.getEpisodeNumbers` has been deprecated. Please use `shows.getEpisodeNumbers` instead');
-		return plugin('showdata').getEpisodeNumbers(file);
+		return require('nodetv-shows').getEpisodeNumbers(file);
 	},
 	
 	// Formatting methods

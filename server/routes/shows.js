@@ -11,7 +11,7 @@ var logger = log4js.getLogger('routes:shows');
 
 module.exports = function(app, db, socket){
 	
-	var shows	= plugin('showdata');
+	var shows	= require('nodetv-shows');
 		
 	app.get('/api/shows', function(req,res){
 		shows.list(req.user, function(error,results){
@@ -45,8 +45,12 @@ module.exports = function(app, db, socket){
 			if (error) logger.error(error)
 			res.send(results);
 		});
+	}).get('/api/shows/upcoming', function(req,res){
+		shows.upcoming(req.user, function(error,calendar){
+			if (error) logger.error(error);
+			res.send(calendar);
+		});
 	})
-	
 	
 	app.post('/api/shows/match', function(req,res){
 		shows.match(req.user, req.body, function(error, result){

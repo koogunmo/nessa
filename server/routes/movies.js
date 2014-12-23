@@ -12,7 +12,7 @@ log4js.configure({
 var logger = log4js.getLogger('routes:movies');
 
 module.exports = function(app,db,socket){
-	var movies	= plugin('moviedata');
+	var movies	= require('nodetv-movies');
 	
 	app.get('/api/movies', function(req,res){
 		// Get show list

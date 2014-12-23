@@ -4,7 +4,7 @@
 module.exports = function(app,db,socket){
 	try {
 		var schedule	= require('node-schedule');
-		var shows		= plugin('showdata');
+		var shows		= require('nodetv-shows');
 		var ObjectID	= require('mongodb').ObjectID;
 		
 		var updateListings = function(){

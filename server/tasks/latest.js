@@ -4,7 +4,7 @@
 module.exports = function(app,db,socket){
 	try {
 		var schedule = require('node-schedule');
-		var movies = plugin('moviedata'), shows = plugin('showdata');
+		var movies = require('nodetv-movies'), shows = require('nodetv-shows');
 		
 		var checkLatest = function(){
 			if (movies.getLatest) movies.getLatest();

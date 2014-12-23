@@ -41,6 +41,8 @@
     "xtend": "^4.0.0"
   },
   "bundleDependencies": {
+    "nodetv-movies": "^0.7.0",
+    "nodetv-shows": "^0.7.0",
     "nodetv-system": "^0.7.0",
     "nodetv-trakt": "^0.7.0"
   },

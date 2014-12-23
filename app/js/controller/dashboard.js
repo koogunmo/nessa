@@ -57,6 +57,7 @@ define(['app'], function(nessa){
 		$http.get('/api/movies/pending').success(function(json,status){
 			$scope.pending = json;
 		});
+		
 		$http.get('/api/shows/latest').success(function(json,status){
 			$scope.episodes = json;
 		});
@@ -109,11 +110,13 @@ define(['app'], function(nessa){
 	nessa.controller('upcomingCtrl', function($log, $scope){
 		$scope.visible = false;
 		
+		/*
 		$scope.day.episodes.forEach(function(episode){
 			if (episode.episode.in_collection == false) $scope.visible = true;
 			
 			
 		});
+		*/
 	});
 	
 	return nessa;
