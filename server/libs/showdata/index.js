@@ -29,7 +29,7 @@ var ShowData = {
 	/***** Rewritten methods *****/
 	
 	add: function(user, tvdb, callback){
-		var self = this, deferred = Q.defer();;
+		var self = this, deferred = Q.defer();
 		var process = function(error,json){
 			if (error) logger.error('show.add:',error);
 			if (json){
@@ -40,6 +40,7 @@ var ShowData = {
 						'year': parseInt(json.year,10),
 						'url': json.url.split('/').pop(),
 						'synopsis': json.overview,
+						'runtime': parseInt(json.runtime,10),
 						'imdb': json.imdb_id,
 						'tvdb': parseInt(json.tvdb_id,10),
 						'genres': json.genres,
@@ -190,6 +191,45 @@ var ShowData = {
 	downloadAll: function(tvdb, callback){
 		var self = this, tvdb = parseInt(tvdb, 10);
 		self.download(tvdb, {}, callback);
+	},
+	get: function(user, tvdb, callback){
+		var self = this, tvdb = parseInt(tvdb, 10), deferred = Q.defer();
+		showCollection.findOne({'tvdb':tvdb,'users._id':ObjectID(user._id)},function(error,show){
+			if (error) logger.error(error);
+			if (show){
+				var response = show, listings = [{'season':0,'episodes':[]},{'season':1,'episodes':[]}];
+				
+				show.users.forEach(function(u){
+					if (!user._id.equals(u._id)) return;
+					response.progress = (u.progress) ? u.progress : {};
+					response.seasons = (u.seasons) ? u.seasons : [];
+				});
+				delete response.users;
+				
+				episodeCollection.find({'tvdb':show.tvdb}).sort({'season':1,'episode':1}).toArray(function(error,episodes){
+					if (error) logger.error(error);
+					if (episodes.length){
+						episodes.forEach(function(episode){
+							if (!listings[episode.season]) listings[episode.season] = {'season':episode.season,'episodes':[]};
+							var season = response.seasons.filter(function(season){
+								if (season.season == episode.season) return true;
+								return false;
+							});
+							if (season.length == 1) {
+								episode.watched = season[0].episodes[episode.episode] || false;
+							}
+							listings[episode.season].episodes.push(episode);
+						});
+					}
+					response.episodes = listings;
+					
+					deferred.resolve(response);
+					if (typeof(callback) == 'function') callback(null, response);
+				});
+				return;
+			}
+		});
+		return deferred.promise;
 	},
 	latest: function(user, callback){
 		var self = this;
@@ -469,43 +509,7 @@ var ShowData = {
 		});
 	},
 	summary: function(user, tvdb, callback){
-		var self = this, tvdb = parseInt(tvdb, 10), deferred = Q.defer();
-		showCollection.findOne({'tvdb':tvdb,'users._id':ObjectID(user._id)},function(error,show){
-			if (error) logger.error(error);
-			if (show){
-				var response = show, listings = [{'season':0,'episodes':[]},{'season':1,'episodes':[]}];
-				
-				show.users.forEach(function(u){
-					if (!user._id.equals(u._id)) return;
-					response.progress = (u.progress) ? u.progress : {};
-					response.seasons = (u.seasons) ? u.seasons : [];
-				});
-				delete response.users;
-				
-				episodeCollection.find({'tvdb':show.tvdb}).sort({'season':1,'episode':1}).toArray(function(error,episodes){
-					if (error) logger.error(error);
-					if (episodes.length){
-						episodes.forEach(function(episode){
-							if (!listings[episode.season]) listings[episode.season] = {'season':episode.season,'episodes':[]};
-							var season = response.seasons.filter(function(season){
-								if (season.season == episode.season) return true;
-								return false;
-							});
-							if (season.length == 1) {
-								episode.watched = season[0].episodes[episode.episode] || false;
-							}
-							listings[episode.season].episodes.push(episode);
-						});
-					}
-					response.episodes = listings;
-					
-					deferred.resolve(response);
-					if (typeof(callback) == 'function') callback(null, response);
-				});
-				return;
-			}
-		});
-		return deferred.promise;
+		return this.get(user,tvdb,callback);
 	},
 	sync: function(user, callback){
 		var self = this;
@@ -522,6 +526,7 @@ var ShowData = {
 							'url': show.url.split('/').pop(),
 							'status': (show.status == 'Ended') ? false:true,
 							'synopsis': show.overview,
+							'runtime': parseInt(json.runtime,10),
 							'imdb': show.imdb_id,
 							'tvdb': parseInt(show.tvdb_id,10),
 							'genres': show.genres,
