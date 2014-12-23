@@ -111,7 +111,6 @@ var ShowData = {
 									'added': new Date(),
 									'updated': new Date()
 								};
-								
 								if (!record.file) return;
 								
 								var meta = self.getEpisodeNumbers(file.name),
@@ -119,12 +118,22 @@ var ShowData = {
 								
 								helper.fileCopy(source, target, function(error){
 									if (error) return logger.error(error);
+									
 									var search = {'tvdb:':show.tvdb,'season':meta.season,'episode':{$in:meta.episodes}};
-									episodeCollection.update(search,{$set:record,$unset:{'downloading':true}},{'multi':true,'w':0});
+									
+									logger.debug(search);
+									episodeCollection.update(search,{$set:record,$unset:{'downloading':true}},{'multi':true}, function(error,affected){
+										if (error) logger.error(error);
+										logger.debug(affected);
+									});
 									showCollection.update({'tvdb':show.tvdb},{$set:{'updated':record.updated}},{w:0});
 									if (show.users){
+										var library = [];
+										meta.episodes.forEach(function(episode){
+											library.push({'season':meta.season,'episode':episode});
+										});
 										show.users.forEach(function(u){
-											userCollection.findOne({'_id': ObjectID(u._id),'trakt':{$exists:true}},{'trakt':1},function(error,user){
+											userCollection.findOne({'_id':ObjectID(u._id),'trakt':{$exists:true}},{'trakt':1},function(error,user){
 												if (error) logger.error(error)
 												if (user && library) trakt(user.trakt).show.episode.library(show.tvdb, library);
 											});
