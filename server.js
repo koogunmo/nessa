@@ -99,10 +99,6 @@ if (process.getuid) {
 	}
 }
 
-io.on('listening', function(){
-	logger.debug('derp');
-})
-
 /***********************************************************************/
 /* Set up Express */
 
@@ -129,67 +125,73 @@ if (!nconf.get('listen:nginx')){
 
 try {
 	var Q = require('q');
+	
 	var dbConnect = function(msg){
-		logger.info('MongoDB: Connecting to '+nconf.get('mongo:host')+'...');
-		var deferred = Q.defer();
-		var dsn = 'mongodb://';
-		if (nconf.get('mongo:auth')) {
-			dsn += nconf.get('mongo:username')+':'+nconf.get('mongo:password')+'@';
-		}
-		dsn += nconf.get('mongo:host')+':'+nconf.get('mongo:port')+'/'+nconf.get('mongo:name');
-		var mongo = require('mongodb').MongoClient;
-		mongo.connect(dsn,{'w':1},function(error,db){
-			if (error) deferred.reject(error)
-			if (db) deferred.resolve(db);
-		});
-		return deferred.promise;
-	};
-	
-	var dbConnected = function(db){
-		logger.info('MongoDB: Connected');
-		
-		global.db = db;
-		global.torrent = plugin('transmission');
-		
-		if (nconf.get('media:base') && !nconf.get('listen:nginx')){
-			app.use('/media', require('express').static(nconf.get('media:base')));
-		}
-		
-		require('./server/routes/auth')(app,db);
-		require('./server/routes/dashboard')(app,db,io);
-		require('./server/routes/default')(app,db,io);
-		require('./server/routes/downloads')(app,db,io);
-		require('./server/routes/movies')(app,db,io);
-		require('./server/routes/shows')(app,db,io);
-		require('./server/routes/system')(app,db,io);
-		require('./server/routes/users')(app,db,io);
-
-		app.use(function(req, res) {	
-			res.sendFile(process.cwd() + '/app/views/index.html');
-		});
-		
-		setTimeout(function(){
-			fs.readdir(process.cwd() + '/server/tasks', function(error, files){
-				if (error) {
-					logger.error(error);
-					return;
-				}
-				if (files === undefined) return;
-				files.filter(function(file){
-					return (file.substr(-3) == '.js');
-				}).forEach(function(file){
-					require(process.cwd() + '/server/tasks/' + file)(app,db,io);
-				});
+		try {
+			logger.info('MongoDB: Connecting to '+nconf.get('mongo:host')+'...');
+			var deferred = Q.defer();
+			var dsn = 'mongodb://';
+			if (nconf.get('mongo:auth')) {
+				dsn += nconf.get('mongo:username')+':'+nconf.get('mongo:password')+'@';
+			}
+			dsn += nconf.get('mongo:host')+':'+nconf.get('mongo:port')+'/'+nconf.get('mongo:name');
+			var mongo = require('mongodb').MongoClient;
+			mongo.connect(dsn,{'w':1},function(error,db){
+				if (error) deferred.reject(error)
+				if (db) deferred.resolve(db);
 			});
-		},1000);
+			return deferred.promise;
+		} catch(e){
+			logger.error(e.message)
+		}
 	};
+	var dbConnected = function(db){
+		try {
+			logger.info('MongoDB: Connected');
+			global.db = db;
+			
+			if (nconf.get('media:base') && !nconf.get('listen:nginx')){
+				app.use('/media', require('express').static(nconf.get('media:base')));
+			}
+			
+			require('./server/routes/auth')(app,db);
+			require('./server/routes/dashboard')(app,db,io);
+			require('./server/routes/default')(app,db,io);
+			require('./server/routes/downloads')(app,db,io);
+			require('./server/routes/movies')(app,db,io);
+			require('./server/routes/shows')(app,db,io);
+			require('./server/routes/system')(app,db,io);
+			require('./server/routes/users')(app,db,io);
 	
+			app.use(function(req, res) {	
+				res.sendFile(process.cwd() + '/app/views/index.html');
+			});
+			
+			setTimeout(function(){
+				fs.readdir(process.cwd() + '/server/tasks', function(error, files){
+					if (error) {
+						logger.error(error);
+						return;
+					}
+					if (files === undefined) return;
+					files.filter(function(file){
+						return (file.substr(-3) == '.js');
+					}).forEach(function(file){
+						require(process.cwd() + '/server/tasks/' + file)(app,db,io);
+					});
+				});
+			},1000);
+		} catch(e){
+			logger.error(e.message)
+		}
+	};
 	var dbError = function(error){
 		logger.error('MongoDB: Unable to connect. Retrying...');
 		setTimeout(function(){
 			dbConnect().then(dbConnected,dbError);
 		}, 2500);
 	};
+	
 	dbConnect().then(dbConnected,dbError);
 } catch(e){
 	logger.error(e.message);

@@ -44,7 +44,8 @@
     "nodetv-movies": "^0.7.0",
     "nodetv-shows": "^0.7.0",
     "nodetv-system": "^0.7.0",
-    "nodetv-trakt": "^0.7.0"
+    "nodetv-trakt": "^0.7.0",
+    "nodetv-transmission": "^0.7.0"
   },
   "devDependencies": {
     "gulp": "^3.8.10",

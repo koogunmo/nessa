@@ -11,7 +11,7 @@ var logger = log4js.getLogger('routes:downloads');
 
 module.exports = function(app, db, socket){
 	
-	var torrents	= plugin('transmission');
+	var torrents	= require('nodetv-transmission')(nconf.get('transmission'));
 	
 	app.get('/api/:session?/downloads', function(req,res){
 		// List torrents

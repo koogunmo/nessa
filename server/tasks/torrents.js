@@ -3,7 +3,9 @@
 /* Check for completed downloads every 5 minutes */
 module.exports = function(app,db,socket){
 	var movies	= require('nodetv-movies'),
-		shows	= require('nodetv-shows');
+		shows	= require('nodetv-shows'),
+		torrent = require('nodetv-transmission')(nconf.get('transmission'));
+	
 	try {
 		var checkDownloads = function(){
 			torrent.getComplete(function(error, torrents){
