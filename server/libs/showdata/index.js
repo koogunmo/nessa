@@ -113,10 +113,10 @@ var ShowData = {
 								};
 								if (!record.file) return;
 								var source = data.dir+'/'+file.name, target = basedir+record.file;
-								
+								var meta = self.getEpisodeNumbers(target);
 								helper.fileCopy(source, target, function(error){
 									if (error) return logger.error(error);
-									var search = {'tvdb:':show.tvdb,'season':numbers.season,'episode':{$in:numbers.episodes}};
+									var search = {'tvdb:':show.tvdb,'season':meta.season,'episode':{$in:meta.episodes}};
 									
 									episodeCollection.update(search,{$set:record,$unset:{'downloading':true}},{'multi':true,'w':0});
 									showCollection.update({'tvdb':show.tvdb},{$set:{'updated':record.updated}},{w:0});
@@ -161,10 +161,8 @@ var ShowData = {
 					if (episodes){
 						episodes.forEach(function(episode){
 							if (episode.file) return;
-							if (episode.hash){
-								var magnet = helper.createMagnet(result.hash);
-								addTorrent(magnet,episode._id);
-							} else if (episode.hashes.length){
+							
+							if (episode.hashes && episode.hashes.length){
 								var hashes = episode.hashes.filter(function(hash){
 									if (hash.hd == show.hd) return true;
 									return false;
@@ -173,6 +171,9 @@ var ShowData = {
 								hashes.forEach(function(hash){
 									addTorrent(hash.hash,episode._id);
 								});
+							} else if (episode.hash){
+								var magnet = helper.createMagnet(result.hash);
+								addTorrent(magnet,episode._id);
 							}
 						});
 					}
