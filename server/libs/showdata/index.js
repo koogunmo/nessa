@@ -119,13 +119,8 @@ var ShowData = {
 								helper.fileCopy(source, target, function(error){
 									if (error) return logger.error(error);
 									
-									var search = {'tvdb:':show.tvdb,'season':meta.season,'episode':{$in:meta.episodes}};
-									
-									logger.debug(search);
-									episodeCollection.update(search,{$set:record,$unset:{'downloading':true}},{'multi':true}, function(error,affected){
-										if (error) logger.error(error);
-										logger.debug(affected);
-									});
+									var search = {'tvdb':show.tvdb,'season':meta.season,'episode':{$in:meta.episodes}};
+									episodeCollection.update(search,{$set:record,$unset:{'downloading':true}},{'multi':true},{'w':0});
 									showCollection.update({'tvdb':show.tvdb},{$set:{'updated':record.updated}},{w:0});
 									if (show.users){
 										var library = [];
