@@ -10,103 +10,50 @@ log4js.configure({
 var logger = log4js.getLogger('routes:downloads');
 
 module.exports = function(app, db, socket){
-	
 	var torrents	= require('nodetv-transmission')(nconf.get('transmission'));
 	
 	app.get('/api/downloads', function(req,res){
-		// List torrents
-		torrents.list(function(error, data){
-		//	logger.info(data);
+		torrents.get(function(error, data){
 			if (error) return console.error(error);
 			res.send(data.torrents);
 		});
-			
-	}).post('/api/downloads', function(req,res){
-		// Add new manual torrent
+	})
+	
+	app.post('/api/downloads', function(req,res){
 		if (req.body.url){
 			torrents.add(req.body.url, function(error, data){
 				if (error) return logger.error(error);
 			});
 			res.status(202).end();
 		}
-	});
+	})
 	
 	app.get('/api/downloads/:id', function(req,res){
 		// Get torrent data
 		torrents.info(parseInt(req.params.id, 10), function(error, data){
-			if (error) {
+			if (error){
 				logger.error(error);
-				return res.status(404).end()
+				return res.status(404).send({'success':false})
 			}
 			res.send(data.torrents[0]);
 		});
 	}).post('/api/downloads/:id', function(req,res){
 		if (typeof(req.body.status) != 'undefined'){
+			
+			// Per-torrent settings?
+			
 			torrents.setStatus(req.params.id, req.body.status, function(error,json){
-				res.status(202).send({success: true});
+				res.status(202).send({'success': true});
 			});
 		}
 	}).delete('/api/downloads/:id', function(req,res){
 		// Remove & delete torrent
-		torrents.remove({id: parseInt(req.params.id, 10), purge: true}, function(error){
-			if (error) return logger.error(error);
-			res.status(204).send({success: true});
-		});
-	});
-	
-	
-	
-	/*
-	app.get('/api/:session?/downloads/:id', function(req,res){
-		// Get torrent info
-		var showCollection = db.collection('show');
-		var episodeCollection = db.collection('episode');
-		
-		torrents.info(parseInt(req.params.id, 10), function(error, data){
-			try {
-				var torrent = data.torrents[0];
-				var response = {
-					id: torrent.id,
-					status: !!torrent.status,
-					hash: torrent.hashString,
-					date: {
-						started: torrent.addedDate
-					},
-				};
-				episodeCollection.findOne({hash: torrent.hashString.toUpperCase()}, function(error, results){
-					if (results) {
-						// In DB, no manual move required
-						response.episode = results;
-						showCollection.findOne({tvdb: results.tvdb}, function(error, show){
-							response.show = show;
-							res.send(response);
-						});
-					} else {
-						response.files = [];
-						torrent.files.forEach(function(file){
-							response.files.push(file);
-						});
-						res.send(response);
-					}
-				});
-			} catch(e){
-				logger.error(e.message);
+		torrents.remove(parseInt(req.params.id,10), true, function(error){
+			if (error){
+				logger.error(error);
+				return res.status(404).send({'success':false});
 			}
+			res.status(204).send({'success':true});
 		});
-		
-		
-	}).post('/api/:session?/downloads/:id', function(req,res){
-		// Update torrent settings (i.e. ratio)
-		
-	}).delete('/api/:session?/downloads/:id', function(req,res){
-		// Remove torrent
-		torrents.remove({id: req.params.id, purge: true}, function(error){
-			if (error) return logger.error(error);
-			res.status(204).end();
-		});
-	});
-	
-	*/
-	
-	
+	})
 };

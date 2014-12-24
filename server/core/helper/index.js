@@ -116,53 +116,8 @@ exports = module.exports = {
 	},
 	
 	formatName: function(data){
-		logger.warn('`helper.formatName` has been deprecated. Please use `shows.getFilename` instead');
-		
-		try {
-			var defaults = {
-				format: nconf.get('media:shows:format'),
-				season: null,
-				episodes: [],
-				ext: null
-			};
-			var values = extend(defaults, data);
-			var token = {
-				'E': null,
-				'S': null,
-				'T': null,
-				'X': null,
-			};
-			if (values.episodes.length > 1) {
-				values.episodes.sort(function(a,b){
-					if (a.episode < b.episode) return -1;
-					if (a.episode > b.episode) return 1;
-					return 0;
-				});
-				token.E = helper.zeroPadding(values.episodes[0].episode)+'-'+helper.zeroPadding(values.episodes[values.episodes.length-1].episode);
-				var titles = [];
-				values.episodes.forEach(function(episode){
-					if (episode.title.indexOf('Episode') != 0) titles.push(episode.title.replace('/', '-'));
-				});
-				token.T = (titles.length) ? titles.join('; ') : '';
-			} else {
-				token.E = helper.zeroPadding(values.episodes[0].episode);
-				if (values.episodes[0].title.indexOf('Episode') != 0){
-					token.T = values.episodes[0].title.replace('/', '-');
-				} else {
-					token.T = '';
-				}
-			}
-			token.S = helper.zeroPadding(values.season);
-			token.X = values.ext.replace(/^\./, '');
-			
-			// TO DO: fix names that look like 'Episode 01 - '
-			
-			return values.format.replace(/%(\w)/g, function(match, key){			
-				return token[key];
-			});
-		} catch(e) {
-			logger.error('helper.formatName: %s', e.message);
-		}
+		logger.error('`helper.formatName` has been deprecated. Please use `shows.getFilename` instead');
+		return false;
 	},
 	formatDirectory: function(name){
 		// Sanitize the directory names (remove backslash, foreslash and colon)
@@ -170,6 +125,7 @@ exports = module.exports = {
 	},
 	fixFeedUrl: function(url, full){
 		logger.warn('`helper.fixFeedUrl` has been deprecated')
+		
 		var full = (typeof(full) == 'undefined') ? false: true;
 		if (url.indexOf('tvshowsapp.com') >= 0) {
 			var oldurl = decodeURIComponent(url);
@@ -186,68 +142,8 @@ exports = module.exports = {
 		return url;
 	},
 	parseFeed: function(url, since, callback){
-		logger.warn('`helper.parseFeed` has been deprecated')
-		
-		var helper = this, deferred = Q.defer();
-		try {
-			var userAgent = 'NodeTV '+global.pkg.version+' (http://greebowarrior.github.io/nessa/)';
-			if (url.indexOf('tvshowsapp.com') >= 0) {
-				url = helper.fixFeedUrl(url);
-				userAgent = 'TVShows 2 (http://tvshowsapp.com/)';
-			}
-			var options = {
-				url: url,
-				headers: {
-					'User-Agent': userAgent
-				}
-			};
-			request.get(options, function(error, req, xml){
-				if (error || req.statusCode != 200) return;
-				try {
-					parser.parseString(xml, function(error, json){
-						if (error) {
-							logger.error(error);
-							return;
-						}
-						if (!json || !json.rss.channel[0].item) return;
-						json.rss.channel[0].item.forEach(function(item){
-							if (since) {
-								var published = new Date(item.pubDate[0]).getTime();
-								if (published < since) return;
-							}
-							var sources = [];
-							if (item.enclosure) sources.push(item.enclosure[0]['$'].url);
-							if (item.link) sources.push(item.link[0]);
-							if (item.guid) sources.push(item.guid[0]['_']);
-							
-							var magnet = null;
-							sources.forEach(function(source){
-								if (magnet) return;
-								if (source.indexOf('magnet') == 0) {
-									magnet = source;
-									return;
-								}
-							});
-							var res = helper.getEpisodeNumbers(item.title[0]);
-							var response = {
-								season: res.season,
-								episodes: res.episodes,
-								hd: helper.isHD(item.title[0]),
-								repack: helper.isRepack(item.title[0]),
-								hash: helper.getHash(magnet)
-							};
-							if (typeof(callback) == 'function') callback(null, response);
-							deferred.resolve(response);
-						});
-					});
-				} catch(e){
-					logger.error('XML Parser error', url, e.message);
-				}
-			});
-		} catch(e) {
-			logger.error('helper.parseFeed: %s', e.message);
-		}
-		return deferred.promise;
+		logger.error('`helper.parseFeed` has been deprecated');
+		return false;
 	},
 	
 	// Torrent methods

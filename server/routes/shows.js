@@ -12,7 +12,7 @@ var logger = log4js.getLogger('routes:shows');
 module.exports = function(app, db, socket){
 	
 	var shows	= require('nodetv-shows');
-		
+	
 	app.get('/api/shows', function(req,res){
 		shows.list(req.user, function(error,results){
 			if (error) logger.error(error);

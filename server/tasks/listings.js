@@ -16,26 +16,22 @@ module.exports = function(app,db,socket){
 			var showCollection = db.collection('show'),
 				userCollection = db.collection('user');
 			
-			userCollection.findOne({'admin':true,'trakt':{$exists:true}},{'trakt':1}, function(error, admin){
+			showCollection.find({'ended':false,'status':{$exists:true}}).toArray(function(error,results){
 				if (error) logger.error(error);
-				
-				if (admin){
-					showCollection.find({'status':{$exists:true}}).toArray(function(error,results){
-						if (error) logger.error(error);
-						if (results){
-							results.forEach(function(show){
-								shows.getArtwork(admin, show.tvdb);
-								shows.getSummary(show.tvdb)
-								shows.getListings(show.tvdb, function(error,tvdb){
-									shows.getHashes(tvdb);
+				if (results){
+					results.forEach(function(show){
+						shows.getArtwork(show.tvdb);
+						shows.getFeed(show.tvdb);
+						shows.getSummary(show.tvdb);
+						shows.getListings(show.tvdb, function(error,tvdb){
+							shows.getHashes(show.tvdb);
+						});
+						
+						if (show.users && show.users.length >= 1){
+							show.users.forEach(function(user){
+								userCollection.findOne({'_id':ObjectID(user._id),'trakt':{$exists:true}},{'trakt':1}, function(error, user){
+									shows.getProgress(user, show.tvdb);
 								});
-								if (show.users && show.users.length >= 1){
-									show.users.forEach(function(user){
-										userCollection.findOne({'_id':ObjectID(user._id),'trakt':{$exists:true}},{'trakt':1}, function(error, user){
-											shows.getProgress(user, show.tvdb);
-										});
-									});
-								}
 							});
 						}
 					});

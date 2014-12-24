@@ -8,20 +8,20 @@ module.exports = function(app,db,socket){
 	
 	try {
 		var checkDownloads = function(){
-			torrent.getComplete(function(error, torrents){
-				torrents.forEach(function(transfer){
+			torrent.getComplete(function(error, transfers){
+				transfers.forEach(function(transfer){
 					if (movies.complete) {
 						movies.complete(transfer, function(error, data){
 							if (error) return logger.error(error);
 							socket.emit('alert', {'title':'Movie downloaded','message':data.movie.title});
-							if (data.trash) torrent.remove({'id':transfer.id,'purge':true});
+							if (data.trash) torrent.remove(transfer.id,true);
 						});
 					}
 					if (shows.complete) {
 						shows.complete(transfer, function(error,data){
 							if (error) return logger.error(error);
 							socket.emit('alert', {'title':'Episode downloaded','message':data.show.name});
-							if (data.trash) torrent.remove({'id':transfer.id,'purge':true});
+							if (data.trash) torrent.remove(transfer.id,true);
 						});
 					}
 				});
