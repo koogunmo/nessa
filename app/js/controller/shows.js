@@ -5,7 +5,7 @@ define(['app'], function(nessa){
 			abstract: true,
 			url: '/shows',
 			controller: 'showsCtrl',
-			templateUrl: 'views/section/shows.html',
+			templateUrl: 'views/shows/index.html',
 			data: {
 				secure: true,
 				title: 'Shows'
@@ -19,7 +19,7 @@ define(['app'], function(nessa){
 			},
 			onEnter: function($modal, $state, $stateParams){
 				$modal.open({
-					templateUrl: 'views/modal/show/search.html',
+					templateUrl: 'views/shows/modal/search.html',
 					controller: 'searchCtrl',
 					windowClass: 'modal-add'
 				}).result.then(function(result){
@@ -41,7 +41,7 @@ define(['app'], function(nessa){
 			},
 			onEnter: function($modal, $state, $stateParams){
 				$modal.open({
-					templateUrl: 'views/modal/show/random.html',
+					templateUrl: 'views/shows/modal/random.html',
 					controller: 'showRandomCtrl',
 					backdrop: true
 				}).result.then(function(result){
@@ -64,7 +64,7 @@ define(['app'], function(nessa){
 			},
 			onEnter: function($modal, $state, $stateParams){
 				$modal.open({
-					templateUrl: 'views/modal/show/detail.html',
+					templateUrl: 'views/shows/modal/detail.html',
 					controller: 'showModalCtrl',
 					backdrop: true,
 					windowClass: 'modal-show'
@@ -89,7 +89,7 @@ define(['app'], function(nessa){
 			},
 			onEnter: function($modal, $state){
 				$modal.open({
-					templateUrl: 'views/modal/show/match.html',
+					templateUrl: 'views/shows/modal/match.html',
 					controller: 'matchCtrl',
 					backdrop: 'static'
 				}).result.then(function(result){

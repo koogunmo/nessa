@@ -6,7 +6,7 @@ define(['app'], function(nessa){
 			abstract: true,
 			url: '/settings',
 			controller: 'settingsCtrl',
-			templateUrl: 'views/partials/settings.html',
+			templateUrl: 'views/settings/index.html',
 			data: {
 				secure: true,
 				title: 'Settings'
@@ -23,7 +23,7 @@ define(['app'], function(nessa){
 			url: '/add',
 			onEnter: function($modal, $state){
 				$modal.open({
-					templateUrl: 'views/modal/user.html',
+					templateUrl: 'views/settings/modal/user.html',
 					controller: 'userCtrl'
 				}).result.then(function(result){
 					$state.transitionTo('settings.index');
@@ -42,7 +42,7 @@ define(['app'], function(nessa){
 			url: '/edit/{id:[0-9a-f]{24}}',
 			onEnter: function($modal, $state){
 				$modal.open({
-					templateUrl: 'views/modal/user.html',
+					templateUrl: 'views/settings/modal/user.html',
 					controller: 'userCtrl',
 					backdrop: 'static'
 				}).result.then(function(result){
@@ -68,7 +68,7 @@ define(['app'], function(nessa){
 			onEnter: function($modal, $rootScope, $state){
 				var previous = ($rootScope.stateFrom.name) ? $rootScope.stateFrom.name : 'dashboard';
 				$modal.open({
-					templateUrl: 'views/modal/user.html',
+					templateUrl: 'views/settings/modal/user.html',
 					controller: 'userCtrl'
 				}).result.then(function(result){
 					$state.transitionTo(previous);

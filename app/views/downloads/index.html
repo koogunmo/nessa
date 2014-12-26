@@ -22,7 +22,7 @@
 		</div>
 	</div>
 	
-	<div ng-repeat="download in results = (downloads | filter:filterList) | orderBy:'name'" ng-include="'/views/partials/download.html'"></div>
+	<div ng-repeat="download in results = (downloads | filter:filterList) | orderBy:'name'" ng-include="'/views/downloads/partial/download.html'"></div>
 	
 	<div ng-hide="results.length">
 		<div ng-show="filter.name.length">No matches found</div>

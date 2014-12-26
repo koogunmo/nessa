@@ -23,7 +23,7 @@
 			<tab heading="Episodes" ng-if="show.episodes">
 				<accordion class="seasons">
 					<accordion-group heading="{{display()}}" class="season" ng-repeat="season in show.episodes | orderBy:'season':true" ng-controller="seasonCtrl">
-						<div class="episode" ng-repeat="episode in season.episodes | orderBy:'episode'" ng-include="'/views/partials/episode.html'"></div>
+						<div class="episode" ng-repeat="episode in season.episodes | orderBy:'episode'" ng-include="'/views/shows/partial/episode.html'"></div>
 					</accordion-group>
 				</accordion>
 			</tab>

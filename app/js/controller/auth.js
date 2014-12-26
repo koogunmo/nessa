@@ -6,7 +6,7 @@ define(['app'], function(nessa){
 		$stateProvider.state('login', {
 			url: '/login',
 			controller: 'loginCtrl',
-			templateUrl: 'app/views/section/login.html',
+			templateUrl: 'views/auth/login.html',
 			data: {
 				secure: false,
 				title: 'Login'

@@ -4,6 +4,10 @@ $border: #EEEEEE;
 $break-large: 768px;
 $break-small: 767px;
 
+
+$screen-sm: 768px;
+$screen-md: 992px;
+
 body {
 	background-color: #F6F6F6;
 	font-family: -apple-system-font, 'Roboto', Arial, sans-serif;
@@ -92,11 +96,10 @@ body {
 		}
 	}
 }
+
 .nav-tabs, .nav-pills {
 	margin-bottom: 10px;
 }
-
-
 .panel-group {
 	.panel-heading {
 		cursor: pointer;
@@ -443,6 +446,112 @@ input {
 	}
 }
 
+.poster {
+	border-bottom: 1px solid $border;
+	color: $font-color;
+	margin-bottom: 10px;
+	padding: 10px;
+	
+	.badge {
+		background-color: darkred;
+		border-color: #FFFFFF;
+	}
+	>.image {
+		display: none;
+		margin: 0px auto;
+		position: relative;
+		.badge {
+			border-style: solid;
+			border-width: 1px;
+			position: absolute;
+			right: -10px;
+			text-align: center;
+			top: -10px;
+			z-index: 3;
+		}
+		h6 {
+			color: #FFFFFF;
+			font-weight: bold;
+			left: 5px;
+			margin: 0px;
+			position: absolute;
+			right: 5px;
+			top: 17px;
+			transition: opacity 0.5s;
+		}
+		img {
+			background-color: #777777;
+			box-shadow: 0px 0px 5px black;
+		}
+		.overlay {
+			background-color: rgba(0,0,0,0.7);
+			bottom: 0px;
+			color: #FFFFFF;
+			font-size: 12px;
+			height: auto;
+			left: 0px;
+			opacity: 0;
+			padding: 15px 5px 5px;
+			position: absolute;
+			right: 0px;
+			top: 0px;
+			transition: opacity 0.5s;
+			width: auto;
+			z-index: 2;
+			.title {
+				font-weight: bold;
+			}
+			.hud {
+				bottom: 15px;
+				left: 5px;
+				position: absolute;
+				right: 5px;
+			}
+			.progress {
+				bottom: 5px;
+				height: 3px;
+				left: 5px;
+				margin: 0px;
+				position: absolute;
+				right: 5px;
+			}
+		}
+		&:hover {
+			h6 {
+				opacity: 0;
+			}
+			.overlay {
+				opacity: 1;
+			}
+		}
+	}
+	>.title {
+		display: block;
+	}
+	&.artwork {
+		h6 {
+			display: none;
+		}
+	}
+	
+	@media (min-width: $screen-sm){
+		border-bottom: none;
+		height: auto;
+		max-height: 213px;
+		text-align: center;
+		
+		>.image {
+			display: inline-block;
+		}
+		>.title {
+			display: none;
+		}
+	}
+}
+
+
+
+
 #shows {
 	div.search {
 		padding: 10px 0px;
@@ -453,232 +562,6 @@ input {
 	}
 	.input-group-addon {
 		cursor: pointer;
-	}
-	div.image {
-		display: none;
-		.corner {
-			display: none !important;
-			height: 25px;
-			position: absolute;
-			right: 0px;
-			top: 0px;
-			width: 25px;
-			z-index: 4;
-		}
-		.badge {
-			border: 1px solid transparent;
-			position: absolute;
-			right: -5px;
-			top: -10px;
-			z-index: 5;
-			&.unwatched {
-				background-color: darkred;
-				border-color: #FFFFFF;
-				display: inline;
-			}
-			&.new {
-				background-color: lightblue;
-				border-color: #6de6fa;
-			}
-		}
-		&.ended {
-			.corner {
-				background-image: url('../gfx/icons/ended.png');
-				background-position: left top;
-				background-repeat: no-repeat;
-				background-size: contain;
-				display: block;
-			}
-		}
-	}
-	h6 {
-		box-sizing: border-box;
-		margin: 0px;
-		padding: 3px;
-		position: absolute;
-		top: 125px;
-		width: 100%;
-		z-index: 2;
-	}
-	div.title {
-		
-	}
-	.show {
-		border-bottom: 1px solid $border;
-		padding: 10px;
-		a {
-			color: inherit;
-			text-decoration: none;
-		}
-		>.title {
-			a {
-				display: inline-block;
-				width: 100%;
-			}
-		}
-	}
-	@media screen and (min-width: $break-large){
-		.show {
-			border: none;
-			height: 200px;
-			padding: 10px 0px 0px;
-			text-align: center;
-			div.image {
-				background-color: #666666;
-				background-image: url('../gfx/no-cover.png');
-				background-position: center center;
-				background-repeat: no-repeat;
-				background-size: contain;
-				box-shadow: 0px 0px 5px black;
-				display: block;
-				height: 174px;
-				margin: 0px auto 5px;
-				position: relative;
-				transition: all 0.5s;
-				-moz-transition: all 0.5s;
-				-ms-transition: all 0.5s;
-				-webkit-transition: all 0.5s;
-				width: 118px;
-				a {
-					display: block;
-					height: 100%;
-					width: 100%;
-				}
-				img {
-					opacity: 0;
-					position: relative;
-					transition: opacity 1s;
-					-webkit-transition: opacity 1s;
-					z-index: 3;
-					&.lazy-loaded {
-						opacity: 1;
-					}
-				}
-				
-				.actions {
-					bottom: 0px;
-					display: none !important;
-					font-size: 20px;
-					height: 35px;
-					left: 0px;
-					opacity: 0;
-					position: absolute;
-					right: 0px;
-					transition: all 0.5s;
-					-moz-transition: all 0.5s;
-					-ms-transition: all 0.5s;
-					-webkit-transition: all 0.5s;
-					visibility: hidden;
-					z-index: 5;
-					> .fa {
-						color: #AAAAAA;
-						cursor: pointer;
-						padding: 0px 5px;
-						&:hover {
-							color: #FFFFFF !important;
-						}
-					} 
-				}
-				
-				.overlay {
-					background-color: rgba(0,0,0,0.8);
-					bottom: 0px;
-					color: #FFFFFF;
-					/* height: 35px; */
-					left: 0px;
-					opacity: 0;
-					position: absolute;
-					right: 0px;
-					top: 0px;
-					transition: all 0.5s;
-					-moz-transition: all 0.5s;
-					-ms-transition: all 0.5s;
-					-webkit-transition: all 0.5s;
-					visibility: hidden;
-					z-index: 3;
-					> .title {
-						font-size: 12px;
-						font-weight: bold;
-						padding: 20px 15px;
-					}
-					.hud {
-						bottom: 10px;
-						height: 20px;
-						left: 0px;
-						margin: 0px 5px;
-						position: absolute;
-						right: 0px;
-						text-align: left;
-						
-						span {
-							margin-right: 5px;
-						}
-					}
-					.progress {
-						bottom: 5px;
-						height: 5px;
-						left: 0px;
-						margin: 0px 5px;
-						position: absolute;
-						right: 0px;
-					}
-				}
-				&:hover {
-					.actions {
-						opacity: 1;
-						visibility: visible;
-					}
-					.overlay {
-						opacity: 1;
-						visibility: visible;
-					}
-				}
-			}
-			> .title {
-				display: none;
-			}
-		}
-	}
-}
-
-#movies {
-	.input-group-addon {
-		cursor: pointer;
-	}
-	div.image {
-		display: none;
-	}
-	.movie {
-		border-bottom: 1px solid $border;
-		cursor: pointer;
-		padding: 10px;
-	}
-	@media screen and (min-width: $break-large) {
-		.movie {
-			border: none;
-			height: 160px;
-			padding: 10px 0px 0px;
-			text-align: center;
-			div.image {
-				background-color: #666666;
-				background-image: url('../gfx/no-cover.png');
-				background-position: center center;
-				background-repeat: no-repeat;
-				background-size: contain;
-				box-shadow: 0px 0px 5px black;
-				display: block;
-				height: 100px;
-				margin: 0px auto;
-				transition: all 0.5s;
-				-moz-transition: all 0.5s;
-				-ms-transition: all 0.5s;
-				-webkit-transition: all 0.5s;
-				width: 68px;
-			}
-			> img {
-				display: none;
-			}
-		}
 	}
 }
 

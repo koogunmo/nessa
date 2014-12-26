@@ -4,7 +4,7 @@ define(['app'], function(nessa){
 		$stateProvider.state('downloads', {
 			url: '/downloads',
 			controller: 'downloadsCtrl',
-			templateUrl: 'views/section/downloads.html',
+			templateUrl: 'views/downloads/index.html',
 			data: {
 				secure: true,
 				title: 'Downloads'
@@ -15,7 +15,7 @@ define(['app'], function(nessa){
 			onEnter: function($state, $modal){
 				$modal.open({
 					controller: 'downloadAddCtrl',
-					templateUrl: 'views/modal/download/add.html'
+					templateUrl: 'views/downloads/modal/add.html'
 				}).result.then(function(result){
 					$state.transitionTo('downloads');
 					window.modal = null;
@@ -36,7 +36,7 @@ define(['app'], function(nessa){
 			onEnter: function($state, $stateParams, $modal){
 				$modal.open({
 					controller: 'downloadModalCtrl',
-					templateUrl: 'views/modal/download/settings.html'
+					templateUrl: 'views/downloads/modal/settings.html'
 				}).result.then(function(result){
 					$state.transitionTo('downloads');
 					window.modal = null;

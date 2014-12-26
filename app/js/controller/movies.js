@@ -6,7 +6,7 @@ define(['app'], function(nessa){
 				abstract: true,
 				url: '/movies',
 				controller: 'MovieListCtrl',
-				templateUrl: 'views/section/movies.html',
+				templateUrl: 'views/movies/index.html',
 				data: {
 					secure: true,
 					title: 'Movies'
@@ -20,7 +20,7 @@ define(['app'], function(nessa){
 			onEnter: function($modal, $state, $stateParams){
 				$modal.open({
 					controller: 'MovieSearchCtrl',
-					templateUrl: 'views/modal/movie/search.html'
+					templateUrl: 'views/movies/modal/search.html'
 				}).result.then(function(result){
 					$state.transitionTo('movies.index');
 					window.modal = null;
@@ -40,7 +40,7 @@ define(['app'], function(nessa){
 			onEnter: function($log,$modal,$state,$stateParams){
 				$modal.open({
 					controller: 'MovieDetailCtrl',
-					templateUrl: 'views/modal/movie/detail.html'
+					templateUrl: 'views/movies/modal/detail.html'
 				}).result.then(function(result){
 					$state.transitionTo('movies.index');
 					window.modal = null;
@@ -60,7 +60,7 @@ define(['app'], function(nessa){
 			onEnter: function($modal, $state, $stateParams){
 				$modal.open({
 					controller: 'MovieUnmatchedCtrl',
-					templateUrl: 'views/modal/movie/match.html'
+					templateUrl: 'views/movies/modal/match.html'
 				}).result.then(function(result){
 					$state.transitionTo('movies.index');
 					window.modal = null;

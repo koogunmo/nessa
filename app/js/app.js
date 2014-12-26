@@ -19,10 +19,10 @@ define('app', ['angular','moment','ngAnimate','ngMessages','ngResource','ngSocke
 	
 	/****** Directives ******/
 	
-	nessa.directive('lazyLoad', function($document, $timeout, $window){
+	nessa.directive('lazyLoad', function($document,$log,$timeout,$window){
 		return {
 			restrict: 'AC',
-			link: function($scope, $element, $attr){
+			link: function($scope,$element,$attr){
 				var lazyLoad = function(){
 					if ($element.hasClass('lazyLoaded') || $window.innerWidth < 750) return;
 					var height	= $window.innerHeight,
@@ -31,14 +31,23 @@ define('app', ['angular','moment','ngAnimate','ngMessages','ngResource','ngSocke
 					
 					if ($element.offset().top >= scrollY && $element.offset().top < bottom){
 						if (typeof($scope.progress) == 'function') $scope.progress();
-						var image = $element.find('img[data-src]');
-						image.on('load', function(){
-							$(this).addClass('lazy-loaded');
-						}).attr('src', image.data('src'));
+						
+						var img = $element.find('img[lazy-src]'),
+							src = img.attr('lazy-src');
+						
+						var poster = new Image();
+						poster.onload = function(){
+							img.attr('src', poster.src);
+							$element.addClass('artwork');
+						};
+						poster.onerror = function(){
+							$log.debug('error', src);
+						};
+						poster.src = src;
 						$element.addClass('lazyLoaded');
 					}
 				};
-				$document.bind('lazyload orientationchange resize scroll', lazyLoad);
+		//		$document.bind('lazyload orientationchange resize scroll', lazyLoad);
 				$timeout(lazyLoad);
 			}
 		};

@@ -4,7 +4,7 @@ define(['app'], function(nessa){
 		$stateProvider.state('dashboard', {
 			url: '/dashboard',
 			controller: 'dashboardCtrl',
-			templateUrl: 'app/views/section/dashboard.html',
+			templateUrl: 'views/dashboard/index.html',
 			data: {
 				secure: true,
 				title: 'Dashboard'
