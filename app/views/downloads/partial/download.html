@@ -8,7 +8,7 @@
 			<!-- <input type="checkbox" ng-model="selected"> -->
 			<span ui-sref="downloads.info({id: download.id})">{{download.name}}</span>
 		</h4>
-		<div class="progress progress-striped" title="{{download.percentDone*100 | number:2}}%">
+		<div class="progress" title="{{download.percentDone*100 | number:2}}%">
 			<div class="progress-bar" role="progressbar" style="width: {{download.percentDone*100}}%;" ng-class="{'progress-bar-success': download.percentDone==1}"></div>
 		</div>
 		<div class="stats">

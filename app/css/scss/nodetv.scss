@@ -446,6 +446,49 @@ input {
 	}
 }
 
+
+.library-filter {
+	.input-group-addon {
+		cursor: pointer;
+	}
+	.row {
+		margin-bottom: 10px;
+	}
+}
+
+.download {
+	border-bottom: 1px solid $border;
+	box-sizing: border-box;
+	margin: 0px;
+	padding: 10px 5px;
+	&.paused {
+		color: #AAAAAA !important;
+		opacity: 0.7;
+		.progress-bar {
+			background-color: #AAAAAA !important;
+		}
+	}
+	&:hover {
+		background-color: $border;
+	}
+	h4 {
+		height: 20px;
+		margin: 0px 0px 5px;
+		margin-top: 0px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	.progress {
+		height: 10px;
+		margin-bottom: 0px;
+	}
+	.stats {
+		font-size: 12px;
+		margin-top: 5px;
+	} 
+}
+
 .poster {
 	border-bottom: 1px solid $border;
 	color: $font-color;
@@ -534,13 +577,11 @@ input {
 			display: none;
 		}
 	}
-	
 	@media (min-width: $screen-sm){
 		border-bottom: none;
 		height: auto;
 		max-height: 213px;
 		text-align: center;
-		
 		>.image {
 			display: inline-block;
 		}
@@ -550,70 +591,10 @@ input {
 	}
 }
 
-.library-filter {
-	.row {
-		margin-bottom: 10px;
-	}
-}
 
-
-
-#shows {
-	div.search {
-		padding: 10px 0px;
-	}
-	.filter {
-		border-top: none;
-		border-radius: 0px 0px 5px 5px;
-	}
-	.input-group-addon {
-		cursor: pointer;
-	}
-}
-
-/* Downloads */
-
-#downloads {
-	div.search {
-		padding: 10px 0px;
-	}
-	
-	.download {
-		border-bottom: 1px solid $border;
-		box-sizing: border-box;
-		margin: 0px;
-		padding: 10px 5px;
-		&.paused {
-			color: #AAAAAA !important;
-			opacity: 0.7;
-			.progress-bar {
-				background-color: #AAAAAA !important;
-			}
-		}
-		&:hover {
-			background-color: $border;
-		}
-		h4 {
-			height: 20px;
-			margin: 0px 0px 5px;
-			margin-top: 0px;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
-		}
-		.progress {
-			height: 10px;
-			margin-bottom: 0px;
-		}
-		.stats {
-			font-size: 12px;
-			margin-top: 5px;
-		} 
-	}
-}
 
 /* Settings */
-
+/*
 #install, #match, #settings {
 	padding-bottom: 50px;
 	
@@ -632,3 +613,4 @@ input {
 		z-index: 10;
 	}
 }
+*/

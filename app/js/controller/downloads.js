@@ -3,7 +3,7 @@ define(['app'], function(nessa){
 	nessa.config(function($stateProvider){
 		$stateProvider.state('downloads', {
 			url: '/downloads',
-			controller: 'downloadsCtrl',
+			controller: 'DownloadsController',
 			templateUrl: 'views/downloads/index.html',
 			data: {
 				secure: true,
@@ -68,28 +68,25 @@ define(['app'], function(nessa){
 	
 	/****** Controllers ******/
 	
-	nessa.controller('downloadsCtrl', function($http, $log, $rootScope, $scope){
-		$scope.predicate = 'name';
-		$scope.reverse = false;
+	nessa.controller('DownloadsController', function($http, $log, $rootScope, $scope){
 		$scope.downloads = [];
-		
 		$scope.filter = {
 			active: false,
 			title: '',
 			status: ''
 		};
-		
 		$scope.filterList = function(item){
 			if (!item.name.toLowerCase().match($scope.filter.title.toLowerCase())) return false;
 			if ($scope.filter.active){
 				if ($scope.filter.status != '' && item.status != $scope.filter.status) return false;
 			}
 			return true;
-		}
-		
+		};
 		$scope.clearFilter = function(){
 			$scope.filter.title = '';
 		};
+		
+		
 		
 		
 		$scope.load = function(){
