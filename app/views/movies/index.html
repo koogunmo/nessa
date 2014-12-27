@@ -33,7 +33,8 @@
 <div class="row">
 	<div class="poster col-sm-2" ng-repeat="movie in results = (movies | filter:filterList) | orderBy:definiteArticle | offset:(paginate.page-1)*paginate.items | limitTo:paginate.items" lazy-load>
 		<div class="image" ui-sref="movies.detail({id:movie.tmdb,url:movie.url})">
-			<img src="/assets/gfx/no-cover.png" lazy-src="/media/{{settings.movies.directory}}/.artwork/{{movie.tmdb}}.jpg" alt="" class="img-responsive" />
+			<img src="/assets/gfx/no-cover.png" alt="" class="img-responsive placeholder">
+			<img lazy-src="/media/{{settings.movies.directory}}/.artwork/{{movie.tmdb}}.jpg" alt="" class="img-responsive artwork" />
 			<h6>{{movie.title}}</h6>
 			<div class="overlay">
 				<div class="title">{{movie.title}}</div>

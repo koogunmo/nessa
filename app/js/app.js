@@ -28,24 +28,19 @@ define('app', ['angular','moment','ngAnimate','ngMessages','ngResource','ngSocke
 					var height	= $window.innerHeight,
 						scrollY	= $window.scrollY,
 						bottom	= height+scrollY;
-					
-					if ($element.offset().top >= scrollY && $element.offset().top < bottom){
+				//	if ($element.offset().top >= scrollY && $element.offset().top < bottom){
 						if (typeof($scope.progress) == 'function') $scope.progress();
-						
-						var img = $element.find('img[lazy-src]'),
-							src = img.attr('lazy-src');
-						
+						var img = $element.find('img[lazy-src]'), src = img.attr('lazy-src');
 						var poster = new Image();
 						poster.onload = function(){
 							img.attr('src', poster.src);
-							$element.addClass('artwork');
+							$element.addClass('lazyLoaded');
 						};
 						poster.onerror = function(){
-							$log.debug('error', src);
+						//	$log.error('Error:', src);
 						};
 						poster.src = src;
-						$element.addClass('lazyLoaded');
-					}
+				//	}
 				};
 		//		$document.bind('lazyload orientationchange resize scroll', lazyLoad);
 				$timeout(lazyLoad);

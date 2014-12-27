@@ -4,7 +4,7 @@ define(['app'], function(nessa){
 		$stateProvider.state('shows', {
 			abstract: true,
 			url: '/shows',
-			controller: 'showsCtrl',
+			controller: 'ShowsController',
 			templateUrl: 'views/shows/index.html',
 			data: {
 				secure: true,
@@ -127,24 +127,12 @@ define(['app'], function(nessa){
 	
 	/****** Controller ******/
 	
-	nessa.controller('showsCtrl', function($http, $log, $rootScope, $scope){
+	nessa.controller('ShowsController', function($http,$log,$modal,$scope){
 		$scope.shows	= [];
 		
 		$scope.definiteArticle = function(show){
 			return show.name.replace(/^The\s/i, '');
 		};
-		$scope.load = function(){
-			$http.get('/api/shows').success(function(json, status){
-				if (status == 200 && json) {
-					$scope.shows = json;
-				//	$(document).trigger('lazyload');
-				}
-			}).error(function(json, status){
-				$log.error(json, status);
-			});
-		};
-		
-		// TODO: Rebuild show filtering
 		$scope.filter = {
 			active: false,
 			genre: '',
@@ -155,15 +143,37 @@ define(['app'], function(nessa){
 			items: 24,
 			page: 1
 		};
+		
+		$scope.$on('showsRefresh', function(event, tvdb){
+			$http.get('/api/shows').success(function(json, status){
+				if (status == 200 && json) {
+					$scope.shows = json;
+				}
+			}).error(function(json, status){
+				$log.error(json, status);
+			});
+		});
 		$scope.$watch('filter', function(){
 			if ($scope.filter.title != '') $scope.paginate.page = 1;
 		});
 		
-		$scope.clearFilter = function(){
-			$scope.filter.title = '';
-			$(document).trigger('lazyload');
+		$scope.add = function(){
+			$modal.open({
+				'backdrop': 'static',
+				'controller': function(){
+					// ShowsModalAddController?
+				},
+				'templateUrl': 'views/shows/modal/search.html'
+			}).result.then(function(resolve){
+				$scope.$emit('ShowsRefresh');
+			},function(reject){
+				// Nothing?
+			});
 		};
 		
+		$scope.clearFilter = function(){
+			$scope.filter.title = '';
+		};
 		$scope.filterList = function(item){
 			if (!item.name.toLowerCase().match($scope.filter.title.toLowerCase())) return false;
 			if ($scope.filter.active){
@@ -172,13 +182,10 @@ define(['app'], function(nessa){
 			}
 			return true;
 		};
-		$scope.$on('showsRefresh', function(event, tvdb){
-			$scope.load()
-		});
-		$scope.load();
+		$scope.$emit('showsRefresh');
 	});
 	
-	nessa.controller('showCtrl', function($http, $log, $scope){
+	nessa.controller('ShowController', function($http,$log,$scope){
 		var tvdb = parseInt($scope.show.tvdb);
 		$scope.progress = function(){
 			$http.get('/api/shows/'+tvdb+'/progress').success(function(json, status){
@@ -188,6 +195,11 @@ define(['app'], function(nessa){
 			});
 		};
 	});
+	
+	
+	
+	
+	
 	
 	nessa.controller('showModalCtrl', function($http, $log, $modalInstance, $rootScope, $scope, $stateParams){
 		var tvdb = parseInt($stateParams.showid, 10);

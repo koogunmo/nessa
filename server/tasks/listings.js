@@ -21,7 +21,7 @@ module.exports = function(app,db,socket){
 				if (results){
 					results.forEach(function(show){
 						shows.getArtwork(show.tvdb);
-						shows.getFeed(show.tvdb);
+						if (!show.feed) shows.getFeed(show.tvdb);
 						shows.getSummary(show.tvdb);
 						shows.getListings(show.tvdb, function(error,tvdb){
 							shows.getHashes(show.tvdb);
