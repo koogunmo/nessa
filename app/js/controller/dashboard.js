@@ -24,7 +24,7 @@ define(['app'], function(nessa){
 	
 	/****** Controller ******/
 	
-	nessa.controller('dashboardCtrl', function($http, $log, $scope){
+	nessa.controller('dashboardCtrl', function($http,$interval,$log,$scope){
 		
 		$scope.unmatched = 0;
 		
@@ -43,12 +43,15 @@ define(['app'], function(nessa){
 		
 		$http.get('/api/system/status').success(function(json,status){
 			$scope.stats = json;
-			$scope.uptime = {
-				days: Math.floor($scope.stats.uptime / 86400),
-				hour: Math.floor(($scope.stats.uptime % 86400) / 3600),
-				mins: Math.floor((($scope.stats.uptime % 86400) % 3600) / 60),
-				secs: (($scope.stats.uptime % 86400) % 3600) % 60
-			};			
+			$interval(function(){
+				$scope.stats.uptime++;
+				$scope.uptime = {
+					days: Math.floor($scope.stats.uptime / 86400),
+					hour: Math.floor(($scope.stats.uptime % 86400) / 3600),
+					mins: Math.floor((($scope.stats.uptime % 86400) % 3600) / 60),
+					secs: (($scope.stats.uptime % 86400) % 3600) % 60
+				};
+			},1000)
 		});
 		
 		$http.get('/api/movies/latest').success(function(json,status){
@@ -67,7 +70,7 @@ define(['app'], function(nessa){
 		
 		
 		
-		
+		/*
 		
 		$http.get('/api/dashboard/latest').success(function(json,status){
 			$scope.latest = json;
@@ -76,6 +79,7 @@ define(['app'], function(nessa){
 			$scope.upcoming = json;
 		});
 		
+		*/
 		
 		$scope.enableAlerts = function(){
 			if (('Notification' in window)){

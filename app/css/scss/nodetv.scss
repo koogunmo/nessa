@@ -34,9 +34,17 @@ body {
 .accordion-toggle, .nav, .pagination, .carousel a, [ui-sref] {
 	cursor: pointer;
 }
+
+
+
+
+
+
+
 .well[ui-view]{
 	height: 65px; 
 }
+
 .ui-view-container {
 	position: relative;
 }
@@ -44,6 +52,17 @@ body {
 	bottom: 0px;
 	position: fixed;
 }
+.loading {
+	background-image: url('../assets/gfx/spinner-light.gif');
+	background-position: center center;
+	background-repeat: no-repeat;
+	display: none;
+	height: 50px;
+	&.active {
+		display: block;
+	}
+}
+
 
 .page-links {
 	text-align: center;

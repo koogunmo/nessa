@@ -1,5 +1,8 @@
 define(['app'], function(nessa){
 	
+//	angular.module('tv.shows', ['ngAnimate','ngMessages','ngStorage','ui.bootstrap','ui.router']);	
+//	angular.module('tv.shows')
+	
 	nessa.config(function($stateProvider){
 		$stateProvider.state('shows', {
 			abstract: true,
@@ -12,22 +15,23 @@ define(['app'], function(nessa){
 			}
 		}).state('shows.index', {
 			url: ''
+			
 		}).state('shows.add', {
 			url: '/add',
 			data: {
 				title: 'Add Show'
 			},
-			onEnter: function($modal, $state, $stateParams){
+			onEnter: function($modal,$state,$stateParams){
 				$modal.open({
 					templateUrl: 'views/shows/modal/search.html',
-					controller: 'searchCtrl',
+					controller: 'ShowsSearchController',
 					windowClass: 'modal-add'
 				}).result.then(function(result){
 					$state.transitionTo('shows.index');
-					window.modal = null;
+				//	window.modal = null;
 				}, function(result){
 					$state.transitionTo('shows.index');
-					window.modal = null;
+				//	window.modal = null;
 				});
 			},
 			onExit: function(){
@@ -105,7 +109,7 @@ define(['app'], function(nessa){
 				window.modal = null;
 			}
 		});
-	});
+	})
 	
 	nessa.run(function($log, $rootScope){
 		$log.info('Module loaded: Shows');
@@ -123,7 +127,7 @@ define(['app'], function(nessa){
 			'Science Fiction','Soap','Special Interest',
 			'Sport','Talk Show','Western'
 		];
-	});
+	})
 	
 	/****** Controller ******/
 	
@@ -153,16 +157,15 @@ define(['app'], function(nessa){
 				$log.error(json, status);
 			});
 		});
+		
 		$scope.$watch('filter', function(){
 			if ($scope.filter.title != '') $scope.paginate.page = 1;
 		});
 		
-		$scope.add = function(){
+		$scope.addShow = function(){
 			$modal.open({
 				'backdrop': 'static',
-				'controller': function(){
-					// ShowsModalAddController?
-				},
+				'controller': 'ShowsSearchController',
 				'templateUrl': 'views/shows/modal/search.html'
 			}).result.then(function(resolve){
 				$scope.$emit('ShowsRefresh');
@@ -183,20 +186,59 @@ define(['app'], function(nessa){
 			return true;
 		};
 		$scope.$emit('showsRefresh');
-	});
+	})
 	
+	nessa.controller('ShowsSearchController', function($http, $log, $modalInstance, $rootScope, $scope){
+		$scope.loading = false;
+		$scope.selected = null;
+		$scope.filter = {
+			query: ''
+		};
+		
+		$scope.dismiss = function(){
+			$modalInstance.dismiss();
+		};
+		$scope.reset = function(){
+			$scope.selected = null;
+			$scope.results = null;
+			$scope.filter.query = '';
+		};
+		$scope.save = function(){
+			$http.post('/api/shows', {tvdb: $scope.selected}).success(function(json, status){
+				$rootScope.$broadcast('showsRefresh', $scope.selected);
+				$modalInstance.close();
+			}).error(function(json, status){
+				$log.error(json, status);
+			});
+		};
+		$scope.search = function(){
+			$scope.loading = true;
+			$scope.results = null;
+			$http.post('/api/shows/search', {q: $scope.filter.query}).success(function(results, status){
+				$scope.loading = false;
+				$scope.results = results;
+			}).error(function(json, status){
+				$log.error(json, status);
+			});
+		};
+		$scope.select = function(tvdb) {
+			$scope.selected = tvdb;
+		};
+	})
+
 	nessa.controller('ShowController', function($http,$log,$scope){
-		var tvdb = parseInt($scope.show.tvdb);
 		$scope.progress = function(){
-			$http.get('/api/shows/'+tvdb+'/progress').success(function(json, status){
+			$http.get('/api/shows/'+parseInt($scope.show.tvdb)+'/progress').success(function(json, status){
 				$scope.show.progress = json;
 			}).error(function(json, status){
 				$log.error(json, status);
 			});
 		};
-	});
+	})
 	
-	
+	nessa.controller('ShowDetailController', function($http,$log,$scope,$stateParams){
+		
+	})
 	
 	
 	
@@ -205,6 +247,7 @@ define(['app'], function(nessa){
 		var tvdb = parseInt($stateParams.showid, 10);
 		window.modal = $modalInstance;
 		
+		$scope.season = null;
 		$scope.close = function(){
 			$rootScope.$broadcast('showsRefresh', true);
 			$modalInstance.close();
@@ -226,6 +269,7 @@ define(['app'], function(nessa){
 		$scope.load = function(tvdb){
 			$http.get('/api/shows/'+tvdb).success(function(json, status){
 				if (status == 200 && json) $scope.show = json;
+				$scope.season = $scope.show.episodes[1];
 			}).error(function(json, status){
 				$scope.dismiss();
 			});
@@ -381,39 +425,6 @@ define(['app'], function(nessa){
 		};
 	});
 	
-	nessa.controller('searchCtrl', function($http, $log, $modalInstance, $rootScope, $scope){
-		$scope.selected = null;
-		$scope.filter = {
-			query: ''
-		};
-		
-		$scope.close = function(){
-			$modalInstance.close();
-		};
-		$scope.reset = function(){
-			$scope.selected = null;
-			$scope.results = null;
-			$scope.filter.query = '';
-		};
-		$scope.save = function(){
-			$http.post('/api/shows', {tvdb: $scope.selected}).success(function(json, status){
-				$rootScope.$broadcast('showsRefresh', $scope.selected);
-				$modalInstance.close();
-			}).error(function(json, status){
-				$log.error(json, status);
-			});
-		};
-		$scope.search = function(){
-			$http.post('/api/shows/search', {q: $scope.filter.query}).success(function(results, status){
-				$scope.results = results;
-			}).error(function(json, status){
-				$log.error(json, status);
-			});
-		};
-		$scope.select = function(tvdb) {
-			$scope.selected = tvdb;
-		};
-	});
 	
 	nessa.controller('showRandomCtrl', function($http, $log, $modalInstance, $rootScope, $scope){
 		$scope.random = null;

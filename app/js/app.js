@@ -1,4 +1,5 @@
 define('app', ['angular','moment','ngAnimate','ngMessages','ngResource','ngSocketIO','ngStorage','ngTouch','ui.bootstrap','ui.router'], function(angular,moment){
+	
 	var nessa = angular.module('nessa', ['ngAnimate','ngMessages','ngResource','ngSocketIO','ngStorage','ui.bootstrap','ui.router']);
 
 	nessa.config(function($compileProvider,$tooltipProvider,$urlRouterProvider){
@@ -6,7 +7,7 @@ define('app', ['angular','moment','ngAnimate','ngMessages','ngResource','ngSocke
 			$state.transitionTo('dashboard');
 		});
 		$compileProvider.debugInfoEnabled(false);
-		$tooltipProvider.options({appendToBody:true})
+		$tooltipProvider.options({'appendToBody':true})
 	})
 	
 	/****** Factory ******/

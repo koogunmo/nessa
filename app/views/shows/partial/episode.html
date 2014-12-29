@@ -1,3 +1,27 @@
+	<p class="well">{{episode.synopsis || 'TBA'}}</p>
+	<div class="row">
+		<div class="col-xs-3 text-left">
+			<button type="button" class="btn btn-default" tooltip="Download episode" tooltip-placement="right" ng-if="!episode.file">
+				<span class="fa fa-cloud-download"></span>
+			</button>
+			<button type="button" class="btn btn-default" disabled="true" ng-if="episode.file">
+				<span class="fa fa-hdd-o"></span>
+			</button>
+		</div>
+		<div class="col-xs-6 text-center">
+			<div class="btn"><span class="fa fa-clock-o"></span> {{episode.airdate|date:'longDate'}}</div>
+		</div>
+		<div class="col-xs-3 text-right">
+			<button type="button" class="btn btn-default" disabled="true" tooltip="Episode watched" tooltip-placement="left" ng-if="episode.watched">
+				<span class="fa fa-eye"></span>
+			</button>
+			<button type="button" class="btn btn-default" tooltip="Mark episode as watched" tooltip-placement="left" ng-if="!episode.watched" ng-click="watched()">
+				<span class="fa fa-eye-slash"></span>
+			</button>
+		</div>
+	</div>
+	
+	<!--
 	<div class="episode {{downloadStatus()}}" ng-class="{unaired: !hasAired()}" ng-hide="episode.episode==0" ng-controller="episodeCtrl">
 		<h5 class="title"><span class="small">{{episode.episode|zeroPad:2}}</span>{{episode.title||'TBC'}}</h5>
 		<div class="extended">
@@ -17,3 +41,4 @@
 			</div>
 		</div>
 	</div>
+	-->

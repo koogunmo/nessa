@@ -36,7 +36,11 @@ module.exports = function(app, db, socket){
 		}
 	});
 	
-	app.get('/api/shows/random', function(req,res){
+	app.get('/api/shows/latest', function(req,res){
+		shows.latest(req.user, function(error,json){
+			res.send(json);
+		})
+	}).get('/api/shows/random', function(req,res){
 		shows.random(req.user, function(error,json){
 			res.send(json);
 		});

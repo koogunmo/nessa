@@ -1,6 +1,9 @@
 'use strict';
 
 require(['app','tv.auth','tv.global','tv.dashboard','tv.shows','tv.movies','tv.downloads','tv.settings'], function(nessa){
+	
+	
+	
 	nessa.run(function($log){
 		$log.info('NodeTV: Bootstrapping...');
 	});

@@ -7,16 +7,17 @@
 		</span>
 	</form>
 </div>
-<div class="modal-body" ng-show="results">
-	<div class="results">
+<div class="modal-body">
+	<div class="loading" ng-class="{'active': loading}"></div>
+	<div class="results" ng-show="results">
 		<div class="result" ng-repeat="result in results" ng-class="{selected: selected==result.tvdb_id}" ng-click="select(result.tvdb_id)">
 			<img ng-src="{{result.images.poster | traktPoster}}" />
-			<strong>{{result.title}}</strong>
-			<p class="synopsis">{{result.overview || 'No synopsis available'}}</p>
+			<strong>{{::result.title}}</strong>
+			<p class="synopsis">{{::result.overview || 'No synopsis available'}}</p>
 		</div>
 	</div>
 </div>
 <div class="modal-footer">
 	<button type="button" class="btn btn-success" ng-show="selected" ng-click="save()">Add Show</button>
-	<button type="button" class="btn btn-default" ng-click="close()">Close</button>
+	<button type="button" class="btn btn-default" ng-click="dismiss()">Close</button>
 </div>

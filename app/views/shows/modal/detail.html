@@ -21,9 +21,13 @@
 			</tab>
 			
 			<tab heading="Episodes" ng-if="show.episodes">
-				<accordion class="seasons">
-					<accordion-group heading="{{display()}}" class="season" ng-repeat="season in show.episodes | orderBy:'season':true" ng-controller="seasonCtrl">
-						<div class="episode" ng-repeat="episode in season.episodes | orderBy:'episode'" ng-include="'/views/shows/partial/episode.html'"></div>
+				<div class="form-group">
+					<select name="season" class="form-control" ng-model="season" ng-options="item.label for item in show.episodes"></select>
+				</div>
+				<hr />
+				<accordion ng-if="season">
+					<accordion-group heading="{{episode.episode|zeroPad}}: {{episode.title || 'TBA'}}" ng-class="{'panel-warning':episode.downloading||episode.file&&!episode.watched,'panel-success':episode.watched}" ng-repeat="episode in season.episodes" ng-hide="episode.episode==0">
+						<div ng-include="'/views/shows/partial/episode.html'"></div>
 					</accordion-group>
 				</accordion>
 			</tab>
