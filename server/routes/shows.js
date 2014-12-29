@@ -24,16 +24,15 @@ module.exports = function(app, db, socket){
 		});
 	}).post('/api/shows', function(req,res){
 		// Add new show
-		if (req.body.tvdb){
-			shows.add(req.user, req.body.tvdb, function(error, tvdb){
-				shows.getArtwork(tvdb);
-				shows.getSummary(tvdb);
-				shows.getListings(tvdb, function(error, tvdb){
-					shows.getHashes(tvdb);
-				})
-				res.status(201).end();
-			});
-		}
+		shows.add(req.user, req.body.tvdb, function(error,tvdb){
+		//	socket.emit('alert', {'title':'Show added','message':result.title});
+			shows.getArtwork(tvdb);
+			shows.getSummary(tvdb);
+			shows.getListings(tvdb, function(error, tvdb){
+				shows.getHashes(tvdb);
+			})
+			res.status(201).end();
+		});
 	});
 	
 	app.get('/api/shows/latest', function(req,res){
@@ -114,6 +113,7 @@ module.exports = function(app, db, socket){
 	}).post('/api/shows/:tvdb([0-9]+)/update', function(req,res){
 		// Update show listings
 		shows.getSummary(req.params.tvdb, function(error,tvdb){
+	//		socket.emit('alert', {'title':'Show updated','message':result.title});
 			shows.getArtwork(tvdb);
 			shows.getFeed(tvdb);
 			shows.getListings(tvdb, function(error,tvdb){

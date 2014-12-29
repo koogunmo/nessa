@@ -9,7 +9,7 @@ var gulp		= require('gulp'),
 gulp.task('default', ['sass','nodemon']);
 
 gulp.task('nodemon', function(){
-	nodemon({script: 'server.js'});
+	nodemon({'script': 'server.js','ignore':['app/*']});
 });
 
 gulp.task('sass', function(){

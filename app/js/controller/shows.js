@@ -7,16 +7,25 @@ define(['app'], function(nessa){
 		$stateProvider.state('shows', {
 			abstract: true,
 			url: '/shows',
-			controller: 'ShowsController',
 			templateUrl: 'views/shows/index.html',
 			data: {
 				secure: true,
 				title: 'Shows'
 			}
+		}).state('shows.match', {
+			url: '/match',
+			controller: 'ShowsMatchController',
+			templateUrl: 'views/shows/match.html',
+			data: {
+				secure: true,
+				title: 'Unmatched Shows'
+			}
 		}).state('shows.index', {
-			url: ''
+			url: '',
+			controller: 'ShowsController',
+			templateUrl: 'views/shows/grid.html',
 			
-		}).state('shows.add', {
+		}).state('shows.index.add', {
 			url: '/add',
 			data: {
 				title: 'Add Show'
@@ -38,7 +47,7 @@ define(['app'], function(nessa){
 				if (window.modal) window.modal.dismiss()
 				window.modal = null;
 			}
-		}).state('shows.random', {
+		}).state('shows.index.random', {
 			url: '/random',
 			data: {
 				title: 'Randomizer'
@@ -46,7 +55,7 @@ define(['app'], function(nessa){
 			onEnter: function($modal, $state, $stateParams){
 				$modal.open({
 					templateUrl: 'views/shows/modal/random.html',
-					controller: 'showRandomCtrl',
+					controller: 'ShowsRandomController',
 					backdrop: true
 				}).result.then(function(result){
 					$state.transitionTo('shows.index');
@@ -61,15 +70,15 @@ define(['app'], function(nessa){
 				window.modal = null;
 			}
 			
-		}).state('shows.detail', {
-			url: '/{showid:[0-9]+}',
+		}).state('shows.index.detail', {
+			url: '/{tvdb:[0-9]+}',
 			data: {
-				title: 'Show Details'
+				title: 'Show Info'
 			},
 			onEnter: function($modal, $state, $stateParams){
 				$modal.open({
 					templateUrl: 'views/shows/modal/detail.html',
-					controller: 'showModalCtrl',
+					controller: 'ShowDetailController',
 					backdrop: true,
 					windowClass: 'modal-show'
 				}).result.then(function(result){
@@ -84,31 +93,7 @@ define(['app'], function(nessa){
 				if (window.modal) window.modal.dismiss()
 				window.modal = null;
 			}
-		}).state('shows.match', {
-
-			url: '/match',
-			data: {
-				secure: true,
-				title: 'Unmatched Shows'
-			},
-			onEnter: function($modal, $state){
-				$modal.open({
-					templateUrl: 'views/shows/modal/match.html',
-					controller: 'matchCtrl',
-					backdrop: 'static'
-				}).result.then(function(result){
-					$state.transitionTo('shows.index');
-					window.modal = null;
-				}, function(result){
-					$state.transitionTo('shows.index');
-					window.modal = null;				
-				});
-			},
-			onExit: function(){
-				if (window.modal) window.modal.dismiss()
-				window.modal = null;
-			}
-		});
+		})
 	})
 	
 	nessa.run(function($log, $rootScope){
@@ -148,7 +133,7 @@ define(['app'], function(nessa){
 			page: 1
 		};
 		
-		$scope.$on('showsRefresh', function(event, tvdb){
+		$scope.$on('ShowsRefresh', function(event, tvdb){
 			$http.get('/api/shows').success(function(json, status){
 				if (status == 200 && json) {
 					$scope.shows = json;
@@ -185,11 +170,37 @@ define(['app'], function(nessa){
 			}
 			return true;
 		};
-		$scope.$emit('showsRefresh');
+		$scope.$emit('ShowsRefresh');
+	})
+	
+	nessa.controller('ShowsMatchController', function($http,$log,$modal,$scope){
+		$scope.unmatched = [];
+		
+		$http.get('/api/shows/unmatched').success(function(json,status){
+			$scope.unmatched = json;
+		})
+		
+		
+	})
+	
+	nessa.controller('ShowsRandomController', function($http,$log,$modalInstance,$scope){
+		$scope.random = null;
+		$scope.close = function(){
+			$modalInstance.dismiss();
+		};
+		$scope.load = function(){
+			$http.get('/api/shows/random').success(function(json, status){
+				$scope.random = json;
+			}).error(function(json, status){
+				$log.error(json, status);	
+			});
+		};
+		$scope.load();
 	})
 	
 	nessa.controller('ShowsSearchController', function($http, $log, $modalInstance, $rootScope, $scope){
 		$scope.loading = false;
+		$scope.results = [];
 		$scope.selected = null;
 		$scope.filter = {
 			query: ''
@@ -205,7 +216,7 @@ define(['app'], function(nessa){
 		};
 		$scope.save = function(){
 			$http.post('/api/shows', {tvdb: $scope.selected}).success(function(json, status){
-				$rootScope.$broadcast('showsRefresh', $scope.selected);
+				$rootScope.$broadcast('ShowsRefresh', $scope.selected);
 				$modalInstance.close();
 			}).error(function(json, status){
 				$log.error(json, status);
@@ -236,48 +247,40 @@ define(['app'], function(nessa){
 		};
 	})
 	
-	nessa.controller('ShowDetailController', function($http,$log,$scope,$stateParams){
+	nessa.controller('ShowDetailController', function($http,$log,$modalInstance,$scope,$stateParams){
+		var tvdb = parseInt($stateParams.tvdb,10);
 		
-	})
-	
-	
-	
-	
-	nessa.controller('showModalCtrl', function($http, $log, $modalInstance, $rootScope, $scope, $stateParams){
-		var tvdb = parseInt($stateParams.showid, 10);
-		window.modal = $modalInstance;
-		
-		$scope.season = null;
-		$scope.close = function(){
-			$rootScope.$broadcast('showsRefresh', true);
-			$modalInstance.close();
-		};
-		
-		$scope.dismiss = function(){
-			$modalInstance.dismiss();
-		};
-		
-		$scope.downloadAll = function(){
-			if (confirm('Are you sure you want to download all available episodes?')) {
-				$http.post('/api/shows/'+tvdb+'/download').success(function(){
-					$scope.close();
-				}).error(function(json, status){
-					$log.error(json, status);
-				});
-			}
-		};
-		$scope.load = function(tvdb){
+		$scope.$on('ShowReload', function(e){
 			$http.get('/api/shows/'+tvdb).success(function(json, status){
 				if (status == 200 && json) $scope.show = json;
 				$scope.season = $scope.show.episodes[1];
 			}).error(function(json, status){
 				$scope.dismiss();
 			});
+		});
+		
+		$scope.season = {};
+		
+		$scope.close = function(){
+			$scope.$emit('ShowsRefresh');
+			$modalInstance.close();
+		};
+		$scope.dismiss = function(){
+			$modalInstance.dismiss();
+		};
+		$scope.downloadAll = function(){
+			if (confirm('Are you sure you want to download all available episodes?')) {
+				$http.post('/api/shows/'+tvdb+'/download').success(function(){
+					$scope.$emit('ShowReload');
+				}).error(function(json, status){
+					$log.error(json, status);
+				});
+			}
 		};
 		$scope.rescan = function(){
 			$http.post('/api/shows/'+tvdb+'/scan').success(function(json, status){
-				$rootScope.$broadcast('alert', {title: $scope.show.name, message: 'Rescan in progress...'});
-				$scope.close();
+			//	$rootScope.$broadcast('alert', {title: $scope.show.name, message: 'Rescan in progress...'});
+				
 			}).error(function(json, status){
 				$log.error(json, status);
 			});
@@ -285,7 +288,8 @@ define(['app'], function(nessa){
 		$scope.remove = function(){
 			if (confirm('Are you sure you want to remove this show?')) {
 				$http.delete('/api/shows/'+tvdb).success(function(){
-					$rootScope.$broadcast('alert', {title: $scope.show.name, message: 'Show removed'});
+				//	$scope.$emit('alert', {'title':$scope.show.name,'message':'Show removed'});
+					$scope.$emit('ShowsRefresh');
 					$scope.close();
 				}).error(function(json, status){
 					$log.error(json, status);
@@ -294,115 +298,72 @@ define(['app'], function(nessa){
 		};
 		$scope.save = function(){
 			$http.post('/api/shows/'+tvdb, $scope.show).success(function(json, status){
-				$rootScope.$broadcast('alert', {title: $scope.show.name, message: 'Changes saved'});
-				$scope.close();
+			//	$scope.$emit('alert', {title: $scope.show.name, message: 'Changes saved'});
+			//	$scope.close();
 			}).error(function(json, status){
 				$log.error(json, status);
 			});
 		};
 		$scope.update = function(){
 			$http.post('/api/shows/'+tvdb+'/update').success(function(json, status){	
-				$rootScope.$broadcast('alert', {title: $scope.show.name, message: 'Updating listings...'});
-				$scope.close();
+			//	$rootScope.$broadcast('alert', {'title':$scope.show.name, message: 'Updating listings...'});
+			//	$scope.close();
 			}).error(function(json, status){
 				$log.error(json, status);
 			});
 		};
 		$scope.watched = function(){
-			var payload = {
-				tvdb: $scope.episode.tvdb
-			};
-			$http.post('/api/shows/'+$scope.episode.tvdb+'/watched', payload).success(function(json,status){
+			var payload = {'tvdb':tvdb};
+			$http.post('/api/shows/'+tvdb+'/watched', payload).success(function(json,status){
 				$log.log(json, status);
 			});
 		};
-		
-		$scope.$on('showRefresh', function(e, tvdb){
-			$log.info(tvdb);
-			$scope.load(tvdb);
-		});
-
-		
-		$scope.load(tvdb);
-	});
+		$scope.$emit('ShowReload');
+	})
 	
-	
-	nessa.controller('seasonCtrl', function($log, $scope){
-		$scope.display = function(){
-			if ($scope.season.season == 0) {
-				return 'Specials';
-			} else {
-				return 'Season '+$scope.season.season;
-			}
-		};
-		$scope.watched = function(){
+	nessa.controller('ShowEpisodeController', function($http,$log,$scope){
+		$scope.download = function(){
 			var payload = {
-				tvdb: $scope.episode.tvdb,
-				season: $scope.episode.season
+				'season': $scope.episode.season,
+				'episode': $scope.episode.episode
 			};
-			$http.post('/api/shows/'+$scope.episode.tvdb+'/watched', payload).success(function(json,status){
-				$log.log(json, status);
-			});
+			$http.post('/api/shows/'+$scope.episode.tvdb+'/download', payload);
 		};
-	});
-	
-	nessa.controller('episodeCtrl', function($http, $log, $scope){
-		$scope.collapsed = true;
 		$scope.watched = function(){
 			$scope.episode.watched = !$scope.episode.watched;
 			var payload = {
-				tvdb: $scope.episode.tvdb,
-				season: $scope.episode.season,
-				episode: $scope.episode.episode,
-				watched: $scope.episode.watched
+				'tvdb': $scope.episode.tvdb,
+				'season': $scope.episode.season,
+				'episode': $scope.episode.episode,
+				'watched': $scope.episode.watched
 			};
-			$http.post('/api/shows/'+$scope.episode.tvdb+'/watched', payload).success(function(json,status){
-				$log.log(json, status);
-			});
-		};
-		
-		$scope.download = function(){
-			var payload = {
-				season: $scope.episode.season,
-				episode: $scope.episode.episode
-			};
-			$http.post('/api/shows/'+$scope.episode.tvdb+'/download', payload).success(function(json,status){
-				$log.debug(json, status);
-			});
+			$http.post('/api/shows/'+$scope.episode.tvdb+'/watched', payload);
 		};
 		
 		$scope.canDownload = function(){
 			if ($scope.episode.hash || $scope.episode.hashes){
-				if ($scope.episode.downloading) return false;
-				if ($scope.episode.file) return false;
+				if ($scope.episode.downloading || $scope.episode.file) return false;
 				return true;
 			}
 			return false;
 		};
-		
-		$scope.downloadStatus = function(){
-			var status = '';
-			if ($scope.episode.hash || $scope.episode.hashes) status = 'available';
-			if ($scope.episode.file) status = 'downloaded';
-			if ($scope.episode.downloading) status = 'downloading';
-			
-			return status;
-		};
-		
 		$scope.hasAired = function(){
-			return true;
+			if ($scope.episode.file) return true;
 			
-		//	$log.debug($scope.episode.airdate.getTime(), new Date().now())
+			var airdate = new Date($scope.episode.airdate).getTime();
+			if (airdate != 0 && airdate < Date.now()) return true;
 			
-		//	return ($scope.episode.airdate && Number($scope.episode.airdate) < Number(new Date()));
+			return false;
 		};
-		
-		/*
-		$scope.hasAired = function(){
-			return (!!$scope.episode.file || !!$scope.episode.hash || $scope.episode.airdate && $scope.episode.airdate*1000 < new Date().getTime());
+		$scope.hasDate = function(){
+			var airdate = new Date($scope.episode.airdate).getTime();
+			if (airdate > 0) return true;
+			return false;
 		};
-		*/
-	});
+	})
+	
+	
+	
 	
 	nessa.controller('matchCtrl', function($http, $modalInstance, $scope, $state){
 		$scope.unmatched	= [];
@@ -425,22 +386,5 @@ define(['app'], function(nessa){
 		};
 	});
 	
-	
-	nessa.controller('showRandomCtrl', function($http, $log, $modalInstance, $rootScope, $scope){
-		$scope.random = null;
-		
-		$scope.close = function(){
-			$modalInstance.dismiss();
-		};
-		$scope.load = function(){
-			$http.get('/api/shows/random').success(function(json, status){
-				$scope.random = json;
-			}).error(function(json, status){
-				$log.error(json, status);	
-			});
-		};
-		$scope.load();
-	});
-
 	return nessa;
 });
