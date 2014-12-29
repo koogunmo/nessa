@@ -1,13 +1,16 @@
 <div id="dashboard">
-	<div class="alert alert-warning" ng-if="unmatched!=0">
-		There are <a ui-sref="shows.match" class="alert-link">unmatched shows</a> that need updating
-	</div>
+	
 	<div class="alert alert-warning hidden-xs" ng-if="!notifications">
 		<a href="#" ng-click="enableAlerts()" class="alert-link">Enable desktop notifications</a>
 	</div>
 	
 	<tabset type="pills">
 		<tab heading="Shows">
+			<div class="alert alert-warning" ng-if="unmatched.shows!=0">
+				There <ng-pluralize count="unmatched.shows" when="{'1':'is','other':'are'}"></ng-pluralize>
+				<a ui-sref="shows.match" class="alert-link">{{unmatched.shows}} unmatched <ng-pluralize count="unmatched.shows" when="{'1':'show','other':'shows'}"></ng-pluralize></a>
+				that need updating.
+			</div>
 			<div class="row">
 				<div class="col-sm-6">
 					<div class="page-header">
@@ -65,6 +68,11 @@
 		</tab>
 		
 		<tab heading="Movies" ng-if="movies.length">
+			<div class="alert alert-warning" ng-if="unmatched.movies!=0">
+				There <ng-pluralize count="unmatched.movies" when="{'1':'is','other':'are'}"></ng-pluralize>
+				<a ui-sref="movies.match" class="alert-link">{{unmatched.movies}} unmatched <ng-pluralize count="unmatched.movies" when="{'1':'movie','other':'movies'}"></ng-pluralize></a>
+				that need updating.
+			</div>
 			<div class="row">
 				<div class="col-sm-12" ng-repeat="movie in movies">
 					<div class="panel panel-success">

@@ -47,14 +47,30 @@ module.exports = function(app,db,socket){
 				res.status(404).end();
 			}
 		});
+	}).get('/api/movies/unmatched', function(req,res){
+		movies.getUnmatched(function(error,results){
+			if (error) logger.error(error);
+			if (results) {
+				res.send(results);
+			} else {
+				res.status(404).end();
+			}
+		})
 	})
 	
-	app.post('/api/movies/scan', function(req,res){
+	app.post('/api/movies/genres', function(req,res){
+		socket.emit('alert', {'title':'Movies','message':'Rebuilding genres...'});
+		movies.rebuildGenres(function(){
+			socket.emit('alert', {'title':'Movies','message':'Genres rebuilt'});
+		});
+		res.status(202).send({'status':true,'message':'Rebuilding genres'});
+		
+	}).post('/api/movies/scan', function(req,res){
 		socket.emit('alert', {'title':'Movies','message':'Scanning library...'});
 		movies.scan(req.user, function(error, tmdb){
 			if (error) logger.error(error);
 		});
-		res.status(202).send({status:true,message:'Scanning movie library'});
+		res.status(202).send({'status':true,'message':'Scanning movie library'});
 		
 	}).post('/api/movies/search', function(req,res){
 		movies.search(req.user, req.body.q, function(error, results){
@@ -62,7 +78,7 @@ module.exports = function(app,db,socket){
 			res.send(results);
 		});
 	}).post('/api/movies/sync', function(req,res){
-		socket.emit('alert', {title:'Movies', message:'Syncing library...'});
+		socket.emit('alert', {'title':'Movies','message':'Syncing library...'});
 		movies.sync(req.user, function(error,results){
 			if (error) logger.error(error);
 			if (results.library){
@@ -72,14 +88,11 @@ module.exports = function(app,db,socket){
 			}
 			if (message) socket.emit('alert', {'title':'Movies','message':message});
 		});
-		res.status(202).send({status:true,message:'Syncing movie library'});
+		res.status(202).send({'status':true,'message':'Syncing movie library'});
 		
-	}).post('/api/movies/genres', function(req,res){
-		socket.emit('alert', {title:'Movies', message:'Rebuilding genres...'});
-		movies.rebuildGenres(function(){
-			socket.emit('alert', {'title':'Movies','message':'Genres rebuilt'});
-		});
-		res.status(202).send({status:true,message:'Rebuilding genres'});
+	}).post('/api/movies/unmatched', function(req,res){
+		
+	//	movies.match(req.user, req.body) //??
 		
 	})
 	
@@ -108,8 +121,8 @@ module.exports = function(app,db,socket){
 	
 	
 	
-	
-	app.get('/api/:session?/movies/unmatched', function(req,res){
+	/*
+	app.get('/api/movies/unmatched', function(req,res){
 		// Get list of unmatched movies
 		movies.unmatched(function(error,results){
 			if (error) {
@@ -119,8 +132,8 @@ module.exports = function(app,db,socket){
 			if (results) return res.send(results);
 		});
 	})
-	
-	app.post('/api/:session?/movies/unmatched', function(req,res){
+	*/
+	app.post('/api/movies/unmatched', function(req,res){
 		// Save manual matches
 		movies.match(req.body);
 		return res.status(202).end();

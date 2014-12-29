@@ -26,10 +26,9 @@ define(['app'], function(nessa){
 	
 	nessa.controller('dashboardCtrl', function($http,$interval,$log,$scope){
 		
-		$scope.unmatched = 0;
-		
 		$scope.latest = [];
 		$scope.notifications = false;
+		$scope.unmatched = {'movies':0,'shows':0};
 		
 		$scope.episodes = [];
 		$scope.movies = [];
@@ -68,18 +67,12 @@ define(['app'], function(nessa){
 			$scope.upcoming = json;
 		});
 		
-		
-		
-		/*
-		
-		$http.get('/api/dashboard/latest').success(function(json,status){
-			$scope.latest = json;
+		$http.get('/api/dashboard/movies/unmatched').success(function(json,status){
+			$scope.unmatched.movies = json.count;
 		});
-		$http.get('/api/dashboard/upcoming').success(function(json,status){
-			$scope.upcoming = json;
+		$http.get('/api/dashboard/shows/unmatched').success(function(json,status){
+			$scope.unmatched.shows = json.count;
 		});
-		
-		*/
 		
 		$scope.enableAlerts = function(){
 			if (('Notification' in window)){
@@ -91,7 +84,7 @@ define(['app'], function(nessa){
 							Notification.permission = permission;
 						}
 						if (permission === 'granted') {
-							var notification = new Notification('NodeTV', {body: 'Desktop alerts enabled', icon: '/assets/gfx/icons/touch-icon.png'});
+							var notification = new Notification('NodeTV',{'body':'Desktop alerts enabled','icon':'/assets/gfx/icons/touch-icon.png'});
 							setTimeout(function(){
 								notification.close()
 							}, 1500);
@@ -102,6 +95,10 @@ define(['app'], function(nessa){
 			}
 		}
 	});
+	
+	
+	
+	
 	
 	nessa.controller('DashboardMovieCtrl', function($http,$log,$scope){
 		$scope.download = function(object){

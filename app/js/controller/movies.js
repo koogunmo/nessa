@@ -5,17 +5,34 @@ define(['app'], function(nessa){
 			.state('movies', {
 				abstract: true,
 				url: '/movies',
-				controller: 'MovieListCtrl',
 				templateUrl: 'views/movies/index.html',
 				data: {
 					secure: true,
 					title: 'Movies'
 				}
 			})
-			.state('movies.index', {
-				url: ''
+			.state('movies.match', {
+				url: '/match',
+				templateUrl: 'views/movies/match.html',
+				data: {
+					secure: true,
+					title: 'Unmatched movies'
+				}
 			})
-		.state('movies.add', {
+			.state('movies.index', {
+				url: '',
+				controller: 'MovieListCtrl',
+				templateUrl: 'views/movies/grid.html',
+				data: {
+					secure: true,
+					title: 'Movies'
+				}
+			})
+			
+			
+
+			
+		.state('movies.index.add', {
 			url: '/add',
 			onEnter: function($modal, $state, $stateParams){
 				$modal.open({
@@ -35,7 +52,7 @@ define(['app'], function(nessa){
 			}
 		})
 		
-		.state('movies.detail', {
+		.state('movies.index.detail', {
 			url: '/info/{id:[0-9]+}',
 			onEnter: function($log,$modal,$state,$stateParams){
 				$modal.open({
@@ -55,25 +72,6 @@ define(['app'], function(nessa){
 			}
 		})
 		
-		.state('movies.match', {
-			url: '/match',
-			onEnter: function($modal, $state, $stateParams){
-				$modal.open({
-					controller: 'MovieUnmatchedCtrl',
-					templateUrl: 'views/movies/modal/match.html'
-				}).result.then(function(result){
-					$state.transitionTo('movies.index');
-					window.modal = null;
-				}, function(result){
-					$state.transitionTo('movies.index');
-					window.modal = null;
-				});
-			},
-			onExit: function(){
-				if (window.modal) window.modal.dismiss()
-				window.modal = null;
-			}
-		})
 		
 	});
 	

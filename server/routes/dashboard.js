@@ -14,17 +14,14 @@ var logger = log4js.getLogger('routes:dashboard');
 module.exports = function(app, db){
 	var movies = require('nodetv-movies'), shows = require('nodetv-shows');
 	
-	/*
-	app.get('/api/:session?/dashboard/unmatched', function(req,res){
-	//	trakt(req.user.trakt).calendar.shows(function(error, json){
-	//		res.send(json);
-	//	});
-	});
-	
-	app.get('/api/:session?/dashboard/upcoming', function(req,res){
-		trakt(req.user.trakt).calendar.shows(function(error, json){
-			res.send(json);
+	app.get('/api/dashboard/movies/unmatched', function(req,res){
+		movies.countUnmatched().then(function(count){
+			res.send({'status':true,'count':count});
 		});
 	});
-	*/
+	app.get('/api/dashboard/shows/unmatched', function(req,res){
+		shows.countUnmatched().then(function(count){
+			res.send({'status':true,'count':count});
+		});
+	});
 };
