@@ -1,15 +1,38 @@
+<h4>Unmatched Shows</h4>
+<hr />
 <div class="row">
-	
-	<div class="col-sm-6">
-		<div class="panel panel-default">
-			<div class="panel-heading">
-				<h4 class="panel-title">Derp show</h4>
+	<div class="col-sm-12" ng-repeat="show in unmatched | offset:(paginate.page-1)*paginate.items | limitTo:paginate.items" ng-controller="ShowsUnmatchedController">
+		<form ng-submit="match()">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title">Folder: "{{show.directory}}"</h4>
+				</div>
+				<div class="panel-body">
+					<div class="media match" ng-repeat="match in show.matches" ng-controller="ShowsMatchOptionController" ng-click="select()" ng-class="{'selected': match.tvdb_id==selected.tvdb_id}">
+						<div class="media-left">
+							<img ng-src="{{match.images.poster}}" class="img-responsive" />
+						</div>
+						<div class="media-right">
+							<strong>{{match.title}} <small>({{match.year}})</small></strong>
+							<p>{{match.overview}}</p>
+							<p>
+								<strong>Network</strong>: {{match.network}} ({{match.country|uppercase}})<br />
+								<strong>Runtime</strong>: {{match.runtime}} mins
+							</p>
+						</div>
+					</div>
+					<!-- TODO: Add search option -->
+				</div>
+				<div class="panel-footer text-right" ng-show="selected">
+					<button type="submit" class="btn btn-success"><span class="fa fa-check"></span> Match</button>
+				</div>
 			</div>
-			<div class="panel-body">
-				
-			</div>
-		</div>
+		</form>
 	</div>
-	
-	
+	<div class="col-sm-12 text-center" ng-if="unmatched.length==0">No unmatched shows</div>
+</div>
+
+<div class="text-center" ng-show="unmatched.length>paginate.items" ng-cloak>
+	<pagination class="hidden-xs pagination-sm" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;" items-per-page="paginate.items" total-items="unmatched.length" ng-model="paginate.page" max-size="5" boundary-links="true"></pagination>
+	<pager class="visible-xs pagination-sm" items-per-page="paginate.items" total-items="unmatched.length" ng-model="paginate.page"></pager>
 </div>

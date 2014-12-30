@@ -1,15 +1,37 @@
+<h4>Unmatched Movies</h4>
+<hr />
 <div class="row">
-	
-	<div class="col-sm-6">
-		<div class="panel panel-default">
-			<div class="panel-heading">
-				<h4 class="panel-title">Derp movie</h4>
+	<div class="col-sm-12" ng-repeat="movie in unmatched | offset:(paginate.page-1)*paginate.items | limitTo:paginate.items" ng-controller="MoviesUnmatchedController">
+		<form ng-submit="match()">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title">File: "{{movie.file}}"</h4>
+				</div>
+				<div class="panel-body">
+					<div class="media match" ng-repeat="match in movie.matches" ng-controller="MoviesMatchOptionController" ng-click="select()" ng-class="{'selected': match.tmdb_id==selected.tmdb_id}">
+						<div class="media-left">
+							<img ng-src="{{match.images.poster}}" class="img-responsive" />
+						</div>
+						<div class="media-right">
+							<strong>{{match.title}} <small>({{match.year}})</small></strong>
+							<p>{{match.overview}}</p>
+							<p>
+								<strong>Runtime</strong>: {{match.runtime}} mins
+							</p>
+						</div>
+					</div>
+					<!-- TODO: Add search option -->
+				</div>
+				<div class="panel-footer text-right" ng-show="selected">
+					<button type="submit" class="btn btn-success"><span class="fa fa-check"></span> Match</button>
+				</div>
 			</div>
-			<div class="panel-body">
-				
-			</div>
-		</div>
+		</form>
 	</div>
-	
-	
+	<div class="col-sm-12 text-center" ng-if="unmatched.length==0">No unmatched movies</div>
+</div>
+
+<div class="text-center" ng-show="unmatched.length>paginate.items" ng-cloak>
+	<pagination class="hidden-xs pagination-sm" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;" items-per-page="paginate.items" total-items="unmatched.length" ng-model="paginate.page" max-size="5" boundary-links="true"></pagination>
+	<pager class="visible-xs pagination-sm" items-per-page="paginate.items" total-items="unmatched.length" ng-model="paginate.page"></pager>
 </div>

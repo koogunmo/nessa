@@ -35,7 +35,20 @@ body {
 	cursor: pointer;
 }
 
-
+.media {
+	img {
+		max-width: 75px;
+		@media (min-width: $screen-sm){
+			max-width: 100px;
+		}
+	}
+	&.match {
+		cursor: pointer;
+	}
+	&.selected {
+		background-color: #DFF0D8;
+	}
+}
 
 
 

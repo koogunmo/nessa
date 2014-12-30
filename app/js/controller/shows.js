@@ -14,7 +14,7 @@ define(['app'], function(nessa){
 			}
 		}).state('shows.match', {
 			url: '/match',
-			controller: 'ShowsMatchController',
+			controller: 'ShowsMatchingController',
 			templateUrl: 'views/shows/match.html',
 			data: {
 				secure: true,
@@ -173,15 +173,43 @@ define(['app'], function(nessa){
 		$scope.$emit('ShowsRefresh');
 	})
 	
-	nessa.controller('ShowsMatchController', function($http,$log,$modal,$scope){
+	nessa.controller('ShowsMatchingController', function($http,$log,$modal,$scope){
+		$scope.paginate = {
+			items: 1,
+			page: 1
+		};
 		$scope.unmatched = [];
 		
 		$http.get('/api/shows/unmatched').success(function(json,status){
 			$scope.unmatched = json;
-		})
+		});
 		
-		
+		$scope.$on('ShowMatched', function(e,item){
+			var idx = $scope.unmatched.indexOf(item);
+			$scope.unmatched.splice(idx,1);
+		});
 	})
+	
+	nessa.controller('ShowsUnmatchedController', function($http,$log,$scope){
+		$scope.matched = false;
+		$scope.selected = null;
+		$scope.$on('MatchSelected', function(e,match){
+			$scope.selected = match;
+		});
+		
+		$scope.match = function(){
+			$http.post('/api/shows/match', [{'tvdb':$scope.selected.tvdb_id,'directory':$scope.show.directory}]).success(function(){
+				$scope.$emit('ShowMatched', $scope.show);
+			});
+		};
+	})
+	
+	nessa.controller('ShowsMatchOptionController', function($http,$log,$scope){
+		$scope.select = function(){
+			$scope.$emit('MatchSelected', $scope.match);
+		};
+	})
+	
 	
 	nessa.controller('ShowsRandomController', function($http,$log,$modalInstance,$scope){
 		$scope.random = null;

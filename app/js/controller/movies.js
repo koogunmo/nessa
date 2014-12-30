@@ -13,6 +13,7 @@ define(['app'], function(nessa){
 			})
 			.state('movies.match', {
 				url: '/match',
+				controller: 'MoviesMatchingController',
 				templateUrl: 'views/movies/match.html',
 				data: {
 					secure: true,
@@ -96,6 +97,46 @@ define(['app'], function(nessa){
 	});
 	
 	/****** Controller ******/
+	
+	nessa.controller('MoviesMatchingController', function($http,$log,$modal,$scope){
+		$scope.paginate = {
+			items: 1,
+			page: 1
+		};
+		$scope.unmatched = [];
+		
+		$http.get('/api/movies/unmatched').success(function(json,status){
+			$scope.unmatched = json;
+		});
+		
+		$scope.$on('MovieMatched', function(e,item){
+			var idx = $scope.unmatched.indexOf(item);
+		//	$scope.unmatched.splice(idx,1);
+		});
+	})
+	
+	nessa.controller('MoviesUnmatchedController', function($http,$log,$scope){
+		$scope.matched = false;
+		$scope.selected = null;
+		$scope.$on('MatchSelected', function(e,match){
+			$scope.selected = match;
+		});
+		
+		$scope.match = function(){
+			$http.post('/api/movies/match', [{'tmdb':$scope.selected.tmdb_id,'file':$scope.movie.file}]).success(function(){
+				$scope.$emit('MovieMatched', $scope.movie);
+			});
+		};
+	})
+	
+	nessa.controller('MoviesMatchOptionController', function($http,$log,$scope){
+		$scope.select = function(){
+			$scope.$emit('MatchSelected', $scope.match);
+		};
+	})
+	
+	
+	
 	
 	nessa.controller('MovieListCtrl', function($log,$http,$rootScope,$scope){
 		$scope.settings	= {};
