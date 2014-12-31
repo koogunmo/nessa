@@ -32,10 +32,12 @@ exports = module.exports = {
 			var rd = fs.createReadStream(from);
 			rd.on('error', function(error) {
 				logger.error('Read Error - %s (%d): %s', error.code, error.errno, from);
+				deferred.reject();
 			});
 			var wr = fs.createWriteStream(to, {mode: 0664});
 			wr.on('error', function(error){
 				logger.error('Write Error - %s (%d): %s', error.code, error.errno, to);
+				deferred.reject();
 			});
 			wr.on('close', function(){
 				if (typeof(callback) == 'function') callback();
@@ -44,6 +46,7 @@ exports = module.exports = {
 			rd.pipe(wr);
 		} catch(e) {
 			logger.error('helper.fileCopy: %s', e.message);
+			deferred.reject();
 		}
 		return deferred.promise;
 	},
@@ -63,17 +66,7 @@ exports = module.exports = {
 		} catch(e) {
 			logger.error('helper.fileMove: %s', e.message);
 		}
-		return deferred.promise();
-	},
-	
-	copyFile: function(from, to, callback) {
-		logger.warn('helper.copyFile is deprecated');
-		return this.fileCopy(from, to, callback);
-	},
-	
-	moveFile: function(from, to, callback) {
-		logger.warn('helper.moveFile is deprecated');
-		return this.fileMove(from, to, callback);
+		return deferred.promise;
 	},
 	
 	listDirectory: function(path, callback) {
