@@ -9,7 +9,7 @@
 			<div class="alert alert-warning" ng-if="unmatched.shows!=0">
 				There <ng-pluralize count="unmatched.shows" when="{'1':'is','other':'are'}"></ng-pluralize>
 				<a ui-sref="shows.match" class="alert-link">{{unmatched.shows}} unmatched <ng-pluralize count="unmatched.shows" when="{'1':'show','other':'shows'}"></ng-pluralize></a>
-				that need updating.
+				that <ng-pluralize count="unmatched.shows" when="{'1':'needs','other':'need'}"></ng-pluralize> updating.
 			</div>
 			<div class="row">
 				<div class="col-sm-6">
@@ -39,29 +39,32 @@
 						No recent episodes
 					</div>
 				</div>
-			
+				
 				<div class="col-sm-6">
 					<div class="page-header">
 						<h3>Next 7 days</h3>
 					</div>
 					<div ng-if="upcoming.length>=1">
-						<div ng-repeat="day in upcoming" ng-controller="upcomingCtrl">
-							<div class="panel panel-default date" ng-if="visible">
-								<div class="panel-heading">
-									<h4 class="panel-title">{{day.date|date:'fullDate'}}</h4>
-								</div>
-							</div>
-							<div class="panel panel-info" ng-repeat="episode in day.episodes|orderBy:episode.show.first_aired_localized" ng-controller="episodeCtrl" ng-if="!episode.episode.in_collection">
-								<div class="panel-heading">
-									<span class="fa fa-lg pull-right" ng-class="{'fa-angle-down': collapsed, 'fa-angle-up': !collapsed}" ng-click="collapsed=!collapsed"></span>
-									<h4 class="panel-title"><a href="/shows/{{episode.show.tvdb_id}}">{{episode.show.title}}</a> <span class="small">{{episode.episode.title}}</span></h4>
+						<div ng-repeat="item in upcoming|orderBy:['airdate','episode.episode']" ng-controller="DashboardUpcomingController">
+							<div class="panel panel-info">
+								<div class="panel-heading" ng-click="toggle()">
+									<span class="small pull-right">{{item.airdate|date:'EEE d MMM, h:mma'}}</span>
+									<h4 class="panel-title">
+										{{item.show.name}}
+										<span class="small">{{item.episode.title}}</span>
+									</h4>
 								</div>
 								<div class="panel-body" collapse="collapsed">
-									<div><strong>Season {{episode.episode.season}}, Episode {{episode.episode.number}}</strong></div>
-									<p>{{episode.episode.overview}}</p>
+									<div>
+										<strong>Season {{item.episode.season}}, Episode {{item.episode.episode}}</strong>
+									</div>
+									<p>{{item.episode.synopsis || 'TBA'}}</p>
 								</div>
 							</div>
 						</div>
+					</div>
+					<div ng-if="upcoming.length==0">
+						No upcoming episodes
 					</div>
 				</div>
 			</div>
@@ -71,7 +74,7 @@
 			<div class="alert alert-warning" ng-if="unmatched.movies!=0">
 				There <ng-pluralize count="unmatched.movies" when="{'1':'is','other':'are'}"></ng-pluralize>
 				<a ui-sref="movies.match" class="alert-link">{{unmatched.movies}} unmatched <ng-pluralize count="unmatched.movies" when="{'1':'movie','other':'movies'}"></ng-pluralize></a>
-				that need updating.
+				that <ng-pluralize count="unmatched.movies" when="{'1':'needs','other':'need'}"></ng-pluralize> updating.
 			</div>
 			<div class="row">
 				<div class="col-sm-12" ng-repeat="movie in movies">

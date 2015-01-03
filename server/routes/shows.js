@@ -49,8 +49,7 @@ module.exports = function(app, db, socket){
 			res.send(results);
 		});
 	}).get('/api/shows/upcoming', function(req,res){
-		shows.upcoming(req.user, function(error,calendar){
-			if (error) logger.error(error);
+		shows.upcoming(req.user).then(function(calendar){
 			res.send(calendar);
 		});
 	})

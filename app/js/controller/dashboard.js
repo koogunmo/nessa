@@ -10,7 +10,7 @@ define(['app'], function(nessa){
 				title: 'Dashboard'
 			}
 		});
-	});
+	})
 
 	nessa.run(function($log, $rootScope){
 		$log.info('Module loaded: Dashboard');
@@ -20,7 +20,7 @@ define(['app'], function(nessa){
 			icon: 'dashboard',
 			order: 10
 		});
-	});
+	})
 	
 	/****** Controller ******/
 	
@@ -94,11 +94,14 @@ define(['app'], function(nessa){
 				}
 			}
 		}
-	});
+	})
 	
-	
-	
-	
+	nessa.controller('DashboardUpcomingController', function($http,$log,$scope){
+		$scope.collapsed = true;
+		$scope.toggle = function(){
+			$scope.collapsed = !$scope.collapsed;
+		};
+	})
 	
 	nessa.controller('DashboardMovieCtrl', function($http,$log,$scope){
 		$scope.download = function(object){
@@ -107,18 +110,6 @@ define(['app'], function(nessa){
 			})
 		};
 	})
-	
-	nessa.controller('upcomingCtrl', function($log, $scope){
-		$scope.visible = false;
-		
-		/*
-		$scope.day.episodes.forEach(function(episode){
-			if (episode.episode.in_collection == false) $scope.visible = true;
-			
-			
-		});
-		*/
-	});
 	
 	return nessa;
 });
