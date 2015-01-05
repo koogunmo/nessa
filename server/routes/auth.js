@@ -25,8 +25,9 @@ module.exports = function(app, db){
 				return next();
 			} else {				
 				var response = {
-					success: false,
-					message: 'Not authorised'
+					'success': false,
+					'message': 'Not authorised',
+					'localnet': true
 				};
 				res.status(401).send(response);
 			}
