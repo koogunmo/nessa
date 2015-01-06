@@ -1,5 +1,25 @@
 define(['app'], function(nessa){
 	
+	nessa.controller('NavigationController', function($http,$location,$log,$scope,$state){
+		$scope.authenticated = true;
+		$scope.isCollapsed = true;
+		$scope.state = $state;
+		
+		$scope.collapse = function(){
+			$scope.isCollapsed = true;
+		};
+		$scope.toggle = function(){
+			$scope.isCollapsed = !$scope.isCollapsed;
+		};
+		
+		
+		/*
+		$scope.$on('authenticated', function(e,status){
+			$scope.authenticated = !!status;
+		});
+		*/
+	})
+	
 	nessa.controller('headCtrl', function($scope, $state){
 		
 	});
@@ -44,7 +64,6 @@ define(['app'], function(nessa){
 		$scope.$on('socket:alert', alertHandler);
 		$scope.$on('alert', alertHandler);
 		
-		
 		$scope.closeAlert = function(index){
 			$scope.alerts.splice(index, 1);
 		};
@@ -57,7 +76,8 @@ define(['app'], function(nessa){
 	nessa.controller('navCtrl', function($location, $log, $rootScope, $scope, $state){
 		$scope.menu = $rootScope.menu;
 		$scope.state = $state;
-		$scope.authenticated = false;
+		
+		$scope.authenticated = true;
 		
 		$scope.isCollapsed = true;
 		$scope.isActive = function(viewLocation){
@@ -69,10 +89,10 @@ define(['app'], function(nessa){
 		$scope.toggle = function(){
 			$scope.isCollapsed = !$scope.isCollapsed;
 		};
-		
 		$scope.$on('authenticated', function(e,status){
 			$scope.authenticated = !!status;
 		});
+		
 	});
 	
 	nessa.run(function($log){

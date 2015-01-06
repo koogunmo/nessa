@@ -138,7 +138,7 @@ define(['app'], function(nessa){
 	
 	
 	
-	nessa.controller('MovieListCtrl', function($log,$http,$rootScope,$scope){
+	nessa.controller('MovieListCtrl', function($log,$http,$scope){
 		$scope.settings	= {};
 		$scope.movies	= [];
 		$scope.page 	= 1;
@@ -161,7 +161,6 @@ define(['app'], function(nessa){
 		},true);
 
 		$http.get('/api/system/settings').success(function(json,status){
-			$rootScope.settings = json.media;
 			$scope.settings = json.media;
 		});
 		
@@ -267,7 +266,7 @@ define(['app'], function(nessa){
 		$scope.save = function(){
 			$http.post('/api/movies', {tmdb: $scope.selected}).success(function(json){
 				$modalInstance.close();
-				$rootScope.$broadcast('MoviesRefresh', true);
+				$scope.$emit('MoviesRefresh', true);
 			});
 		};
 		$scope.search = function(){

@@ -93,7 +93,7 @@ define(['app'], function(nessa){
 					});
 				}
 			}
-		}
+		};
 	})
 	
 	nessa.controller('DashboardUpcomingController', function($http,$log,$scope){

@@ -20,17 +20,17 @@ module.exports = function(app,db,socket){
 				if (error) logger.error(error);
 				if (results){
 					results.forEach(function(show){
-						shows.getArtwork(show.tvdb);
-						if (!show.feed) shows.getFeed(show.tvdb);
-						shows.getSummary(show.tvdb);
-						shows.getListings(show.tvdb, function(error,tvdb){
-							shows.getHashes(show.tvdb);
+						shows.getArtwork(show.imdb);
+						shows.getFeed(show.imdb);
+						shows.getSummary(show.imdb);
+						shows.getListings(show.imdb).then(function(){
+							shows.getHashes(show.imdb);
 						});
 						
 						if (show.users && show.users.length >= 1){
 							show.users.forEach(function(user){
 								userCollection.findOne({'_id':ObjectID(user._id),'trakt':{$exists:true}},{'trakt':1}, function(error, user){
-									shows.getProgress(user, show.tvdb);
+									shows.getProgress(user, show.imdb);
 								});
 							});
 						}

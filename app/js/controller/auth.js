@@ -56,6 +56,7 @@ define(['app'], function(nessa){
 			if (to.data && !to.data.secure) return;
 			$auth.check().then(function(response){
 				// Authorized
+			//	$rootScope.authorized = true;
 			}, function(error){
 				$log.debug(error);
 				$state.transitionTo('login');

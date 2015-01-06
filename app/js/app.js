@@ -185,19 +185,12 @@ define('app', ['angular','moment','ngAnimate','ngMessages','ngResource','ngSocke
 	
 	nessa.factory('httpIntercept', function($location,$q){
 		return {
-			request: function(config){
-				return config;
-			},
-			requestError: function(response){
-				if (response.status === 401) $location.url('/login');
-				$q.reject(response);
-			},
-			response: function(response){
+			'response': function(response){
 				return response;
 			},
-			responseError: function(rejection){
+			'responseError': function(rejection){
 				if (rejection.status === 401) $location.url('/login');
-				$q.reject(rejection);
+				return $q.reject(rejection);
 			}
 		}
 	});
@@ -227,11 +220,12 @@ define('app', ['angular','moment','ngAnimate','ngMessages','ngResource','ngSocke
 	});
 	
 	nessa.run(function($auth, $http, $localStorage, $log, $rootScope, $sessionStorage, $state){
-		$rootScope.menu = [];
 		$rootScope.genres = {};
+		$rootScope.menu = [];
+		$rootScope.settings = {};
 		
 		$rootScope.$on('$stateChangeStart', function(event, to, toParams, from, fromParams){
-			if (to.data) $rootScope.pagetitle = to.data.title;
+			if (to && to.data) $rootScope.pagetitle = to.data.title;
 			$rootScope.stateTo = to;
 			$rootScope.stateFrom = from;
 		});

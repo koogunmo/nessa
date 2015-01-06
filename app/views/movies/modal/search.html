@@ -5,15 +5,14 @@
 			<span class="input-group-addon btn btn-success" ng-click="search()"><span class="fa fa-search"></span></span>
 			<span class="input-group-addon btn btn-danger" ng-click="reset()"><span class="fa fa-times"></span></span>
 		</span>
-		{{query}}
 	</form>
 </div>
 <div class="modal-body" ng-show="results.length">
 	<div class="results">
-		<div class="result" ng-repeat="result in results" ng-class="{selected: selected==result.tmdb_id}" ng-click="select(result.tmdb_id)">
-			<img ng-src="{{result.images.poster | traktPoster}}" />
-			<strong>{{result.title}}</strong>
-			<p class="synopsis">{{result.overview || 'No synopsis available'}}</p>
+		<div class="result" ng-repeat="result in results" ng-class="{selected: selected==result.movie.ids.tmdb}" ng-click="select(result.movie.ids.tmdb)">
+			<img ng-src="{{result.movie.images.poster.thumb}}" />
+			<strong>{{::result.movie.title}}</strong>
+			<p class="synopsis">{{result.movie.overview || 'No synopsis available'}}</p>
 		</div>
 	</div>
 </div>

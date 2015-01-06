@@ -71,7 +71,7 @@ define(['app'], function(nessa){
 			}
 			
 		}).state('shows.index.detail', {
-			url: '/{tvdb:[0-9]+}',
+			url: '/{imdb:[t]+[0-9]+}',
 			data: {
 				title: 'Show Info'
 			},
@@ -198,7 +198,7 @@ define(['app'], function(nessa){
 		});
 		
 		$scope.match = function(){
-			$http.post('/api/shows/match', [{'tvdb':$scope.selected.tvdb_id,'directory':$scope.show.directory}]).success(function(){
+			$http.post('/api/shows/match', [{'imdb':$scope.selected.ids.imdb,'directory':$scope.show.directory}]).success(function(){
 				$scope.$emit('ShowMatched', $scope.show);
 			});
 		};
@@ -243,7 +243,7 @@ define(['app'], function(nessa){
 			$scope.filter.query = '';
 		};
 		$scope.save = function(){
-			$http.post('/api/shows', {tvdb: $scope.selected}).success(function(json, status){
+			$http.post('/api/shows', {'imdb': $scope.selected}).success(function(json, status){
 				$rootScope.$broadcast('ShowsRefresh', $scope.selected);
 				$modalInstance.close();
 			}).error(function(json, status){
@@ -253,21 +253,21 @@ define(['app'], function(nessa){
 		$scope.search = function(){
 			$scope.loading = true;
 			$scope.results = null;
-			$http.post('/api/shows/search', {q: $scope.filter.query}).success(function(results, status){
+			$http.post('/api/shows/search', {'q': $scope.filter.query}).success(function(results, status){
 				$scope.loading = false;
 				$scope.results = results;
 			}).error(function(json, status){
 				$log.error(json, status);
 			});
 		};
-		$scope.select = function(tvdb) {
-			$scope.selected = tvdb;
+		$scope.select = function(imdb) {
+			$scope.selected = imdb;
 		};
 	})
 
 	nessa.controller('ShowController', function($http,$log,$scope){
 		$scope.progress = function(){
-			$http.get('/api/shows/'+parseInt($scope.show.tvdb)+'/progress').success(function(json, status){
+			$http.get('/api/shows/'+parseInt($scope.show.imdb)+'/progress').success(function(json, status){
 				$scope.show.progress = json;
 			}).error(function(json, status){
 				$log.error(json, status);
@@ -276,10 +276,10 @@ define(['app'], function(nessa){
 	})
 	
 	nessa.controller('ShowDetailController', function($http,$log,$modalInstance,$scope,$stateParams){
-		var tvdb = parseInt($stateParams.tvdb,10);
+		var imdb = $stateParams.imdb;
 		
 		$scope.$on('ShowReload', function(e){
-			$http.get('/api/shows/'+tvdb).success(function(json, status){
+			$http.get('/api/shows/'+imdb).success(function(json, status){
 				if (status == 200 && json) $scope.show = json;
 				$scope.season = $scope.show.episodes[1];
 			}).error(function(json, status){
@@ -298,7 +298,7 @@ define(['app'], function(nessa){
 		};
 		$scope.downloadAll = function(){
 			if (confirm('Are you sure you want to download all available episodes?')) {
-				$http.post('/api/shows/'+tvdb+'/download').success(function(){
+				$http.post('/api/shows/'+$scope.show.imdb+'/download').success(function(){
 					$scope.$emit('ShowReload');
 				}).error(function(json, status){
 					$log.error(json, status);
@@ -306,7 +306,7 @@ define(['app'], function(nessa){
 			}
 		};
 		$scope.rescan = function(){
-			$http.post('/api/shows/'+tvdb+'/scan').success(function(json, status){
+			$http.post('/api/shows/'+$scope.show.imdb+'/scan').success(function(json, status){
 			//	$rootScope.$broadcast('alert', {title: $scope.show.name, message: 'Rescan in progress...'});
 				
 			}).error(function(json, status){
@@ -315,7 +315,7 @@ define(['app'], function(nessa){
 		};
 		$scope.remove = function(){
 			if (confirm('Are you sure you want to remove this show?')) {
-				$http.delete('/api/shows/'+tvdb).success(function(){
+				$http.delete('/api/shows/'+$scope.show.imdb).success(function(){
 				//	$scope.$emit('alert', {'title':$scope.show.name,'message':'Show removed'});
 					$scope.$emit('ShowsRefresh');
 					$scope.close();
@@ -325,7 +325,7 @@ define(['app'], function(nessa){
 			}
 		};
 		$scope.save = function(){
-			$http.post('/api/shows/'+tvdb, $scope.show).success(function(json, status){
+			$http.post('/api/shows/'+$scope.show.imdb, $scope.show).success(function(json, status){
 			//	$scope.$emit('alert', {title: $scope.show.name, message: 'Changes saved'});
 			//	$scope.close();
 			}).error(function(json, status){
@@ -333,7 +333,7 @@ define(['app'], function(nessa){
 			});
 		};
 		$scope.update = function(){
-			$http.post('/api/shows/'+tvdb+'/update').success(function(json, status){	
+			$http.post('/api/shows/'+$scope.show.imdb+'/update').success(function(json, status){	
 			//	$rootScope.$broadcast('alert', {'title':$scope.show.name, message: 'Updating listings...'});
 			//	$scope.close();
 			}).error(function(json, status){
@@ -341,8 +341,8 @@ define(['app'], function(nessa){
 			});
 		};
 		$scope.watched = function(){
-			var payload = {'tvdb':tvdb};
-			$http.post('/api/shows/'+tvdb+'/watched', payload).success(function(json,status){
+			var payload = {'imdb':imdb};
+			$http.post('/api/shows/'+$scope.show.imdb+'/watched', payload).success(function(json,status){
 				$log.log(json, status);
 			});
 		};
@@ -355,7 +355,7 @@ define(['app'], function(nessa){
 				'season': $scope.episode.season,
 				'episode': $scope.episode.episode
 			};
-			$http.post('/api/shows/'+$scope.episode.tvdb+'/download', payload);
+	//		$http.post('/api/shows/'+$scope.episode.tvdb+'/download', payload);
 		};
 		$scope.watched = function(){
 			$scope.episode.watched = !$scope.episode.watched;
@@ -365,7 +365,7 @@ define(['app'], function(nessa){
 				'episode': $scope.episode.episode,
 				'watched': $scope.episode.watched
 			};
-			$http.post('/api/shows/'+$scope.episode.tvdb+'/watched', payload);
+	//		$http.post('/api/shows/'+$scope.episode.tvdb+'/watched', payload);
 		};
 		
 		$scope.canDownload = function(){
@@ -405,12 +405,12 @@ define(['app'], function(nessa){
 			$modalInstance.dismiss('close');
 		};
 		$scope.save = function(){
-			$http.post('/api/shows/match', {matched: $scope.matched}).success(function(json,status){
+			$http.post('/api/shows/match', {'matched': $scope.matched}).success(function(json,status){
 				$scope.close();
 			});
 		};
-		$scope.set = function(id, tvdb){
-			$scope.matched[id] = {id: id, tvdb: tvdb};
+		$scope.set = function(id, imdb){
+			$scope.matched[id] = {'id':id,'imdb':imdb};
 		};
 	});
 	

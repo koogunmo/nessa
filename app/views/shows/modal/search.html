@@ -10,10 +10,10 @@
 <div class="modal-body">
 	<div class="loading" ng-class="{'active': loading}"></div>
 	<div class="results" ng-show="results">
-		<div class="result" ng-repeat="result in results" ng-class="{selected: selected==result.tvdb_id}" ng-click="select(result.tvdb_id)">
-			<img ng-src="{{result.images.poster | traktPoster}}" />
-			<strong>{{::result.title}}</strong>
-			<p class="synopsis">{{::result.overview || 'No synopsis available'}}</p>
+		<div class="result" ng-repeat="result in results" ng-class="{selected: selected==result.show.ids.tvdb}" ng-click="select(result.show.ids.tvdb)">
+			<img ng-src="{{result.show.images.poster.thumb}}" />
+			<strong>{{::result.show.title}}</strong>
+			<p class="synopsis">{{::result.show.overview || 'No synopsis available'}}</p>
 		</div>
 	</div>
 </div>
