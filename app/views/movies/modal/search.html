@@ -9,7 +9,7 @@
 </div>
 <div class="modal-body" ng-show="results.length">
 	<div class="results">
-		<div class="result" ng-repeat="result in results" ng-class="{selected: selected==result.movie.ids.tmdb}" ng-click="select(result.movie.ids.tmdb)">
+		<div class="result" ng-repeat="result in results" ng-class="{selected: selected==result.movie.ids.imdb}" ng-click="select(result.movie.ids.imdb)">
 			<img ng-src="{{result.movie.images.poster.thumb}}" />
 			<strong>{{::result.movie.title}}</strong>
 			<p class="synopsis">{{result.movie.overview || 'No synopsis available'}}</p>

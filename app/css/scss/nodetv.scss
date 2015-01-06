@@ -563,6 +563,7 @@ input {
 			top: 0px;
 			transition: opacity 0.5s;
 			&.artwork {
+				max-height: 200px;
 				opacity: 0;
 				position: absolute;
 			}

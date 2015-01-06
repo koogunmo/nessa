@@ -79,9 +79,10 @@ module.exports = function(app, db, socket){
 	})
 	
 	app.get('/api/shows/:imdb(tt[0-9]+)', function(req,res){
-		shows.summary(req.user, req.params.imdb, function(error, show){
-			if (error) logger.error(error);
-			if (show) return res.send(show);
+		shows.get(req.user, req.params.imdb).then(function(show){
+			res.send(show);
+		}, function(error){
+			logger.error(error);
 			res.status(404).end();
 		});
 	}).post('/api/shows/:imdb(tt[0-9]+)', function(req,res){

@@ -54,7 +54,7 @@ define(['app'], function(nessa){
 		})
 		
 		.state('movies.index.detail', {
-			url: '/info/{id:[0-9]+}',
+			url: '/{imdb:[0-9]+}',
 			onEnter: function($log,$modal,$state,$stateParams){
 				$modal.open({
 					controller: 'MovieDetailCtrl',
@@ -123,7 +123,7 @@ define(['app'], function(nessa){
 		});
 		
 		$scope.match = function(){
-			$http.post('/api/movies/match', [{'tmdb':$scope.selected.tmdb_id,'file':$scope.movie.file}]).success(function(){
+			$http.post('/api/movies/match', [{'imdb':$scope.selected.ids.imdb,'file':$scope.movie.file}]).success(function(){
 				$scope.$emit('MovieMatched', $scope.movie);
 			});
 		};
@@ -205,7 +205,7 @@ define(['app'], function(nessa){
 	
 	nessa.controller('MovieDetailCtrl', function($http,$log,$modalInstance,$scope,$stateParams){
 		$scope.movie = null
-		$http.get('/api/movies/'+$stateParams.id).success(function(success){
+		$http.get('/api/movies/'+$stateParams.imdb).success(function(success){
 			$scope.movie = success;
 		});
 		$scope.close = function(){
@@ -213,12 +213,12 @@ define(['app'], function(nessa){
 		};
 		$scope.download = function(object){
 			$scope.movie.downloading = object.quality;
-			$http.post('/api/movies/'+$scope.movie.tmdb+'/download', object).success(function(success){
+			$http.post('/api/movies/'+$scope.movie.imdb+'/download', object).success(function(success){
 				$modalInstance.close()
 			})
 		};
 		$scope.hashes = function(){
-			$http.get('/api/movies/'+$scope.movie.tmdb+'/hashes').success(function(success){
+			$http.get('/api/movies/'+$scope.movie.imdb+'/hashes').success(function(success){
 				$scope.movie.hashes = success;
 			});
 		};
@@ -264,7 +264,7 @@ define(['app'], function(nessa){
 			$scope.results = [];
 		}
 		$scope.save = function(){
-			$http.post('/api/movies', {tmdb: $scope.selected}).success(function(json){
+			$http.post('/api/movies', {imdb: $scope.selected}).success(function(json){
 				$modalInstance.close();
 				$scope.$emit('MoviesRefresh', true);
 			});
@@ -274,8 +274,8 @@ define(['app'], function(nessa){
 				$scope.results = json
 			});
 		};
-		$scope.select = function(tmdb){
-			$scope.selected = tmdb;
+		$scope.select = function(imdb){
+			$scope.selected = imdb;
 		};
 	});
 	

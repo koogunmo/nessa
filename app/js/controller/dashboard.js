@@ -96,7 +96,7 @@ define(['app'], function(nessa){
 		};
 	})
 	
-	nessa.controller('DashboardUpcomingController', function($http,$log,$scope){
+	nessa.controller('DashboardEpisodeController', function($http,$log,$scope){
 		$scope.collapsed = true;
 		$scope.toggle = function(){
 			$scope.collapsed = !$scope.collapsed;

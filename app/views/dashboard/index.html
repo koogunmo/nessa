@@ -16,10 +16,10 @@
 					<div class="page-header">
 						<h3>Past 7 days</h3>
 					</div>
-					<div ng-if="latest.length>=1">
-						<div class="panel" ng-class="{'panel-success': episode.watched, 'panel-warning': !episode.watched}" ng-repeat="episode in latest | orderBy:['airdate','show_name']:true" ng-controller="episodeCtrl">
-							<div class="panel-heading">
-								<span class="fa fa-lg pull-right" ng-class="{'fa-angle-down': collapsed, 'fa-angle-up': !collapsed}" ng-click="collapsed=!collapsed"></span>
+					<div ng-if="episodes.length>=1">
+						<div class="panel" ng-class="{'panel-success': episode.watched, 'panel-warning': !episode.watched}" ng-repeat="episode in episodes | orderBy:['added','show_name']:true" ng-controller="DashboardEpisodeController">
+							<div class="panel-heading" ng-click="toggle()">
+								<span class="small pull-right">{{episode.added|date:'EEE d MMM, h:mma'}}</span>
 								<h4 class="panel-title">
 									<a href="/shows/{{episode.tvdb}}">{{episode.show_name}}</a> <span class="small">{{episode.title}}</span>
 								</h4>
@@ -35,7 +35,7 @@
 							</div>
 						</div>
 					</div>
-					<div ng-if="latest.length==0">
+					<div ng-if="episodes.length==0">
 						No recent episodes
 					</div>
 				</div>
@@ -45,7 +45,7 @@
 						<h3>Next 7 days</h3>
 					</div>
 					<div ng-if="upcoming.length>=1">
-						<div ng-repeat="item in upcoming|orderBy:['airdate','episode.episode']" ng-controller="DashboardUpcomingController">
+						<div ng-repeat="item in upcoming|orderBy:['airdate','episode.episode']" ng-controller="DashboardEpisodeController">
 							<div class="panel panel-info">
 								<div class="panel-heading" ng-click="toggle()">
 									<span class="small pull-right">{{item.airdate|date:'EEE d MMM, h:mma'}}</span>
