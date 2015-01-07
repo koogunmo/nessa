@@ -269,7 +269,7 @@ define(['app'], function(nessa){
 		
 	})
 	
-	nessa.controller('ShowDetailController', function($http,$log,$modalInstance,$scope,$stateParams){
+	nessa.controller('ShowDetailController', function($http,$log,$modalInstance,$rootScope,$scope,$stateParams){
 		var imdb = $stateParams.imdb;
 		
 		$scope.$on('ShowReload', function(e){
@@ -310,8 +310,8 @@ define(['app'], function(nessa){
 		$scope.remove = function(){
 			if (confirm('Are you sure you want to remove this show?')) {
 				$http.delete('/api/shows/'+$scope.show.imdb).success(function(){
-				//	$scope.$emit('alert', {'title':$scope.show.name,'message':'Show removed'});
-					$scope.$emit('ShowsRefresh');
+					$rootScope.$broadcast('alert', {'title':$scope.show.name,'message':'Show removed'});
+					$rootScope.$broadcast('ShowsRefresh');
 					$scope.close();
 				}).error(function(json, status){
 					$log.error(json, status);
@@ -327,7 +327,7 @@ define(['app'], function(nessa){
 				'status': $scope.show.status
 			};
 			$http.post('/api/shows/'+$scope.show.imdb, settings).success(function(json, status){
-			//	$scope.$emit('alert', {title: $scope.show.name, message: 'Changes saved'});
+				$rootScope.$broadcast('alert', {'title':$scope.show.name,'message':'Settings saved'});
 			//	$scope.close();
 			}).error(function(json, status){
 				$log.error(json, status);
