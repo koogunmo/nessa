@@ -21,19 +21,24 @@ module.exports = function(app,db,socket){
 				if (results){
 					results.forEach(function(show){
 						shows.getArtwork(show.imdb);
-						shows.getFeed(show.imdb);
+						/*
 						shows.getSummary(show.imdb);
+						
+						
 						shows.getListings(show.imdb).then(function(){
-							shows.getHashes(show.imdb);
+							return shows.getFeed(show.imdb);
+						}).then(function(){
+							return shows.getHashes(show.imdb);
 						});
 						
 						if (show.users && show.users.length >= 1){
-							show.users.forEach(function(user){
-								userCollection.findOne({'_id':ObjectID(user._id),'trakt':{$exists:true}},{'trakt':1}, function(error, user){
+							show.users.forEach(function(u){
+								userCollection.findOne({'_id':ObjectID(u._id),'trakt':{$exists:true}},{'trakt':1}, function(error, user){
 									shows.getProgress(user, show.imdb);
 								});
 							});
 						}
+						*/
 					});
 				}
 			});

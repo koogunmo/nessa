@@ -71,7 +71,7 @@ define(['app'], function(nessa){
 			}
 			
 		}).state('shows.index.detail', {
-			url: '/{imdb:[t]+[0-9]+}',
+			url: '/:imdb/:url',
 			data: {
 				title: 'Show Info'
 			},
@@ -266,13 +266,7 @@ define(['app'], function(nessa){
 	})
 
 	nessa.controller('ShowController', function($http,$log,$scope){
-		$scope.progress = function(){
-			$http.get('/api/shows/'+parseInt($scope.show.imdb)+'/progress').success(function(json, status){
-				$scope.show.progress = json;
-			}).error(function(json, status){
-				$log.error(json, status);
-			});
-		};
+		
 	})
 	
 	nessa.controller('ShowDetailController', function($http,$log,$modalInstance,$scope,$stateParams){

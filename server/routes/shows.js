@@ -38,17 +38,18 @@ module.exports = function(app, db, socket){
 	
 	
 	app.get('/api/shows/latest', function(req,res){
-		shows.latest(req.user, function(error,json){
+		shows.latest(req.user).then(function(json){
 			res.send(json);
 		})
 	}).get('/api/shows/random', function(req,res){
-		shows.random(req.user, function(error,json){
+		shows.random(req.user).then(function(json){
 			res.send(json);
 		});
 	}).get('/api/shows/unmatched', function(req,res){
-		shows.unmatched(function(error,results){
-			if (error) logger.error(error)
+		shows.unmatched().then(function(results){
 			res.send(results);
+		}, function(error){
+			res.status(404).send(error);
 		});
 	}).get('/api/shows/upcoming', function(req,res){
 		shows.upcoming(req.user).then(function(calendar){
@@ -60,18 +61,20 @@ module.exports = function(app, db, socket){
 		shows.listings(req.user);
 		res.status(202).end();
 	}).post('/api/shows/match', function(req,res){
-		shows.match(req.user, req.body, function(error, result){
-			if (error) logger.error(error);
-			if (result) return res.status(201).end();
+		shows.match(req.user, req.body).then(function(result){
+			res.status(201).end();
+		}, function(error){
+			logger.error(error);
 			res.status(400).end();
 		});
 	}).post('/api/shows/scan', function(req,res){
 		shows.scan(req.user);
 		res.status(202).end();
 	}).post('/api/shows/search', function(req,res){
-		shows.search(req.user, req.body.q, function(error,results){
-			if (error) logger.error(error);
+		shows.search(req.user, req.body.q).then(function(results){
 			res.send(results);
+		}, function(){
+			res.status(404).end()
 		});
 	}).post('/api/shows/sync', function(req,res){
 		shows.sync(req.user);
@@ -86,25 +89,16 @@ module.exports = function(app, db, socket){
 			res.status(404).end();
 		});
 	}).post('/api/shows/:imdb(tt[0-9]+)', function(req,res){
-		shows.settings(req.user,req.body,function(error,status){
-			if (error) logger.error(error);
-			if (status) return res.status(200).end();
+		shows.settings(req.user,req.body).then(function(show){
+			return res.status(200).end();
+		}, function(){
 			res.status(400).end();
 		});
 	}).delete('/api/shows/:imdb(tt[0-9]+)', function(req,res){
-		shows.remove(req.user, req.params.imdb, function(error,status){
-			if (error) logger.error(error);
-			if (status) return res.status(204).end();
+		shows.remove(req.user, req.params.imdb).then(function(status){
+			res.status(204).end();
+		}, function(){
 			res.status(400).end();
-		});
-	})
-	
-	app.get('/api/shows/:imdb(tt[0-9]+)/progress', function(req,res){
-		// Get show details
-		shows.progress(req.user, req.params.imdb, function(error, json){
-			if (error) logger.error(error);
-			if (json) return res.send(json);
-			res.status(404).end()
 		});
 	})
 	
@@ -112,19 +106,22 @@ module.exports = function(app, db, socket){
 		shows.download(req.params.imdb, req.body);
 		res.status(202).end()
 	}).post('/api/shows/:imdb(tt[0-9]+)/scan', function(req,res){
-		// Scan episode files
 		shows.scanEpisodes(req.user, req.params.imdb);
 		res.status(202).end();
 		
 	}).post('/api/shows/:imdb(tt[0-9]+)/update', function(req,res){
 		// Update show listings
-		shows.getSummary(req.params.imdb).then(function(imdb){
-			shows.getArtwork(imdb);
-			shows.getFeed(imdb);
-			shows.getListings(imdb).then(function(imdb){
-	//			shows.getHashes(imdb);
+		shows.getSummary(req.params.imdb).then(function(show){
+			socket.emit('alert',{'title':'Show updated','message':show.name});
+			
+			shows.getArtwork(show.imdb);
+			
+			shows.getListings(show.imdb).then(function(){
+				shows.getProgress(req.user, show.imdb);
+				shows.getFeed(show.imdb).then(function(){
+					shows.getHashes(show.imdb);
+				});
 			});
-			shows.getProgress(req.user, imdb);
 		}, function(error){
 			logger.error(error);
 		});

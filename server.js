@@ -105,9 +105,8 @@ app.disable('view cache');
 app.disable('x-powered-by');
 
 /***********************************************************************/
-/* TODO: rebuild the following to allow for the installer */
 
-// Move this
+// Move this to somewhere sensible...
 if (!nconf.get('listen:nginx')){
 	app.use('/app', require('express').static(process.cwd() + '/app'));
 	app.use('/assets', require('express').static(process.cwd() + '/app/assets'));

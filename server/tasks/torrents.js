@@ -11,15 +11,13 @@ module.exports = function(app,db,socket){
 			torrent.getComplete(function(error, transfers){
 				transfers.forEach(function(transfer){
 					if (movies.complete) {
-						movies.complete(transfer, function(error, data){
-							if (error) return logger.error(error);
+						movies.complete(transfer).then(function(data){
 							if (data.trash) torrent.remove(transfer.id,true);
 							socket.emit('alert', {'title':'Movie downloaded','message':data.movie.title});
 						});
 					}
 					if (shows.complete) {
-						shows.complete(transfer, function(error,data){
-							if (error) return logger.error(error);
+						shows.complete(transfer).then(function(data){
 							if (data.trash) torrent.remove(transfer.id,true);
 							socket.emit('alert', {'title':'Episode downloaded','message':data.show.name});
 						});

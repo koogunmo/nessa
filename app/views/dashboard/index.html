@@ -17,20 +17,24 @@
 						<h3>Past 7 days</h3>
 					</div>
 					<div ng-if="episodes.length>=1">
-						<div class="panel" ng-class="{'panel-success': episode.watched, 'panel-warning': !episode.watched}" ng-repeat="episode in episodes | orderBy:['added','show_name']:true" ng-controller="DashboardEpisodeController">
+						<div class="panel" ng-class="{'panel-success': item.episode.watched, 'panel-warning': !item.episode.watched}" ng-repeat="item in episodes | orderBy:['episode.added','show.name']:true" ng-controller="DashboardEpisodeController">
 							<div class="panel-heading" ng-click="toggle()">
-								<span class="small pull-right">{{episode.added|date:'EEE d MMM, h:mma'}}</span>
+								<span class="small pull-right">{{::item.episode.added|date:'EEE d MMM, h:mma'}}</span>
 								<h4 class="panel-title">
-									<a href="/shows/{{episode.tvdb}}">{{episode.show_name}}</a> <span class="small">{{episode.title}}</span>
+									<a ui-sref="shows.index.detail({imdb:item.show.imdb,url:item.show.url})">{{::item.show.name}}</a> <span class="small">{{::item.episode.title}}</span>
 								</h4>
 							</div>
 							<div class="panel-body" collapse="collapsed">
 								<!--div ng-include="'/views/dashboard/partial/episode.html'"></div-->
-								<div><strong>Season {{episode.season}}, Episode {{episode.episode}}</strong> <span class="small">{{episode.airdate|date:'mediumDate'}}</span></div>
-								<p>{{episode.synopsis}}</p>
-								<div class="tools">
-									<span class="fa fa-lg fa-eye" title="Episode has been watched" ng-if="episode.watched" ng-click="watched()"></span>
-									<span class="fa fa-lg fa-eye-slash" title="Episode has not been watched" ng-if="!episode.watched" ng-click="watched()"></span>
+								<div><strong>Season {{::item.episode.season}}, Episode {{::item.episode.episode}}</strong> <span class="small">{{::item.episode.airdate|date:'mediumDate'}}</span></div>
+								<p>{{::item.episode.synopsis}}</p>
+								<div class="text-right">
+									<button type="button" class="btn btn-default" tooltip="Episode watched" tooltip-placement="left" ng-if="item.episode.watched" ng-click="watched()">
+										<span class="fa fa-eye"></span>
+									</button>
+									<button type="button" class="btn btn-default" tooltip="Mark episode as watched" tooltip-placement="left" ng-if="!item.episode.watched" ng-click="watched()">
+										<span class="fa fa-eye-slash"></span>
+									</button>
 								</div>
 							</div>
 						</div>
@@ -48,17 +52,17 @@
 						<div ng-repeat="item in upcoming|orderBy:['airdate','episode.episode']" ng-controller="DashboardEpisodeController">
 							<div class="panel panel-info">
 								<div class="panel-heading" ng-click="toggle()">
-									<span class="small pull-right">{{item.airdate|date:'EEE d MMM, h:mma'}}</span>
+									<span class="small pull-right">{{::item.airdate|date:'EEE d MMM, h:mma'}}</span>
 									<h4 class="panel-title">
-										{{item.show.name}}
-										<span class="small">{{item.episode.title}}</span>
+										{{::item.show.name}}
+										<span class="small">{{::item.episode.title}}</span>
 									</h4>
 								</div>
 								<div class="panel-body" collapse="collapsed">
 									<div>
-										<strong>Season {{item.episode.season}}, Episode {{item.episode.episode}}</strong>
+										<strong>Season {{::item.episode.season}}, Episode {{::item.episode.episode}}</strong>
 									</div>
-									<p>{{item.episode.synopsis || 'TBA'}}</p>
+									<p>{{::item.episode.synopsis || 'TBA'}}</p>
 								</div>
 							</div>
 						</div>
@@ -119,39 +123,45 @@
 				</div>
 			</div>
 		</tab>
+		<tab heading="System">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="panel panel-info">
+						<div class="panel-heading">
+							<h4 class="panel-title">Server info</h4>
+						</div>
+						<div class="panel-body">
+							<div>Version: {{stats.version}}</div>
+							<div ng-switch="uptime.days">
+								Uptime: 
+								<span ng-switch-when="1">{{uptime.days}} day</span>
+								<span ng-switch-default>{{uptime.days}} days</span>
+								<span>{{uptime.hour|zeroPad}}:{{uptime.mins|zeroPad}}:{{uptime.secs|zeroPad}}</span>
+							</div>
+							<div>
+								Node.js: {{stats.system.node}} ({{stats.system.arch}})
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-12" ng-if="stats.disks">
+					<div class="panel panel-info">
+						<div class="panel-heading">
+							<h4 class="panel-title">Disk usage</h4>
+						</div>
+						<div class="panel-body">
+							<div ng-repeat="disk in stats.disks">
+								<span class="pull-right">{{disk.size*1024|formatBytes}}</span>
+								<span>{{disk.mount}}</span>
+								<progress animate="false" title="">
+									<bar type="danger" value="disk.capacity*100">{{disk.used*1024|formatBytes}}</bar>
+									<bar type="success" value="100-(disk.capacity*100)">{{disk.available*1024|formatBytes}}</bar>
+								</progress>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</tab>
 	</tabset>
-	<hr />
-	<div class="panel panel-primary">
-		<div class="panel-heading">
-			<h4 class="panel-title">System Information</h4>
-		</div>
-		<div class="panel-body">
-			<tabset>
-				<tab heading="System">
-					<div>Version: {{stats.version}}</div>
-					<div ng-switch="uptime.days">
-						Uptime: 
-						<span ng-switch-when="1">{{uptime.days}} day</span>
-						<span ng-switch-default>{{uptime.days}} days</span>
-						<span>{{uptime.hour|zeroPad}}:{{uptime.mins|zeroPad}}:{{uptime.secs|zeroPad}}</span>
-					</div>
-					<hr />
-					<div>
-						Powered by node.js {{stats.system.node}} ({{stats.system.arch}})
-					</div>
-				</tab>
-				<tab heading="Disks" ng-if="stats.disks">
-					<div ng-repeat="disk in stats.disks">
-						<span class="pull-right">{{disk.size*1024|formatBytes}}</span>
-						<span>{{disk.mount}}</span>
-						<progress animate="false" title="">
-							<bar type="danger" value="disk.capacity*100">{{disk.used*1024|formatBytes}}</bar>
-							<bar type="success" value="100-(disk.capacity*100)">{{disk.available*1024|formatBytes}}</bar>
-						</progress>
-					</div>
-				</tab>
-			</tabset>
-		</div>
-	</div>
-	
 </div>

@@ -1,7 +1,6 @@
 'use strict';
 
-var log4js	= require('log4js'),
-	trakt	= require('nodetv-trakt');
+var log4js	= require('log4js');
 
 log4js.configure({
 	appenders: [{

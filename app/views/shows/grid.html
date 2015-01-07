@@ -26,16 +26,16 @@
 	
 <div class="row">
 	<div class="poster col-sm-2" ng-show="results.length" ng-repeat="show in results = (shows | filter:filterList) | orderBy:definiteArticle | offset:(paginate.page-1)*paginate.items | limitTo:paginate.items" ng-controller="ShowController" lazy-load>
-		<div class="image" ng-class="{'ended': show.ended}" ui-sref="shows.index.detail({'imdb':show.imdb})">
-			<span class="badge unwatched" ng-if="show.progress.left>0">{{show.progress.left}}</span>
+		<div class="image" ng-class="{'ended': show.ended}" ui-sref="shows.index.detail({'imdb':show.imdb,'url':show.url})">
+			<span class="badge unwatched" ng-if="show.progress.left>0">{{::show.progress.left}}</span>
 			
 			<img src="/app/assets/gfx/no-cover.png" alt="" class="img-responsive placeholder" />
-			<img lazy-src="/media/{{settings.media.shows.directory}}/{{show.directory}}/poster.jpg" alt="" class="img-responsive artwork" />
+			<img lazy-src="/media/{{::settings.media.shows.directory}}/{{::show.directory}}/poster.jpg" alt="{{::show.name}}" class="img-responsive artwork" />
 			
-			<h6>{{show.name}}</h6>
+			<h6>{{::show.name}}</h6>
 			
 			<div class="overlay">
-				<div class="title">{{show.name}}</div>
+				<div class="title">{{::show.name}}</div>
 				<div class="hud">
 					<!-- Heads-up display for basic show info -->
 					<!-- TODO: need better icons
@@ -43,16 +43,16 @@
 					<span class="fa fa-exclamation-circle" ng-if="show.ended" title="Series ended/cancelled"></span>
 					-->
 				</div>
-				<progress animate="false" title="{{show.progress.percentage}}% Watched">
-					<bar type="success" value="show.progress.percentage"></bar>
+				<progress animate="false" title="{{::show.progress.percentage}}% Watched">
+					<bar type="success" value="::show.progress.percentage"></bar>
 					<bar type="danger" value="100-show.progress.percentage"></bar>
 				</progress>
 			</div>		
 		</div>
 		<div class="title">
-			<a ui-sref="shows.index.detail({'imdb':show.imdb})">
-				<span class="badge pull-right" ng-if="show.progress && show.progress.left>0">{{show.progress.left}}</span>
-				{{show.name}}
+			<a ui-sref="shows.index.detail({'imdb':show.imdb,'url':show.url})">
+				<span class="badge pull-right" ng-if="show.progress && show.progress.left>0">{{::show.progress.left}}</span>
+				{{::show.name}}
 			</a>
 		</div>
 	</div>

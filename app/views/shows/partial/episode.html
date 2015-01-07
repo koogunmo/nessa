@@ -1,4 +1,4 @@
-	<p class="well" ng-if="episode.synopsis">{{episode.synopsis || 'TBA'}}</p>
+	<p class="well" ng-if="::episode.synopsis">{{::episode.synopsis || 'TBA'}}</p>
 	<div class="row">
 		<div class="col-xs-3 text-left">
 			<button type="button" class="btn btn-default" tooltip="Download episode" tooltip-placement="right" ng-if="canDownload()" ng-click="download()">
@@ -9,7 +9,7 @@
 			</button>
 		</div>
 		<div class="col-xs-6 text-center">
-			<div class="btn" ng-if="hasDate()"><span class="fa fa-clock-o"></span> {{episode.airdate|date:'longDate'}}</div>
+			<div class="btn" ng-if="hasDate()"><span class="fa fa-clock-o"></span> {{::episode.airdate|date:'longDate'}}</div>
 		</div>
 		<div class="col-xs-3 text-right">
 			<button type="button" class="btn btn-default" tooltip="Episode watched" tooltip-placement="left" ng-if="episode.watched" ng-click="watched()">

@@ -30,7 +30,6 @@ define('app', ['angular','moment','ngAnimate','ngMessages','ngResource','ngSocke
 						scrollY	= $window.scrollY,
 						bottom	= height+scrollY;
 					
-					if (typeof($scope.progress) == 'function') $scope.progress();
 					var img = $element.find('img[lazy-src]'), src = img.attr('lazy-src');
 					var poster = new Image();
 					poster.onload = function(){

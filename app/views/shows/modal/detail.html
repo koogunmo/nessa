@@ -1,19 +1,21 @@
 <form name="showForm" ng-submit="save()">
 	<div class="modal-header">
-		<img src="/assets/gfx/no-banner.png" ng-src="/media/{{settings.media.shows.directory}}/{{show.directory}}/banner.jpg" alt="{{show.name}}" class="img-responsive" />
+		<img src="/assets/gfx/no-banner.png" ng-src="/media/{{::settings.media.shows.directory}}/{{::show.directory}}/banner.jpg" alt="{{::show.name}}" class="img-responsive" />
+		
+		
 	</div>
 	<div class="modal-body">
 		<tabset type="pills">
 			<tab heading="Synopsis">
 				<div class="synopsis well">
-					{{show.synopsis || 'No synopsis available'}}
+					{{::show.synopsis}}
 				</div>
 				<div ng-if="show.progress && show.progress.percentage">
 					<hr />
-					<p>Watched {{show.progress.completed}} of {{show.progress.aired}} episodes</p>
+					<p>Watched {{::show.progress.completed}} of {{::show.progress.aired}} episodes</p>
 					<progress animate="false">
-						<bar type="success" value="show.progress.percentage">
-							<span ng-hide="show.progress.percentage<=5">{{show.progress.percentage}}%</span>
+						<bar type="success" value="::show.progress.percentage">
+							<span ng-hide="show.progress.percentage<=5">{{::show.progress.percentage}}%</span>
 						</bar>
 						<bar type="danger" value="100-show.progress.percentage"></bar>
 					</progress>
@@ -26,7 +28,7 @@
 				</div>
 				<hr />
 				<accordion ng-if="season">
-					<accordion-group heading="{{episode.episode|zeroPad}}: {{episode.title || 'TBA'}}" ng-class="{'panel-warning':episode.downloading||episode.file&&!episode.watched,'panel-success':episode.watched}" ng-repeat="episode in season.episodes" ng-hide="episode.episode==0">
+					<accordion-group heading="{{::episode.episode|zeroPad}}: {{::episode.title}}" ng-class="{'panel-warning':episode.downloading||episode.file&&!episode.watched,'panel-success':episode.watched}" ng-repeat="episode in season.episodes" ng-hide="episode.episode==0">
 						<div ng-include="'/views/shows/partial/episode.html'" ng-controller="ShowEpisodeController"></div>
 					</accordion-group>
 				</accordion>
@@ -36,7 +38,7 @@
 				<div class="well" ng-switch on="show.status">
 					<div class="form-group">
 						<label for="ipt_format">Filename format</label>
-						<input type="text" id="ipt_format" name="format" class="form-control" placeholder="{{settings.media.shows.format}}" ng-model="show.format" />
+						<input type="text" id="ipt_format" name="format" class="form-control" placeholder="{{::settings.media.shows.format}}" ng-model="show.format" />
 						<div class="small text-right">
 							<strong>%S</strong>: Season, <strong>%E</strong>: Episode, <strong>%T</strong>: Title, <strong>%X</strong>: File extension
 						</div>

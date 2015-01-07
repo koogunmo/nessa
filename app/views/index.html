@@ -36,9 +36,9 @@
 			<nav class="collapse navbar-collapse" collapse="isCollapsed" ng-cloak>
 				<ul class="nav navbar-nav navbar-left" ng-if="authenticated">
 					<li ng-repeat="item in menu | orderBy: 'order'" ng-class="{active: state.includes(item.path)}" ng-cloak>
-						<a ui-sref="{{item.path}}" ng-click="collapse()">
-							<span class="fa fa-{{item.icon}}"></span>
-							{{item.name}}
+						<a ui-sref="{{::item.path}}" ng-click="collapse()">
+							<span class="fa fa-{{::item.icon}}"></span>
+							{{::item.name}}
 						</a>
 					</li>
 				</ul>
