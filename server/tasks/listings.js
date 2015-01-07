@@ -8,7 +8,7 @@ module.exports = function(app,db,socket){
 		var ObjectID	= require('mongodb').ObjectID;
 		
 		var updateListings = function(){
-			socket.emit('alert', {message: 'Updating TV listings'})
+			socket.emit('alert', {'message': 'Updating TV listings'})
 			// Update show listings
 			shows.getShowlist();
 			
@@ -20,10 +20,9 @@ module.exports = function(app,db,socket){
 				if (error) logger.error(error);
 				if (results){
 					results.forEach(function(show){
-						shows.getArtwork(show.imdb);
-						/*
-						shows.getSummary(show.imdb);
 						
+						shows.getSummary(show.imdb);
+						shows.getArtwork(show.imdb);
 						
 						shows.getListings(show.imdb).then(function(){
 							return shows.getFeed(show.imdb);
@@ -31,14 +30,13 @@ module.exports = function(app,db,socket){
 							return shows.getHashes(show.imdb);
 						});
 						
-						if (show.users && show.users.length >= 1){
+						if (show.users){
 							show.users.forEach(function(u){
 								userCollection.findOne({'_id':ObjectID(u._id),'trakt':{$exists:true}},{'trakt':1}, function(error, user){
 									shows.getProgress(user, show.imdb);
 								});
 							});
 						}
-						*/
 					});
 				}
 			});
