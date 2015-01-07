@@ -89,8 +89,8 @@ module.exports = function(app, db, socket){
 			res.status(404).end();
 		});
 	}).post('/api/shows/:imdb(tt[0-9]+)', function(req,res){
-		shows.settings(req.user,req.body).then(function(show){
-			return res.status(200).end();
+		shows.settings(req.user, req.body).then(function(show){
+			res.status(200).end();
 		}, function(){
 			res.status(400).end();
 		});

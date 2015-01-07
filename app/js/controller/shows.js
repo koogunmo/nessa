@@ -319,7 +319,14 @@ define(['app'], function(nessa){
 			}
 		};
 		$scope.save = function(){
-			$http.post('/api/shows/'+$scope.show.imdb, $scope.show).success(function(json, status){
+			var settings = {
+				'id': $scope.show._id,
+				'feed': $scope.show.feed,
+				'format': $scope.show.format,
+				'hd': $scope.show.hd,
+				'status': $scope.show.status
+			};
+			$http.post('/api/shows/'+$scope.show.imdb, settings).success(function(json, status){
 			//	$scope.$emit('alert', {title: $scope.show.name, message: 'Changes saved'});
 			//	$scope.close();
 			}).error(function(json, status){
