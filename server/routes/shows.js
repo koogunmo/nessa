@@ -100,7 +100,7 @@ module.exports = function(app, db, socket){
 		shows.download(req.params.imdb, req.body);
 		res.status(202).end()
 	}).post('/api/shows/:imdb(tt[0-9]+)/scan', function(req,res){
-		shows.scanEpisodes(req.user, req.params.imdb);
+		shows.scanEpisodes(req.params.imdb);
 		res.status(202).end();
 		
 	}).post('/api/shows/:imdb(tt[0-9]+)/update', function(req,res){
