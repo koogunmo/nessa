@@ -342,12 +342,23 @@ define(['app'], function(nessa){
 			});
 		};
 		$scope.watched = function(){
-			var payload = {'imdb':imdb};
-			$http.post('/api/shows/'+$scope.show.imdb+'/watched', payload).success(function(json,status){
-				$log.log(json, status);
-			});
+			var payload = {'watched':true};
+			$http.post('/api/shows/'+$scope.show.imdb+'/watched', payload);
 		};
 		$scope.$emit('ShowReload');
+	})
+	
+	nessa.controller('ShowSeasonController', function($http,$log,$scope){
+		$scope.watched = function(){
+			$scope.season.progress.completed = $scope.season.progress.aired;
+			$scope.season.progress.left = 0;
+			$scope.season.progress.percentage = 100;
+			var payload = {
+				'season': $scope.season.season,
+				'watched': true
+			};
+		//	$http.post('/api/shows/'+$scope.show.imdb+'/watched', payload);
+		};
 	})
 	
 	nessa.controller('ShowEpisodeController', function($http,$log,$scope){
@@ -356,17 +367,18 @@ define(['app'], function(nessa){
 				'season': $scope.episode.season,
 				'episode': $scope.episode.episode
 			};
-	//		$http.post('/api/shows/'+$scope.episode.tvdb+'/download', payload);
+			$http.post('/api/shows/'+$scope.show.imdb+'/download', payload);
 		};
 		$scope.watched = function(){
 			$scope.episode.watched = !$scope.episode.watched;
 			var payload = {
-				'tvdb': $scope.episode.tvdb,
 				'season': $scope.episode.season,
 				'episode': $scope.episode.episode,
 				'watched': $scope.episode.watched
 			};
-	//		$http.post('/api/shows/'+$scope.episode.tvdb+'/watched', payload);
+		//	if (watched) $scope.season.progress.completed += 1;
+		//	if (!watched) $scope.season.progress.completed -= 1;
+			$http.post('/api/shows/'+$scope.show.imdb+'/watched', payload);
 		};
 		
 		$scope.canDownload = function(){

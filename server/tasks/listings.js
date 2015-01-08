@@ -1,5 +1,14 @@
 'use strict';
 
+var log4js = require('log4js');
+log4js.configure({
+	appenders: [{
+		type: 'console'
+	}],
+	replaceConsole: true
+});
+var logger = log4js.getLogger('task-listings');
+
 /* Update show listings from XML */
 module.exports = function(app,db,socket){
 	try {
@@ -20,7 +29,6 @@ module.exports = function(app,db,socket){
 				if (error) logger.error(error);
 				if (results){
 					results.forEach(function(show){
-						
 						shows.getSummary(show.imdb);
 						shows.getArtwork(show.imdb);
 						

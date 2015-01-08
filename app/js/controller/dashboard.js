@@ -103,7 +103,6 @@ define(['app'], function(nessa){
 		};
 		$scope.watched = function(){
 			$scope.item.episode.watched = !$scope.item.episode.watched;
-			$log.debug($scope.item.episode.watched);
 			var payload = {
 				'season': $scope.item.episode.season,
 				'episode': $scope.item.episode.episode,

@@ -23,12 +23,6 @@ module.exports = function(app, db, socket){
 		// Add new show
 		shows.add(req.user, req.body.imdb).then(function(show){
 			socket.emit('alert', {'title':'Show added','message':show.name});
-			
-			shows.getArtwork(show.imdb);
-			shows.getSummary(show.imdb);
-			shows.getListings(show.imdb).then(function(imdb){
-				shows.getHashes(show.imdb);
-			});
 			res.status(201).end();
 		}, function(error){
 			logger.error(error);
@@ -113,14 +107,12 @@ module.exports = function(app, db, socket){
 		// Update show listings
 		shows.getSummary(req.params.imdb).then(function(show){
 			socket.emit('alert',{'title':'Show updated','message':show.name});
-			
 			shows.getArtwork(show.imdb);
-			
 			shows.getListings(show.imdb).then(function(){
 				shows.getProgress(req.user, show.imdb);
-				shows.getFeed(show.imdb).then(function(){
-					shows.getHashes(show.imdb);
-				});
+				return shows.getFeed(show.imdb);
+			}).then(function(){
+				shows.getHashes(show.imdb);
 			});
 		}, function(error){
 			logger.error(error);

@@ -26,12 +26,35 @@
 				<div class="form-group">
 					<select class="form-control" ng-model="season" ng-options="item.label for item in show.episodes"></select>
 				</div>
-				<hr />
-				<accordion ng-if="season">
-					<accordion-group heading="{{::episode.episode|zeroPad}}: {{::episode.title}}" ng-class="{'panel-warning':episode.downloading||episode.file&&!episode.watched,'panel-success':episode.watched}" ng-repeat="episode in season.episodes" ng-hide="episode.episode==0">
-						<div ng-include="'/views/shows/partial/episode.html'" ng-controller="ShowEpisodeController"></div>
-					</accordion-group>
-				</accordion>
+				<div ng-controller="ShowSeasonController">
+					<!--
+					<div>
+						<progress style="height:5px;">
+							<bar type="success" value="season.progress.percentage"></bar>
+							<bar type="danger" value="100-season.progress.percentage"></bar>
+						</progress>
+					</div>
+					<div class="text-right">
+						<span class="btn-sm pull-left">You have watched {{season.progress.completed || 0}} of {{season.progress.aired || 0}} episodes for this season</span>
+						<button type="button" class="btn btn-sm btn-default" tooltip="Mark season as watched" tooltip-placement="left" ng-if="season.progress.percentage<100" ng-click="watched()">
+							<span class="fa fa-eye-slash"></span>
+						</button>
+						<button type="button" class="btn btn-sm btn-default" disabled="true" tooltip="Season watched" tooltip-placement="left" ng-if="season.progress.percentage==100">
+							<span class="fa fa-eye"></span>
+						</button>
+					</div>
+					<br />
+					-->
+					<accordion ng-if="season">
+						<accordion-group heading="{{::episode.episode|zeroPad}}: {{::episode.title}}" ng-class="{'panel-warning':episode.downloading||episode.file&&!episode.watched,'panel-success':episode.watched}" ng-repeat="episode in season.episodes" ng-hide="episode.episode==0">
+							
+							<div ng-include="'/views/shows/partial/episode.html'" ng-controller="ShowEpisodeController"></div>
+						</accordion-group>
+					</accordion>
+					<div class="text-center" ng-if="!season.episodes.length">
+						No episodes
+					</div>
+				</div>
 			</tab>
 			
 			<tab heading="Settings">
