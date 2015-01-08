@@ -5,7 +5,7 @@ define(['app'], function(nessa){
 	nessa.config(function($stateProvider){
 		$stateProvider.state('login', {
 			url: '/login',
-			controller: 'loginCtrl',
+			controller: 'LoginController',
 			templateUrl: 'views/auth/login.html',
 			data: {
 				secure: false,
@@ -18,50 +18,32 @@ define(['app'], function(nessa){
 			url: '/logout',
 			data: {
 				secure: true,
-				title: 'Logging out'
+				title: 'Logging out...'
 			},
 			onEnter: function($auth, $log, $state){
 				$auth.logout().then(function(){
 					$log.warn('Authentication: Removed');
-					$state.transitionTo('login');
+					$state.go('login');
 				});
 			}
 		});
 	});
 	
-	nessa.controller('loginCtrl', function($auth, $log, $rootScope, $scope, $state, $window){
+	nessa.controller('LoginController', function($auth,$log,$scope,$state){
 		$scope.user = {};
 		$scope.login = function(){
 			$auth.login($scope.user.username, $scope.user.password, !!$scope.user.remember).then(function(json){
-				if (json.success){
-					$log.info('Authentication: Success');
-					$state.transitionTo('dashboard');
-				}
-			}, function(json,status){
-				// Form feedback
-				$rootScope.$broadcast('alert', {message: 'Login failed. Please try again'})
+				$log.info('Authentication: Success');
+				$state.go('dashboard');
+			}, function(json){
 				$log.warn('Authentication: Failed');
+				$scope.user = {};
 			});
 		};
-		$scope.reset = function(){
-			$scope.error = null;
-		};
-		if ($rootScope.$storage.session) $state.transitionTo('dashboard');
 	});
-		
-	nessa.run(function($auth,$log,$rootScope,$state){
+	
+	nessa.run(function($log){
 		$log.info('Module loaded: Authentication');
-		
-		$rootScope.$on('$stateChangeStart', function(e,to){
-			if (to.data && !to.data.secure) return;
-			$auth.check().then(function(response){
-				// Authorized
-			//	$rootScope.authorized = true;
-			}, function(error){
-				$log.debug(error);
-				$state.transitionTo('login');
-			});
-		});
 	});
 	
 	return nessa;

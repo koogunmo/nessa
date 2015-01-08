@@ -1,9 +1,11 @@
 define(['app'], function(nessa){
 	
-	nessa.controller('NavigationController', function($http,$location,$log,$scope,$state){
-		$scope.authenticated = true;
+	nessa.controller('NavigationController', function($http,$localStorage,$location,$log,$scope,$state){
+		$scope.$storage = $localStorage;
+		
 		$scope.isCollapsed = true;
 		$scope.state = $state;
+		$scope.visible = true;
 		
 		$scope.collapse = function(){
 			$scope.isCollapsed = true;
@@ -12,34 +14,28 @@ define(['app'], function(nessa){
 			$scope.isCollapsed = !$scope.isCollapsed;
 		};
 		
-		
-		/*
-		$scope.$on('authenticated', function(e,status){
-			$scope.authenticated = !!status;
-		});
-		*/
+		$scope.$watch('$storage', function(){
+			$scope.visible = !!$scope.$storage.session;
+			$scope.user = $scope.$storage.user;
+		},true);
 	})
 	
-	nessa.controller('headCtrl', function($scope, $state){
-		
-	});
-	
-	nessa.controller('alertsCtrl', function($log,$scope,$socket){
+	nessa.controller('AlertsController', function($log,$scope,$socket){
 		$scope.alerts = [];
 		
 		var alertHandler = function(e,alert){
 			var defaults = {
-				icon: '/assets/gfx/icons/touch-icon.png',
-				message: '',
-				timeout: 3000,
-				title: 'NodeTV',
-				type: 'info',
-				url: false
+				'icon': '/assets/gfx/icons/touch-icon.png',
+				'message': '',
+				'timeout': 3000,
+				'title': 'NodeTV',
+				'type': 'info',
+				'url': false
 			};
 			var alert = angular.extend({}, defaults, alert);
 			if (('Notification' in window) && Notification.permission === 'granted'){
 				// Use Notification API
-				var notification = new Notification(alert.title, {body: alert.message, icon: alert.icon});
+				var notification = new Notification(alert.title,{'body':alert.message,'icon':alert.icon});
 				notification.onclick = function(e){
 					if (alert.url) document.location = alert.url;
 					notification.close();
@@ -68,36 +64,15 @@ define(['app'], function(nessa){
 			$scope.alerts.splice(index, 1);
 		};
 		
-		$scope.$on('$stateChangeSuccess', function(){
+		$scope.$on('$stateChangeStart', function(){
 			$scope.alerts = [];
 		});
-	});
+	})
 	
-	nessa.controller('navCtrl', function($location, $log, $rootScope, $scope, $state){
-		$scope.menu = $rootScope.menu;
-		$scope.state = $state;
-		
-		$scope.authenticated = true;
-		
-		$scope.isCollapsed = true;
-		$scope.isActive = function(viewLocation){
-			return viewLocation === $location.path();
-		};
-		$scope.collapse = function(){
-			$scope.isCollapsed = true;
-		};
-		$scope.toggle = function(){
-			$scope.isCollapsed = !$scope.isCollapsed;
-		};
-		$scope.$on('authenticated', function(e,status){
-			$scope.authenticated = !!status;
-		});
-		
-	});
 	
 	nessa.run(function($log){
 		$log.info('Module loaded: Notifications');
-	});
+	})
 	
 	return nessa;
 });

@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
-<head ng-controller="headCtrl">
+<head>
 	<base href="/" />
-	<title ng-bind="'NodeTV - '+pagetitle">NodeTV</title>
+	<title update-title>NodeTV</title>
 	<meta name="apple-mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-status-bar-style" content="black">
 	<meta name="format-detection" content="telephone=no">
@@ -34,7 +34,8 @@
 				<a class="navbar-brand" ui-sref="dashboard">NodeTV</a>
 			</div>
 			<nav class="collapse navbar-collapse" collapse="isCollapsed" ng-cloak>
-				<ul class="nav navbar-nav navbar-left" ng-if="authenticated">
+				
+				<ul class="nav navbar-nav navbar-left" ng-if="visible">
 					<li ng-repeat="item in menu | orderBy: 'order'" ng-class="{active: state.includes(item.path)}" ng-cloak>
 						<a ui-sref="{{::item.path}}" ng-click="collapse()">
 							<span class="fa fa-{{::item.icon}}"></span>
@@ -42,7 +43,7 @@
 						</a>
 					</li>
 				</ul>
-				<ul class="nav navbar-nav navbar-right" ng-if="authenticated">
+				<ul class="nav navbar-nav navbar-right" ng-if="visible">
 					<li class="dropdown" dropdown ng-cloak>
 						<a class="dropdown-toggle" dropdown-toggle><span class="fa fa-user"></span> {{user.username}}</a>
 						<ul class="dropdown-menu">
@@ -51,11 +52,12 @@
 						</ul>
 					</li>
 				</ul>
+				
 			</nav>
 		</div>
 	</header>
 	
-	<div class="container alert-container" ng-controller="alertsCtrl" ng-cloak>
+	<div class="container alert-container" ng-controller="AlertsController" ng-cloak>
 		<alert ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)"><strong>{{alert.message}}</strong></alert>
 	</div>
 	

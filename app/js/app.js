@@ -1,6 +1,6 @@
 define('app', ['angular','moment','ngAnimate','ngMessages','ngResource','ngSocketIO','ngStorage','ngTouch','ui.bootstrap','ui.router'], function(angular,moment){
 	
-	var nessa = angular.module('nessa', ['ngAnimate','ngMessages','ngResource','ngSocketIO','ngStorage','ui.bootstrap','ui.router']);
+	var nessa = angular.module('nessa', ['ngAnimate','ngMessages','ngResource','ngSocketIO','ngStorage','ngTouch','ui.bootstrap','ui.router']);
 
 	nessa.config(function($compileProvider,$tooltipProvider,$urlRouterProvider){
 		$urlRouterProvider.when('/', function($state){
@@ -12,15 +12,15 @@ define('app', ['angular','moment','ngAnimate','ngMessages','ngResource','ngSocke
 	
 	/****** Factory ******/
 	
-	nessa.factory('$socket', function(socketFactory){
+	.factory('$socket', function(socketFactory){
 		var socket = socketFactory();
 		socket.forward('alert');
 		return socket;
-	});
+	})
 	
 	/****** Directives ******/
 	
-	nessa.directive('lazyLoad', function($document,$log,$timeout,$window){
+	.directive('lazyLoad', function($document,$log,$timeout,$window){
 		return {
 			restrict: 'AC',
 			link: function($scope,$element,$attr){
@@ -44,7 +44,22 @@ define('app', ['angular','moment','ngAnimate','ngMessages','ngResource','ngSocke
 				$timeout(lazyLoad);
 			}
 		};
-	});
+	})
+	.directive('updateTitle', function($rootScope, $timeout) {
+		return {
+			link: function(scope, element){
+				var listener = function(event,toState,toParams,fromState,fromParams){
+					var title = 'NodeTV';
+					var suffix = (toState.data && toState.data.title) ? ' - '+ toState.data.title : '';
+					// Set asynchronously so page changes before title does
+					$timeout(function(){
+						element.text(title+suffix);
+					});
+				};
+				$rootScope.$on('$stateChangeStart', listener);
+			}
+		}
+	})
 	
 	/****** Filters ******/
 	
@@ -77,11 +92,6 @@ define('app', ['angular','moment','ngAnimate','ngMessages','ngResource','ngSocke
 		}
 	});
 	
-	nessa.filter('moment', function() {
-		return function(dateString, format) {
-			return moment(dateString).format(format);
-		};
-	});
 	
 	nessa.filter('offset', function(){
 		return function(input, start){
@@ -110,42 +120,20 @@ define('app', ['angular','moment','ngAnimate','ngMessages','ngResource','ngSocke
 	/****** Factory ******/
 	
 	nessa.factory('$auth', function($http, $localStorage, $location, $log, $q, $rootScope, $sessionStorage){
-		
 		$rootScope.$storage = $localStorage;
 		
 		if ($rootScope.$storage.session) $http.defaults.headers.common['session'] = $rootScope.$storage.session;
 		
 		var auth = {
-			check: function(){
-				var deferred = $q.defer();
-				if (!$rootScope.$storage.session) {
-					deferred.reject({});
-				}
-				$http.post('/auth/check', {session: $rootScope.$storage.session}).success(function(json, status){
-					if (json && json.success){
-						auth.update(json);
-						deferred.resolve(json);
-					} else {
-						auth.clear()
-						deferred.reject(json);
-					}
-				}).error(function(json, status){
-					auth.clear()
-					deferred.reject(json);
-				});
-				return deferred.promise;
+			'clear': function(){
+				delete $http.defaults.headers.common['session'];
+				delete $rootScope.$storage.session;
+				delete $rootScope.$storage.user;
+				delete $rootScope.user;
 			},
-			clear: function(){
-				$http.defaults.headers.common['session'] = null;
-				$rootScope.$storage.session = null;
-				$rootScope.$storage.user = {};
-				$rootScope.user = {};
-				$rootScope.$broadcast('authenticated', false);
-			},
-			login: function(username, password, remember){
+			'login': function(username, password){
 				var deferred = $q.defer();
-				$http.post('/auth/login', {username: username, password: password}).success(function(json){
-				//	if (!remember) $rootScope.$session = $sessionStorage;
+				$http.post('/auth/login', {'username':username,'password':password}).success(function(json){
 					if (json.success){
 						auth.update(json);
 						deferred.resolve(json);
@@ -159,36 +147,43 @@ define('app', ['angular','moment','ngAnimate','ngMessages','ngResource','ngSocke
 				});
 				return deferred.promise;
 			},
-			logout: function(){
+			'logout': function(){
 				var deferred = $q.defer();
-				$http.post('/auth/logout', {session: $rootScope.$storage.session}).then(function(json, status){
+				$http.post('/auth/logout',{'session':$rootScope.$storage.session}).then(function(json){
 					auth.clear();
-					deferred.resolve(json);
+					deferred.resolve();
 				}, function(json, status){
 					auth.clear();
-					deferred.resolve(json);
+					deferred.resolve();
 				});
 				return deferred.promise;
 			},
-			update: function(json){
+			'update': function(json){
 				$http.defaults.headers.common['session'] = json.session;
-				$rootScope.$storage.lastTime = json.lastTime;
 				$rootScope.$storage.session = json.session;
 				$rootScope.$storage.user = json.user;
 				$rootScope.user = $rootScope.$storage.user;
-				$rootScope.$broadcast('authenticated', true);
 			}
 		};
 		return auth;
 	});
 	
-	nessa.factory('httpIntercept', function($location,$q){
+	nessa.factory('httpIntercept', function($location,$localStorage,$log,$q){
+		
 		return {
+			'request': function(config){
+				if ($localStorage.session){
+					if (!config.headers) config.headers = {};
+					if (!config.headers.session) config.headers.session = $localStorage.session;
+				}
+				return config;
+			},
 			'response': function(response){
 				return response;
 			},
 			'responseError': function(rejection){
 				if (rejection.status === 401) $location.url('/login');
+				if (rejection.status === 418) $location.url('/install');
 				return $q.reject(rejection);
 			}
 		}
@@ -200,7 +195,7 @@ define('app', ['angular','moment','ngAnimate','ngMessages','ngResource','ngSocke
 		
 		$locationProvider.html5Mode(true).hashPrefix('!');
 		$httpProvider.interceptors.push('httpIntercept');
-		
+		/*
 		var checkInstalled = function($q, $timeout, $http, $location, $rootScope){
 			var deferred = $q.defer();
 			$http.get('/api/installed').success(function(response){
@@ -215,24 +210,20 @@ define('app', ['angular','moment','ngAnimate','ngMessages','ngResource','ngSocke
 			});
 			return deferred.promise;
 		};
-		
+		*/
 	});
 	
-	nessa.run(function($auth, $http, $localStorage, $log, $rootScope, $sessionStorage, $state){
+	nessa.run(function($http,$log,$rootScope,$state){
 		$rootScope.genres = {};
 		$rootScope.menu = [];
 		$rootScope.settings = {};
 		
-		$rootScope.$on('$stateChangeStart', function(event, to, toParams, from, fromParams){
-			if (to && to.data) $rootScope.pagetitle = to.data.title;
-			$rootScope.stateTo = to;
-			$rootScope.stateFrom = from;
-		});
-		
 		$rootScope.$on('$stateChangeSuccess', function(){
+			/*
 			$http.get('/api/system/settings').success(function(json, status){
 				$rootScope.settings = json;
 			});
+			*/
 		});
 	});
 	
