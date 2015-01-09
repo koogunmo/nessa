@@ -1,14 +1,18 @@
 <form name="userForm" autocomplete="off">
 	<div class="modal-header">
-		<h4 class="modal-title">User settings</h4>
+		<h4 class="modal-title">
+			<span ng-if="!adding && user.username">User: {{user.username}}</span>
+			<span ng-if="adding">Add new user</span>
+		</h4>
 	</div>
 	<div class="modal-body">
 		<tabset type="pills">
 			<tab heading="General">
-				<div class="form-group">
+				<div class="form-group" ng-if="adding">
 					<label for="ipt_username">Username</label>
-					<input id="ipt_username" type="text" class="form-control" required="true" ng-model="user.username" />
+					<input id="ipt_username" type="text" class="form-control" placeholder="john_smith" required="true" ng-model="user.username" />
 				</div>
+				
 				<div class="form-group">
 					<label for="ipt_email">Email Address</label>
 					<input id="ipt_email" type="email" class="form-control" placeholder="user@example.com" ng-model="user.email" />
@@ -29,11 +33,8 @@
 					<label for="ipt_trakt_password">Password</label>
 					<input id="ipt_trakt_password" type="password" class="form-control" ng-model="user.trakt.password" />
 				</div>
-				<div class="form-group">
-					<label for="ipt_trakt_api">API Key</label>
-					<input id="ipt_trakt_api" type="text" class="form-control" ng-model="user.trakt.apikey" />
-				</div>
 			</tab>
+			
 			<!--tab heading="Security">
 				<div class="checkbox">
 					<label>
@@ -41,9 +42,7 @@
 						Enable Multi-factor authentication<br /><span class="small">Requires the Google Authenticator app</span>
 					</label>
 				</div>
-				
 				<div ng-if="user.mfa.enabled" class="row">
-					
 					<div class="col-sm-6" style="text-align: center;">
 						<img src="https://chart.googleapis.com/chart?chs=150x150&amp;chld=H|0&amp;cht=qr&chl=otpauth://totp/{{user.username}}%3Fsecret={{user.mfa.secret.base32}}%26issuer=NodeTV" alt="{{user.mfa.secret}}" />
 					</div>
@@ -60,9 +59,11 @@
 		</tabset>
 	</div>
 	<div class="modal-footer">
-		<button type="button" class="btn btn-danger" ng-click="remove()" ng-if="user._id">
+		
+		<!--button type="button" class="btn btn-danger" ng-click="remove()" ng-if="user._id">
 			<span class="fa fa-trash-o"></span> Delete
-		</button>
+		</button-->
+		
 		<button type="button" class="btn btn-success" ng-show="userForm.$dirty && userForm.$valid" ng-click="save()">
 			<span class="fa fa-save"></span> Save
 		</button>

@@ -5,7 +5,7 @@ define(['app'], function(nessa){
 		$stateProvider.state('settings', {
 			abstract: true,
 			url: '/settings',
-			controller: 'settingsCtrl',
+			controller: 'SettingsController',
 			templateUrl: 'views/settings/index.html',
 			data: {
 				secure: true,
@@ -15,16 +15,18 @@ define(['app'], function(nessa){
 			url: ''
 		});
 		
+		
 		$stateProvider.state('settings.user', {
 			abstract: true,
-			url: '/user'
+			url: '/user',
+			data:{secure:true}
 			
 		}).state('settings.user.add', {
 			url: '/add',
 			onEnter: function($modal, $state){
 				$modal.open({
 					templateUrl: 'views/settings/modal/user.html',
-					controller: 'userCtrl'
+					controller: 'UserController'
 				}).result.then(function(result){
 					$state.transitionTo('settings.index');
 					window.modal = null;
@@ -39,11 +41,11 @@ define(['app'], function(nessa){
 			}
 			
 		}).state('settings.user.edit', {
-			url: '/edit/{id:[0-9a-f]{24}}',
+			url: '/:id',
 			onEnter: function($modal, $state){
 				$modal.open({
 					templateUrl: 'views/settings/modal/user.html',
-					controller: 'userCtrl',
+					controller: 'UserController',
 					backdrop: 'static'
 				}).result.then(function(result){
 					$state.transitionTo('settings.index');
@@ -65,11 +67,10 @@ define(['app'], function(nessa){
 				secure: true,
 				title: 'Profile'
 			},
-			onEnter: function($modal, $rootScope, $state){
-				var previous = ($rootScope.stateFrom.name) ? $rootScope.stateFrom.name : 'dashboard';
+			onEnter: function($modal, $state){
 				$modal.open({
 					templateUrl: 'views/settings/modal/user.html',
-					controller: 'userCtrl'
+					controller: 'UserController'
 				}).result.then(function(result){
 					$state.transitionTo(previous);
 					window.modal = null;
@@ -98,7 +99,7 @@ define(['app'], function(nessa){
 	
 	/****** Controller ******/
 	
-	nessa.controller('settingsCtrl', function($http, $log, $modal, $rootScope, $scope){
+	nessa.controller('SettingsController', function($http, $log, $modal, $rootScope, $scope){
 		
 		$scope.branches = [{name: 'master'},{name: 'nightly'}];
 		$scope.settings = {}
@@ -184,34 +185,42 @@ define(['app'], function(nessa){
 	
 	
 	
-	nessa.controller('userCtrl', function($http, $log, $modalInstance, $rootScope, $scope, $state, $stateParams){
+	
+	nessa.controller('UserController', function($http,$localStorage,$log,$modalInstance,$rootScope,$scope,$state,$stateParams){
 		window.modal = $modalInstance;
+		
+		$scope.adding = false;
 		$scope.user = {};
 		
 		$scope.close = function(){
 			$modalInstance.dismiss();
 		};
+		
 		$scope.load = function(id){
-			$http.get('/api/user/'+id).success(function(json, status){
+			$http.get('/api/users/'+id).success(function(json, status){
 				$scope.user = json;
 			});
 		};
 		$scope.remove = function(){
 			if (confirm('Are you sure you want to delete this user?')){
-				$http.delete('/api/user/'+id).success(function(json, status){
+				$http.delete('/api/users/'+id).success(function(json, status){
 					$rootScope.$broadcast('userRefresh');
 					$modalInstance.close();
 				});
 			}
 		};
 		$scope.save = function(){
-			$http.post('/api/user/'+id, $scope.user).success(function(json, status){
+			var path = ($state.current.name == 'settings.user.add') ? '/api/users' : '/api/users/'+id;
+			$http.post(path, $scope.user).success(function(json, status){
 				$rootScope.$broadcast('usersRefresh');
 				$modalInstance.close();
 			});
 		};
-		if ($state.current.name != 'settings.user.add'){
-			var id = ($stateParams && $stateParams.id) ? $stateParams.id : $rootScope.user._id;
+		if ($state.current.name == 'settings.user.add'){
+			$scope.adding = true;
+		} else {
+			$scope.$storage = $localStorage;
+			var id = ($stateParams && $stateParams.id) ? $stateParams.id : $scope.$storage.user.username;
 			$scope.load(id);
 		}
 	});

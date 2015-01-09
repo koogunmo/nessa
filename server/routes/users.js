@@ -14,30 +14,36 @@ module.exports = function(app, db, socket){
 	
 	app.get('/api/users', function(req,res){
 		// List users
-		users.list(function(error, json){
+		users.list(req.user).then(function(json){
 			res.send(json);
+		}, function(){
+			res.status(404).end();
 		});
 	}).post('/api/users', function(req,res){
-		// Create user
-		res.status(201).end();
+		users.add(req.user, req.body).then(function(user){
+			res.status(201).end();
+		}, function(){
+			res.status(400).end();
+		});
 	})
 	
 	app.get('/api/users/:id', function(req,res){
-		users.get(req.params.id, function(error, user){
-			if (error) logger.error(error);
-			if (user) return res.status(200).send(user);
-			return res.status(404).end();
+		users.get(req.user, req.params.id).then(function(user){
+			res.send(user);
+		}, function(error){
+			res.status(404).end();
 		});
 	}).post('/api/users/:id', function(req,res){
-		// Update user
-		users.update(req.params.id, req.body, function(error, json){
-			if (error) logger.error(error);
+		users.update(req.user, req.params.id, req.body).then(function(json){
 			res.status(200).end();
+		}, function(error){
+			res.status(400).end();
 		});
 	}).delete('/api/users/:id', function(req,res){
-		// Remove user
-		users.remove(req.params.id, function(error, json){
+		users.remove(req.user, req.params.id).then(function(json){
 			res.status(204).end();
+		}, function(){
+			res.status(404).end();
 		});
 	})
 };

@@ -35,9 +35,9 @@
 		<div class="image" ui-sref="movies.index.detail({id:movie.imdb,url:movie.url})">
 			<img src="/assets/gfx/no-cover.png" alt="" class="img-responsive placeholder">
 			<img lazy-src="/media/{{settings.movies.directory}}/.artwork/{{::movie.imdb}}.jpg" alt="" class="img-responsive artwork" />
-			<h6>{{movie.title}}</h6>
+			<h6>{{::movie.title}}</h6>
 			<div class="overlay">
-				<div class="title">{{movie.title}}</div>
+				<div class="title">{{::movie.title}}</div>
 				<div class="hud">
 					<!--
 					<span class="fa fa-hdd-o" ng-if="movie.file"></span>
@@ -46,7 +46,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="title"><a ui-sref="movies.index.detail({id:movie.imdb,url:movie.url})">{{movie.title}}</a></div>
+		<div class="title"><a ui-sref="movies.index.detail({id:movie.imdb,url:movie.url})">{{::movie.title}}</a></div>
 	</div>
 	<div class="col-sm-12" ng-show="!results.length" style="text-align: center;">
 		No matches found
