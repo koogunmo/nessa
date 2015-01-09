@@ -169,7 +169,6 @@ define('app', ['angular','moment','ngAnimate','ngMessages','ngResource','ngSocke
 	});
 	
 	nessa.factory('httpIntercept', function($location,$localStorage,$log,$q){
-		
 		return {
 			'request': function(config){
 				if ($localStorage.session){
@@ -219,11 +218,9 @@ define('app', ['angular','moment','ngAnimate','ngMessages','ngResource','ngSocke
 		$rootScope.settings = {};
 		
 		$rootScope.$on('$stateChangeSuccess', function(){
-			/*
 			$http.get('/api/system/settings').success(function(json, status){
 				$rootScope.settings = json;
 			});
-			*/
 		});
 	});
 	

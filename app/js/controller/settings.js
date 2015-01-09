@@ -107,8 +107,6 @@ define(['app'], function(nessa){
 		
 		$http.get('/api/system/settings').success(function(json,status){
 			$scope.settings = json;
-		}).error(function(json,status){
-			$log.error(json);
 		});
 		
 		$scope.library = {

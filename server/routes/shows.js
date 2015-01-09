@@ -30,7 +30,6 @@ module.exports = function(app, db, socket){
 		});
 	})
 	
-	
 	app.get('/api/shows/latest', function(req,res){
 		shows.latest(req.user).then(function(json){
 			res.send(json);

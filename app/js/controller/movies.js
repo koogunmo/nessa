@@ -135,9 +135,6 @@ define(['app'], function(nessa){
 		};
 	})
 	
-	
-	
-	
 	nessa.controller('MovieListCtrl', function($log,$http,$scope){
 		$scope.settings	= {};
 		$scope.movies	= [];
