@@ -133,6 +133,16 @@ define(['app'], function(nessa){
 			page: 1
 		};
 		
+		$scope.pageNext = function(){
+			var pages = Math.ceil($scope.results.length/$scope.paginate.items);
+			if ($scope.paginate.page == pages) return;
+			$scope.paginate.page++;
+		};
+		$scope.pagePrev = function(){
+			if ($scope.paginate.page == 1) return;
+			$scope.paginate.page--;
+		};
+		
 		$scope.$on('ShowsRefresh', function(event, tvdb){
 			$http.get('/api/shows').success(function(json, status){
 				if (status == 200 && json) {

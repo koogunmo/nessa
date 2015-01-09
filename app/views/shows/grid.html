@@ -24,7 +24,7 @@
 	</div>
 </div>
 	
-<div class="row">
+<div class="row" ng-swipe-left="pageNext()" ng-swipe-right="pagePrev()">
 	<div class="poster col-sm-2" ng-show="results.length" ng-repeat="show in results = (shows | filter:filterList) | orderBy:definiteArticle | offset:(paginate.page-1)*paginate.items | limitTo:paginate.items" ng-controller="ShowController" lazy-load>
 		<div class="image" ng-class="{'ended': show.ended}" ui-sref="shows.index.detail({'imdb':show.imdb,'url':show.url})">
 			<span class="badge unwatched" ng-if="show.progress.left>0">{{::show.progress.left}}</span>

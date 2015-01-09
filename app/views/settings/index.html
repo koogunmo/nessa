@@ -12,7 +12,7 @@
 				</accordion>
 			</tab>
 			
-			<tab heading="Users">
+			<tab heading="Users" ng-if="users">
 				<accordion>
 					<accordion-group heading="Users" class="panel-info" is-open="true">
 						<div ng-include="'/views/settings/partial/user.html'"></div>
