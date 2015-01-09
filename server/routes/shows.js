@@ -97,7 +97,11 @@ module.exports = function(app, db, socket){
 	})
 	
 	app.post('/api/shows/:imdb(tt[0-9]+)/download', function(req,res){
-		shows.download(req.params.imdb, req.body);
+		shows.getHashes(req.params.imdb).then(function(){
+			shows.download(req.params.imdb, req.body);
+		}, function(error){
+			logger.error(error)
+		});
 		res.status(202).end()
 	}).post('/api/shows/:imdb(tt[0-9]+)/scan', function(req,res){
 		shows.scanEpisodes(req.params.imdb);
