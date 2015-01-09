@@ -32,7 +32,7 @@ module.exports = function(app, db){
 		users.check(req.headers.session).then(function(user){
 			res.status(200).end();
 		}, function(error){
-			res.status(401).send(response);
+			res.status(401).send(error);
 		});
 		
 	}).post('/auth/login', function(req, res){
