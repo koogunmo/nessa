@@ -10,7 +10,7 @@
 	</thead>
 	<tbody>
 		<tr ng-repeat="user in users" ui-sref="settings.user.edit({id:user.username})">
-			<td><img ng-src="{{user.avatar}}" ng-if="user.avatar" /></td>
+			<td class="text-center"><img class="avatar avatar-xs" ng-src="{{user.avatar}}" ng-if="user.avatar" /></td>
 			<td>{{user.username}}</td>
 			<td>{{user.name}}</td>
 			<td>&nbsp;</td>

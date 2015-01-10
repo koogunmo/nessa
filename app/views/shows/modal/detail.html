@@ -2,12 +2,12 @@
 	<div class="modal-header" lazy-load>
 		
 		<img src="/assets/gfx/no-banner.png" class="img-responsive placeholder" />
-		<img lazy-src="/media/{{::settings.media.shows.directory}}/{{::show.directory}}/banner.jpg" alt="{{::show.name}}" class="img-responsive banner" />
+		<img ng-if="show.directory" lazy-src="/media/{{settings.media.shows.directory}}/{{show.directory}}/banner.jpg" class="img-responsive banner" />
 		
 	</div>
 	<div class="modal-body">
 		<tabset type="pills">
-			<tab heading="Synopsis">
+			<tab heading="Overview">
 				<div class="synopsis well">
 					{{::show.synopsis}}
 				</div>

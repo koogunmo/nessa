@@ -80,7 +80,7 @@ define(['app'], function(nessa){
 					templateUrl: 'views/shows/modal/detail.html',
 					controller: 'ShowDetailController',
 					backdrop: true,
-					windowClass: 'modal-show'
+					windowClass: 'modal-media'
 				}).result.then(function(result){
 					$state.transitionTo('shows.index');
 					window.modal = null;

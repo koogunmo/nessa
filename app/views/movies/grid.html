@@ -5,7 +5,7 @@
 				<span class="input-group-addon btn btn-primary" ng-click="filter.active=!filter.active" ng-class="{'active':filter.active}"><span class="fa fa-filter"></span></span>
 				<input type="text" class="form-control search" placeholder="Search library..." ng-model="filter.title" />
 				
-				<span class="input-group-addon btn btn-success" ui-sref="movies.index.add"><span class="fa fa-plus"></span></span>
+				<span class="input-group-addon btn btn-success" ng-click="addMovie()"><span class="fa fa-plus"></span></span>
 				<span class="input-group-addon btn btn-danger" ng-click="clearFilter()"><span class="fa fa-times"></span></span>
 			</div>
 		</div>
@@ -30,9 +30,9 @@
 	</div>
 </div>
 
-<div class="row">
+<div class="row" ng-swipe-left="pageNext()" ng-swipe-right="pagePrev()">
 	<div class="poster col-sm-2" ng-repeat="movie in results = (movies | filter:filterList) | orderBy:definiteArticle | offset:(paginate.page-1)*paginate.items | limitTo:paginate.items" lazy-load>
-		<div class="image" ui-sref="movies.index.detail({id:movie.imdb,url:movie.url})">
+		<div class="image" ui-sref="movies.index.detail({imdb:movie.imdb,url:movie.url})">
 			<img src="/assets/gfx/no-cover.png" alt="" class="img-responsive placeholder">
 			<img lazy-src="/media/{{settings.movies.directory}}/.artwork/{{::movie.imdb}}.jpg" alt="" class="img-responsive artwork" />
 			<h6>{{::movie.title}}</h6>
@@ -46,7 +46,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="title"><a ui-sref="movies.index.detail({id:movie.imdb,url:movie.url})">{{::movie.title}}</a></div>
+		<div class="title"><a ui-sref="movies.index.detail({imdb:movie.imdb,url:movie.url})">{{::movie.title}}</a></div>
 	</div>
 	<div class="col-sm-12" ng-show="!results.length" style="text-align: center;">
 		No matches found

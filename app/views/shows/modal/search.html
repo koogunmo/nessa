@@ -7,7 +7,7 @@
 		</span>
 	</form>
 </div>
-<div class="modal-body">
+<div class="modal-body" ng-show="loading || results.length">
 	<div class="loading" ng-class="{'active': loading}"></div>
 	<div class="results" ng-show="results">
 		<div class="result" ng-repeat="result in results" ng-class="{selected: selected==result.show.ids.imdb}" ng-click="select(result.show.ids.imdb)">

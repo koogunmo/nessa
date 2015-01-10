@@ -17,7 +17,7 @@
 						<h3>Past 7 days</h3>
 					</div>
 					<div ng-if="episodes.length>=1">
-						<div class="panel" ng-class="{'panel-success': item.episode.watched, 'panel-warning': !item.episode.watched}" ng-repeat="item in episodes | orderBy:['episode.added','show.name']:true" ng-controller="DashboardEpisodeController">
+						<div class="panel" ng-class="{'panel-success': item.episode.watched, 'panel-warning': !item.episode.watched}" ng-repeat="item in episodes | orderBy:['episode.airdate','episode.added','show.name','episode.episode']:true" ng-controller="DashboardEpisodeController">
 							<div class="panel-heading" ng-click="toggle()">
 								<span class="small pull-right">{{::item.episode.added|date:'EEE d MMM, h:mma'}}</span>
 								<h4 class="panel-title">

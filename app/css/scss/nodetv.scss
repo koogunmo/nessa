@@ -332,12 +332,50 @@ input {
 	}
 }
 
-
-/* Shows */
-
 .modal-content {
-	.modal-header {
-		border-bottom: none;
+	.modal-body {
+		.nav {
+			margin-bottom: 10px;
+		}
+		.nav-pills {
+			display: table;
+			font-size: 15px;
+			width: 100%;
+			li {
+				display: table-cell;
+				float: none;
+				width: 33.3%;
+				a {
+					text-align: center;
+				}
+			}
+		}
+		.tab-pane {
+			div.buttons {
+				text-align: center;
+				
+				button.btn {
+					display: inline-block;
+					margin-bottom: 5px;
+					width: 45%;
+					> .fa {
+						margin-right: 5px;
+					}
+				}
+				
+				@media screen and (max-width: $break-small){
+					button.btn {
+						display: block;
+						text-align: left;
+						width: 100%;
+						> .fa {
+							float: right;
+							margin-right: 0px;
+						}
+					}
+				}
+			}
+		}
 	}
 	.result {
 		border-bottom: 1px solid $border;
@@ -369,117 +407,49 @@ input {
 	}
 }
 
-.modal-show {
+.modal-media {
 	.modal-header {
 		padding: 0px;
+		.modal-title {
+			bottom: 10px;
+			font-size: 15px;
+			left: 15px;
+			position: absolute;
+			right: 0px;
+			width: auto;
+		}
+		&.lazyLoaded {
+			.modal-title {
+				color: #FFFFFF;
+			}
+		}
 	}
 	.modal-footer {
 		margin-top: 0px;
 	}
-	.nav {
-		margin-bottom: 10px;
+}
+
+.avatar {
+	border-radius: 50%;
+	margin-left: 5px;
+	margin-right: 5px;
+	&.avatar-xs {
+		max-width: 25px;
 	}
-	.nav-pills {
-		display: table;
-		font-size: 15px;
-		width: 100%;
-		li {
-			display: table-cell;
-			float: none;
-			width: 33.3%;
-			a {
-				text-align: center;
-			}
-		}
+	&.avatar-sm {
+		max-width: 50px;
 	}
-	.tab-pane {
-		div.buttons {
-			text-align: center;
-			
-			button.btn {
-				display: inline-block;
-				margin-bottom: 5px;
-				width: 45%;
-				> .fa {
-					margin-right: 5px;
-				}
-			}
-			
-			@media screen and (max-width: $break-small){
-				button.btn {
-					display: block;
-					text-align: left;
-					width: 100%;
-					> .fa {
-						float: right;
-						margin-right: 0px;
-					}
-				}
-			}
-		}
+	&.avatar-md {
+		max-width: 75px;
 	}
-	
-	.seasons {
-		.panel-heading {
-			cursor: pointer;
-		}
-		.season {
-			.episode {
-				border-bottom: 1px solid $border;
-				.title {
-					cursor: pointer;
-					margin-left: 20px;
-					> .small {
-						padding-right: 8px;
-						margin-left: -20px;
-					}
-				}
-				.extended {
-					display: none;
-					padding-bottom: 10px;
-					
-					.tools {
-						font-size: 16px;
-						height: 22px;
-						margin-left: 10px;
-						text-align: left;
-						
-						>span {
-							display: inline-block;
-							margin-left: 10px;
-						}
-						
-						>span.action {
-							cursor: pointer;
-							float: right;
-						}
-					}
-					@media screen and (min-width: $break-large){
-						.synopsis {
-							margin-left: 20px;
-						}
-					}
-				}
-				&:last-child {
-					border-bottom: none;
-				}
-				&.unaired {
-					.title {
-						color: #CCCCCC;
-					}
-					/*
-					.extended .tools {
-						text-align: right;
-					}
-					*/
-				}
-			}
-		}
+	&.avatar-lg {
+		max-width: 100px;
 	}
 }
 
 
 .library-filter {
+	margin-top: 10px;
 	.input-group-addon {
 		cursor: pointer;
 	}
@@ -523,7 +493,7 @@ input {
 
 [lazy-load]{
 	img {
-		&.artwork {
+		&.artwork,&.banner {
 			opacity: 0;
 			position: absolute;
 		}
@@ -534,7 +504,7 @@ input {
 	}
 	&.lazyLoaded {
 		img {
-			&.artwork {
+			&.artwork,&.banner {
 				opacity: 1;
 				position: relative;
 			}

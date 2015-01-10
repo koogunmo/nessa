@@ -12,14 +12,6 @@ define('app', ['angular','moment','ngAnimate','ngMessages','ngResource','ngSocke
 		$tooltipProvider.options({'appendToBody':true})
 	})
 	
-	/****** Factory ******/
-	
-	.factory('$socket', function(socketFactory){
-		var socket = socketFactory();
-		socket.forward('alert');
-		return socket;
-	})
-	
 	/****** Directives ******/
 	
 	.directive('lazyLoad', function($document,$log,$timeout,$window){
@@ -47,13 +39,12 @@ define('app', ['angular','moment','ngAnimate','ngMessages','ngResource','ngSocke
 			}
 		};
 	})
-	.directive('updateTitle', function($rootScope, $timeout) {
+	.directive('updateTitle', function($rootScope,$timeout) {
 		return {
 			link: function(scope, element){
 				var listener = function(event,toState,toParams,fromState,fromParams){
 					var title = 'NodeTV';
 					var suffix = (toState.data && toState.data.title) ? ' - '+ toState.data.title : '';
-					// Set asynchronously so page changes before title does
 					$timeout(function(){
 						element.text(title+suffix);
 					});
@@ -63,65 +54,9 @@ define('app', ['angular','moment','ngAnimate','ngMessages','ngResource','ngSocke
 		}
 	})
 	
-	/****** Filters ******/
+	/****** Factories ******/
 	
-	nessa.filter('bytes', function() {
-		return function(bytes, precision) {
-			if (isNaN(parseFloat(bytes)) || !isFinite(bytes)) return '0';
-			if (typeof precision === 'undefined') precision = 1;
-			var	units	= ['bytes','KB','MB','GB','TB','PB','EB','ZB','YB'],
-				number	= Math.floor(Math.log(bytes) / Math.log(1024));
-			return (bytes / Math.pow(1024, Math.floor(number))).toFixed(precision) +  ' ' + units[number];
-		}
-	});
-	
-	nessa.filter('downloadName', function(){
-		return function(string){
-			return string.replace(/\./g, ' ');
-		}
-	});
-	
-	nessa.filter('formatBytes', function(){
-		return function(bytes, si) {
-			if (bytes == 0) return '0.0B';
-			if (!si) si = true;
-			var value = (si) ? 1000 : 1024;
-			// Yes, this is excessive. No, I don't care.
-			var sizes = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-			var i = parseInt(Math.floor(Math.log(bytes) / Math.log(value)));
-			if (i == 0) { return (bytes / Math.pow(value, i))+' '+sizes[i]; }
-			return (bytes / Math.pow(value, i)).toFixed(1)+' '+sizes[i];
-		}
-	});
-	
-	
-	nessa.filter('offset', function(){
-		return function(input, start){
-			start = parseInt(start, 10);
-			return input.slice(start);
-		};
-	});
-	
-	nessa.filter('traktPoster', function(){
-		return function(string){
-			return string.replace(/\.jpg$/ig, '-138.jpg');
-		}
-	});
-	
-	nessa.filter('zeroPad', function(){
-		return function(n, l){
-			if (!l) l = 2;
-			var num = parseInt(n, 10), len = parseInt(l, 10);
-			if (isNaN(num) || isNaN(len)) return n;
-			num = ''+num;
-			while (num.length < len) num = '0'+num;
-			return num;
-		}
-	});
-	
-	/****** Factory ******/
-	
-	nessa.factory('$auth', function($http, $localStorage, $location, $log, $q, $rootScope, $sessionStorage){
+	.factory('$auth', function($http, $localStorage, $location, $log, $q, $rootScope, $sessionStorage){
 		$rootScope.$storage = $localStorage;
 		
 		if ($rootScope.$storage.session) $http.defaults.headers.common['session'] = $rootScope.$storage.session;
@@ -168,9 +103,13 @@ define('app', ['angular','moment','ngAnimate','ngMessages','ngResource','ngSocke
 			}
 		};
 		return auth;
-	});
-	
-	nessa.factory('httpIntercept', function($location,$localStorage,$log,$q){
+	})
+	.factory('$socket', function(socketFactory){
+		var socket = socketFactory();
+		socket.forward('alert');
+		return socket;
+	})
+	.factory('httpIntercept', function($location,$localStorage,$log,$q){
 		return {
 			'request': function(config){
 				if ($localStorage.session){
@@ -188,39 +127,68 @@ define('app', ['angular','moment','ngAnimate','ngMessages','ngResource','ngSocke
 				return $q.reject(rejection);
 			}
 		}
-	});
+	})
+	
+	/****** Filters ******/
+	
+	.filter('bytes', function() {
+		return function(bytes, precision) {
+			if (isNaN(parseFloat(bytes)) || !isFinite(bytes)) return '0';
+			if (typeof precision === 'undefined') precision = 1;
+			var	units	= ['bytes','KB','MB','GB','TB','PB','EB','ZB','YB'],
+				number	= Math.floor(Math.log(bytes) / Math.log(1024));
+			return (bytes / Math.pow(1024, Math.floor(number))).toFixed(precision) +  ' ' + units[number];
+		}
+	})
+	.filter('downloadName', function(){
+		return function(string){
+			return string.replace(/\./g, ' ');
+		}
+	})
+	.filter('formatBytes', function(){
+		return function(bytes, si) {
+			if (bytes == 0) return '0.0B';
+			if (!si) si = true;
+			var value = (si) ? 1000 : 1024;
+			// Yes, this is excessive. No, I don't care.
+			var sizes = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+			var i = parseInt(Math.floor(Math.log(bytes) / Math.log(value)));
+			if (i == 0) { return (bytes / Math.pow(value, i))+' '+sizes[i]; }
+			return (bytes / Math.pow(value, i)).toFixed(1)+' '+sizes[i];
+		}
+	})
+	.filter('offset', function(){
+		return function(input, start){
+			start = parseInt(start, 10);
+			return input.slice(start);
+		};
+	})
+	.filter('zeroPad', function(){
+		return function(n, l){
+			if (!l) l = 2;
+			var num = parseInt(n, 10), len = parseInt(l, 10);
+			if (isNaN(num) || isNaN(len)) return n;
+			num = ''+num;
+			while (num.length < len) num = '0'+num;
+			return num;
+		}
+	})
+	
 	
 	/****** Config ******/
 	
-	nessa.config(function($httpProvider, $locationProvider, $stateProvider){
-		
+	.config(function($httpProvider,$locationProvider){
 		$locationProvider.html5Mode(true).hashPrefix('!');
 		$httpProvider.interceptors.push('httpIntercept');
-		/*
-		var checkInstalled = function($q, $timeout, $http, $location, $rootScope){
-			var deferred = $q.defer();
-			$http.get('/api/installed').success(function(response){
-				if (response.installed) {
-					$timeout(deferred.resolve, 0);
-				} else {
-					$timeout(function(){
-						deferred.reject();
-					}, 0);
-					$location.url('/install');
-				}
-			});
-			return deferred.promise;
-		};
-		*/
-	});
+	})
 	
-	nessa.run(function($http,$log,$rootScope,$state){
+	.run(function($http,$log,$rootScope,$state){
 		$rootScope.genres = {};
 		$rootScope.menu = [];
 		$rootScope.settings = {};
 		
-		$rootScope.$on('$stateChangeSuccess', function(){
-			$http.get('/api/system/settings').success(function(json, status){
+		$rootScope.$on('$stateChangeStart', function(){
+			$http.get('/api/system/settings').success(function(json){
 				$rootScope.settings = json;
 			});
 		});

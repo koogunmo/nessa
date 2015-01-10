@@ -1,51 +1,66 @@
-<div class="modal-header">
-	<h3 class="modal-title" ng-cloak>{{movie.title}} <span class="small">{{movie.year}}</span></h3>
-	</div>
+<div class="modal-header" lazy-load>
+	<img src="/assets/gfx/no-banner.png" class="img-responsive placeholder" />
+	<h5 class="modal-title" ng-cloak>{{movie.title}} <span class="small">{{movie.year}}</span></h5>
 </div>
 
 <div class="modal-body">
 	<tabset type="pills">
 		<tab heading="Overview">
-			<div class="row">
-				<div class="col-sm-3 hidden-xs">
-					<img class="img-thumbnail" ng-src="/media/Movies/.artwork/{{movie.imdb}}.jpg" alt="{{movie.title}}" />
-				</div>
-				<div class="col-sm-9">
-					<div class="well">{{movie.synopsis}}</div>
-				</div>
+			<div class="synopsis well">
+				{{::movie.synopsis}}
 			</div>
-			<div class="row">
-				<div class="col-md-12 small">
-					<div ng-if="movie.added"><strong>Added</strong> {{movie.added|date:'longDate'}}</div>
-					<div ng-if="movie.runtime"><strong>Runtime</strong> {{movie.runtime}} mins</div>
-					<div ng-if="movie.quality"><strong>Quality</strong> {{movie.quality}}</div>
-					<div ng-if="movie.size"><strong>Size</strong> {{movie.size|formatBytes}}</div>
-					<div ng-if="movie.genres"><strong>Genres</strong> {{movie.genres.join(', ')}}</div>
+			<div class="row small">
+				<div class="col-sm-6">
+					<div class="col-xs-4"><strong>Added</strong></div>
+					<div class="col-xs-8">{{::movie.added|date:'longDate'}}</div>
+				</div>
+				<div class="col-sm-6">
+					<div class="col-xs-4"><strong>Runtime</strong></div>
+					<div class="col-xs-8">{{::movie.runtime}} mins</div>
+				</div>
+				
+				<div class="col-sm-6">
+					<div class="col-xs-4"><strong>Quality</strong></div>
+					<div class="col-xs-8">{{::movie.quality}}</div>
+				</div>
+				<div class="col-sm-6">
+					<div class="col-xs-4"><strong>Size</strong></div>
+					<div class="col-xs-8">{{movie.size|formatBytes}}</div>
+				</div>
+				<div class="col-sm-12">
+					<div class="col-sm-2"><strong>Genres</strong></div>
+					<div class="col-sm-10">{{::movie.genres.join(', ')}}</div>
 				</div>
 			</div>
 		</tab>
+		
+		<tab heading="Download">
+			<div class="btn-group pull-left" ng-cloak>
+				<button class="btn btn-default" disabled="disabled" ng-if="movie.downloading">
+					<span class="fa fa-cloud-download"></span> Downloading {{movie.downloading}}
+				</button>
+				<button class="btn btn-default pull-left" ng-if="movie.hashes && !movie.downloading" ng-click="hashes()">
+					<span class="fa fa-refresh"></span>
+				</button>
+				
+				<button type="button" class="btn btn-default" ng-if="movie.hashes && !movie.downloading" ng-repeat="dl in movie.hashes|orderBy:'size'" ng-click="download(dl)" ng-class="{'active': dl.quality == movie.quality}" tooltip="{{dl.size|formatBytes}}">
+					<span class="fa" ng-class="{'fa-download': dl.quality == movie.quality,'fa-cloud-download': dl.quality != movie.quality}"></span> {{dl.quality}}
+				</button>
+				
+				<button class="btn btn-default pull-left" ng-if="!movie.hashes" ng-click="hashes()">
+					<span class="fa fa-refresh"></span> Check availability
+				</button>
+			</div>
+		</tab>
+		
 		<tab heading="Settings">
-			<button type="button" class="btn btn-danger"><span class="fa fa-trash"></span> Remove</button>
-			<button type="button" class="btn btn-info"><span class="fa fa-file-image-o"></span> Get artwork</button>
+			<div class="buttons form-group">
+				<button type="button" class="btn btn-info"><span class="fa fa-file-image-o"></span> Get Artwork</button>
+				<button type="button" class="btn btn-danger"><span class="fa fa-trash"></span> Remove Movie</button>
+			</div>
 		</tab>
 	</tabset>
 </div>
 <div class="modal-footer">
-	<div class="btn-group pull-left" ng-cloak>
-		<button class="btn btn-default" disabled="disabled" ng-if="movie.downloading">
-			<span class="fa fa-cloud-download"></span> Downloading {{movie.downloading}}
-		</button>
-		<button class="btn btn-default pull-left" ng-if="movie.hashes && !movie.downloading" ng-click="hashes()">
-			<span class="fa fa-refresh"></span>
-		</button>
-		
-		<button type="button" class="btn btn-default" ng-if="movie.hashes && !movie.downloading" ng-repeat="dl in movie.hashes|orderBy:'size'" ng-click="download(dl)" ng-class="{'active': dl.quality == movie.quality}" tooltip="{{dl.size|formatBytes}}">
-			<span class="fa" ng-class="{'fa-download': dl.quality == movie.quality,'fa-cloud-download': dl.quality != movie.quality}"></span> {{dl.quality}}
-		</button>
-		
-		<button class="btn btn-default pull-left" ng-if="!movie.hashes" ng-click="hashes()">
-			<span class="fa fa-refresh"></span> Check availability
-		</button>
-	</div>
 	<button type="button" class="btn btn-default" ng-click="close()">Close</button>
 </div>

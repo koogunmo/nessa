@@ -1,8 +1,8 @@
 <form name="userForm" autocomplete="off">
 	<div class="modal-header">
-		<img ng-src="{{user.avatar}}" class="img-responsive" ng-if="user.avatar" />
 		<h4 class="modal-title">
-			<span ng-if="!adding && user.username">User: {{user.username}}</span>
+			<img class="avatar avatar-sm" ng-src="{{user.avatar}}" ng-if="user.avatar" />
+			<span ng-if="!adding && user.username">{{user.name || user.username}}</span>
 			<span ng-if="adding">Add new user</span>
 		</h4>
 	</div>

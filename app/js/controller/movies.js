@@ -3,86 +3,62 @@ define(['app'], function(nessa){
 	nessa.config(function($stateProvider){
 		$stateProvider
 			.state('movies', {
-				abstract: true,
-				url: '/movies',
-				templateUrl: 'views/movies/index.html',
-				data: {
-					secure: true,
-					title: 'Movies'
+				'url': '/movies',
+				'abstract': true,
+				'templateUrl': 'views/movies/index.html',
+				'data': {
+					'secure': true,
+					'title': 'Movies'
 				}
 			})
 			.state('movies.match', {
-				url: '/match',
-				controller: 'MoviesMatchingController',
-				templateUrl: 'views/movies/match.html',
-				data: {
-					secure: true,
-					title: 'Unmatched movies'
+				'url': '/match',
+				'controller': 'MoviesMatchingController',
+				'templateUrl': 'views/movies/match.html',
+				'data': {
+					'secure': true,
+					'title': 'Unmatched movies'
 				}
 			})
 			.state('movies.index', {
-				url: '',
-				controller: 'MovieListCtrl',
-				templateUrl: 'views/movies/grid.html',
-				data: {
-					secure: true,
-					title: 'Movies'
+				'url': '',
+				'controller': 'MoviesController',
+				'templateUrl': 'views/movies/grid.html',
+				'data': {
+					'secure': true,
+					'title': 'Movies'
 				}
 			})
-			
-			
-
-			
-		.state('movies.index.add', {
-			url: '/add',
-			onEnter: function($modal, $state, $stateParams){
-				$modal.open({
-					controller: 'MovieSearchCtrl',
-					templateUrl: 'views/movies/modal/search.html'
-				}).result.then(function(result){
-					$state.transitionTo('movies.index');
+			.state('movies.index.detail', {
+				'url': '/:imdb/:url',
+				'onEnter': function($log,$modal,$state,$stateParams){
+					$modal.open({
+						'backdrop': true,
+						'controller': 'MovieDetailController',
+						'templateUrl': 'views/movies/modal/detail.html',
+						'windowClass': 'modal-media'
+					}).result.then(function(result){
+						$state.transitionTo('movies.index');
+						window.modal = null;
+					}, function(result){
+						$state.transitionTo('movies.index');
+						window.modal = null;
+					});
+				},
+				'onExit': function(){
+					if (window.modal) window.modal.dismiss()
 					window.modal = null;
-				}, function(result){
-					$state.transitionTo('movies.index');
-					window.modal = null;
-				});
-			},
-			onExit: function(){
-				if (window.modal) window.modal.dismiss()
-				window.modal = null;
-			}
-		})
-		
-		.state('movies.index.detail', {
-			url: '/{imdb:[0-9]+}',
-			onEnter: function($log,$modal,$state,$stateParams){
-				$modal.open({
-					controller: 'MovieDetailCtrl',
-					templateUrl: 'views/movies/modal/detail.html'
-				}).result.then(function(result){
-					$state.transitionTo('movies.index');
-					window.modal = null;
-				}, function(result){
-					$state.transitionTo('movies.index');
-					window.modal = null;
-				});
-			},
-			onExit: function(){
-				if (window.modal) window.modal.dismiss()
-				window.modal = null;
-			}
-		})
-		
-		
-	});
+				}
+			});
+	})
 	
-	nessa.run(function($log, $rootScope){
+	.run(function($log,$rootScope){
 		$log.info('Module loaded: Movies');
 		$rootScope.menu.push({
-			path: 'movies.index',
-			name: 'Movies',
-			icon: 'film',
-			order: 30
+			'path': 'movies.index',
+			'name': 'Movies',
+			'icon': 'film',
+			'order': 30
 		});
 		$rootScope.genres.movies = [
 			'Action','Adventure','Animation',
@@ -94,10 +70,146 @@ define(['app'], function(nessa){
 			'Thriller','War','Western'
 		];
 		$rootScope.quality = ['480p','720p','1080p'];
+	})
+	
+	
+	/******************************** Controllers ********************************/
+	
+	nessa.controller('MoviesController', function($http,$log,$modal,$scope){
+		$scope.filter	= {
+			active: false,
+			downloaded: true,
+			genre: '',
+			magnets: false,
+			quality: '',
+			title: ''
+		};
+		$scope.movies = [];
+		$scope.paginate = {
+			items: 24,
+			page: 1
+		};
+		$scope.settings = {};
+		
+		$scope.addMovie = function(){
+			$modal.open({
+				'backdrop': 'static',
+				'controller': 'MoviesSearchController',
+				'templateUrl': 'views/movies/modal/search.html'
+			}).result.then(function(resolve){
+				$scope.$emit('MoviesRefresh');
+			});
+		};
+		
+		$scope.clearFilter = function(){
+			$scope.filter.title = '';
+			$(document).trigger('lazyload');
+		};
+		$scope.definiteArticle = function(movie){
+			var title = movie.title.split(':')[0].replace(/^The\s/i, '').replace(/\W/, '');
+			return [title, movie.year];
+		};
+		$scope.filterList = function(item){
+			if (!item.title.toLowerCase().match($scope.filter.title.toLowerCase())) return false;
+			if ($scope.filter.active){
+				if ($scope.filter.genre && item.genres.indexOf($scope.filter.genre) == -1) return false;
+				if ($scope.filter.quality && item.quality != $scope.filter.quality) return false;
+				if ($scope.filter.magnets && (!item.hashes || item.hashes.length == 0)) return false;
+			}
+			if ($scope.filter.downloaded && !item.file) return false;
+			return true;
+		};
+		$scope.pageNext = function(){
+			var pages = Math.ceil($scope.results.length/$scope.paginate.items);
+			if ($scope.paginate.page == pages) return;
+			$scope.paginate.page++;
+		};
+		$scope.pagePrev = function(){
+			if ($scope.paginate.page == 1) return;
+			$scope.paginate.page--;
+		};
+		
+		$scope.$on('MoviesRefresh', function(){
+			$http.get('/api/movies').success(function(json, status){
+				if (status == 200 && json) {
+					$scope.movies = json;
+					$(document).trigger('lazyload');
+				}
+			}).error(function(json, status){
+				$log.error(json, status);
+			});
+		});
+		$http.get('/api/system/settings').success(function(json,status){
+			$scope.settings = json.media;
+		});
+		$scope.$watch('filter', function(){
+			if ($scope.filter.title != '') $scope.paginate.page = 1;
+		},true);
+		
+		$scope.$emit('MoviesRefresh');
+	})
+	
+	nessa.controller('MoviesSearchController', function($http,$log,$modalInstance,$scope){
+		$scope.filter = {
+			query: ''
+		};
+		$scope.loading = false;
+		$scope.results = [];
+		$scope.selected = null;
+		
+		$scope.dismiss = function(){
+			$modalInstance.dismiss();
+		};
+		$scope.reset = function(){
+			$scope.filter.query = '';
+			$scope.results = [];
+		}
+		$scope.save = function(){
+			$http.post('/api/movies',{'imdb':$scope.selected}).success(function(json){
+				$modalInstance.close();
+				$scope.$emit('MoviesRefresh', true);
+			});
+		};
+		$scope.search = function(){
+			$scope.loading = true;
+			$scope.results = null;
+			
+			$http.post('/api/movies/search', {'q':$scope.filter.query}).success(function(results){
+				$scope.loading = false;
+				$scope.results = results
+			}).error(function(error){
+				$scope.loading = false;
+				$log.error(error);
+			});
+		};
+		$scope.select = function(imdb){
+			$scope.selected = imdb;
+		};
 	});
 	
-	/****** Controller ******/
+	nessa.controller('MovieDetailController', function($http,$log,$modalInstance,$scope,$stateParams){
+		$scope.movie = {};
+		$http.get('/api/movies/'+$stateParams.imdb).success(function(movie){
+			$scope.movie = movie;
+		});
+		$scope.close = function(){
+			$modalInstance.dismiss();
+		};
+		$scope.download = function(object){
+			$scope.movie.downloading = object.quality;
+			$http.post('/api/movies/'+$scope.movie.imdb+'/download', object).success(function(success){
+				$modalInstance.close()
+			})
+		};
+		$scope.hashes = function(){
+			$http.get('/api/movies/'+$scope.movie.imdb+'/hashes').success(function(success){
+				$scope.movie.hashes = success;
+			});
+		};
+	})
 	
+	
+		
 	nessa.controller('MoviesMatchingController', function($http,$log,$modal,$scope){
 		$scope.paginate = {
 			items: 1,
@@ -134,69 +246,6 @@ define(['app'], function(nessa){
 			$scope.$emit('MatchSelected', $scope.match);
 		};
 	})
-	
-	nessa.controller('MovieListCtrl', function($log,$http,$scope){
-		$scope.settings	= {};
-		$scope.movies	= [];
-		$scope.page 	= 1;
-		
-		$scope.filter	= {
-			active: false,
-			downloaded: true,
-			genre: '',
-			magnets: false,
-			quality: '',
-			title: ''
-		};
-		$scope.paginate = {
-			items: 24,
-			page: 1
-		};
-		
-		$scope.$watch('filter', function(){
-			if ($scope.filter.title != '') $scope.paginate.page = 1;
-		},true);
-
-		$http.get('/api/system/settings').success(function(json,status){
-			$scope.settings = json.media;
-		});
-		
-		$scope.filterList = function(item){
-			if (!item.title.toLowerCase().match($scope.filter.title.toLowerCase())) return false;
-			if ($scope.filter.active){
-				if ($scope.filter.genre && item.genres.indexOf($scope.filter.genre) == -1) return false;
-				if ($scope.filter.quality && item.quality != $scope.filter.quality) return false;
-				if ($scope.filter.magnets && (!item.hashes || item.hashes.length == 0)) return false;
-			}
-			if ($scope.filter.downloaded && !item.file) return false;
-			return true;
-		};
-		
-		$scope.clearFilter = function(){
-			$scope.filter.title = '';
-			$(document).trigger('lazyload');
-		};
-		$scope.definiteArticle = function(movie){
-			var title = movie.title.split(':')[0].replace(/^The\s/i, '').replace(/\W/, '');
-			return [title, movie.year];
-		};
-		
-		
-		$scope.load = function(){
-			$http.get('/api/movies').success(function(json, status){
-				if (status == 200 && json) {
-					$scope.movies = json;
-					$(document).trigger('lazyload');
-				}
-			}).error(function(json, status){
-				$log.error(json, status);
-			});
-		};
-		$scope.load();
-		$scope.$on('MoviesRefresh', function(){
-			$scope.load();
-		});
-	});
 	
 	
 	
@@ -244,36 +293,6 @@ define(['app'], function(nessa){
 	
 	nessa.controller('MovieMatchCtrl', function($http,$log,$scope){
 		
-	});
-	
-	nessa.controller('MovieSearchCtrl', function($http,$log,$modalInstance,$scope){
-		$scope.filter = {
-			query: ''
-		};
-		$scope.results = [];
-		$scope.selected = null;
-		
-		$scope.close = function(){
-			$modalInstance.dismiss();
-		};
-		$scope.reset = function(){
-			$scope.filter.query = '';
-			$scope.results = [];
-		}
-		$scope.save = function(){
-			$http.post('/api/movies', {imdb: $scope.selected}).success(function(json){
-				$modalInstance.close();
-				$scope.$emit('MoviesRefresh', true);
-			});
-		};
-		$scope.search = function(){
-			$http.post('/api/movies/search', {q: $scope.filter.query}).success(function(json){
-				$scope.results = json
-			});
-		};
-		$scope.select = function(imdb){
-			$scope.selected = imdb;
-		};
 	});
 	
 	return nessa;
