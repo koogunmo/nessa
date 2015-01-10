@@ -252,27 +252,6 @@ define(['app'], function(nessa){
 	
 	
 	
-	nessa.controller('MovieDetailCtrl', function($http,$log,$modalInstance,$scope,$stateParams){
-		$scope.movie = null
-		$http.get('/api/movies/'+$stateParams.imdb).success(function(success){
-			$scope.movie = success;
-		});
-		$scope.close = function(){
-			$modalInstance.dismiss();
-		};
-		$scope.download = function(object){
-			$scope.movie.downloading = object.quality;
-			$http.post('/api/movies/'+$scope.movie.imdb+'/download', object).success(function(success){
-				$modalInstance.close()
-			})
-		};
-		$scope.hashes = function(){
-			$http.get('/api/movies/'+$scope.movie.imdb+'/hashes').success(function(success){
-				$scope.movie.hashes = success;
-			});
-		};
-	});
-	
 	nessa.controller('MovieUnmatchedCtrl', function($http, $log, $modalInstance, $scope){
 		window.modal = $modalInstance;
 		

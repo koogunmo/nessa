@@ -3,7 +3,7 @@ define(['app'], function(nessa){
 	nessa.config(function($stateProvider){
 		$stateProvider.state('dashboard', {
 			url: '/dashboard',
-			controller: 'dashboardCtrl',
+			controller: 'DashboardController',
 			templateUrl: 'views/dashboard/index.html',
 			data: {
 				secure: true,
@@ -24,7 +24,7 @@ define(['app'], function(nessa){
 	
 	/****** Controller ******/
 	
-	nessa.controller('dashboardCtrl', function($http,$interval,$log,$scope){
+	nessa.controller('DashboardController', function($http,$interval,$log,$scope){
 		
 		$scope.latest = [];
 		$scope.notifications = false;
@@ -112,9 +112,9 @@ define(['app'], function(nessa){
 		}
 	})
 	
-	nessa.controller('DashboardMovieCtrl', function($http,$log,$scope){
+	nessa.controller('DashboardMovieController', function($http,$log,$scope){
 		$scope.download = function(object){
-			$http.post('/api/movies/'+$scope.movie.tmdb+'/download', object).success(function(success){
+			$http.post('/api/movies/'+$scope.movie.imdb+'/download', object).success(function(success){
 				$scope.movie.downloading = object.quality;
 			})
 		};

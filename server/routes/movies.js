@@ -81,7 +81,6 @@ module.exports = function(app,db,socket){
 		res.status(202).end();
 	})
 	
-	
 	app.get('/api/movies/:imdb(tt[0-9]+)', function(req,res){
 		movies.get(req.user, req.params.imdb).then(function(result){
 			res.send(result);
@@ -100,7 +99,7 @@ module.exports = function(app,db,socket){
 		// Download torrent
 		movies.download(req.user, req.params.imdb, req.body).then(function(movie){
 			var message = movie.title+' ('+movie.year+')';
-			socket.emit('alert', {'title':'Download added','icon':'/media/'+nconf.get('media:movies:directory')+'/.artwork/'+movie.imdb+'.jpg','message':message});
+			socket.emit('alert', {'title':'Download added','icon':'/media/'+nconf.get('media:movies:directory')+'/.artwork/'+movie.imdb+'/poster.jpg','message':message});
 		})
 		res.status(201).end();
 		

@@ -7,28 +7,28 @@
 <div class="modal-body">
 	<tabset type="pills">
 		<tab heading="Overview">
-			<div class="synopsis well">
+			<div class="synopsis well" ng-if="movie.synopsis">
 				{{::movie.synopsis}}
 			</div>
 			<div class="row small">
-				<div class="col-sm-6">
+				<div class="col-sm-6" ng-if="movie.added">
 					<div class="col-xs-4"><strong>Added</strong></div>
 					<div class="col-xs-8">{{::movie.added|date:'longDate'}}</div>
 				</div>
-				<div class="col-sm-6">
+				<div class="col-sm-6" ng-if="movie.runtime">
 					<div class="col-xs-4"><strong>Runtime</strong></div>
 					<div class="col-xs-8">{{::movie.runtime}} mins</div>
 				</div>
 				
-				<div class="col-sm-6">
+				<div class="col-sm-6" ng-if-"movie.quality">
 					<div class="col-xs-4"><strong>Quality</strong></div>
 					<div class="col-xs-8">{{::movie.quality}}</div>
 				</div>
-				<div class="col-sm-6">
+				<div class="col-sm-6" ng-if="movie.size">
 					<div class="col-xs-4"><strong>Size</strong></div>
 					<div class="col-xs-8">{{::movie.size|formatBytes}}</div>
 				</div>
-				<div class="col-sm-12">
+				<div class="col-sm-12" ng-if="movie.genres">
 					<div class="col-sm-2"><strong>Genres</strong></div>
 					<div class="col-sm-10">{{::movie.genres.join(', ')}}</div>
 				</div>
