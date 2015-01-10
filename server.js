@@ -113,7 +113,7 @@ try {
 				app.use('/media', require('express').static(nconf.get('media:base')));
 			}
 			
-			require('./server/routes/auth')(app,db);
+			require('./server/routes/auth')(app,db,io);
 			require('./server/routes/dashboard')(app,db,io);
 			require('./server/routes/default')(app,db,io);
 			require('./server/routes/downloads')(app,db,io);
