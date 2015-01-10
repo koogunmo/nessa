@@ -192,14 +192,17 @@ define(['app'], function(nessa){
 		$http.get('/api/movies/'+$stateParams.imdb).success(function(movie){
 			$scope.movie = movie;
 		});
+		
+		$scope.artwork = function(){
+			$http.post('/api/movies/'+$scope.movie.imdb+'/artwork');
+		};
+		
 		$scope.close = function(){
 			$modalInstance.dismiss();
 		};
 		$scope.download = function(object){
 			$scope.movie.downloading = object.quality;
-			$http.post('/api/movies/'+$scope.movie.imdb+'/download', object).success(function(success){
-				$modalInstance.close()
-			})
+			$http.post('/api/movies/'+$scope.movie.imdb+'/download', object)
 		};
 		$scope.hashes = function(){
 			$http.get('/api/movies/'+$scope.movie.imdb+'/hashes').success(function(success){

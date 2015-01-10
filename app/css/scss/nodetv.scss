@@ -420,7 +420,7 @@ input {
 		}
 		&.lazyLoaded {
 			.modal-title {
-				color: #FFFFFF;
+				display: none;
 			}
 		}
 	}
