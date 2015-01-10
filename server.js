@@ -2,71 +2,43 @@
 
 /* Enable New Relic Monitoring, if available */
 try{require('newrelic')} catch(e){}
-
-/***********************************************************************/
+/******************************************************************************/
 /* Set up logging to run according to the environment */
 if (!process.env.NODE_ENV) process.env.NODE_ENV = 'production';
 
 var log4js = require('log4js')
-log4js.configure({
-	appenders: [{
-		type: 'console',
-	}],
-	replaceConsole: true
-});
+log4js.configure({'appenders':[{'type': 'console'}],'replaceConsole':true});
 var logger = log4js.getLogger('nodetv-server');
-//logger.setLevel((process.env.NODE_ENV == 'production') ? 'WARN' : 'ALL');
-
-/***********************************************************************/
-
+//logger.setLevel((process.env.NODE_ENV=='production')?'WARN':'ALL');
+/******************************************************************************/
 try {
 	/* Global Configuration */
-	global.pkg = require('./package.json');
-	global.plugin = function(name){
-		try {
-			return require(__dirname + '/server/libs/' + name);
-		} catch(e) {
-			logger.error(e.message);
-		}
-		return false;
-	};
+	global.pkg		= require('./package.json');
 	global.helper	= require('./server/core/helper');
 	
 	/* Load Settings */
 	global.nconf = require('nconf');
 	global.nconf.file({
-		file: __dirname + '/settings.json'
+		'file': __dirname + '/settings.json'
 	}).defaults({
-		installed: false,
-		listen: {
-			address: '0.0.0.0',
-			port: 6377,
-		},
-		run: {
-			user: 'media',
-			group: 'media'
-		},
-		system: {
-			updates: {
-				enabled: true,
-				branch: 'master'
-			},
-			dyndns: false,
-			upnp: false
+		'installed': false,
+		'listen': {'address':'0.0.0.0','port':6377},
+		'run': {'user':'media','group':'media'},
+		'system': {
+			'updates':{'enabled':true,'branch':'master'},
+			'dyndns': false,
+			'upnp': false
 		}
 	});
 	/* Set a friendly process name */
 	if (process.title) process.title = 'NodeTV';
-	if (process.cwd() != __dirname) {
-		process.chdir(__dirname);
-	}
+	if (process.cwd() != __dirname) process.chdir(__dirname);
 } catch(e){
 	logger.warn(e.message);
 }
-
-/***********************************************************************/
+/******************************************************************************/
 logger.info(process.title + ' v'+pkg.version);
-/***********************************************************************/
+/******************************************************************************/
 /* Create server */
 
 var app		= require('express')(),
@@ -76,7 +48,7 @@ var app		= require('express')(),
 
 server.listen(port);
 
-server.on('listening', function(){
+server.on('listening',function(){
 	logger.info('Listening on port '+ server.address().port);
 });
 	
@@ -91,20 +63,17 @@ if (process.getuid) {
 	}
 }
 
-/***********************************************************************/
+/******************************************************************************/
 /* Set up Express */
-
-app.enable('trust proxy');
 app.use(require('compression')());
 app.use(require('cookie-parser')());
 app.use(require('body-parser').json());
-app.use(require('body-parser').urlencoded({extended: true}));
+app.use(require('body-parser').urlencoded({'extended':true}));
 
 app.enable('trust proxy');
 app.disable('view cache');
 app.disable('x-powered-by');
-
-/***********************************************************************/
+/******************************************************************************/
 
 // Move this to somewhere sensible...
 if (!nconf.get('listen:nginx')){
