@@ -2,11 +2,13 @@ define('app', ['angular','moment','ngAnimate','ngMessages','ngResource','ngSocke
 	
 	var nessa = angular.module('nessa', ['ngAnimate','ngMessages','ngResource','ngSocketIO','ngStorage','ngTouch','ui.bootstrap','ui.router']);
 
-	nessa.config(function($compileProvider,$tooltipProvider,$urlRouterProvider){
+	nessa.config(function($compileProvider,$logProvider,$tooltipProvider,$urlRouterProvider){
+		var debug = (window.location.hostname == 'localhost') ? true : false;
 		$urlRouterProvider.when('/', function($state){
 			$state.transitionTo('dashboard');
 		});
-		$compileProvider.debugInfoEnabled(false);
+		$logProvider.debugEnabled(debug);
+		$compileProvider.debugInfoEnabled(debug);
 		$tooltipProvider.options({'appendToBody':true})
 	})
 	

@@ -1,14 +1,18 @@
 <table class="table table-stripe table-hover">
 	<thead>
 		<tr>
-			<th class="col-sm-3">Username</th>
-			<th class="col-sm-8">&nbsp;</th>
+			<th class="col-sm-1">&nbsp;</th>
+			<th class="col-sm-2">Username</th>
+			<th class="col-sm-2">Real Name</th>
+			<th class="col-sm-6">&nbsp;</th>
 			<th class="col-sm-1">&nbsp;</th>
 		</tr>
 	</thead>
 	<tbody>
 		<tr ng-repeat="user in users" ui-sref="settings.user.edit({id:user.username})">
+			<td><img ng-src="{{user.avatar}}" ng-if="user.avatar" /></td>
 			<td>{{user.username}}</td>
+			<td>{{user.name}}</td>
 			<td>&nbsp;</td>
 			<td align="right">
 				<span class="fa fa-edit"></span>

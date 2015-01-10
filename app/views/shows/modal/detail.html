@@ -1,7 +1,8 @@
 <form name="showForm" ng-submit="save()">
-	<div class="modal-header">
-		<img src="/assets/gfx/no-banner.png" ng-src="/media/{{::settings.media.shows.directory}}/{{::show.directory}}/banner.jpg" alt="{{::show.name}}" class="img-responsive" />
+	<div class="modal-header" lazy-load>
 		
+		<img src="/assets/gfx/no-banner.png" class="img-responsive placeholder" />
+		<img lazy-src="/media/{{::settings.media.shows.directory}}/{{::show.directory}}/banner.jpg" alt="{{::show.name}}" class="img-responsive banner" />
 		
 	</div>
 	<div class="modal-body">
