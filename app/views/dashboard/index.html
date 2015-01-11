@@ -102,11 +102,11 @@
 		
 		<tab heading="Queue" ng-if="pending.length">
 			<div class="row">
-				<div class="col-md-6" ng-repeat="movie in pending" ng-if="!movie.downloading" ng-controller="DashboardMovieController">
-					<div class="panel panel-default"><!-- ng-class="{'panel-warning': movie.file, 'panel-danger': movie.hashes && !movie.file}"-->
+				<div class="col-md-6" ng-repeat="movie in pending|orderBy:'updated':true" ng-if="!movie.downloading" ng-controller="DashboardMovieController">
+					<div class="panel panel-default">
 						<div class="panel-heading">
 							<h4 class="panel-title">
-								{{movie.title}} <span class="badge">{{movie.year}}</span>
+								{{::movie.title}} <span class="badge">{{::movie.year}}</span>
 							</h4>
 						</div>
 						<div class="panel-body">
@@ -115,7 +115,7 @@
 									<span class="fa fa-cloud-download"></span> Downloading {{movie.downloading}}
 								</button>
 								<button class="btn btn-default" tooltip="{{dl.size|formatBytes}}" ng-repeat="dl in movie.hashes|orderBy:'size'" ng-disabled="dl.quality==movie.quality" ng-click="download(dl)">
-									<span class="fa fa-cloud-download"></span> {{dl.quality}}
+									<span class="fa fa-cloud-download"></span> {{::dl.quality}}
 								</button>
 							</div>
 							
