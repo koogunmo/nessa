@@ -87,13 +87,18 @@ module.exports = function(app,db,socket){
 		}, function(error){
 			res.status(404).end();
 		});
+	}).post('/api/movies/:imdb(tt[0-9]+)', function(req,res){
+		// Is there anything that needs saving?
+	}).delete('/api/movies/:imdb(tt[0-9]+)', function(req,res){
+		movies.remove(req.user, req.params.imdb).then(function(){
+			res.status(204).end();
+		});
 	});
 	
 	app.post('/api/movies/:imdb(tt[0-9]+)/artwork', function(req,res){
 		// Download torrent
 		movies.getArtwork(req.params.imdb, req.body);
 		res.status(201).end();
-		
 	
 	}).post('/api/movies/:imdb(tt[0-9]+)/download', function(req,res){
 		// Download torrent

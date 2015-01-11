@@ -77,12 +77,12 @@ define(['app'], function(nessa){
 	
 	nessa.controller('MoviesController', function($http,$log,$modal,$scope){
 		$scope.filter	= {
-			active: false,
-			downloaded: true,
-			genre: '',
-			magnets: false,
-			quality: '',
-			title: ''
+			'active': false,
+			'downloaded': false,
+			'genre': '',
+			'magnets': false,
+			'quality': '',
+			'title': ''
 		};
 		$scope.movies = [];
 		$scope.paginate = {
@@ -167,7 +167,7 @@ define(['app'], function(nessa){
 		$scope.save = function(){
 			$http.post('/api/movies',{'imdb':$scope.selected}).success(function(json){
 				$modalInstance.close();
-				$scope.$emit('MoviesRefresh', true);
+				$scope.$emit('MoviesRefresh');
 			});
 		};
 		$scope.search = function(){
@@ -196,7 +196,6 @@ define(['app'], function(nessa){
 		$scope.artwork = function(){
 			$http.post('/api/movies/'+$scope.movie.imdb+'/artwork');
 		};
-		
 		$scope.close = function(){
 			$modalInstance.dismiss();
 		};
@@ -208,6 +207,14 @@ define(['app'], function(nessa){
 			$http.get('/api/movies/'+$scope.movie.imdb+'/hashes').success(function(success){
 				$scope.movie.hashes = success;
 			});
+		};
+		$scope.remove = function(){
+			if (confirm('Are you sure you want to remove this movie?')){
+				$http.delete('/api/movies/'+$scope.movie.imdb).success(function(){
+					$modalInstance.dismiss();
+					$scope.$emit('MoviesRefresh');
+				});
+			}
 		};
 	})
 	
