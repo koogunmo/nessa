@@ -21,17 +21,15 @@ module.exports = function(app,db,socket){
 			logger.debug('Checking downloads...');
 			torrent.getComplete(function(error, transfers){
 				transfers.forEach(function(transfer){
-				//	logger.debug(transfer.title);
-					
 					if (movies.complete){
 						movies.complete(transfer).then(function(data){
-						//	if (data.trash) torrent.remove(transfer.id,true);
+							if (data.trash) torrent.remove(transfer.id,true);
 							socket.emit('alert', {'title':'Movie downloaded','message':data.movie.title});
 						});
 					}
 					if (shows.complete){
 						shows.complete(transfer).then(function(data){
-						//	if (data.trash) torrent.remove(transfer.id,true);
+							if (data.trash) torrent.remove(transfer.id,true);
 							socket.emit('alert', {'title':'Episode downloaded','message':data.show.name});
 						});
 					}
