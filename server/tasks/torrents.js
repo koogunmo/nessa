@@ -26,13 +26,15 @@ module.exports = function(app,db,socket){
 							if (data.trash) torrent.remove(transfer.id,true);
 							socket.emit('alert', {'title':'Movie downloaded','message':data.movie.title});
 						}, function(error){
-							logger.error(error);
+							if (error) logger.error(error);
 						});
 					}
 					if (shows.complete){
 						shows.complete(transfer).then(function(data){
 							if (data.trash) torrent.remove(transfer.id,true);
 							socket.emit('alert', {'title':'Episode downloaded','message':data.show.name});
+						}, function(error){
+							if (error) logger.error(error);
 						});
 					}
 				});
