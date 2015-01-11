@@ -1,0 +1,23 @@
+<div class="modal-header">
+	<form ng-submit="search()">
+		<span class="input-group">
+			<input type="text" class="form-control search" autofocus="true" placeholder="Type to search" ng-model="filter.query" />
+			<span class="input-group-addon btn btn-success" ng-click="search()"><span class="fa fa-search"></span></span>
+			<span class="input-group-addon btn btn-danger" ng-click="reset()"><span class="fa fa-times"></span></span>
+		</span>
+	</form>
+</div>
+<div class="modal-body" ng-show="loading || results.length">
+	<div class="loading" ng-class="{'active': loading}"></div>
+	<div class="results" ng-show="results">
+		<div class="result" ng-repeat="result in results" ng-class="{selected: selected==result.show.ids.imdb}" ng-click="select(result.show.ids.imdb)">
+			<img ng-src="{{result.show.images.poster.thumb}}" />
+			<strong>{{::result.show.title}}</strong>
+			<p class="synopsis">{{::result.show.overview || 'No synopsis available'}}</p>
+		</div>
+	</div>
+</div>
+<div class="modal-footer">
+	<button type="button" class="btn btn-success" ng-show="selected" ng-click="save()">Add Show</button>
+	<button type="button" class="btn btn-default" ng-click="dismiss()">Close</button>
+</div>

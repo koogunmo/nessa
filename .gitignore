@@ -10,11 +10,15 @@ lib-cov
 
 .sass-cache
 newrelic.js
-node_modules
+proxy.pac
+node_modules/*
+!node_modules/nodetv-*
 
-docs/*.txt
-docs/*.md
+app/components/*
+
 settings.json
 
 test_data/*
-test.*
+
+*.service
+*.copy.*

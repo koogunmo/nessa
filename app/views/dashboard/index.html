@@ -1,0 +1,168 @@
+<div>
+	
+	<div class="alert alert-warning hidden-xs" ng-if="!notifications">
+		<a href="#" ng-click="enableAlerts()" class="alert-link">Enable desktop notifications</a>
+	</div>
+	
+	<tabset type="pills">
+		<tab heading="Shows">
+			<div class="alert alert-warning" ng-if="unmatched.shows!=0">
+				There <ng-pluralize count="unmatched.shows" when="{'1':'is','other':'are'}"></ng-pluralize>
+				<a ui-sref="shows.match" class="alert-link">{{unmatched.shows}} unmatched <ng-pluralize count="unmatched.shows" when="{'1':'show','other':'shows'}"></ng-pluralize></a>
+				that <ng-pluralize count="unmatched.shows" when="{'1':'needs','other':'need'}"></ng-pluralize> updating.
+			</div>
+			<div class="row">
+				<div class="col-sm-6">
+					<div class="page-header">
+						<h3>Past 7 days</h3>
+					</div>
+					<div ng-if="episodes.length>=1">
+						<div class="panel" ng-class="{'panel-success': item.episode.watched, 'panel-warning': !item.episode.watched}" ng-repeat="item in episodes | orderBy:['episode.airdate','episode.added','show.name','episode.episode']:true" ng-controller="DashboardEpisodeController">
+							<div class="panel-heading" ng-click="toggle()">
+								<span class="small pull-right">{{::item.episode.added|date:'EEE d MMM, h:mma'}}</span>
+								<h4 class="panel-title">
+									<a ui-sref="shows.index.detail({imdb:item.show.imdb,url:item.show.url})">{{::item.show.name}}</a>
+									<span class="small">{{::item.episode.title}}</span>
+								</h4>
+							</div>
+							<div class="panel-body" collapse="collapsed">
+								<!--div ng-include="'/views/dashboard/partial/episode.html'"></div-->
+								<div><strong>Season {{::item.episode.season}}, Episode {{::item.episode.episode}}</strong> <span class="small">{{::item.episode.airdate|date:'mediumDate'}}</span></div>
+								<p>{{::item.episode.synopsis}}</p>
+								<div class="text-right">
+									<button type="button" class="btn btn-default" tooltip="Episode watched" tooltip-placement="left" ng-if="item.episode.watched" ng-click="watched()">
+										<span class="fa fa-eye"></span>
+									</button>
+									<button type="button" class="btn btn-default" tooltip="Mark episode as watched" tooltip-placement="left" ng-if="!item.episode.watched" ng-click="watched()">
+										<span class="fa fa-eye-slash"></span>
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div ng-if="episodes.length==0">
+						No recent episodes
+					</div>
+				</div>
+				
+				<div class="col-sm-6">
+					<div class="page-header">
+						<h3>Next 7 days</h3>
+					</div>
+					<div ng-if="upcoming.length>=1">
+						<div ng-repeat="item in upcoming|orderBy:['airdate','episode.episode']" ng-controller="DashboardEpisodeController">
+							<div class="panel panel-info">
+								<div class="panel-heading" ng-click="toggle()">
+									<span class="small pull-right">{{::item.airdate|date:'EEE d MMM, h:mma'}}</span>
+									<h4 class="panel-title">
+										<a ui-sref="shows.index.detail({imdb:item.show.imdb,url:item.show.url})">{{::item.show.name}}</a>
+										<span class="small">{{::item.episode.title}}</span>
+									</h4>
+								</div>
+								<div class="panel-body" collapse="collapsed">
+									<div>
+										<strong>Season {{::item.episode.season}}, Episode {{::item.episode.episode}}</strong>
+									</div>
+									<p>{{::item.episode.synopsis}}</p>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div ng-if="upcoming.length==0">
+						No upcoming episodes
+					</div>
+				</div>
+			</div>
+		</tab>
+		
+		<tab heading="Movies" ng-if="movies.length">
+			<div class="alert alert-warning" ng-if="unmatched.movies!=0">
+				There <ng-pluralize count="unmatched.movies" when="{'1':'is','other':'are'}"></ng-pluralize>
+				<a ui-sref="movies.match" class="alert-link">{{unmatched.movies}} unmatched <ng-pluralize count="unmatched.movies" when="{'1':'movie','other':'movies'}"></ng-pluralize></a>
+				that <ng-pluralize count="unmatched.movies" when="{'1':'needs','other':'need'}"></ng-pluralize> updating.
+			</div>
+			<div class="row">
+				<div class="col-sm-12" ng-repeat="movie in movies">
+					<div class="panel panel-success">
+						<div class="panel-heading">
+							<h4 class="panel-title">
+								{{movie.title}} <span class="badge">{{movie.year}}</span>
+								<span class="small pull-right">{{movie.quality}}</span>
+							</h4>
+						</div>
+						<div class="panel-body">
+							<p>{{movie.synopsis}}</p>
+							<div class="small"><strong>Runtime</strong>: {{movie.runtime}} mins</div>
+							<div class="small"><strong>Genres</strong>: {{movie.genres.join(', ')}}</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</tab>
+		
+		<tab heading="Queue" ng-if="pending.length">
+			<div class="row">
+				<div class="col-md-6" ng-repeat="movie in pending" ng-if="!movie.downloading" ng-controller="DashboardMovieController">
+					<div class="panel panel-default"><!-- ng-class="{'panel-warning': movie.file, 'panel-danger': movie.hashes && !movie.file}"-->
+						<div class="panel-heading">
+							<h4 class="panel-title">
+								{{movie.title}} <span class="badge">{{movie.year}}</span>
+							</h4>
+						</div>
+						<div class="panel-body">
+							<div class="btn-group">
+								<button class="btn btn-default" disabled="true" ng-if="movie.downloading">
+									<span class="fa fa-cloud-download"></span> Downloading {{movie.downloading}}
+								</button>
+								<button class="btn btn-default" tooltip="{{dl.size|formatBytes}}" ng-repeat="dl in movie.hashes|orderBy:'size'" ng-disabled="dl.quality==movie.quality" ng-click="download(dl)">
+									<span class="fa fa-cloud-download"></span> {{dl.quality}}
+								</button>
+							</div>
+							
+						</div>
+					</div>
+				</div>
+			</div>
+		</tab>
+		<tab heading="System">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="panel panel-info">
+						<div class="panel-heading">
+							<h4 class="panel-title">Server info</h4>
+						</div>
+						<div class="panel-body">
+							<div>Version: {{stats.version}}</div>
+							<div ng-switch="uptime.days">
+								Uptime: 
+								<span ng-switch-when="1">{{uptime.days}} day</span>
+								<span ng-switch-default>{{uptime.days}} days</span>
+								<span>{{uptime.hour|zeroPad}}:{{uptime.mins|zeroPad}}:{{uptime.secs|zeroPad}}</span>
+							</div>
+							<div>
+								Node.js: {{stats.system.node}} ({{stats.system.arch}})
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-12" ng-if="stats.disks">
+					<div class="panel panel-info">
+						<div class="panel-heading">
+							<h4 class="panel-title">Disk usage</h4>
+						</div>
+						<div class="panel-body">
+							<div ng-repeat="disk in stats.disks">
+								<span class="pull-right">{{disk.size*1024|formatBytes}}</span>
+								<span>{{disk.mount}}</span>
+								<progress animate="false" title="">
+									<bar type="danger" value="disk.capacity*100">{{disk.used*1024|formatBytes}}</bar>
+									<bar type="success" value="100-(disk.capacity*100)">{{disk.available*1024|formatBytes}}</bar>
+								</progress>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</tab>
+	</tabset>
+</div>

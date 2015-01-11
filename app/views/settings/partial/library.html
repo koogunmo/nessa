@@ -1,0 +1,30 @@
+<div class="row">
+	<div class="col-sm-12">
+		<h4>Shows</h4>
+		<div class="form-group">
+			<button type="button" class="btn btn-primary" ng-click="library.shows.resync()">
+				<span class="fa fa-refresh"></span> Resync library from Trakt
+			</button>
+			<button type="button" class="btn btn-info" ng-click="library.shows.rescan()">
+				<span class="fa fa-wrench"></span> Rescan local files
+			</button>
+			<button type="button" class="btn btn-warning" ng-click="library.shows.listings()">
+				<span class="fa fa-list"></span> Update listings
+			</button>
+		</div>
+	</div>
+	<div class="col-sm-12">
+		<h4>Movies</h4>
+		<div class="form-group">
+			<button type="button" class="btn btn-primary" ng-click="library.movies.resync()">
+				<span class="fa fa-refresh"></span> Resync library from Trakt
+			</button>
+			<button type="button" class="btn btn-info" ng-click="library.movies.rescan()">
+				<span class="fa fa-wrench"></span> Rescan local files
+			</button>
+			<button type="button" class="btn btn-warning" ng-click="library.movies.genres()">
+				<span class="fa fa-list"></span> Update genres
+			</button>
+		</div>
+	</div>
+</div>

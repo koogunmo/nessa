@@ -1,0 +1,21 @@
+	<div class="checkbox">
+		<label>
+			<input type="checkbox" id="ipt_twilio_enabled" ng-model="settings.twilio.enabled" />
+			<strong>Enable SMS Notifications</strong>
+		</label>
+	</div>
+	<div ng-switch on="settings.twilio.enabled">
+		<div class="alert alert-warning" ng-switch-when="false"><strong>Note</strong>: SMS integration is not yet functional</div>
+		<div class="form-group" ng-switch-when="true">
+			<label for="ipt_twilio_phone">Phone</label>
+			<input type="text" id="ipt_twilio_phone" ng-model="settings.twilio.phone" />
+		</div>
+		<div class="form-group" ng-switch-when="true">
+			<label for="ipt_twilio_sid">SID</label>
+			<input type="text" id="ipt_twilio_sid" class="form-control" required="true" ng-model="settings.twilio.sid" />
+		</div>
+		<div class="form-group" ng-switch-when="true">
+			<label for="ipt_twilio_token">Token</label>
+			<input type="text" id="ipt_twilio_token" class="form-control" required="true" ng-model="settings.twilio.token" />
+		</div>
+	</div>

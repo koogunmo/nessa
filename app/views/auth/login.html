@@ -1,0 +1,15 @@
+<div id="login">
+	<form name="formLogin" class="form-signin" autocomplete="off" ng-submit="login()">
+		<div class="form-group">
+			<input type="text" id="ipt_password" name="username" ng-model="user.username" class="form-control" placeholder="Username" required="true" autocapitalize="off" autocorrect="off" autofocus="true" />
+			<input type="password" id="ipt_password" name="password" ng-model="user.password" class="form-control" placeholder="Password" required="true" />
+			<input type="text" id="ipt_googleauth" name="password" ng-model="user.googleauth" class="form-control" placeholder="Google Authenticator code" maxlength="6" ng-if="mfa" />
+		</div>
+		<div class="checkbox">
+			<label>
+				<input type="checkbox" name="remember" class="checkbox" ng-model="user.remember"> Remember me on this device
+			</label>
+		</div>
+		<button type="submit" class="btn btn-lg btn-primary btn-block" ng-disabled="formLogin.$invalid">Sign in</button>
+	</form>
+</div>

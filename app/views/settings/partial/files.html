@@ -1,0 +1,34 @@
+<div class="form-group">
+	<label for="ipt_media_base">Media Directory</label><input type="text" id="ipt_media_base" class="form-control" required="true" ng-model="settings.media.base" />
+</div>
+<hr />
+
+<div class="form-group">
+	<label for="ipt_shows_base">Show Subdirectory</label>
+	<div class="input-group">
+		<span class="input-group-addon">{{settings.media.base}}</span>
+		<input type="text" id="ipt_shows_base" class="form-control" required="true" ng-model="settings.media.shows.directory" />
+	</div>
+</div>
+<div class="checkbox">
+	<label><input type="checkbox" ng-model="settings.media.shows.autoclean" /> Automatically delete episode torrents on complete</label>
+</div>
+<div class="checkbox">
+	<label>
+		<input type="checkbox" id="ipt_media_hd" ng-model="settings.media.shows.hd" />
+		Prefer HD Video<br /><span class="small">Note: Xbox 360 does not support .mkv files</span>
+	</label>
+</div>
+
+<hr />
+
+<div class="form-group">
+	<label for="ipt_movies_base">Movie Subdirectory</label>
+	<div class="input-group">
+		<span class="input-group-addon">{{settings.media.base}}</span>
+		<input type="text" id="ipt_movies_base" class="form-control" required="true" ng-model="settings.media.movies.directory" />
+	</div>
+</div>
+<div class="checkbox">
+	<label><input type="checkbox" ng-model="settings.media.movies.autoclean" /> Automatically delete movie torrents on complete</label>
+</div>

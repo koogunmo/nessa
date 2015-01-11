@@ -1,5 +1,7 @@
-# NodeTV
+# NodeTV 
 Automated TV Torrenting acquisition
+
+[ ![Codeship Status for greebowarrior/nessa](https://codeship.io/projects/dc9bec00-3cd7-0132-2ca6-12c33aebd1cb/status)](https://codeship.io/projects/43087)
 
 ## Project Goal
 
@@ -16,10 +18,10 @@ I tried [SickBeard](http://sickbeard.com/), but it wouldn't easily let me arrang
 	- Windows users: You're on your own for now
 		- Please see the note at the bottom of this document
 - [Node.js](http://nodejs.org) 0.10.x
-- [MongoDB](http://mongodb.org) 2.4.x
+- [MongoDB](http://mongodb.org) 2.6.x
 - [Transmission](http://transmissionbt.com) with RPC Enabled
 - A free [Trakt](http://trakt.tv) account
-
+	- Personally, I recommend getting the VIP account, it's only $15 a year, and hides all the ads
 
 ## Optional Third-party software
 NodeTV doesn't handle uPNP/DLNA (yet), so if you want to stream your content, you'll need a MediaServer. I've used the following, with various degrees of success
@@ -27,15 +29,14 @@ NodeTV doesn't handle uPNP/DLNA (yet), so if you want to stream your content, yo
 
 [ReadyMedia](minidlna.sourceforge.net) - ** Recommended **  
 A simple uPNP/DLNA compatible MediaServer (Open Source)  
-[Twonky 7](http://twonky.com/downloads)  
-Commercial uPNP/DLNA server with companion app for mobile devices
   
-These work reasonably well with VLC and my XBOX 360. Your mileage may vary.
+This has been tested on VLC for iOS, Xbox 360, and a Samsung HT-F4550 Blu-ray player. 
 
 
 ## Browser Support
 
-NodeTV works in all current browsers. IE 8.0 and earlier are not supported.
+NodeTV works in all current browsers.
+**Note** Internet Explorer 8.0 and earlier is not supported.
 
 
 ## Installing
@@ -144,7 +145,7 @@ NodeTV utilises the following third-party data sources:
 
 ## Licence
 
-This software is distributed under a Modified BSD License. Please see LICENCE.txt for full details
+This software is distributed under a Modified BSD License. Please see the [LICENCE](docs/LICENCE.md).
 
 
 

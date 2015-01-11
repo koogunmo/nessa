@@ -1,0 +1,25 @@
+<table class="table table-stripe table-hover">
+	<thead>
+		<tr>
+			<th class="col-sm-1">&nbsp;</th>
+			<th class="col-sm-2">Username</th>
+			<th class="col-sm-2">Real Name</th>
+			<th class="col-sm-6">&nbsp;</th>
+			<th class="col-sm-1">&nbsp;</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="user in users" ui-sref="settings.user.edit({id:user.username})">
+			<td class="text-center"><img class="avatar avatar-xs" ng-src="{{user.avatar}}" ng-if="user.avatar" /></td>
+			<td>{{user.username}}</td>
+			<td>{{user.name}}</td>
+			<td>&nbsp;</td>
+			<td align="right">
+				<span class="fa fa-edit"></span>
+			</td>
+		</tr>
+	</tbody>
+</table>
+<button type="button" class="btn btn-success" ui-sref="settings.user.add">
+	<span class="fa fa-plus"></span> Add User
+</button>

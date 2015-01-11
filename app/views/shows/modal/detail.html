@@ -1,0 +1,113 @@
+<form name="showForm" ng-submit="save()">
+	<div class="modal-header" lazy-load>
+		
+		<img src="/assets/gfx/no-banner.png" class="img-responsive placeholder" />
+		<img ng-if="show.directory" lazy-src="/media/{{settings.media.shows.directory}}/{{show.directory}}/banner.jpg" class="img-responsive banner" />
+		
+	</div>
+	<div class="modal-body">
+		<tabset type="pills">
+			<tab heading="Overview">
+				<div class="synopsis well">
+					{{::show.synopsis}}
+				</div>
+				<div ng-if="show.progress && show.progress.percentage">
+					<hr />
+					<p>Watched {{::show.progress.completed}} of {{::show.progress.aired}} episodes</p>
+					<progress animate="false">
+						<bar type="success" value="::show.progress.percentage">
+							<span ng-hide="show.progress.percentage<=5">{{::show.progress.percentage}}%</span>
+						</bar>
+						<bar type="danger" value="100-show.progress.percentage"></bar>
+					</progress>
+				</div>
+			</tab>
+			
+			<tab heading="Episodes" ng-if="show.episodes">
+				<div class="form-group">
+					<select class="form-control" ng-model="season" ng-options="item.label for item in show.episodes"></select>
+				</div>
+				<div ng-controller="ShowSeasonController">
+					<!--
+					<div>
+						<progress style="height:5px;">
+							<bar type="success" value="season.progress.percentage"></bar>
+							<bar type="danger" value="100-season.progress.percentage"></bar>
+						</progress>
+					</div>
+					<div class="text-right">
+						<span class="btn-sm pull-left">You have watched {{season.progress.completed || 0}} of {{season.progress.aired || 0}} episodes for this season</span>
+						<button type="button" class="btn btn-sm btn-default" tooltip="Mark season as watched" tooltip-placement="left" ng-if="season.progress.percentage<100" ng-click="watched()">
+							<span class="fa fa-eye-slash"></span>
+						</button>
+						<button type="button" class="btn btn-sm btn-default" disabled="true" tooltip="Season watched" tooltip-placement="left" ng-if="season.progress.percentage==100">
+							<span class="fa fa-eye"></span>
+						</button>
+					</div>
+					<br />
+					-->
+					<accordion ng-if="season">
+						<accordion-group heading="{{::episode.episode|zeroPad}}: {{::episode.title}}" ng-class="{'panel-warning':episode.downloading||episode.file&&!episode.watched,'panel-success':episode.watched}" ng-repeat="episode in season.episodes" ng-hide="episode.episode==0">
+							
+							<div ng-include="'/views/shows/partial/episode.html'" ng-controller="ShowEpisodeController"></div>
+						</accordion-group>
+					</accordion>
+					<div class="text-center" ng-if="!season.episodes.length">
+						No episodes
+					</div>
+				</div>
+			</tab>
+			
+			<tab heading="Settings">
+				<div class="well" ng-switch on="show.status">
+					<div class="form-group">
+						<label for="ipt_format">Filename format</label>
+						<input type="text" id="ipt_format" name="format" class="form-control" placeholder="{{::settings.media.shows.format}}" ng-model="show.format" />
+						<div class="small text-right">
+							<strong>%S</strong>: Season, <strong>%E</strong>: Episode, <strong>%T</strong>: Title, <strong>%X</strong>: File extension
+						</div>
+					</div>
+					<div class="checkbox">
+						<label>
+							<input type="checkbox" name="status" ng-checked="show.status" ng-model="show.status" />
+							Download new episodes when available
+						</label>
+					</div>
+					<div class="checkbox" ng-switch-when="true">
+						<label>
+							<input type="checkbox" name="hd" ng-checked="show.hd" ng-model="show.hd" />
+							Prefer HD video<br /><span class="small">Note: Some devices may not support High-definition .mkv files</span>
+						</label>
+					</div>
+					<div class="form-group" ng-switch-when="true">
+						<label for="ipt_setting_feed">RSS Feed</label>
+						<input type="text" name="feed" class="form-control" ng-model="show.feed" />
+					</div>
+				</div>
+				
+				<div class="buttons form-group">
+					<button type="button" class="btn btn-info" ng-click="downloadAll()">
+						<span class="fa fa-cloud-download"></span>
+						Download all
+					</button>
+					<button type="button" class="btn btn-primary" ng-click="update()">
+						<span class="fa fa-list"></span>
+						Update listings
+					</button>
+					<button type="button" class="btn btn-warning" ng-click="rescan()">
+						<span class="fa fa-refresh"></span>
+						Rescan Files
+					</button>
+					<button type="button" class="btn btn-danger" ng-click="remove()">
+						<span class="fa fa-trash-o"></span>
+						Remove Show
+					</button>
+				</div>
+			</tab>
+		</tabset>
+	</div>
+	<div class="modal-footer">
+		<button type="submit" ng-show="showForm.$dirty" class="btn btn-success">Save</button>
+		<button type="button" class="btn btn-default" ng-click="dismiss()">Close</button>
+	</div>
+</form>

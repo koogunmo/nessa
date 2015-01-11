@@ -1,0 +1,28 @@
+	<p class="well" ng-if="::episode.synopsis">{{::episode.synopsis || 'TBA'}}</p>
+	<div class="row">
+		<div class="col-xs-3 text-left">
+			<!-- Information -->
+			<button type="button" class="btn btn-default" disabled="true" ng-if="episode.file">
+				<span class="fa fa-hdd-o"></span>
+			</button>
+			
+			<a ng-href="http://imdb.com/title/{{episode.imdb}}" target="_blank" class="btn btn-default" tooltip="View on IMDB" tooltip-placement="right" ng-if="episode.imdb">
+				<span class="fa fa-external-link"></span>
+			</a>
+		</div>
+		<div class="col-xs-6 text-center">
+			<div class="btn" ng-if="hasDate()"><span class="fa fa-clock-o"></span> {{::episode.airdate|date:'longDate'}}</div>
+		</div>
+		<div class="col-xs-3 text-right">
+			<!-- User actions -->
+			<button type="button" class="btn btn-default" tooltip="Download episode" tooltip-placement="right" ng-if="canDownload()" ng-click="download()">
+				<span class="fa fa-cloud-download"></span>
+			</button>
+			<button type="button" class="btn btn-default" tooltip="Episode watched" tooltip-placement="left" ng-if="episode.watched" ng-click="watched()">
+				<span class="fa fa-eye"></span>
+			</button>
+			<button type="button" class="btn btn-default" tooltip="Mark episode as watched" tooltip-placement="left" ng-if="hasAired() && !episode.watched" ng-click="watched()">
+				<span class="fa fa-eye-slash"></span>
+			</button>
+		</div>
+	</div>

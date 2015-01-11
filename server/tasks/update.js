@@ -1,17 +1,24 @@
-/* Check for software updates on Github */
+'use strict';
 
-var schedule = require('node-schedule');
-
-/* Run every day at 3am */
-var rule = new schedule.RecurrenceRule();
-	rule.hour	= 3;
-	rule.minute = 0;
-
-schedule.scheduleJob(rule, function(){
+/* Check for software updates from GitHub */
+module.exports = function(app,db,socket){
+	/*
 	try {
-		var system = plugin('system');
-		system.update();
+		var schedule = require('node-schedule');
+		var rule = new schedule.RecurrenceRule();
+			rule.hour	= 3;
+			rule.minute = 0;
+		
+		schedule.scheduleJob(rule, function(){
+			try {
+				var system = require('nodetv-system');
+				system.update();
+			} catch(e){
+				console.error(e.message);
+			}
+		});
 	} catch(e){
-		console.error(e.message);
+		logger.error(e.message)
 	}
-});
+	*/
+}
