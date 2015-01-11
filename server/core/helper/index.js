@@ -23,7 +23,7 @@ var logger = log4js.getLogger('nodetv-helper');
 exports = module.exports = {
 	
 	// FS methods
-	fileCopy: function(from, to, callback) {
+	fileCopy: function(from, to, callback){
 		var deferred = Q.defer();
 		try {
 			if (!fs.existsSync(path.dirname(to))) {
@@ -40,36 +40,40 @@ exports = module.exports = {
 				deferred.reject();
 			});
 			wr.on('close', function(){
+				deferred.resolve(to)
 				if (typeof(callback) == 'function') callback();
-				deferred.resolve()
 			});
 			rd.pipe(wr);
 		} catch(e) {
 			logger.error('helper.fileCopy: %s', e.message);
-			deferred.reject();
+			deferred.reject(e.message);
 		}
 		return deferred.promise;
 	},
 	
-	fileMove: function(from, to, callback) {
+	fileMove: function(from, to, callback){
 		// Move a file to the correct location
 		var deferred = Q.defer();
 		try {
-			if (!fs.existsSync(path.dirname(to))) {
-				mkdirp.sync(path.dirname(to, 0755));
-			}
+			if (!fs.existsSync(path.dirname(to))) mkdirp.sync(path.dirname(to, 0755));
 			fs.rename(from, to, function(error){
-				fs.chmod(to, 0644);
+				if (error){
+					logger.error(error);
+					deferred.reject(error);
+				} else {
+					fs.chmod(to, 0644);
+					deferred.resolve(to);
+				}
 				if (typeof(callback) == 'function') callback(error);
-				deferred.resolve();
 			});
 		} catch(e) {
 			logger.error('helper.fileMove: %s', e.message);
+			deferred.reject(e.message);
 		}
 		return deferred.promise;
 	},
 	
-	listDirectory: function(path, callback) {
+	listDirectory: function(path, callback){
 		var self = this;
 		fs.readdir(path, function(error, list){
 			if (error) logger.error(error);
@@ -133,10 +137,6 @@ exports = module.exports = {
 			}
 		}
 		return url;
-	},
-	parseFeed: function(url, since, callback){
-		logger.error('`helper.parseFeed` has been deprecated');
-		return false;
 	},
 	
 	// Torrent methods

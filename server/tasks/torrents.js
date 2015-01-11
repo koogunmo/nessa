@@ -25,6 +25,8 @@ module.exports = function(app,db,socket){
 						movies.complete(transfer).then(function(data){
 							if (data.trash) torrent.remove(transfer.id,true);
 							socket.emit('alert', {'title':'Movie downloaded','message':data.movie.title});
+						}, function(error){
+							logger.error(error);
 						});
 					}
 					if (shows.complete){
