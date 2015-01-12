@@ -96,7 +96,7 @@ define(['app'], function(nessa){
 		})
 	})
 	
-	nessa.run(function($log, $rootScope){
+	nessa.run(function($http,$log,$rootScope){
 		$log.info('Module loaded: Shows');
 		$rootScope.menu.push({
 			path: 'shows.index',
@@ -105,12 +105,21 @@ define(['app'], function(nessa){
 			order: 20
 		});
 		$rootScope.genres.shows = [
-			'Action','Adventure','Animation',
-			'Children','Comedy','Documentary','Drama',
-			'Fantasy','Game Show','Home and Garden',
-			'Mini Series','News','Reality',
-			'Science Fiction','Soap','Special Interest',
-			'Sport','Talk Show','Western'
+			{'name':'Action','slug':'action'},
+			{'name':'Adventure','slug':'adventure'},
+			{'name':'Animation','slug':'animation'},
+			{'name':'Comedy','slug':'comedy'},
+			{'name':'Crime','slug':'crim'},
+			{'name':'Documentary','slug':'documentary'},
+			{'name':'Drama','slug':'drama'},
+			{'name':'Fantasy','slug':'fantasy'},
+			{'name':'Horror','slug':'horror'},
+			{'name':'Mystery','slug':'mystery'},
+			{'name':'Science Fiction','slug':'science-fiction'},
+			{'name':'Sport','slug':'sports'},
+			{'name':'Thriller','slug':'thriller'},
+			{'name':'War','slug':'war'},
+			{'name':'Western','slug':'western'}
 		];
 	})
 	

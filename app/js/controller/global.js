@@ -1,6 +1,6 @@
 define(['app'], function(nessa){
 	
-	nessa.controller('NavigationController', function($http,$localStorage,$location,$log,$scope,$state){
+	nessa.controller('NavigationController', function($http,$localStorage,$location,$log,$modal,$scope,$state){
 		$scope.$storage = $localStorage;
 		
 		$scope.isCollapsed = true;
@@ -9,6 +9,12 @@ define(['app'], function(nessa){
 		
 		$scope.collapse = function(){
 			$scope.isCollapsed = true;
+		};
+		$scope.profile = function(){
+			$modal.open({
+				'templateUrl': 'views/settings/modal/user.html',
+				'controller': 'UserController'
+			});
 		};
 		$scope.toggle = function(){
 			$scope.isCollapsed = !$scope.isCollapsed;
@@ -19,8 +25,7 @@ define(['app'], function(nessa){
 			$scope.user = $scope.$storage.user;
 		},true);
 	})
-	
-	nessa.controller('AlertsController', function($log,$scope,$socket){
+	.controller('AlertsController', function($log,$scope,$socket){
 		$scope.alerts = [];
 		
 		var alertHandler = function(e,alert){
@@ -68,11 +73,8 @@ define(['app'], function(nessa){
 			$scope.alerts = [];
 		});
 	})
-	
-	
-	nessa.run(function($log){
+	.run(function($log){
 		$log.info('Module loaded: Notifications');
 	})
-	
 	return nessa;
 });

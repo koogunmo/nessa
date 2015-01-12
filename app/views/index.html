@@ -52,7 +52,7 @@
 							<img ng-src="{{user.avatar}}" class="avatar avatar-xs" ng-if="user.avatar" />
 						</a>
 						<ul class="dropdown-menu">
-							<li><a ui-sref="profile"><span class="fa fa-cog"></span> Settings</a></li>
+							<li><a ng-click="profile()"><span class="fa fa-cog"></span> Settings</a></li>
 							<li><a ui-sref="logout"><span class="fa fa-sign-out"></span> Logout</a></li>
 						</ul>
 					</li>

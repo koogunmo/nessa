@@ -12,7 +12,7 @@
 	</div>
 	<div class="row" ng-if="filter.active">
 		<div class="col-sm-3">
-			<select class="form-control" ng-model="filter.genre" ng-options="value for value in genres.movies">
+			<select class="form-control" ng-model="filter.genre" ng-options="genre.slug as genre.name for genre in genres.movies">
 				<option value="">&raquo; All Genres</option>
 			</select>
 		</div>

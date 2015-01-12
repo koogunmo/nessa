@@ -68,7 +68,7 @@ module.exports = function(app,db,socket){
 	}).post('/api/movies/scan', function(req,res){
 		socket.emit('alert', {'title':'Movies','message':'Scanning library...'});
 		movies.scan(req.user);
-		res.status(202).emnd();
+		res.status(202).end();
 		
 	}).post('/api/movies/search', function(req,res){
 		movies.search(req.user, req.body.q).then(function(movies){

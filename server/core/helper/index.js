@@ -1,40 +1,29 @@
-var extend	= require('xtend'),
-	fs		= require('fs'),
+var fs		= require('fs'),
 	log4js	= require('log4js'),
 	mkdirp	= require('mkdirp'),
-	parser	= new(require('xml2js')).Parser(),
 	path	= require('path'),
-	Q		= require('q'),
-	qs		= require('querystring'),
-	request	= require('request'),
-	url		= require('url');
+	Q		= require('q');
 
-log4js.configure({
-	appenders: [{
-		type: 'console'
-	}],
-	replaceConsole: true
-});
+log4js.configure({'appenders':[{'type':'console'}],'replaceConsole':true});
 var logger = log4js.getLogger('nodetv-helper');
-
 
 // Common helper functions
 
-exports = module.exports = {
-	
-	// FS methods
-	fileCopy: function(from, to, callback){
+String.prototype.capitalize = function(){
+	return this.replace(/(?:^|\s)\S/g, function(a){return a.toUpperCase()});
+};
+
+module.exports = {
+	'fileCopy': function(from, to, callback){
 		var deferred = Q.defer();
 		try {
-			if (!fs.existsSync(path.dirname(to))) {
-				mkdirp.sync(path.dirname(to, 0775));
-			}
+			if (!fs.existsSync(path.dirname(to))) mkdirp.sync(path.dirname(to, 0775));
 			var rd = fs.createReadStream(from);
 			rd.on('error', function(error) {
 				logger.error('Read Error - %s (%d): %s', error.code, error.errno, from);
 				deferred.reject();
 			});
-			var wr = fs.createWriteStream(to, {mode: 0664});
+			var wr = fs.createWriteStream(to, {'mode':0664});
 			wr.on('error', function(error){
 				logger.error('Write Error - %s (%d): %s', error.code, error.errno, to);
 				deferred.reject();
@@ -50,8 +39,7 @@ exports = module.exports = {
 		}
 		return deferred.promise;
 	},
-	
-	fileMove: function(from, to, callback){
+	'fileMove': function(from, to, callback){
 		// Move a file to the correct location
 		var deferred = Q.defer();
 		try {
@@ -72,8 +60,11 @@ exports = module.exports = {
 		}
 		return deferred.promise;
 	},
-	
-	listDirectory: function(path, callback){
+	'formatDirectory': function(name){
+		// Sanitize directory names (remove backslash, foreslash and colon)
+		return name.replace(/[\\\:\/]/ig, '-');
+	},
+	'listDirectory': function(path, callback){
 		var self = this;
 		fs.readdir(path, function(error, list){
 			if (error) logger.error(error);
@@ -87,10 +78,7 @@ exports = module.exports = {
 						if (stats.isDirectory()){
 							return self.listDirectory(fullpath, callback);
 						} else if (stats.isFile() || stats.isSymbolicLink()) {
-							var record = {
-								path: fullpath,
-								stat: stats
-							};
+							var record = {'path': fullpath,'stat':stats};
 							if (typeof(callback) == 'function') callback(error, record);
 						}
 					});
@@ -98,65 +86,14 @@ exports = module.exports = {
 			}
 		});
 	},
-	
-	// RegExp methods
-	getEpisodeNumbers: function(file) {
-		logger.warn('`helper.getEpisodeNumbers` has been deprecated. Please use `shows.getEpisodeNumbers` instead');
-		return require('nodetv-shows').getEpisodeNumbers(file);
-	},
-	
-	// Formatting methods
-	zeroPadding: function(num, length) {
+	'zeroPadding': function(num, length) {
 		var pad = '000000';
 		if (typeof(length) == 'undefined') length = 2;
 		return (pad + num).slice(-length);
 	},
 	
-	formatName: function(data){
-		logger.error('`helper.formatName` has been deprecated. Please use `shows.getFilename` instead');
-		return false;
-	},
-	formatDirectory: function(name){
-		// Sanitize the directory names (remove backslash, foreslash and colon)
-		return name.replace(/[\\\:\/]/ig, '-');
-	},
-	fixFeedUrl: function(url, full){
-		logger.warn('`helper.fixFeedUrl` has been deprecated')
-		
-		var full = (typeof(full) == 'undefined') ? false: true;
-		if (url.indexOf('tvshowsapp.com') >= 0) {
-			var oldurl = decodeURIComponent(url);
-			userAgent = 'TVShows 2 (http://tvshowsapp.com/)';
-			/*
-			if (match = oldurl.match(/([\w\s\-\.\']+)$/i)){
-				url = 'http://tvshowsapp.com/feeds/cache/'+encodeURI(match[1]);
-			}
-			*/
-			if (full && url.indexOf('.full.xml') == -1) {
-				url = url.replace(/\.xml$/, '.full.xml');
-			}
-		}
-		return url;
-	},
-	
 	// Torrent methods
-	
-	isHD: function(name){
-		return (name.match(/720p|1080p/i)) ? true : false;
-	},
-	
-	isRepack: function(name) {
-		return (name.match(/repack|proper/i)) ? true : false;
-	},
-	
-	getHash: function(magnet){
-		if (match = magnet.match(/btih\:([\w]{32,40})/i)){
-			return match[1].toUpperCase();
-		}
-		return false;
-	},
-	
-	createMagnet: function(hash, name){
+	'createMagnet': function(hash, name){
 		try {
 			if (!hash) return;
 			if (!name) name = hash;
@@ -183,5 +120,17 @@ exports = module.exports = {
 		} catch(e){
 			logger.error('helper.createMagnet: %s', e.message);
 		}
+	},
+	'getHash': function(magnet){
+		if (match = magnet.match(/btih\:([\w]{32,40})/i)){
+			return match[1].toUpperCase();
+		}
+		return false;
+	},
+	'isHD': function(name){
+		return (name.match(/720p|1080p/i)) ? true : false;
+	},
+	'isRepack': function(name) {
+		return (name.match(/repack|proper/i)) ? true : false;
 	}
 };

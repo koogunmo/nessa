@@ -31,22 +31,28 @@ module.exports = function(app, db, socket){
 	})
 	
 	app.get('/api/shows/latest', function(req,res){
-		shows.latest(req.user).then(function(json){
-			res.send(json);
+		shows.latest(req.user).then(function(latest){
+			res.send(latest);
+		}, function(error){
+			res.status(404).send(error);
 		})
 	}).get('/api/shows/random', function(req,res){
-		shows.random(req.user).then(function(json){
-			res.send(json);
+		shows.random(req.user).then(function(random){
+			res.send(random);
+		}, function(error){
+			res.status(404).send(error);
 		});
 	}).get('/api/shows/unmatched', function(req,res){
-		shows.unmatched().then(function(results){
-			res.send(results);
+		shows.unmatched().then(function(unmatched){
+			res.send(unmatched);
 		}, function(error){
 			res.status(404).send(error);
 		});
 	}).get('/api/shows/upcoming', function(req,res){
 		shows.upcoming(req.user).then(function(calendar){
 			res.send(calendar);
+		}, function(error){
+			res.status(404).send(error);
 		});
 	})
 	

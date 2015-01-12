@@ -52,7 +52,7 @@ define(['app'], function(nessa){
 			});
 	})
 	
-	.run(function($log,$rootScope){
+	.run(function($http,$log,$rootScope){
 		$log.info('Module loaded: Movies');
 		$rootScope.menu.push({
 			'path': 'movies.index',
@@ -61,13 +61,33 @@ define(['app'], function(nessa){
 			'order': 30
 		});
 		$rootScope.genres.movies = [
-			'Action','Adventure','Animation',
-			'Comedy','Crime','Documentary','Drama',
-			'Family','Fantasy','Film Noir',
-			'History','Horror','Indie',
-			'Music','Musical','Mystery','Romance',
-			'Science Fiction','Sport','Suspense',
-			'Thriller','War','Western'
+			{'name':'Action','slug':'action'},
+			{'name':'Adventure','slug':'adventure'},
+			{'name':'Animation','slug':'animation'},
+			{'name':'Comedy','slug':'comedy'},
+			{'name':'Crime','slug':'crime'},
+			{'name':'Disaster','slug':'disaster'},
+			{'name':'Documentary','slug':'documentary'},
+			{'name':'Drama','slug':'drama'},
+			{'name':'Family','slug':'family'},
+			{'name':'Fan Film','slug':'fan-film'},
+			{'name':'Fantasy','slug':'fantasy'},
+			{'name':'Film Noir','slug':'film-noir'},
+			{'name':'History','slug':'history'},
+			{'name':'Horror','slug':'horror'},
+			{'name':'Indie','slug':'indie'},
+			{'name':'Music','slug':'music'},
+			{'name':'Musical','slug':'musical'},
+			{'name':'Mystery','slug':'mystery'},
+			{'name':'Romance','slug':'romance'},
+			{'name':'Science Fiction','slug':'science-fiction'},
+			{'name':'Short','slug':'short'},
+			{'name':'Sports','slug':'sports'},
+			{'name':'Suspense','slug':'suspense'},
+			{'name':'Thriller','slug':'thriller'},
+			{'name':'TV Movie','slug':'tv-movie'},
+			{'name':'War','slug':'war'},
+			{'name':'Western','slug':'western'}
 		];
 		$rootScope.quality = ['480p','720p','1080p'];
 	})
