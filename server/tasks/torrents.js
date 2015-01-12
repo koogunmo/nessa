@@ -18,7 +18,6 @@ module.exports = function(app,db,socket){
 	
 	try {
 		var checkDownloads = function(){
-			logger.debug('Checking downloads...');
 			torrent.getComplete(function(error, transfers){
 				transfers.forEach(function(transfer){
 					if (movies.complete){

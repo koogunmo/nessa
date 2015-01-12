@@ -228,6 +228,11 @@ define(['app'], function(nessa){
 				$scope.movie.hashes = success;
 			});
 		};
+		$scope.rebuild = function(){
+			$http.post('/api/movies/'+$scope.movie.imdb).success(function(){
+				
+			})
+		};
 		$scope.remove = function(){
 			if (confirm('Are you sure you want to remove this movie?')){
 				$http.delete('/api/movies/'+$scope.movie.imdb).success(function(){
