@@ -48,7 +48,6 @@ module.exports = function(app,db,socket){
 		};
 		var trashResponse = function(error, args){
 			if (error) logger.error(error);
-			if (args) logger.debug(args);
 		};
 		
 		setInterval(function(){
