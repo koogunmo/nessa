@@ -23,7 +23,10 @@ module.exports = function(app,db,socket){
 				transfers.forEach(function(transfer){
 					if (movies.complete){
 						movies.complete(transfer).then(function(data){
-							if (data.trash) torrent.remove(transfer.id,true);
+							if (data.trash){
+								logger.debug('Trashing:', data.movie.title);
+								torrent.remove(transfer.id,true,trashResponse);
+							}
 							socket.emit('alert', {'title':'Movie downloaded','message':data.movie.title});
 						}, function(error){
 							if (error) logger.error(error);
@@ -31,7 +34,10 @@ module.exports = function(app,db,socket){
 					}
 					if (shows.complete){
 						shows.complete(transfer).then(function(data){
-							if (data.trash) torrent.remove(transfer.id,true);
+							if (data.trash){
+								logger.debug('Trashing:', data.show.name);
+								torrent.remove(transfer.id,true,trashResponse);
+							}
 							socket.emit('alert', {'title':'Episode downloaded','message':data.show.name});
 						}, function(error){
 							if (error) logger.error(error);
@@ -40,6 +46,11 @@ module.exports = function(app,db,socket){
 				});
 			});
 		};
+		var trashResponse = function(error, args){
+			if (error) logger.error(error);
+			if (args) logger.debug(args);
+		};
+		
 		setInterval(function(){
 			checkDownloads();
 		}, 300000);
