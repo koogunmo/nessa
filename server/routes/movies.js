@@ -88,7 +88,12 @@ module.exports = function(app,db,socket){
 			res.status(404).end();
 		});
 	}).post('/api/movies/:imdb(tt[0-9]+)', function(req,res){
-		// Is there anything that needs saving?
+		// Rescan & rebuild
+		movies.unlink(req.params.imdb).then(function(movie){
+			movies.link(movie.imdb);
+		});
+		res.status(202).end();
+		
 	}).delete('/api/movies/:imdb(tt[0-9]+)', function(req,res){
 		movies.remove(req.user, req.params.imdb).then(function(){
 			res.status(204).end();
