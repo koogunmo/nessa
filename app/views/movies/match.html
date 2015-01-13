@@ -5,7 +5,7 @@
 	<pager class="visible-xs pagination-sm" items-per-page="paginate.items" total-items="unmatched.length" ng-model="paginate.page"></pager>
 </div>
 <div class="row">
-	<div class="col-sm-12" ng-repeat="movie in unmatched|orderBy:'file'|offset:(paginate.page-1)*paginate.items | limitTo:paginate.items" ng-controller="MoviesUnmatchedController">
+	<div class="col-sm-12" ng-repeat="movie in unmatched|orderBy:'file'|offset:(paginate.page-1)*paginate.items|limitTo:paginate.items" ng-controller="MoviesUnmatchedController">
 		<form ng-submit="match()">
 			<div class="panel panel-default">
 				<div class="panel-heading">

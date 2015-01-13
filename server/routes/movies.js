@@ -98,12 +98,19 @@ module.exports = function(app,db,socket){
 		});
 	});
 	
-	app.post('/api/movies/:imdb(tt[0-9]+)/artwork', function(req,res){
+	app.get('/api/movies/:imdb(tt[0-9]+)/hashes', function(req,res){
+		movies.getHashes(req.params.imdb).then(function(hashes){
+			res.send(hashes);
+		}, function(error){
+			res.status(404).end()
+		});
+	}).get('/api/movies/:imdb(tt[0-9]+)/artwork', function(req,res){
 		// Download torrent
 		movies.getArtwork(req.params.imdb, req.body);
 		res.status(201).end();
 	
-	}).post('/api/movies/:imdb(tt[0-9]+)/download', function(req,res){
+	})
+	app.post('/api/movies/:imdb(tt[0-9]+)/download', function(req,res){
 		// Download torrent
 		movies.download(req.user, req.params.imdb, req.body).then(function(movie){
 			var message = movie.title+' ('+movie.year+')';
@@ -111,11 +118,5 @@ module.exports = function(app,db,socket){
 		})
 		res.status(201).end();
 		
-	}).post('/api/movies/:imdb(tt[0-9]+)/hashes', function(req,res){
-		movies.getHashes(req.params.imdb).then(function(hashes){
-			res.send(hashes);
-		}, function(error){
-			res.status(404).end()
-		});
 	})
 }

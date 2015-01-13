@@ -214,7 +214,7 @@ define(['app'], function(nessa){
 		});
 		
 		$scope.artwork = function(){
-			$http.post('/api/movies/'+$scope.movie.imdb+'/artwork');
+			$http.get('/api/movies/'+$scope.movie.imdb+'/artwork');
 		};
 		$scope.close = function(){
 			$modalInstance.dismiss();
