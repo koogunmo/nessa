@@ -33,7 +33,7 @@
 						</div>
 					</div>
 					<div class="text-center" ng-if="!movie.matches">No matches</div>
-					<hr />
+					<div class="loading" ng-class="{'active': loading}"></div>
 				</div>
 				<div class="panel-footer text-right" ng-show="selected">
 					<button type="submit" class="btn btn-success"><span class="fa fa-check"></span> Match</button>
