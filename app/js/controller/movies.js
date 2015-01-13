@@ -281,12 +281,12 @@ define(['app'], function(nessa){
 			}
 		};
 		$scope.submit = function(){
-			if ($scope.query){
-				$scope.search();
-			} else if ($scope.selected){
+			if ($scope.selected){
 				$http.post('/api/movies/match', {'imdb':$scope.selected.ids.imdb,'file':$scope.movie.file}).success(function(){
 					$scope.$emit('MovieMatched', $scope.movie);
 				});
+			} else {
+				$scope.search();
 			}
 		};
 		$scope.reset = function(){
