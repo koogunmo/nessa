@@ -1,23 +1,20 @@
 <h4>Unmatched Movies</h4>
 <hr />
 <div class="row">
-	<div class="col-sm-12" ng-repeat="movie in unmatched | offset:(paginate.page-1)*paginate.items | limitTo:paginate.items" ng-controller="MoviesUnmatchedController">
+	<div class="col-sm-12" ng-repeat="movie in unmatched|orderBy:'file'|offset:(paginate.page-1)*paginate.items | limitTo:paginate.items" ng-controller="MoviesUnmatchedController">
 		<form ng-submit="match()">
 			<div class="panel panel-default">
 				<div class="panel-heading">
-					<h4 class="panel-title">File: "{{movie.file}}"</h4>
+					<h4 class="panel-title">{{movie.file}}</h4>
 				</div>
 				<div class="panel-body">
-					<div class="media match" ng-repeat="match in movie.matches" ng-controller="MoviesMatchOptionController" ng-click="select()" ng-class="{'selected': match.tmdb_id==selected.tmdb_id}">
+					<div class="media match" ng-repeat="match in movie.matches" ng-controller="MoviesMatchOptionController" ng-click="select()" ng-class="{'selected': match.ids.imdb==selected.ids.imdb}">
 						<div class="media-left">
-							<img ng-src="{{match.images.poster}}" class="img-responsive" />
+							<img ng-src="{{match.images.poster.thumb}}" class="img-responsive" />
 						</div>
 						<div class="media-right">
 							<strong>{{match.title}} <small>({{match.year}})</small></strong>
 							<p>{{match.overview}}</p>
-							<p>
-								<strong>Runtime</strong>: {{match.runtime}} mins
-							</p>
 						</div>
 					</div>
 					<!-- TODO: Add search option -->

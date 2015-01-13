@@ -258,29 +258,38 @@ define(['app'], function(nessa){
 		
 		$scope.$on('MovieMatched', function(e,item){
 			var idx = $scope.unmatched.indexOf(item);
-		//	$scope.unmatched.splice(idx,1);
+			$scope.unmatched.splice(idx,1);
 		});
 	})
 	
-	nessa.controller('MoviesUnmatchedController', function($http,$log,$scope){
+	
+	.controller('MoviesUnmatchedController', function($http,$log,$scope){
 		$scope.matched = false;
 		$scope.selected = null;
-		$scope.$on('MatchSelected', function(e,match){
-			$scope.selected = match;
-		});
 		
 		$scope.match = function(){
-			$http.post('/api/movies/match', [{'imdb':$scope.selected.ids.imdb,'file':$scope.movie.file}]).success(function(){
+			$http.post('/api/movies/match', {'imdb':$scope.selected.ids.imdb,'file':$scope.movie.file}).success(function(){
 				$scope.$emit('MovieMatched', $scope.movie);
 			});
 		};
+		$scope.$on('MatchSelected', function(e,match){
+			$scope.selected = match;
+		});
 	})
-	
-	nessa.controller('MoviesMatchOptionController', function($http,$log,$scope){
+	.controller('MoviesMatchOptionController', function($http,$log,$scope){
 		$scope.select = function(){
 			$scope.$emit('MatchSelected', $scope.match);
 		};
 	})
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	
