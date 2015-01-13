@@ -53,11 +53,9 @@ module.exports = function(app,db,socket){
 	
 	app.post('/api/movies/genres', function(req,res){
 		socket.emit('alert', {'title':'Movies','message':'Rebuilding genres...'});
-		/*
-		movies.rebuildGenres(function(){
+		movies.rebuildGenres().then(function(){
 			socket.emit('alert', {'title':'Movies','message':'Genres rebuilt'});
 		});
-		*/
 		res.status(202).end();
 		
 	}).post('/api/movies/match', function(req,res){
