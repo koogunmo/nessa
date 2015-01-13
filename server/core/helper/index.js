@@ -1,6 +1,7 @@
 var fs		= require('fs'),
 	log4js	= require('log4js'),
 	mkdirp	= require('mkdirp'),
+	os		= require('os'),
 	path	= require('path'),
 	Q		= require('q');
 
@@ -59,6 +60,12 @@ module.exports = {
 			deferred.reject(e.message);
 		}
 		return deferred.promise;
+	},
+	'fileSanitize': function(name){
+		// Strip out characters liable to fuck it all up somehow
+		name = name.replace(/[\[\]\/\\]/ig,'');
+		if (os.platform() == 'darwin') name.replace(/[\:]/ig, ';'); // OS X doesn't like colons in the filename
+		return name.trim();
 	},
 	'formatDirectory': function(name){
 		// Sanitize directory names (remove backslash, foreslash and colon)

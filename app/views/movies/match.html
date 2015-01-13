@@ -6,12 +6,23 @@
 </div>
 <div class="row">
 	<div class="col-sm-12" ng-repeat="movie in unmatched|orderBy:'file'|offset:(paginate.page-1)*paginate.items|limitTo:paginate.items" ng-controller="MoviesUnmatchedController">
-		<form ng-submit="match()">
+		<form ng-submit="submit()">
 			<div class="panel panel-default">
 				<div class="panel-heading">
-					<h4 class="panel-title">{{movie.file}}</h4>
+					<h4 class="panel-title">
+						<span class="fa fa-search pull-right" ng-click="filter()"></span>{{movie.file}}
+					</h4>
 				</div>
 				<div class="panel-body">
+					<div ng-show="custom">
+						<div class="form-group">
+							<div class="input-group">
+								<input type="text" class="form-control" placeholder="Search..." ng-model="query" />
+								<span class="input-group-addon btn btn-success" ng-click="search()"><span class="fa fa-search"></span></span>
+								<span class="input-group-addon btn btn-danger" ng-click="reset()"><span class="fa fa-times"></span></span>
+							</div>
+						</div>
+					</div>
 					<div class="media match" ng-repeat="match in movie.matches" ng-controller="MoviesMatchOptionController" ng-click="select()" ng-class="{'selected': match.ids.imdb==selected.ids.imdb}">
 						<div class="media-left">
 							<img ng-src="{{match.images.poster.thumb}}" class="img-responsive" />
@@ -21,7 +32,8 @@
 							<p>{{match.overview}}</p>
 						</div>
 					</div>
-					<!-- TODO: Add search option -->
+					<div class="text-center" ng-if="!movie.matches">No matches</div>
+					<hr />
 				</div>
 				<div class="panel-footer text-right" ng-show="selected">
 					<button type="submit" class="btn btn-success"><span class="fa fa-check"></span> Match</button>

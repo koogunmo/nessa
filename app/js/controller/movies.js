@@ -251,11 +251,9 @@ define(['app'], function(nessa){
 			page: 1
 		};
 		$scope.unmatched = [];
-		
 		$http.get('/api/movies/unmatched').success(function(json,status){
 			$scope.unmatched = json;
 		});
-		
 		$scope.$on('MovieMatched', function(e,item){
 			var idx = $scope.unmatched.indexOf(item);
 			$scope.unmatched.splice(idx,1);
@@ -264,12 +262,48 @@ define(['app'], function(nessa){
 	
 	
 	.controller('MoviesUnmatchedController', function($http,$log,$scope){
+		$scope.custom = false;
+		$scope.loading = false;
 		$scope.matched = false;
-		$scope.selected = null;
+		$scope.selected = false;
+		$scope.query = null;
 		
-		$scope.match = function(){
-			$http.post('/api/movies/match', {'imdb':$scope.selected.ids.imdb,'file':$scope.movie.file}).success(function(){
-				$scope.$emit('MovieMatched', $scope.movie);
+		$scope.movie.original = angular.copy($scope.movie.matches);
+		
+		$scope.filter = function(){
+			$scope.custom = !$scope.custom;
+			$scope.selected = false;
+			$scope.query = null;
+			if ($scope.custom){
+				$scope.movie.matches = [];
+			} else {
+				$scope.movie.matches = angular.copy($scope.movie.original);
+			}
+		};
+		$scope.submit = function(){
+			if ($scope.selected){
+				$http.post('/api/movies/match', {'imdb':$scope.selected.ids.imdb,'file':$scope.movie.file}).success(function(){
+					$scope.$emit('MovieMatched', $scope.movie);
+				});
+			} else {
+				$scope.search();
+			}
+		};
+		$scope.reset = function(){
+			$scope.query = null;
+			if ($scope.custom) $scope.movie.matches = false;
+		};
+		$scope.search = function(){
+			if (!$scope.query) return;
+			$scope.movie.matches = [];
+			$scope.loading = true;
+			$http.post('/api/movies/search', {'q':$scope.query}).success(function(results){
+				$scope.loading = false
+				results.forEach(function(result){
+					$scope.movie.matches.push(result.movie);
+				});
+			}).error(function(){
+				$scope.loading = false;
 			});
 		};
 		$scope.$on('MatchSelected', function(e,match){
