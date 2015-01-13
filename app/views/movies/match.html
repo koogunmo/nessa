@@ -1,5 +1,9 @@
 <h4>Unmatched Movies</h4>
 <hr />
+<div class="text-center" ng-show="unmatched.length>paginate.items" ng-cloak>
+	<pagination class="hidden-xs pagination-sm" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;" items-per-page="paginate.items" total-items="unmatched.length" ng-model="paginate.page" max-size="5" boundary-links="true"></pagination>
+	<pager class="visible-xs pagination-sm" items-per-page="paginate.items" total-items="unmatched.length" ng-model="paginate.page"></pager>
+</div>
 <div class="row">
 	<div class="col-sm-12" ng-repeat="movie in unmatched|orderBy:'file'|offset:(paginate.page-1)*paginate.items | limitTo:paginate.items" ng-controller="MoviesUnmatchedController">
 		<form ng-submit="match()">
