@@ -291,11 +291,13 @@ define(['app'], function(nessa){
 		};
 		$scope.reset = function(){
 			$scope.query = null;
+			$scope.selected = false;
 			if ($scope.custom) $scope.movie.matches = false;
 		};
 		$scope.search = function(){
 			if (!$scope.query) return;
 			$scope.movie.matches = [];
+			$scope.selected = false;
 			$scope.loading = true;
 			$http.post('/api/movies/search', {'q':$scope.query}).success(function(results){
 				$scope.loading = false

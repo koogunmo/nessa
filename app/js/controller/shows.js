@@ -198,36 +198,72 @@ define(['app'], function(nessa){
 			page: 1
 		};
 		$scope.unmatched = [];
-		
 		$http.get('/api/shows/unmatched').success(function(json,status){
 			$scope.unmatched = json;
 		});
-		
 		$scope.$on('ShowMatched', function(e,item){
 			var idx = $scope.unmatched.indexOf(item);
 			$scope.unmatched.splice(idx,1);
 		});
 	})
-	
-	nessa.controller('ShowsUnmatchedController', function($http,$log,$scope){
+	.controller('ShowsUnmatchedController', function($http,$log,$scope){
+		$scope.custom = false;
+		$scope.loading = false;
 		$scope.matched = false;
-		$scope.selected = null;
+		$scope.selected = false;
+		$scope.query = null;
+
+		$scope.show.original = angular.copy($scope.show.matches);
+		
+		$scope.filter = function(){
+			$scope.custom = !$scope.custom;
+			$scope.selected = false;
+			$scope.query = null;
+			if ($scope.custom){
+				$scope.show.matches = [];
+			} else {
+				$scope.show.matches = angular.copy($scope.show.original);
+			}
+		};
+		$scope.submit = function(){
+			if ($scope.selected){
+				$http.post('/api/shows/match', {'imdb':$scope.selected.ids.imdb,'directory':$scope.show.file}).success(function(){
+					$scope.$emit('ShowMatched', $scope.show);
+				});
+			} else {
+				$scope.search();
+			}
+		};
+		$scope.reset = function(){
+			$scope.query = null;
+			$scope.selected = false
+			if ($scope.custom) $scope.show.matches = false;
+		};
+		$scope.search = function(){
+			if (!$scope.query) return;
+			$scope.show.matches = [];
+			$scope.selected = false;
+			$scope.loading = true;
+			$http.post('/api/shows/search', {'q':$scope.query}).success(function(results){
+				$scope.loading = false
+				results.forEach(function(result){
+					$scope.show.matches.push(result.show);
+				});
+			}).error(function(){
+				$scope.loading = false;
+			});
+		};
 		$scope.$on('MatchSelected', function(e,match){
 			$scope.selected = match;
 		});
-		
-		$scope.match = function(){
-			$http.post('/api/shows/match', [{'imdb':$scope.selected.ids.imdb,'directory':$scope.show.directory}]).success(function(){
-				$scope.$emit('ShowMatched', $scope.show);
-			});
-		};
 	})
-	
-	nessa.controller('ShowsMatchOptionController', function($http,$log,$scope){
+	.controller('ShowsMatchOptionController', function($http,$log,$scope){
 		$scope.select = function(){
 			$scope.$emit('MatchSelected', $scope.match);
 		};
 	})
+	
+	
 	
 	
 	nessa.controller('ShowsRandomController', function($http,$log,$modalInstance,$scope){

@@ -28,8 +28,8 @@
 							<img ng-src="{{match.images.poster.thumb}}" class="img-responsive" />
 						</div>
 						<div class="media-right">
-							<strong>{{match.title}} <small>({{match.year}})</small></strong>
-							<p>{{match.overview}}</p>
+							<strong>{{::match.title}} <small>({{::match.year}})</small></strong>
+							<p>{{::match.overview}}</p>
 						</div>
 					</div>
 					<div class="text-center" ng-if="!movie.matches">No matches</div>
