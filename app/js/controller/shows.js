@@ -348,7 +348,7 @@ define(['app'], function(nessa){
 		$scope.downloadAll = function(){
 			if (confirm('Are you sure you want to download all available episodes?')) {
 				$http.post('/api/shows/'+$scope.show.imdb+'/download').success(function(){
-					$scope.$emit('ShowReload');
+				//	$scope.$emit('ShowReload');
 				}).error(function(json, status){
 					$log.error(json, status);
 				});
@@ -356,8 +356,12 @@ define(['app'], function(nessa){
 		};
 		$scope.rescan = function(){
 			$http.post('/api/shows/'+$scope.show.imdb+'/scan').success(function(json, status){
-			//	$rootScope.$broadcast('alert', {title: $scope.show.name, message: 'Rescan in progress...'});
-				
+				$rootScope.$broadcast('alert',{
+					'type':'info',
+					'title':'Rescanning files',
+					'message':$scope.show.name,
+					'icon':'/media/'+$scope.settings.media.shows.directory+'/'+$scope.show.directory+'/poster.jpg'
+				});
 			}).error(function(json, status){
 				$log.error(json, status);
 			});
@@ -365,7 +369,12 @@ define(['app'], function(nessa){
 		$scope.remove = function(){
 			if (confirm('Are you sure you want to remove this show?')) {
 				$http.delete('/api/shows/'+$scope.show.imdb).success(function(){
-					$rootScope.$broadcast('alert', {'title':$scope.show.name,'message':'Show removed'});
+					$rootScope.$broadcast('alert',{
+						'type':'danger',
+						'title':'Show removed',
+						'message':$scope.show.name,
+						'icon':'/media/'+$scope.settings.media.shows.directory+'/'+$scope.show.directory+'/poster.jpg'
+					});
 					$rootScope.$broadcast('ShowsRefresh');
 					$scope.close();
 				}).error(function(json, status){
@@ -382,16 +391,25 @@ define(['app'], function(nessa){
 				'status': $scope.show.status
 			};
 			$http.post('/api/shows/'+$scope.show.imdb, settings).success(function(json, status){
-				$rootScope.$broadcast('alert', {'title':$scope.show.name,'message':'Settings saved'});
-			//	$scope.close();
+				$rootScope.$broadcast('alert',{
+					'type':'success',
+					'title':'Settings saved',
+					'message':$scope.show.name,
+					'icon':'/media/'+$scope.settings.media.shows.directory+'/'+$scope.show.directory+'/poster.jpg'
+				});
 			}).error(function(json, status){
 				$log.error(json, status);
 			});
 		};
 		$scope.update = function(){
-			$http.post('/api/shows/'+$scope.show.imdb+'/update').success(function(json, status){	
-			//	$rootScope.$broadcast('alert', {'title':$scope.show.name, message: 'Updating listings...'});
-			//	$scope.close();
+			$http.post('/api/shows/'+$scope.show.imdb+'/update').success(function(json, status){
+				$scope.$emit('ShowReload');
+				$rootScope.$broadcast('alert',{
+					'type':'info',
+					'title':'Updating details',
+					'message':$scope.show.name,
+					'icon':'/media/'+$scope.settings.media.shows.directory+'/'+$scope.show.directory+'/poster.jpg'
+				});
 			}).error(function(json, status){
 				$log.error(json, status);
 			});

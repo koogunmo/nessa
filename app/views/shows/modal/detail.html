@@ -1,10 +1,10 @@
 <form name="showForm" ng-submit="save()">
 	<div class="modal-header" lazy-load>
-		
 		<img src="/assets/gfx/no-banner.png" class="img-responsive placeholder" />
-		<img ng-if="show.directory" lazy-src="/media/{{settings.media.shows.directory}}/{{show.directory}}/banner.jpg" class="img-responsive banner" />
-		
+		<img ng-show="show.directory" lazy-src="/media/{{settings.media.shows.directory}}/{{show.directory}}/banner.jpg" class="img-responsive banner" />
+		<h5 class="modal-title" ng-cloak>{{::show.name}} <span class="small">{{::show.year}}</span></h5>
 	</div>
+	
 	<div class="modal-body">
 		<tabset type="pills">
 			<tab heading="Overview">

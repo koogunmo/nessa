@@ -38,11 +38,14 @@
 			<h6>{{::movie.title}}</h6>
 			<div class="overlay">
 				<div class="title">{{::movie.title}}</div>
+				<div>({{::movie.year}})</div>
 				<div class="hud">
-					<!--
-					<span class="fa fa-hdd-o" ng-if="movie.file"></span>
-					<span class="fa fa-magnet" ng-if="movie.hashes"></span>
-					-->
+					<div ng-show="movie.quality">
+						<span class="fa fa-hdd-o"></span> {{::movie.quality}}
+					</div>
+					<div ng-show="movie.hashes && !movie.file">
+						<span class="fa fa-magnet"></span>
+					</div>
 				</div>
 			</div>
 		</div>

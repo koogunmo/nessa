@@ -25,7 +25,7 @@ define(['app'], function(nessa){
 			$scope.user = $scope.$storage.user;
 		},true);
 	})
-	.controller('AlertsController', function($log,$scope,$socket){
+	.controller('AlertsController', function($log,$rootScope,$scope,$socket,$timeout){
 		$scope.alerts = [];
 		
 		var alertHandler = function(e,alert){
@@ -46,29 +46,29 @@ define(['app'], function(nessa){
 					notification.close();
 				};
 				if (alert.timeout){
-					setTimeout(function(){
+					$timeout(function(){
 						notification.close();
 					}, alert.timeout);
 				}
 			} else {
 				// Use bootstrap alerts system
 				$scope.alerts.push(alert);
-				if (alert.timeout) {
-					setTimeout(function(){
-						$scope.closeAlert($scope.alerts.length-1);
+				if (alert.timeout){
+					$timeout(function(){
+						$scope.dismiss($scope.alerts.indexOf(alert));
 						$scope.$apply();
 					}, alert.timeout);
 				}
 			}
+			if (alert.event) $rootScope.$broadcast(alert.event);
 		};
 		
-		$scope.$on('socket:alert', alertHandler);
-		$scope.$on('alert', alertHandler);
-		
-		$scope.closeAlert = function(index){
+		$scope.dismiss = function(index){
 			$scope.alerts.splice(index, 1);
 		};
 		
+		$scope.$on('alert', alertHandler);
+		$scope.$on('socket:alert', alertHandler);
 		$scope.$on('$stateChangeStart', function(){
 			$scope.alerts = [];
 		});

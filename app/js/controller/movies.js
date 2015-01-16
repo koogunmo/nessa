@@ -236,8 +236,14 @@ define(['app'], function(nessa){
 		$scope.remove = function(){
 			if (confirm('Are you sure you want to remove this movie?')){
 				$http.delete('/api/movies/'+$scope.movie.imdb).success(function(){
-					$modalInstance.dismiss();
+					$rootScope.$broadcast('alert',{
+						'type':'danger',
+						'title':'Movie removed',
+						'message':$scope.movie.name,
+						'icon':'/media/'+$scope.settings.media.movies.directory+'/.artwork/'+$scope.movie.imdb+'/poster.jpg'
+					});
 					$scope.$emit('MoviesRefresh');
+					$modalInstance.dismiss();
 				});
 			}
 		};
