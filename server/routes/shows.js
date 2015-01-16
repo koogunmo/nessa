@@ -22,8 +22,7 @@ module.exports = function(app, db, socket){
 	}).post('/api/shows', function(req,res){
 		// Add new show
 		shows.add(req.user, req.body.imdb).then(function(show){
-			socket.emit('alert', {'title':'Show added','message':show.name});
-			res.status(201).end();
+			res.status(201).send(show);
 		}, function(error){
 			logger.error(error);
 			res.status(404).end();
@@ -89,13 +88,13 @@ module.exports = function(app, db, socket){
 		});
 	}).post('/api/shows/:imdb(tt[0-9]+)', function(req,res){
 		shows.settings(req.user, req.body).then(function(show){
-			res.status(200).end();
+			res.status(200).send(show);
 		}, function(){
 			res.status(400).end();
 		});
 	}).delete('/api/shows/:imdb(tt[0-9]+)', function(req,res){
-		shows.remove(req.user, req.params.imdb).then(function(status){
-			res.status(204).end();
+		shows.remove(req.user, req.params.imdb).then(function(show){
+			res.status(204).send(show);
 		}, function(){
 			res.status(400).end();
 		});
@@ -115,7 +114,6 @@ module.exports = function(app, db, socket){
 	}).post('/api/shows/:imdb(tt[0-9]+)/update', function(req,res){
 		// Update show listings
 		shows.getSummary(req.params.imdb).then(function(show){
-			socket.emit('alert',{'title':'Show updated','message':show.name});
 			shows.getArtwork(show.imdb);
 			shows.getListings(show.imdb).then(function(){
 				shows.getProgress(req.user, show.imdb);

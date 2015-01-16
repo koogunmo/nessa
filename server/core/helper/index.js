@@ -44,13 +44,13 @@ module.exports = {
 		// Move a file to the correct location
 		var deferred = Q.defer();
 		try {
-			if (!fs.existsSync(path.dirname(to))) mkdirp.sync(path.dirname(to, 0755));
+			if (!fs.existsSync(path.dirname(to))) mkdirp.sync(path.dirname(to, 0775));
 			fs.rename(from, to, function(error){
 				if (error){
 					logger.error(error);
 					deferred.reject(error);
 				} else {
-					fs.chmod(to, 0644);
+					fs.chmod(to, 0664);
 					deferred.resolve(to);
 				}
 				if (typeof(callback) == 'function') callback(error);
@@ -66,6 +66,23 @@ module.exports = {
 		name = name.replace(/[\[\]\/\\]/ig,'');
 		if (os.platform() == 'darwin') name.replace(/[\:]/ig, ';'); // OS X doesn't like colons in the filename
 		return name.trim();
+	},
+	'folderMove': function(from,to){
+		var deferred = Q.defer();
+		try {
+			fs.rename(from,to, function(error){
+				if (error){
+					logger.error(error);
+					deferred.reject(error);
+				} else {
+					deferred.resolve(to);
+				}
+			});
+		} catch(e){
+			logger.error(e.message);
+			deferred.reject(e.message);
+		}
+		return deferred.promise;
 	},
 	'formatDirectory': function(name){
 		// Sanitize directory names (remove backslash, foreslash and colon)

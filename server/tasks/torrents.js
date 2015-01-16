@@ -26,7 +26,7 @@ module.exports = function(app,db,socket){
 								logger.debug('Trashing:', data.movie.title);
 								torrent.remove(transfer.id,true,trashResponse);
 							}
-							socket.emit('alert', {'title':'Movie downloaded','message':data.movie.title});
+							socket.emit('alert', {'title':'Movie downloaded','message':data.movie.title,'type':'success'});
 						}, function(error){
 							if (error) logger.error(error);
 						});
@@ -37,7 +37,7 @@ module.exports = function(app,db,socket){
 								logger.debug('Trashing:', data.show.name);
 								torrent.remove(transfer.id,true,trashResponse);
 							}
-							socket.emit('alert', {'title':'Episode downloaded','message':data.show.name});
+							socket.emit('alert', {'title':'Episode downloaded','message':data.show.name,'type':'success'});
 						}, function(error){
 							if (error) logger.error(error);
 						});

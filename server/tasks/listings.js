@@ -17,7 +17,7 @@ module.exports = function(app,db,socket){
 		var ObjectID	= require('mongodb').ObjectID;
 		
 		var updateListings = function(){
-			socket.emit('alert', {'message': 'Updating TV listings'})
+			socket.emit('alert', {'message':'Updating TV listings','type':'info'});
 			// Update show listings
 			shows.getShowlist();
 			
