@@ -152,16 +152,6 @@ body {
 	}
 }
 
-/*
-.modal-open {
-	#main, .navbar {
-		-webkit-filter: blur(8px);
-	}
-	.alert-container {
-		display: none;
-	}
-}
-*/
 .modal-backdrop {
 	&.in {
 		opacity: 0.8;
