@@ -16,11 +16,15 @@ module.exports = function(app, db){
 	app.get('/api/dashboard/movies/unmatched', function(req,res){
 		movies.countUnmatched().then(function(count){
 			res.send({'status':true,'count':count});
+		}, function(){
+			res.status(404).end();
 		});
 	});
 	app.get('/api/dashboard/shows/unmatched', function(req,res){
 		shows.countUnmatched().then(function(count){
 			res.send({'status':true,'count':count});
+		}, function(){
+			res.status(404).end();
 		});
 	});
 };

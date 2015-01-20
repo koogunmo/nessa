@@ -121,7 +121,12 @@ try {
 			require('./server/routes/shows')(app,db,io);
 			require('./server/routes/system')(app,db,io);
 			require('./server/routes/users')(app,db,io);
-	
+			
+			// Catch any unknown API endpoints
+			app.all('/api/*', function(req,res){
+				res.status(501).end({'success':false,'url':req.url,'error':'Not implemented'});
+			});
+			
 			app.use(function(req, res) {	
 				res.sendFile(process.cwd() + '/app/views/index.html');
 			});

@@ -14,6 +14,24 @@ define('app', ['angular','moment','ngAnimate','ngMessages','ngResource','ngSocke
 	
 	/****** Directives ******/
 	
+	.directive('autofocus', function($log,$parse,$timeout){
+		return {
+			restrict: 'A',
+			link: function($scope,$element,$attrs){
+				var model = $parse($attrs.autofocus);
+				$scope.$watch(model,function(value){
+					if (value === true) { 
+						$timeout(function(){
+							$element[0].focus(); 
+						});
+					}
+				});
+				$element.bind('blur',function(){
+					if (model.assign) $scope.$apply(model.assign($scope,false));
+				});
+			}
+		};
+	})
 	.directive('lazyLoad', function($document,$log,$timeout,$window){
 		return {
 			restrict: 'AC',

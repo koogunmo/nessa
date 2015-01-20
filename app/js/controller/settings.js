@@ -19,7 +19,7 @@ define(['app'], function(nessa){
 		$stateProvider.state('settings.user', {
 			abstract: true,
 			url: '/user',
-			data:{secure:true}
+			data:{'secure':true}
 			
 		}).state('settings.user.add', {
 			url: '/add',
@@ -60,31 +60,6 @@ define(['app'], function(nessa){
 				window.modal = null;
 			}
 		});
-		
-		$stateProvider.state('profile', {
-			url: '/profile',
-			data: {
-				secure: true,
-				title: 'Profile'
-			},
-			onEnter: function($modal, $state){
-				$modal.open({
-					templateUrl: 'views/settings/modal/user.html',
-					controller: 'UserController'
-				}).result.then(function(result){
-					$state.transitionTo(previous);
-					window.modal = null;
-				}, function(result){
-					$state.transitionTo(previous);
-					window.modal = null;
-				});
-			},
-			onExit: function(){
-				if (window.modal) window.modal.dismiss();
-				window.modal = null;
-			}
-		});
-		
 	});
 	
 	nessa.run(function($log, $rootScope){

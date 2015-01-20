@@ -52,7 +52,7 @@
 							<img ng-src="{{user.avatar}}" class="avatar avatar-xs" ng-if="user.avatar" />
 						</a>
 						<ul class="dropdown-menu">
-							<li><a ui-sref="profile"><span class="fa fa-cog"></span> Settings</a></li>
+							<li><a ng-click="profile()"><span class="fa fa-cog"></span> Settings</a></li>
 							<li><a ui-sref="logout"><span class="fa fa-sign-out"></span> Logout</a></li>
 						</ul>
 					</li>
@@ -62,12 +62,12 @@
 		</div>
 	</header>
 	
-	<div class="container alert-container" ng-controller="AlertsController" ng-cloak>
-		<alert ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)"><strong>{{alert.message}}</strong></alert>
+	<div class="alert-container" ng-class="{'active':alerts.length}" ng-controller="AlertsController" ng-cloak>
+		<alert ng-repeat="alert in alerts" type="{{alert.type}}" close="dismiss($index)"><strong>{{alert.title}}</strong>: {{alert.message}}</alert>
 	</div>
 	
 	<div id="main" class="container" role="main" autoscroll="autoscroll" ui-view>
-		Loading...
+		<div class="loading"></div>
 	</div>
 	
 	<script type="text/javascript" src="/socket.io/socket.io.js"></script>

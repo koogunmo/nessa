@@ -7,6 +7,7 @@ $break-small: 767px;
 
 $screen-sm: 768px;
 $screen-md: 992px;
+$screen-lg: 1200px;
 
 body {
 	background-color: #F6F6F6;
@@ -50,10 +51,6 @@ body {
 	}
 }
 
-
-
-
-
 .well[ui-view]{
 	height: 65px; 
 }
@@ -75,7 +72,6 @@ body {
 		display: block;
 	}
 }
-
 
 .page-links {
 	text-align: center;
@@ -137,16 +133,25 @@ body {
 		cursor: pointer;
 	}
 }
-/*
-.modal-open {
-	#main, .navbar {
-		-webkit-filter: blur(8px);
+.panel-heading {
+	.fa-search {
+		cursor: pointer;
 	}
-	.alert-container {
-		display: none;
+	.panel-title {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	h4.panel-title {
+		line-height: 20px;
 	}
 }
-*/
+.row {
+	.page-header {
+		margin: 20px 0px;
+	}
+}
+
 .modal-backdrop {
 	&.in {
 		opacity: 0.8;
@@ -211,11 +216,35 @@ input {
 /* Alerts */
 
 .alert-container {
+	background-color: rgba(0,0,0,0.8);
+	bottom: 0px;
 	height: auto;
+	left: 0px;
+	opacity: 0;
+	padding: 15px;
+	pointer-events: none;
 	position: fixed;
-	top: 60px;
-	width: 100%;
-	z-index: 1030;
+	right: 0px;
+	top: 0px;
+	z-index: 1060;
+	transition: opacity 0.5s;
+	&.active {
+		opacity: 1;
+		pointer-events: all;
+		display: block;
+	}
+	.alert {
+		pointer-events: all;
+	}
+	@media (min-width: $screen-lg){
+		background-color: transparent;
+		bottom: auto;
+		left: auto;
+		padding: 0px 15px;
+		pointer-events: all;
+		top: 60px;
+		width: 25%;
+	}
 }
 
 /* Login form */
@@ -269,6 +298,8 @@ input {
 }
 
 /* Dashboard */
+
+// need to clean all this up
 
 #dashboard {
 	h3 {

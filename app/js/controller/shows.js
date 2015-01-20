@@ -96,7 +96,7 @@ define(['app'], function(nessa){
 		})
 	})
 	
-	nessa.run(function($log, $rootScope){
+	nessa.run(function($http,$log,$rootScope){
 		$log.info('Module loaded: Shows');
 		$rootScope.menu.push({
 			path: 'shows.index',
@@ -105,12 +105,21 @@ define(['app'], function(nessa){
 			order: 20
 		});
 		$rootScope.genres.shows = [
-			'Action','Adventure','Animation',
-			'Children','Comedy','Documentary','Drama',
-			'Fantasy','Game Show','Home and Garden',
-			'Mini Series','News','Reality',
-			'Science Fiction','Soap','Special Interest',
-			'Sport','Talk Show','Western'
+			{'name':'Action','slug':'action'},
+			{'name':'Adventure','slug':'adventure'},
+			{'name':'Animation','slug':'animation'},
+			{'name':'Comedy','slug':'comedy'},
+			{'name':'Crime','slug':'crim'},
+			{'name':'Documentary','slug':'documentary'},
+			{'name':'Drama','slug':'drama'},
+			{'name':'Fantasy','slug':'fantasy'},
+			{'name':'Horror','slug':'horror'},
+			{'name':'Mystery','slug':'mystery'},
+			{'name':'Science Fiction','slug':'science-fiction'},
+			{'name':'Sport','slug':'sports'},
+			{'name':'Thriller','slug':'thriller'},
+			{'name':'War','slug':'war'},
+			{'name':'Western','slug':'western'}
 		];
 	})
 	
@@ -189,36 +198,72 @@ define(['app'], function(nessa){
 			page: 1
 		};
 		$scope.unmatched = [];
-		
 		$http.get('/api/shows/unmatched').success(function(json,status){
 			$scope.unmatched = json;
 		});
-		
 		$scope.$on('ShowMatched', function(e,item){
 			var idx = $scope.unmatched.indexOf(item);
 			$scope.unmatched.splice(idx,1);
 		});
 	})
-	
-	nessa.controller('ShowsUnmatchedController', function($http,$log,$scope){
+	.controller('ShowsUnmatchedController', function($http,$log,$scope){
+		$scope.custom = false;
+		$scope.loading = false;
 		$scope.matched = false;
-		$scope.selected = null;
+		$scope.selected = false;
+		$scope.query = null;
+
+		$scope.show.original = angular.copy($scope.show.matches);
+		
+		$scope.filter = function(){
+			$scope.custom = !$scope.custom;
+			$scope.selected = false;
+			$scope.query = null;
+			if ($scope.custom){
+				$scope.show.matches = [];
+			} else {
+				$scope.show.matches = angular.copy($scope.show.original);
+			}
+		};
+		$scope.submit = function(){
+			if ($scope.selected){
+				$http.post('/api/shows/match', {'imdb':$scope.selected.ids.imdb,'directory':$scope.show.file}).success(function(){
+					$scope.$emit('ShowMatched', $scope.show);
+				});
+			} else {
+				$scope.search();
+			}
+		};
+		$scope.reset = function(){
+			$scope.query = null;
+			$scope.selected = false
+			if ($scope.custom) $scope.show.matches = false;
+		};
+		$scope.search = function(){
+			if (!$scope.query) return;
+			$scope.show.matches = [];
+			$scope.selected = false;
+			$scope.loading = true;
+			$http.post('/api/shows/search', {'q':$scope.query}).success(function(results){
+				$scope.loading = false
+				results.forEach(function(result){
+					$scope.show.matches.push(result.show);
+				});
+			}).error(function(){
+				$scope.loading = false;
+			});
+		};
 		$scope.$on('MatchSelected', function(e,match){
 			$scope.selected = match;
 		});
-		
-		$scope.match = function(){
-			$http.post('/api/shows/match', [{'imdb':$scope.selected.ids.imdb,'directory':$scope.show.directory}]).success(function(){
-				$scope.$emit('ShowMatched', $scope.show);
-			});
-		};
 	})
-	
-	nessa.controller('ShowsMatchOptionController', function($http,$log,$scope){
+	.controller('ShowsMatchOptionController', function($http,$log,$scope){
 		$scope.select = function(){
 			$scope.$emit('MatchSelected', $scope.match);
 		};
 	})
+	
+	
 	
 	
 	nessa.controller('ShowsRandomController', function($http,$log,$modalInstance,$scope){
@@ -303,7 +348,7 @@ define(['app'], function(nessa){
 		$scope.downloadAll = function(){
 			if (confirm('Are you sure you want to download all available episodes?')) {
 				$http.post('/api/shows/'+$scope.show.imdb+'/download').success(function(){
-					$scope.$emit('ShowReload');
+				//	$scope.$emit('ShowReload');
 				}).error(function(json, status){
 					$log.error(json, status);
 				});
@@ -311,8 +356,12 @@ define(['app'], function(nessa){
 		};
 		$scope.rescan = function(){
 			$http.post('/api/shows/'+$scope.show.imdb+'/scan').success(function(json, status){
-			//	$rootScope.$broadcast('alert', {title: $scope.show.name, message: 'Rescan in progress...'});
-				
+				$rootScope.$broadcast('alert',{
+					'type':'info',
+					'title':'Rescanning files',
+					'message':$scope.show.name,
+					'icon':'/media/'+$scope.settings.media.shows.directory+'/'+$scope.show.directory+'/poster.jpg'
+				});
 			}).error(function(json, status){
 				$log.error(json, status);
 			});
@@ -320,7 +369,12 @@ define(['app'], function(nessa){
 		$scope.remove = function(){
 			if (confirm('Are you sure you want to remove this show?')) {
 				$http.delete('/api/shows/'+$scope.show.imdb).success(function(){
-					$rootScope.$broadcast('alert', {'title':$scope.show.name,'message':'Show removed'});
+					$rootScope.$broadcast('alert',{
+						'type':'danger',
+						'title':'Show removed',
+						'message':$scope.show.name,
+						'icon':'/media/'+$scope.settings.media.shows.directory+'/'+$scope.show.directory+'/poster.jpg'
+					});
 					$rootScope.$broadcast('ShowsRefresh');
 					$scope.close();
 				}).error(function(json, status){
@@ -337,16 +391,25 @@ define(['app'], function(nessa){
 				'status': $scope.show.status
 			};
 			$http.post('/api/shows/'+$scope.show.imdb, settings).success(function(json, status){
-				$rootScope.$broadcast('alert', {'title':$scope.show.name,'message':'Settings saved'});
-			//	$scope.close();
+				$rootScope.$broadcast('alert',{
+					'type':'success',
+					'title':'Settings saved',
+					'message':$scope.show.name,
+					'icon':'/media/'+$scope.settings.media.shows.directory+'/'+$scope.show.directory+'/poster.jpg'
+				});
 			}).error(function(json, status){
 				$log.error(json, status);
 			});
 		};
 		$scope.update = function(){
-			$http.post('/api/shows/'+$scope.show.imdb+'/update').success(function(json, status){	
-			//	$rootScope.$broadcast('alert', {'title':$scope.show.name, message: 'Updating listings...'});
-			//	$scope.close();
+			$http.post('/api/shows/'+$scope.show.imdb+'/update').success(function(json, status){
+				$scope.$emit('ShowReload');
+				$rootScope.$broadcast('alert',{
+					'type':'info',
+					'title':'Updating details',
+					'message':$scope.show.name,
+					'icon':'/media/'+$scope.settings.media.shows.directory+'/'+$scope.show.directory+'/poster.jpg'
+				});
 			}).error(function(json, status){
 				$log.error(json, status);
 			});

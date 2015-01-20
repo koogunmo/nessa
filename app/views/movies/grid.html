@@ -12,7 +12,7 @@
 	</div>
 	<div class="row" ng-if="filter.active">
 		<div class="col-sm-3">
-			<select class="form-control" ng-model="filter.genre" ng-options="value for value in genres.movies">
+			<select class="form-control" ng-model="filter.genre" ng-options="genre.slug as genre.name for genre in genres.movies">
 				<option value="">&raquo; All Genres</option>
 			</select>
 		</div>
@@ -38,11 +38,14 @@
 			<h6>{{::movie.title}}</h6>
 			<div class="overlay">
 				<div class="title">{{::movie.title}}</div>
+				<div>({{::movie.year}})</div>
 				<div class="hud">
-					<!--
-					<span class="fa fa-hdd-o" ng-if="movie.file"></span>
-					<span class="fa fa-magnet" ng-if="movie.hashes"></span>
-					-->
+					<div ng-show="movie.quality">
+						<span class="fa fa-hdd-o"></span> {{::movie.quality}}
+					</div>
+					<div ng-show="movie.hashes && !movie.file">
+						<span class="fa fa-magnet"></span>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -54,4 +57,5 @@
 </div>
 <div class="page-links" ng-show="results.length>=paginate.items" ng-cloak>
 	<pagination class="pagination-sm" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;" items-per-page="paginate.items" total-items="results.length" ng-model="paginate.page" max-size="5" boundary-links="true"></pagination>
+	<!-- <div class="text-center">{{results.length}} items</div> -->
 </div>
