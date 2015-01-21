@@ -22,15 +22,15 @@ module.exports = function(app, db, socket){
 	}).post('/api/shows', function(req,res){
 		// Add new show
 		shows.add(req.user, req.body.imdb).then(function(show){
-			self.getFeed(show.imdb);
+			shows.getFeed(show.imdb);
 			return shows.directory(show.imdb);
 		}).then(function(show){
 			res.status(201).send(show);
-			self.getArtwork(show.imdb);
+			shows.getArtwork(show.imdb);
 			return self.getListings(show.imdb);
 		}).then(function(){
-			self.getHashes(show.imdb)
-			self.getProgress(req.user,show.imdb);
+			shows.getHashes(show.imdb)
+			shows.getProgress(req.user,show.imdb);
 		}).catch(function(error){
 			logger.error(error);
 			res.status(404).end();
