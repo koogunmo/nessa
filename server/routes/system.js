@@ -57,10 +57,12 @@ module.exports = function(app,db,socket){
 			}
 		});
 	}).post('/api/system/restart', function(req,res){
-		socket.emit('alert', {message:'Restarting...',type:'warn'});
-		system.restart();
+		socket.emit('alert', {'type':'warning','message':'Restarting...'});
+		setTimeout(function(){
+			system.restart();	
+		}, 500);
 	}).post('/api/system/update', function(req,res){
-		socket.emit('alert', {message:'Updating...',type:'warn'});
+		socket.emit('alert', {'type':'warning','message':'Updating...'});
 		system.update();
 	}).post('/api/system/upgrade', function(req,res){
 		// Update DB to 0.8 format

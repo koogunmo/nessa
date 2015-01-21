@@ -26,7 +26,12 @@ module.exports = function(app,db,socket){
 								logger.debug('Trashing:', data.movie.title);
 								torrent.remove(transfer.id,true,trashResponse);
 							}
-							socket.emit('alert', {'title':'Movie downloaded','message':data.movie.title,'type':'success'});
+							socket.emit('alert',{
+								'type':'success',
+								'title':'Movie downloaded',
+								'message':data.movie.title,
+								'icon':'/media/'+nconf.get('media:movies:directory')+'/.artwork/'+data.movie.imdb+'/poster.jpg'
+							});
 						}, function(error){
 							if (error) logger.error(error);
 						});
@@ -37,7 +42,12 @@ module.exports = function(app,db,socket){
 								logger.debug('Trashing:', data.show.name);
 								torrent.remove(transfer.id,true,trashResponse);
 							}
-							socket.emit('alert', {'title':'Episode downloaded','message':data.show.name,'type':'success'});
+							socket.emit('alert',{
+								'type':'success',
+								'title':'Episode downloaded',
+								'message':data.show.name,
+								'icon':'/media/'+nconf.get('media:shows:directory')+'/'+data.show.directory+'/poster.jpg'
+							});
 						}, function(error){
 							if (error) logger.error(error);
 						});

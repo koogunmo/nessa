@@ -53,17 +53,19 @@ define(['app'], function(nessa){
 			},1000)
 		});
 		
-		$http.get('/api/movies/latest').success(function(json,status){
+		var cacheBuster = new Date().getTime();
+		
+		$http.get('/api/movies/latest?'+cacheBuster).success(function(json,status){
 			$scope.movies = json;
 		});
-		$http.get('/api/movies/pending').success(function(json,status){
+		$http.get('/api/movies/pending?'+cacheBuster).success(function(json,status){
 			$scope.pending = json;
 		});
 		
-		$http.get('/api/shows/latest').success(function(json,status){
+		$http.get('/api/shows/latest?'+cacheBuster).success(function(json,status){
 			$scope.episodes = json;
 		});
-		$http.get('/api/shows/upcoming').success(function(json,status){
+		$http.get('/api/shows/upcoming?'+cacheBuster).success(function(json,status){
 			$scope.upcoming = json;
 		});
 		
