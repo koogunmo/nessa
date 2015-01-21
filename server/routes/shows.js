@@ -23,6 +23,8 @@ module.exports = function(app, db, socket){
 		// Add new show
 		shows.add(req.user, req.body.imdb).then(function(show){
 			shows.getFeed(show.imdb);
+			return shows.addUser(req.user,show.imdb);
+		}).then(function(show){
 			return shows.directory(show.imdb);
 		}).then(function(show){
 			res.status(201).send(show);
