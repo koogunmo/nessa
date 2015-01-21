@@ -138,7 +138,7 @@ define(['app'], function(nessa){
 						return false;
 					});
 					if (downloads.length == 1){
-				//		$http.delete('/api/downloads/'+downloads[0].id);
+						$http.delete('/api/downloads/'+downloads[0].id);
 					}
 				});
 				setTimeout(function(){$scope.$emit('DownloadsRefresh');},500)
