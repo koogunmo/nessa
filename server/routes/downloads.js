@@ -35,7 +35,7 @@ module.exports = function(app, db, socket){
 				logger.error(error);
 				return res.status(404).send({'success':false})
 			}
-			res.send(data.torrents[0]);
+			if (data.torrents[0]) res.send(data.torrents[0]);
 		});
 	}).post('/api/downloads/:id', function(req,res){
 		if (typeof(req.body.status) != 'undefined'){
