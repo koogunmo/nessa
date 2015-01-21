@@ -10,15 +10,25 @@
 			</div>
 		</div>
 	</div>
-	<div class="row" ng-if="filter.active">
+	<div class="row">
 		<div class="col-sm-3">
-			<div class="checkbox"><label><input type="checkbox" ng-model="filter.status" /> Hide paused</label></div>
+			<select name="" id="" class="form-control" ng-model="filter.state" ng-options="option.type as option.name for option in states">
+				<option value="">Show all</option>
+			</select>
+		</div>
+		<div class="col-sm-6"></div>
+		
+		<div class="col-sm-3 text-right">
+			<div class="btn-group" ng-show="selected.length">
+				<button class="btn btn-success" ng-click="resume()"><span class="fa fa-play"></span></button>
+				<button class="btn btn-warning" ng-click="pause()"><span class="fa fa-pause"></span></button>
+				<button class="btn btn-danger"><span class="fa fa-trash"></span></button>
+			</div>
 		</div>
 	</div>
 </div>
 
 <div ng-repeat="download in results = (downloads|filter:filterList) | orderBy:'name'" ng-include="'/views/downloads/partial/download.html'"></div>
-
 
 <div ng-hide="downloads.length && results.length">
 	<div ng-show="filter.name.length">No matches found</div>

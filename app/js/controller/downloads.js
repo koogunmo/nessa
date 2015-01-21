@@ -11,7 +11,6 @@ define(['app'], function(nessa){
 			}
 			
 		}).state('downloads.add', {
-			// Deprecate this?
 			url: '/add',
 			onEnter: function($modal,$state){
 				$modal.open({
@@ -29,7 +28,7 @@ define(['app'], function(nessa){
 				if (window.modal) window.modal.dismiss()
 				window.modal = null;
 			}
-		}).state('downloads.info', {
+		})/*.state('downloads.info', {
 			url: '/{id:[0-9]{1,}}',
 			data: {
 				secure: true
@@ -51,6 +50,7 @@ define(['app'], function(nessa){
 				window.modal = null;
 			}
 		});
+		*/
 	})
 	
 	nessa.run(function($log, $rootScope){
@@ -67,11 +67,19 @@ define(['app'], function(nessa){
 	
 	nessa.controller('DownloadsController', function($http,$log,$modal,$scope){
 		$scope.downloads = [];
+		$scope.states = [
+			{'type':'active','name':'Active'},
+			{'type':'downloading','name':'Downloading'},
+			{'type':'seeding','name':'Seeding'},
+			{'type':'paused','name':'Paused'},
+			{'type':'complete','name':'Complete'}
+		];
 		$scope.filter = {
-			active: false,
-			title: '',
-			status: ''
+			'active': false,
+			'state': '',
+			'title': ''
 		};
+		$scope.selected = [];
 		
 		$scope.add = function(){
 			$modal.open({
@@ -83,19 +91,84 @@ define(['app'], function(nessa){
 		};
 		$scope.filterClear = function(){
 			$scope.filter.title = '';
+			$scope.filter.state = '';
 		};
 		$scope.filterList = function(item){
 			if (!item.name.toLowerCase().match($scope.filter.title.toLowerCase())) return false;
-			if ($scope.filter.active){
-				if ($scope.filter.status != '' && item.status != $scope.filter.status) return false;
+			if ($scope.filter.state){
+				switch ($scope.filter.state){
+					case 'active':
+						if ([4,6].indexOf(item.status) >= 0) return true;
+						break;
+					case 'complete':
+						if (item.isFinished) return true;
+						break;
+					case 'downloading':
+						if (item.status == 4) return true;
+						break;
+					case 'paused':
+						if (item.status == 0) return true;
+						break;
+					case 'seeding':
+						if (item.status == 6) return true;
+						break;
+				}
+				return false;
 			}
 			return true;
 		};
 		
+		$scope.pause = function(){
+			$scope.selected.forEach(function(id){
+				var downloads = $scope.downloads.filter(function(item){
+					if (item.id == id) return true;
+					return false;
+				});
+				if (downloads.length == 1){
+					$http.post('/api/downloads/'+downloads[0].id,{'status':false});
+				}
+			});
+			setTimeout(function(){$scope.$emit('DownloadsRefresh');},500)
+		};
+		$scope.remove = function(){
+			if (confirm('Are you sure you want to delete these torrents?')){
+				$scope.selected.forEach(function(id){
+					var downloads = $scope.downloads.filter(function(item){
+						if (item.id == id) return true;
+						return false;
+					});
+					if (downloads.length == 1){
+				//		$http.delete('/api/downloads/'+downloads[0].id);
+					}
+				});
+				setTimeout(function(){$scope.$emit('DownloadsRefresh');},500)
+			}
+		};
+		$scope.resume = function(){
+			$scope.selected.forEach(function(id){
+				var downloads = $scope.downloads.filter(function(item){
+					if (item.id == id) return true;
+					return false;
+				});
+				if (downloads.length == 1){
+					 $http.post('/api/downloads/'+downloads[0].id,{'status':true});
+				}
+			});
+			setTimeout(function(){$scope.$emit('DownloadsRefresh');},500)
+		};
+		
+		$scope.$on('DownloadSelected', function(e,data){
+			if (data.status){
+				$scope.selected.push(data.id);
+			} else {
+				var index = $scope.selected.indexOf(data.id);
+				$scope.selected.splice(index,1);
+			}
+		});
 		$scope.$on('DownloadsRefresh', function(){
-			$log.debug('Refreshing...');
 			$http.get('/api/downloads').success(function(json, status){
 				$scope.downloads = json;
+				$scope.selected = [];
 			});
 		});
 		$scope.$emit('DownloadsRefresh');
@@ -104,6 +177,11 @@ define(['app'], function(nessa){
 	nessa.controller('DownloadController', function($http,$interval,$log,$scope){
 		$scope.active	= !!$scope.download.status;
 		$scope.selected	= false;
+		
+		$scope.select = function(){
+			$scope.selected = !$scope.selected;
+			$scope.$emit('DownloadSelected', {'id':$scope.download.id,'status':$scope.selected});
+		};
 		
 		$scope.startStop = function(){
 			$scope.active = !$scope.active;
@@ -140,6 +218,9 @@ define(['app'], function(nessa){
 			});
 		};
 	})
+	
+	
+	
 	
 	nessa.controller('DownloadDetailController', function($http,$log,$modalInstance,$scope,$state,$stateParams){
 		$scope.download = null;

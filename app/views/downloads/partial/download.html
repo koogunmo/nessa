@@ -1,12 +1,7 @@
-	<div class="download" ng-class="{paused: !active}" ng-controller="DownloadController">
-		<span class="pull-right">
-			<button type="button" class="btn btn-xs" ng-click="startStop()" ng-class="{'btn-success': !active, 'btn-danger': active}">
-				<span class="fa" ng-class="{'fa-play': !active, 'fa-pause': active}"></span>
-			</button>
-		</span>
+	<div class="download" ng-click="select($index)" ng-class="{'selected':selected,'paused':!active}" ng-controller="DownloadController">
 		<h4>
-			<!-- <input type="checkbox" ng-model="selected"> -->
-			<span ui-sref="downloads.info({id: download.id})">{{download.name}}</span>
+			{{download.name}}
+			<!--span ui-sref="downloads.info({id: download.id})" ng-click="$event.stopPropagation()">{{download.name}}</span-->
 		</h4>
 		<div class="progress" title="{{download.percentDone*100 | number:2}}%">
 			<div class="progress-bar" role="progressbar" style="width: {{download.percentDone*100}}%;" ng-class="{'progress-bar-success': download.percentDone==1}"></div>
