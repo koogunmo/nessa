@@ -2,18 +2,18 @@
 
 requirejs.config({
 	paths: {
-		'angular': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.3.8/angular.min',
-		'jquery': 'https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min',
+		'angular': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.3.10/angular.min',
+		'jquery': 'https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min',
 		'moment': 'libs/moment.min',
-		'ngAnimate': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.3.8/angular-animate.min',
-		'ngAria': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.3.8/angular-aria.min',
-		'ngCookies': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.3.8/angular-cookies.min',
-		'ngMessages': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.3.8/angular-messages.min',
-		'ngResource': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.3.8/angular-resource.min',
-		'ngSanitize': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.3.8/angular-sanitize.min',
+		'ngAnimate': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.3.10/angular-animate.min',
+		'ngAria': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.3.10/angular-aria.min',
+		'ngCookies': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.3.10/angular-cookies.min',
+		'ngMessages': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.3.10/angular-messages.min',
+		'ngResource': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.3.10/angular-resource.min',
+		'ngSanitize': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.3.10/angular-sanitize.min',
 		'ngSocketIO': 'libs/ngSocketIO.min',
 		'ngStorage': 'libs/ng-storage.min',
-		'ngTouch': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.3.8/angular-touch.min',
+		'ngTouch': 'https://ajax.googleapis.com/ajax/libs/angularjs/1.3.10/angular-touch.min',
 		'ui.bootstrap': 'libs/ui-bootstrap-0.12.0.min',
 		'ui.router': 'libs/ui-router-0.2.13.min',
 		// Application files
