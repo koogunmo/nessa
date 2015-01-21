@@ -27,8 +27,8 @@ module.exports = function(app, db, socket){
 		}).then(function(show){
 			res.status(201).send(show);
 			shows.getArtwork(show.imdb);
-			return self.getListings(show.imdb);
-		}).then(function(){
+			return shows.getListings(show.imdb);
+		}).then(function(show){
 			shows.getHashes(show.imdb)
 			shows.getProgress(req.user,show.imdb);
 		}).catch(function(error){
