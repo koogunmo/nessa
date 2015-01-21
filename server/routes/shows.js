@@ -123,7 +123,13 @@ module.exports = function(app, db, socket){
 		
 	}).post('/api/shows/:imdb(tt[0-9]+)/update', function(req,res){
 		// Update show listings
+		
+		logger.debug('Updating listings')
+		
 		shows.getSummary(req.params.imdb).then(function(show){
+			
+			logger.debug(show.name, show.imdb);
+			
 			shows.getArtwork(show.imdb);
 			shows.getListings(show.imdb).then(function(){
 				shows.getProgress(req.user, show.imdb);
