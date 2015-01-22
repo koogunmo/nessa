@@ -113,7 +113,7 @@ body {
 		>li {
 			>a {
 				transition: color 0.5s;
-				> span.fa {
+				> span.fa, img {
 					margin-right: 5px;
 					float: right;
 					@media screen and (min-width: $break-small){
