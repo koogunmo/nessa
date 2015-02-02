@@ -19,7 +19,7 @@
 					<div ng-if="episodes.length>=1">
 						<div class="panel" ng-class="{'panel-success': item.episode.watched, 'panel-warning': !item.episode.watched}" ng-repeat="item in episodes | orderBy:['episode.added','episode.airdate','show.name','episode.episode']:true" ng-controller="DashboardEpisodeController">
 							<div class="panel-heading" ng-click="toggle()">
-								<span class="small pull-right">{{::item.episode.added|date:'EEE d MMM, h:mma'}}</span>
+								<span class="small pull-right hidden-xs">{{::item.episode.added|date:'EEE d MMM, h:mma'}}</span>
 								<h4 class="panel-title">
 									<a ui-sref="shows.index.detail({imdb:item.show.imdb,url:item.show.url})">{{::item.show.name}}</a>
 									<span class="small">{{::item.episode.title}}</span>
