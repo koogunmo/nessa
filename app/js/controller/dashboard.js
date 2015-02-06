@@ -50,7 +50,7 @@ define(['app'], function(nessa){
 	
 	/****** Controller ******/
 	
-	nessa.controller('DashboardController', function($http,$interval,$log,$scope){
+	nessa.controller('DashboardController', function($http,$log,$scope){
 		$scope.notifications = false;
 		if (('Notification' in window) && Notification.permission === 'granted'){
 			$scope.notifications = true;
@@ -137,20 +137,20 @@ define(['app'], function(nessa){
 			$scope.pending = json;
 		});
 	})
-	.controller('DashboardSystemController', function($http,$log,$scope){
+	.controller('DashboardSystemController', function($http,$interval,$log,$scope){
 		$scope.stats = {'uptime':0};
 		$http.get('/api/system/status').success(function(json,status){
 			$scope.stats = json;
-			$interval(function(){
-				$scope.stats.uptime++;
-				$scope.uptime = {
-					days: Math.floor($scope.stats.uptime / 86400),
-					hour: Math.floor(($scope.stats.uptime % 86400) / 3600),
-					mins: Math.floor((($scope.stats.uptime % 86400) % 3600) / 60),
-					secs: (($scope.stats.uptime % 86400) % 3600) % 60
-				};
-			},1000)
 		});
+		$scope.$watch(function(){return $scope.stats.uptime}, function(){
+			$scope.uptime = {
+				'days': Math.floor($scope.stats.uptime / 86400),
+				'hour': Math.floor(($scope.stats.uptime % 86400) / 3600),
+				'mins': Math.floor((($scope.stats.uptime % 86400) % 3600) / 60),
+				'secs': (($scope.stats.uptime % 86400) % 3600) % 60
+			};
+		});
+		$interval(function(){$scope.stats.uptime++},1000);
 	})
 	
 	return nessa;
