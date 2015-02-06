@@ -31,18 +31,19 @@
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
 				</button>
-				<a class="navbar-brand" ui-sref="dashboard">NodeTV</a>
+				<a class="navbar-brand" ui-sref="dashboard.shows">NodeTV</a>
 			</div>
 			<nav class="collapse navbar-collapse" collapse="isCollapsed" ng-cloak>
 				
 				<ul class="nav navbar-nav navbar-left" ng-if="visible">
-					<li ng-repeat="item in menu | orderBy: 'order'" ng-class="{active: state.includes(item.path)}" ng-cloak>
+					<li ng-repeat="item in menu | orderBy: 'order'" ng-class="{active: state.includes(item.root)}" ng-cloak>
 						<a ui-sref="{{::item.path}}" ng-click="collapse()">
 							<span class="fa fa-{{::item.icon}}"></span>
 							{{::item.name}}
 						</a>
 					</li>
 				</ul>
+				
 				<ul class="nav navbar-nav navbar-right" ng-if="visible">
 					<li class="dropdown" dropdown ng-cloak>
 						<a class="dropdown-toggle" dropdown-toggle>

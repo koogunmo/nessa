@@ -1,0 +1,30 @@
+	<div class="row">
+		<div class="col-sm-12">
+			<div class="page-header">
+				<h3>
+					Available movies
+					<span class="badge">{{pending.length}}</span>
+				</h3>
+			</div>
+		</div>
+		<div class="col-md-4" ng-repeat="movie in pending|orderBy:'title'" ng-if="!movie.downloading" ng-controller="DashboardMovieController">
+			<div class="panel panel-warning">
+				<div class="panel-heading">
+					<h4 class="panel-title">
+						{{::movie.title}}
+					</h4>
+				</div>
+				<div class="panel-body">
+					<div class="btn-group">
+						<button class="btn btn-default" disabled="true" ng-if="movie.downloading">
+							<span class="fa fa-cloud-download"></span> Downloading {{movie.downloading}}
+						</button>
+						<button class="btn btn-default" tooltip="{{dl.size|formatBytes}}" ng-repeat="dl in movie.hashes|orderBy:'size'" ng-disabled="dl.quality==movie.quality" ng-click="download(dl)">
+							<span class="fa fa-cloud-download"></span> {{::dl.quality}}
+						</button>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+	</div>

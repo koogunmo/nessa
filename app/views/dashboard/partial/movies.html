@@ -1,0 +1,28 @@
+	<div class="row">
+		<div class="col-sm-12">
+			<div class="page-header">
+				<h3>Latest movies</h3>
+			</div>
+			<div class="alert alert-warning" ng-show="unmatched">
+				There <ng-pluralize count="unmatched" when="{'1':'is','other':'are'}"></ng-pluralize>
+				<a ui-sref="movies.match" class="alert-link">{{unmatched}} unmatched <ng-pluralize count="unmatched" when="{'1':'movie','other':'movies'}"></ng-pluralize></a>
+				that <ng-pluralize count="unmatched" when="{'1':'needs','other':'need'}"></ng-pluralize> updating.
+			</div>
+		</div>
+		<div class="poster col-sm-2" ng-repeat="movie in movies|orderBy:'added':true" lazy-load>
+			<div class="image" ui-sref="movies.index.detail({imdb:movie.imdb,url:movie.url})">
+				<img src="/assets/gfx/no-cover.png" alt="" class="img-responsive placeholder">
+				<img lazy-src="/media/{{settings.media.movies.directory}}/.artwork/{{::movie.imdb}}/poster.jpg" alt="" class="img-responsive artwork" />
+				<h6>{{::movie.title}}</h6>
+				<div class="overlay">
+					<div class="title">{{::movie.title}}</div>
+					<div>({{::movie.year}})</div>
+					<div class="hud">
+						{{::movie.quality}}<br />
+						{{::movie.added|date:'yyyy-MM-dd'}}
+					</div>
+				</div>
+			</div>
+			<div class="title"><a ui-sref="movies.index.detail({imdb:movie.imdb,url:movie.url})">{{::movie.title}}</a></div>
+		</div>
+	</div>

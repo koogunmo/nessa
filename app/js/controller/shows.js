@@ -99,10 +99,11 @@ define(['app'], function(nessa){
 	nessa.run(function($http,$log,$rootScope){
 		$log.info('Module loaded: Shows');
 		$rootScope.menu.push({
-			path: 'shows.index',
-			name: 'Shows',
-			icon: 'th',
-			order: 20
+			'icon': 'th',
+			'name': 'Shows',
+			'path': 'shows.index',
+			'root': 'shows',
+			'sort': 20
 		});
 		$rootScope.genres.shows = [
 			{'name':'Action','slug':'action'},

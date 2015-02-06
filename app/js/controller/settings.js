@@ -65,10 +65,11 @@ define(['app'], function(nessa){
 	nessa.run(function($log, $rootScope){
 		$log.info('Module loaded: Settings');
 		$rootScope.menu.push({
-			path: 'settings.index',
-			name: 'Settings',
-			icon: 'gears',
-			order: 100
+			'icon': 'gears',
+			'name': 'Settings',
+			'path': 'settings.index',
+			'root': 'settings',
+			'sort': 100
 		});
 	});
 	

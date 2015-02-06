@@ -55,10 +55,11 @@ define(['app'], function(nessa){
 	.run(function($http,$log,$rootScope){
 		$log.info('Module loaded: Movies');
 		$rootScope.menu.push({
-			'path': 'movies.index',
-			'name': 'Movies',
 			'icon': 'film',
-			'order': 30
+			'name': 'Movies',
+			'path': 'movies.index',
+			'root': 'movies',
+			'sort': 30
 		});
 		$rootScope.genres.movies = [
 			{'name':'Action','slug':'action'},

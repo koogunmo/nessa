@@ -1,0 +1,43 @@
+	<div class="row">
+		<div class="col-sm-12">
+			<div class="page-header">
+				<h3>System details</h3>
+			</div>
+		</div>
+		<div class="col-md-12">
+			<div class="panel panel-info">
+				<div class="panel-heading">
+					<h4 class="panel-title">Server info</h4>
+				</div>
+				<div class="panel-body">
+					<div>Version: {{stats.version}}</div>
+					<div ng-switch="uptime.days">
+						Uptime: 
+						<span ng-switch-when="1">{{uptime.days}} day</span>
+						<span ng-switch-default>{{uptime.days}} days</span>
+						<span>{{uptime.hour|zeroPad}}:{{uptime.mins|zeroPad}}:{{uptime.secs|zeroPad}}</span>
+					</div>
+					<div>
+						Node.js: {{stats.system.node}} ({{stats.system.arch}})
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-12" ng-if="stats.disks">
+			<div class="panel panel-info">
+				<div class="panel-heading">
+					<h4 class="panel-title">Disk usage</h4>
+				</div>
+				<div class="panel-body">
+					<div ng-repeat="disk in stats.disks">
+						<span class="pull-right">{{disk.size*1024|formatBytes}}</span>
+						<span>{{disk.mount}}</span>
+						<progress animate="false" title="">
+							<bar type="danger" value="disk.capacity*100">{{disk.used*1024|formatBytes}}</bar>
+							<bar type="success" value="100-(disk.capacity*100)">{{disk.available*1024|formatBytes}}</bar>
+						</progress>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>

@@ -1,0 +1,66 @@
+	<div class="alert alert-warning" ng-show="unmatched">
+		There <ng-pluralize count="unmatched" when="{'1':'is','other':'are'}"></ng-pluralize>
+		<a ui-sref="shows.match" class="alert-link">{{unmatched}} unmatched <ng-pluralize count="unmatched" when="{'1':'show','other':'shows'}"></ng-pluralize></a>
+		that <ng-pluralize count="unmatched" when="{'1':'needs','other':'need'}"></ng-pluralize> updating.
+	</div>
+	<div class="row">
+		<div class="col-sm-6">
+			<div class="page-header">
+				<h3>Past 7 days</h3>
+			</div>
+			<div ng-if="episodes.length>=1">
+				<div class="panel" ng-class="{'panel-success': item.episode.watched, 'panel-warning': !item.episode.watched}" ng-repeat="item in episodes | orderBy:['episode.added','episode.airdate','show.name','episode.episode']:true" ng-controller="DashboardEpisodeController">
+					<div class="panel-heading" ng-click="toggle()">
+						<span class="small pull-right hidden-xs">{{::item.episode.added|date:'EEE d MMM, h:mma'}}</span>
+						<h4 class="panel-title">
+							<a ui-sref="shows.index.detail({imdb:item.show.imdb,url:item.show.url})">{{::item.show.name}}</a>
+							<span class="small">{{::item.episode.title}}</span>
+						</h4>
+					</div>
+					<div class="panel-body" collapse="collapsed">
+						<div><strong>Season {{::item.episode.season}}, Episode {{::item.episode.episode}}</strong> <span class="small">{{::item.episode.airdate|date:'mediumDate'}}</span></div>
+						<p>{{::item.episode.synopsis}}</p>
+						<div class="text-right">
+							<button type="button" class="btn btn-default" tooltip="Episode watched" tooltip-placement="left" ng-if="item.episode.watched" ng-click="watched()">
+								<span class="fa fa-eye"></span>
+							</button>
+							<button type="button" class="btn btn-default" tooltip="Mark episode as watched" tooltip-placement="left" ng-if="!item.episode.watched" ng-click="watched()">
+								<span class="fa fa-eye-slash"></span>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div ng-if="episodes.length==0">
+				No recent episodes
+			</div>
+		</div>
+		
+		<div class="col-sm-6">
+			<div class="page-header">
+				<h3>Next 7 days</h3>
+			</div>
+			<div ng-if="upcoming.length>=1">
+				<div ng-repeat="item in upcoming|orderBy:['airdate','episode.episode']" ng-controller="DashboardEpisodeController">
+					<div class="panel panel-info">
+						<div class="panel-heading" ng-click="toggle()">
+							<span class="small pull-right">{{::item.airdate|date:'EEE d MMM, h:mma'}}</span>
+							<h4 class="panel-title">
+								<a ui-sref="shows.index.detail({imdb:item.show.imdb,url:item.show.url})">{{::item.show.name}}</a>
+								<span class="small">{{::item.episode.title}}</span>
+							</h4>
+						</div>
+						<div class="panel-body" collapse="collapsed">
+							<div>
+								<strong>Season {{::item.episode.season}}, Episode {{::item.episode.episode}}</strong>
+							</div>
+							<p>{{::item.episode.synopsis}}</p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div ng-if="upcoming.length==0">
+				No upcoming episodes
+			</div>
+		</div>
+	</div>

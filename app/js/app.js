@@ -5,7 +5,7 @@ define('app', ['angular','moment','ngAnimate','ngMessages','ngResource','ngSocke
 	nessa.config(function($compileProvider,$logProvider,$tooltipProvider,$urlRouterProvider){
 		var debug = (window.location.hostname == 'localhost') ? true : false;
 		$urlRouterProvider.when('/', function($state){
-			$state.transitionTo('dashboard');
+			$state.transitionTo('dashboard.shows');
 		});
 		$logProvider.debugEnabled(debug);
 		$compileProvider.debugInfoEnabled(debug);

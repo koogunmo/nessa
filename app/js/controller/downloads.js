@@ -56,10 +56,11 @@ define(['app'], function(nessa){
 	nessa.run(function($log, $rootScope){
 		$log.info('Module loaded: Downloads');
 		$rootScope.menu.push({
-			path: 'downloads',
-			name: 'Downloads',
-			icon: 'download',
-			order: 40
+			'icon': 'download',
+			'name': 'Downloads',
+			'path': 'downloads',
+			'root': 'downloads',
+			'sort': 40
 		});
 	})
 	
