@@ -28,8 +28,8 @@ module.exports = function(app,db,socket){
 							if (user){
 								require('nodetv-shows').getProgress(user,show.imdb).then(function(){
 									logger.debug('Progress update: %s (%s)', show.name, user.username);
-								}).catch(function(error){
-									if (error) logger.error(error);
+								}).catch(function(e){
+									if (error) logger.error('%s (%s): %s', show.name, user.username, e.error);
 								});
 							}
 						});
@@ -38,6 +38,6 @@ module.exports = function(app,db,socket){
 			}
 		});
 	}
-	setInterval(resync,300000);
+	setInterval(resync, 300000);
 	resync();
 };
