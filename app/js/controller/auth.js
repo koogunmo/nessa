@@ -34,7 +34,7 @@ define(['app'], function(nessa){
 		$scope.login = function(){
 			$auth.login($scope.user.username, $scope.user.password, !!$scope.user.remember).then(function(json){
 				$log.info('Authentication: Success');
-				$state.go('dashboard');
+				$state.go('dashboard.shows');
 			}, function(json){
 				$log.warn('Authentication: Failed');
 				$scope.user = {};
