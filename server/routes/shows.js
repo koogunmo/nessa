@@ -34,7 +34,7 @@ module.exports = function(app, db, socket){
 			shows.getHashes(show.imdb)
 			shows.getProgress(req.user,show.imdb);
 		}).catch(function(error){
-			logger.error(error);
+			if (error) logger.error(error);
 			res.status(404).end();
 		});
 	})
