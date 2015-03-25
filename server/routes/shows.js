@@ -110,7 +110,16 @@ module.exports = function(app, db, socket){
 		});
 	})
 	
-	app.post('/api/shows/:imdb(tt[0-9]+)/download', function(req,res){
+	app.post('/api/shows/:imdb(tt[0-9]+)/checkin', function(req,res){
+		
+		shows.checkin(req.user, req.params.imdb, req.body).then(function(){
+			
+		}, function(error){
+			logger.error(error)
+		});
+		
+		res.status(202).end()
+	}).post('/api/shows/:imdb(tt[0-9]+)/download', function(req,res){
 		shows.getHashes(req.params.imdb).then(function(){
 			shows.download(req.params.imdb, req.body);
 		}, function(error){

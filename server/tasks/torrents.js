@@ -52,6 +52,12 @@ module.exports = function(app,db,socket){
 							if (error) logger.error(error);
 						});
 					}
+					
+					// TODO: Remove all files that have completed seeding
+					if (transfer.seeded){
+					//	logger.debug('Seeding complete: %s', transfer.title);
+					//	torrent.remove(transfer.id,true,trashResponse);	
+					}
 				});
 			});
 		};

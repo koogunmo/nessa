@@ -101,7 +101,7 @@ module.exports = function(app,db,socket){
 		movies.getHashes(req.params.imdb).then(function(hashes){
 			res.send(hashes);
 		}, function(error){
-			res.status(404).end()
+			res.status(404).send(error)
 		});
 	}).get('/api/movies/:imdb(tt[0-9]+)/artwork', function(req,res){
 		// Download torrent

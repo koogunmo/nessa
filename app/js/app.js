@@ -32,10 +32,13 @@ define('app', ['angular','moment','ngAnimate','ngMessages','ngResource','ngSocke
 			}
 		};
 	})
-	.directive('lazyLoad', function($document,$log,$timeout,$window){
+	.directive('lazyLoad', function($log,$timeout,$window){
 		return {
-			restrict: 'AC',
-			link: function($scope,$element,$attr){
+			'restrict':'AC',
+			'link': function($scope,$element,$attr){
+				
+			//	$log.debug($scope.show.directory)
+				
 				var lazyLoad = function(){
 					if ($element.hasClass('lazyLoaded') || $window.innerWidth < 750) return;
 					var height	= $window.innerHeight,
@@ -53,9 +56,20 @@ define('app', ['angular','moment','ngAnimate','ngMessages','ngResource','ngSocke
 					};
 					poster.src = src;
 				};
+				$scope.$on('DataLoaded', function(){
+					lazyLoad();
+				});
 				$timeout(lazyLoad);
 			}
 		};
+	})
+	.directive('lazySrc', function(){
+		return {
+			'restrict': 'A',
+			'link': function($scope,$element,$attr){
+				
+			}
+		}
 	})
 	.directive('updateTitle', function($rootScope,$timeout) {
 		return {
