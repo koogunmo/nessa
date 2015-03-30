@@ -1,5 +1,15 @@
 'use strict';
 
+var log4js = require('log4js');
+log4js.configure({
+	appenders: [{
+		type: 'console'
+	}],
+	replaceConsole: true
+});
+var logger = log4js.getLogger('task-latest');
+
+
 /* Check for new download availability */
 module.exports = function(app,db,socket){
 	try {
